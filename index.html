@@ -4,33 +4,39 @@
     <meta charset="utf-8">
     <title>rockd</title>
     <style>
-    div {
-      width: 550px;
-      height: 150px;
-      position: absolute;
-      top:0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-      color:#777;
-      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-      text-align:center;
+    html, body {
+      height: 100%;
+      width: 100%;
     }
-    div > h1 {
-      font-size: 50px;
-      font-weight: 100;
-      line-height: 1.1;
+    body {
+      background-color: #363434;
+      color: #fff;
+      font-family: "Helvetica Neue","Segoe UI",sans-serif;
+      font-size: 15px;
     }
-    div > p {
-      color:#FF4136;
+    .container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .center {
+      text-align: center;
+    }
+    img {
+      width: 100%;
+      max-width: 500px;
     }
     </style>
   </head>
   <body>
-    <div>
-      <h1>rockd</h1>
-      <p>Coming soon...</p>
+    <div class="container">
+      <div class="center">
+        <img src="./resources/logo_full.png"/>
+        <p>Coming soon...</p>
+      </div>
     </div>
+
   </body>
 </html>
