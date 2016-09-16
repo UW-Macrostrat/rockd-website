@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>rockd</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <style>
     html, body {
       height: 100%;
@@ -14,6 +15,17 @@
       font-family: "Helvetica Neue","Segoe UI",sans-serif;
       font-size: 15px;
     }
+    p {
+      line-height: 20px;
+    }
+    a {
+      color: #fff;
+      font-weight: bold;
+    }
+    a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
     .container {
       height: 100%;
       width: 100%;
@@ -21,20 +33,277 @@
       align-items: center;
       justify-content: center;
     }
+    .headline-alligner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
     .center {
       text-align: center;
+      line-height: 35px;
     }
     img {
       width: 100%;
+    }
+    .not-huge {
       max-width: 500px;
     }
+    .row-eq-height {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display:         flex;
+    }
+    .download-badge {
+      height: 60px;
+      width: auto;
+    }
+    .ios {
+      height: 40px;
+    }
+    .android {
+      filter: grayscale(100%) blur(1px);
+      -webkit-filter: grayscale(100%) blur(1px);
+      cursor: no-drop;
+    }
+    .map-shot {
+      padding: 0;
+      height: 100%;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    .grand_canyon {
+      background-image: url('./dist/img/grand_canyon.jpg');
+    }
+    .new_zealand {
+      background-image: url('./dist/img/new_zealand.jpg');
+    }
+    .world {
+      background-image: url('./dist/img/world.jpg');
+    }
+    .appalachia {
+      background-image: url('./dist/img/appalachia.jpg');
+    }
+    .half-height-row {
+      height: 50%;
+    }
+    .map-container {
+      height: 100%;
+    }
+    .map-container > .row {
+      height: 50%;
+    }
+    .no-padding {
+      padding: 0;
+    }
+    .white-container {
+      background-color: #fff;
+      color: #777;
+    }
+    .white-container a {
+      color: #000;
+      font-weight: bold;
+    }
+    .white-container a:hover {
+      color: #000;
+      text-decoration: underline;
+    }
+    .dashboard-img-container {
+      margin-top: 40px;
+    }
+    .red_rock {
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-image: url('./dist/img/red_rock.jpg');
+    }
+
+    .stats-img {
+      height: 500px;
+      width: auto;
+    }
+    .stats-container {
+      text-align: center;
+    }
+
+    .record-block {
+      padding-top: 40px;
+      padding-bottom: 40px;
+      padding-right: 20px;
+      padding-left: 20px;
+      overflow-x: hidden;
+    }
+    .record-img {
+      height: 500px;
+      width: auto;
+    }
+    .record-img-caption {
+      margin-top: -35px;
+      font-size: 90%;
+    }
+    .record-img-caption > span {
+      padding: 10px;
+      background-color: rgba(100, 100, 100, 0.5);
+      border-radius: 4px;
+    }
+    .full-width {
+      width: 100%;
+    }
+    .footer-links {
+      list-style: none;
+    }
+    .footer-link-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     </style>
+
   </head>
   <body>
     <div class="container">
-      <div class="center">
-        <img src="./resources/logo_full.png"/>
-        <p>Coming soon...</p>
+      <div class="row row-eq-height">
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <img src="./resources/logo_full.png" class="not-huge"/>
+              <p>Explore, record, and learn about your surrounding geologic world</p>
+              <img src="./dist/img/appstore.png" class="download-badge ios"/>
+              <img src="./dist/img/google-play-badge.png" class="download-badge android"/>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-sm-6">
+          <img src="./dist/img/dashboard-side.png"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="container map-container">
+      <div class="row row-eq-height">
+        <div class="col-sm-7">
+          <div class="row half-height-row">
+            <div class="col-sm-6 map-shot grand_canyon"></div>
+            <div class="col-sm-6 map-shot new_zealand"></div>
+          </div>
+          <div class="row half-height-row">
+            <div class="col-sm-6 map-shot world"></div>
+            <div class="col-sm-6 map-shot appalachia"></div>
+          </div>
+        </div>
+
+        <div class="col-sm-5">
+          <div class="headline-alligner">
+            <div class="center">
+              <h1>Instant access to more than 60 geologic maps</h1>
+              <p>Includes direct links to <a href="https://macrostrat.org">Macrostrat</a> and <a href="https://geodeepdive.org">GeoDeepDive</a> (where available)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container white-container">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <div class="headline-alligner">
+            <div class="center">
+              <h1>Curious what your standing on?</h1>
+              <p>The Dashboard distills everything known about your location into a single, easy-to-read interface</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12 dashboard-img-container">
+          <img src="./dist/img/dashboards.jpg"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="container red_rock">
+      <div class="row row-eq-height">
+        <div class="col-sm-6 stats-container">
+          <img src="./dist/img/stats.png" class="stats-img"/>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <h1>"The best geologist is the one who has seen the most rocks"</h1>
+              <p>Track your progress through the geologic rock record with summary statistics about your checkins</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="record-block">
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <div class="headline-alligner">
+            <div class="center">
+              <h1>Record your observations</h1>
+              <p>Rockd allows you to easy record your observations of outcrops and uses your location to provide intelligent suggestions for rock units, time intervals, and fossils</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <img src="./dist/img/checkin.png" class="record-img"/>
+              <p class="record-img-caption"><span>Take pictures of and rate outcrops</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <img src="./dist/img/formation_name.png" class="record-img"/>
+              <p class="record-img-caption"><span>Tag stratigraphic names, even offline</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <img src="./dist/img/strike_dip.png" class="record-img"/>
+              <p class="record-img-caption"><span>Use your phone's compass to record strike and dip</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="headline-alligner">
+            <div class="center">
+              <img src="./dist/img/taxa.png" class="record-img"/>
+              <p class="record-img-caption"><span>Search for and tag taxa. Recommendations based on your location</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container half-height-row white-container">
+      <div class="row full-width row-eq-height">
+        <div class="col-sm-8">
+          <h3>Produced by the <br><a href="https://macrostrat.org">UW Macrostrat Lab</a></h3>
+
+          <h3>Funded by <br> <a href="http://nsf.gov">NSF</a> <br> and <br> <a href="http://geoscience.wisc.edu/geoscience/">UW Geoscience</a></h3>
+        </div>
+        <div class="col-sm-4">
+          <div class="footer-link-container">
+            <ul class="footer-links">
+              <li><a href="#">Home</a></li>
+              <li><a href="/privacy">Privacy policy</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
