@@ -149,6 +149,9 @@
     .full-width {
       width: 100%;
     }
+    .full-height {
+      height: 100%;
+    }
     .footer-links {
       list-style: none;
     }
@@ -163,33 +166,50 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-image: url('./dist/img/field.jpg');
+      padding: 0;
+    }
+    .mask {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      background-color: rgba(0,0,0,0.6);
+    }
+    .center-me {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     </style>
 
   </head>
   <body>
     <div class="container field">
-      <div class="row row-eq-height">
-        <div class="col-sm-6">
-          <div class="headline-alligner">
-            <div class="center">
-              <img src="./resources/logo_full.png" class="not-huge"/>
-              <p>Explore, record, and learn about your surrounding geologic world</p>
-              <img src="./dist/img/appstore.png" class="download-badge ios"/>
-              <img src="./dist/img/google-play-badge.png" class="download-badge android"/>
+      <div class="mask">
+        <div class="row row-eq-height">
+          <div class="col-sm-6 center-me">
+            <div class="headline-alligner">
+              <div class="center">
+                <img src="./resources/logo_full.png" class="not-huge"/>
+                <p>Explore, record, and learn about your surrounding geologic world</p>
+                <img src="./dist/img/appstore.png" class="download-badge ios"/>
+                <img src="./dist/img/google-play-badge.png" class="download-badge android"/>
+              </div>
             </div>
-          </div>
 
-        </div>
-        <div class="col-sm-6">
-          <img src="./dist/img/dashboard-side.png"/>
+          </div>
+          <div class="col-sm-6">
+            <img src="./dist/img/main.png"/>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="container map-container">
       <div class="row row-eq-height">
-        <div class="col-sm-7">
+        <div class="col-sm-7 full-height">
           <div class="row half-height-row">
             <div class="col-sm-6 map-shot grand_canyon"></div>
             <div class="col-sm-6 map-shot new_zealand"></div>
@@ -200,7 +220,7 @@
           </div>
         </div>
 
-        <div class="col-sm-5">
+        <div class="col-sm-5 center-me">
           <div class="headline-alligner">
             <div class="center">
               <h1>Instant access to more than 60 geologic maps</h1>
@@ -233,7 +253,7 @@
           <img src="./dist/img/stats.png" class="stats-img"/>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-6 center-me">
           <div class="headline-alligner">
             <div class="center">
               <h1>"The best geologist is the one who has seen the most rocks"</h1>
