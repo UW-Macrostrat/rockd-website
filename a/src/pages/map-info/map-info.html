@@ -1,0 +1,111 @@
+<ion-content class="padding">
+  <ion-card class="xyz-card">
+    <ion-item class="map-xyz">
+      <span class="map-xyz-label">x, y, z</span>
+      {{ mapInfo.lng }}, {{ mapInfo.lat }}, {{ mapInfo.elevation + 'm' + ' / ' + (mapInfo.elevation * 3.28084).toFixed(0) + 'ft'}}
+    </ion-item>
+  </ion-card>
+
+  <ion-card *ngFor="let b of mapInfo.burwell">
+    <ion-card-content>
+      <h2 class="title-two">{{ b.name }}</h2>
+      <p class="info-attr">
+        <strong>Age: </strong>
+        {{ b.t_int_name === b.b_int_name ? b.t_int_name : b.b_int_name + ' - ' + b.t_int_name}}
+        ({{ b.b_int_age }} - {{ b.t_int_age }} <small> Ma</small>)
+      </p>
+
+
+      <p class="info-attr" [hidden]="!b.strat_name.length">
+        <strong>Stratigraphic name: </strong>{{ b.strat_name }}
+      </p>
+
+      <p class="info-attr" [hidden]="!b.descrip.length">
+        <strong>Description: </strong>{{ b.descrip }}
+      </p>
+
+      <p class="info-attr" [hidden]="!b.comments.length">
+        <strong>Comments: </strong>{{ b.comments }}
+      </p>
+
+      <p class="info-attr" [hidden]="!b.lith.length">
+        <strong>Lithology: </strong>{{ b.lith }}
+      </p>
+
+      <p class="info-attr reference" [hidden]="!b.ref">
+        <strong>Reference: </strong>
+        {{ b.ref.authors }}, <span [hidden]="!b.ref.ref_year.length">{{ b.ref.ref_year }}, </span><a class="reference-url" href="{{ b.ref.url }}">{{ b.ref.ref_title }}</a><span [hidden]="!b.ref.ref_source.length">: {{ b.ref.ref_source }}</span><span [hidden]="!b.ref.isbn_doi.length">, {{ b.ref.isbn_doi }}</span>.
+      </p>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat)">
+    <ion-card-content>
+      <h2 class="title-two">{{mapInfo.macrostrat.rank_names}}</h2>
+      <p class="info-attr">
+        <strong>Age: </strong>{{mapInfo.macrostrat.uniqueIntervals}} - ({{ mapInfo.macrostrat.b_age }} - {{ mapInfo.macrostrat.t_age}} <small> Ma</small>)
+      </p>
+
+      <p class="info-attr">
+        <strong>Thickness: </strong>≤ {{ mapInfo.macrostrat.max_thick }} <small>m</small>
+      </p>
+
+      <p class="info-attr">
+        <strong>PBDB Collections: </strong> {{ mapInfo.macrostrat.pbdb_collections}}
+      </p>
+
+      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.lith.length">
+        <strong>Lithology: </strong> <span *ngFor="let lith of mapInfo.macrostrat.lith">{{lith.name}} - {{(lith.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
+      </p>
+
+      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.environ.length">
+        <strong>Environment: </strong> <span *ngFor="let environ of mapInfo.macrostrat.environ">{{environ.name}} - {{(environ.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
+      </p>
+
+      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.econ.length">
+        <strong>Economic: </strong> <span *ngFor="let econ of mapInfo.macrostrat.econ">{{econ.name}} - {{(econ.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
+      </p>
+
+      <p class="info-attr reference">
+        <strong>Reference: </strong><a class="reference-url" href="https://macrostrat.org">Macrostrat.org</a>
+      </p>
+
+    </ion-card-content>
+  </ion-card>
+
+
+  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.rank_names.length">
+    <ion-card-content>
+      <ion-item class="literature-header pull-left">
+        <h2 class="title-two">Literature</h2>
+        <small>Relevant articles for this location</small>
+      </ion-item>
+
+      <div class="loading" [hidden]="mapInfo.literature.journals.length">
+        <ion-spinner name="dots"></ion-spinner>
+        <p><small>Loading literature from GeoDeepdDive...</small></p>
+      </div>
+
+      <ion-list>
+        <ion-item *ngFor="let journal of mapInfo.literature.journals" class="item-text-wrap pull-left">
+          <div class="journal-title">
+            <h2 class="title-two">{{ journal.name }}</h2>
+          </div>
+          <div class="reference" *ngFor="let article of journal.articles">
+            {{ article.authors ? article.authors : 'Unknown' }}, <span [hidden]="!article.year">{{ article.year }}. </span><a class="reference-url" href="{{ article.url }}">{{ article.title }}</a>: {{ article.source }}.
+          </div>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <button ion-button icon-right (click)="dismiss()" outline full clear class="close-button">
+      Close <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-toolbar>
+</ion-footer>

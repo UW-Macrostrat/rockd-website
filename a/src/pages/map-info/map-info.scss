@@ -1,0 +1,57 @@
+map-info {
+  .xyz-card {
+    margin: 25px 10px 10px 10px;
+  }
+  .map-xyz {
+    color: #aaa;
+    text-align: right;
+    font-size: 12px;
+  }
+  .map-xyz-label {
+    float: left;
+  }
+  .title-two {
+    font-size: 1.4em;
+    line-height: 1.2em;
+  }
+  .info-attr {
+    margin: 0;
+    margin-bottom: 2px;
+    font-size: 14px;
+    line-height: 23px;
+  }
+  .info-attr a {
+    color: inherit;
+    text-decoration: none;
+  }
+  strong {
+    color: orange;
+  }
+
+  small {
+    color: #bbb;
+  }
+  .reference-url {
+    font-weight: 400;
+    text-decoration: none;
+    color: inherit;
+  }
+  .reference {
+    line-height: 16px;
+    margin-top: 10px;
+    font-size: 12px !important;
+    white-space: normal;
+  }
+  .pull-left {
+    padding-left: 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .loading {
+    text-align: center;
+    margin-top: 10px;
+  }
+  .leaflet-marker-pane {
+    z-index: 200;
+  }
+
+}

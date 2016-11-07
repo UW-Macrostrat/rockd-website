@@ -1,0 +1,14 @@
+home-page {
+  .home {
+    padding:0;
+    margin:0;
+  }
+  .home > scroll-content {
+    padding: 0;
+  }
+  #map {
+    position:absolute;
+    width:100%;
+    height:100%;
+  }
+}
