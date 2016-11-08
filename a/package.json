@@ -1,11 +1,13 @@
 {
-  "name": "ionic-hello-world",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "name": "rockd-web",
+  "author": "John J Czaplewski",
+  "homepage": "https://rockd.org",
   "private": true,
   "scripts": {
     "build": "ionic-app-scripts build",
     "watch": "ionic-app-scripts watch",
+    "bundle": "ionic-app-scripts bundle",
+    "uglifyjs": "ionic-app-scripts uglifyjs",
     "serve:before": "watch",
     "emulate:before": "build",
     "deploy:before": "build",
@@ -26,11 +28,13 @@
     "ionic-angular": "^2.0.0-rc.1",
     "ionic-native": "^2.2.3",
     "ionicons": "^3.0.0",
+    "leaflet": "^1.0.1",
+    "leaflet.markercluster": "^1.0.0",
     "rxjs": "5.0.0-beta.12",
     "zone.js": "^0.6.21"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "^0.0.36",
+    "@ionic/app-scripts": "0.0.41",
     "typescript": "^2.0.3"
   },
   "cordovaPlugins": [
@@ -41,13 +45,6 @@
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard"
   ],
-  "cordovaPlatforms": [
-    "ios",
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
-  ],
-  "description": "ionic-website-rc: An Ionic project"
+  "cordovaPlatforms": [],
+  "description": "rockd-web: web interface for rockd"
 }
