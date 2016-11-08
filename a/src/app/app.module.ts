@@ -15,8 +15,7 @@ import { Settings } from '../services/settings.service'
 
 export const deepLinkConfig: DeepLinkConfig = {
   links: [
-  //  { component: TabsPage, name: 'Tabs', segment: '' },
-    { component: HomePage, name: 'Home Page', segment: '' },
+    { component: HomePage, name: 'Home Page', segment: 'map' },
     { component: AboutPage, name: 'About Page', segment: 'about' },
     { component: ContactPage, name: 'Contact Page', segment: 'contact' },
   ]
