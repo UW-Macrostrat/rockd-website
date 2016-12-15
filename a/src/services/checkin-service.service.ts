@@ -1,8 +1,8 @@
-import { Injectable, Inject } from '@angular/core';
-import { Http } from '@angular/http';
+import { Injectable } from '@angular/core'
+import { Http } from '@angular/http'
 import { Settings } from './settings.service'
 
-import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/toPromise'
 
 @Injectable()
 
@@ -22,10 +22,10 @@ export class CheckinService {
       return hex
     }
 
-    var bigint = parseInt(hex, 16);
-    var r = (bigint >> 16) & 255;
-    var g = (bigint >> 8) & 255;
-    var b = bigint & 255;
+    const bigint = parseInt(hex, 16)
+    const r = (bigint >> 16) & 255
+    const g = (bigint >> 8) & 255
+    const b = bigint & 255
 
     return [r, g, b, 0.5].join(', ')
   }
@@ -72,7 +72,7 @@ export class CheckinService {
   }
 
   getMap(callback) {
-    this.http.get(Settings.APIURL + '/protected/map-checkins')
+    this.http.get(`${Settings.APIURL}/protected/map-checkins`)
       .toPromise()
       .then(response => callback(null, response.json()))
       .catch(error => callback(error, null))
@@ -124,6 +124,8 @@ export class CheckinService {
     if (checkin.checkin_id && !isNaN(checkin.checkin_id)) {
       checkin.checkin_id = 'chk|' + checkin.checkin_id
     }
+    checkin.photo_id = (parseInt(checkin.photo) === checkin.photo) ? checkin.photo : 0
+
     // If the checkin has an integer photo_id
     if (parseInt(checkin.photo) === checkin.photo) {
       checkin.thumb = this.ImageURL(checkin.person_id, checkin.photo, 'thumb', user.token)
@@ -132,9 +134,10 @@ export class CheckinService {
       // Make the default photo the full photo URL
       checkin.photo = checkin.full
     }
+
     // If it has a blob URL or no photo, ignore it
 
-    checkin.photo_id = (parseInt(checkin.photo) === checkin.photo) ? checkin.photo : 0
+
     checkin.ownedByUser = checkin.person_id == user.person_id ? true : false
 
     // Mostly for handling unsynced checkins that don't already have this data
@@ -215,6 +218,13 @@ export class CheckinService {
       })
     }
 
+    if (observation.photo) {
+      observation.thumb = this.ImageURL(person_id, observation.photo, 'thumb', user.token)
+      observation.banner = this.ImageURL(person_id, observation.photo, 'banner', user.token)
+      observation.full = this.ImageURL(person_id, observation.photo, 'full', user.token)
+    }
+
+    // This can be deleted...?
     if (Object.keys(observation.rocks).length && parseInt(observation.rocks.photo) === observation.rocks.photo) {
       observation.rocks.thumb = this.ImageURL(person_id, observation.rocks.photo, 'thumb', user.token)
       observation.rocks.banner = this.ImageURL(person_id, observation.rocks.photo, 'banner', user.token)

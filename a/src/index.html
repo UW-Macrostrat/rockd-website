@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <!-- <base href="/"> -->
-  <script>document.write('<base href="' + document.location + '" />');</script>
+  <base href="">
+  <!-- <script>document.write('<base href="' + document.location + '" />');</script> -->
   <meta charset="UTF-8">
   <title>Rockd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,7 +16,8 @@
   <link rel="stylesheet" href="assets/css/leaflet.css" />
   <link rel="stylesheet" href="assets/css/MarkerCluster.css"/>
   <link rel="stylesheet" href="assets/css/MarkerCluster.Default.css"/>
-  <link href="build/main.css" rel="stylesheet">
+  <link rel="stylesheet"href="assets/css/mapbox-gl.css" />
+  <link rel="stylesheet" href="build/main.css"/>
 
 </head>
 <body>
@@ -25,6 +26,8 @@
   <ion-app></ion-app>
   <script src="assets/js/leaflet.js"></script>
   <script src="assets/js/leaflet.markercluster.js"></script>
+  <script src="assets/js/leaflet-hash.js"></script>
+  <script src='assets/js/mapbox-gl.js'></script>
   <!-- The polyfills js is generated during the build process -->
   <script src="build/polyfills.js"></script>
 
