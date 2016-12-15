@@ -1,12 +1,12 @@
-home-page {
-  .home {
+map {
+  .map-container {
     padding:0;
     margin:0;
   }
-  .home > scroll-content {
+  .map-container > scroll-content {
     padding: 0;
   }
-  #main-map {
+  #the-map {
     position:absolute;
     width:100%;
     height:100%;

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Settings } from './settings.service'
 
@@ -37,9 +37,9 @@ export class MacrostratService {
         // Group articles by journal
         for (let i = 0; i < data.length; i++) {
           data[i].url = (data[i].URL.indexOf('elsevier') > -1) ? 'http://www.sciencedirect.com/science/article/pii/' + data[i].URL.split('pii/')[1] : data[i].URL
-          var found = false
+          let found = false
           data[i].year = (data[i].coverDate) ? data[i].coverDate.match(/\d{4}/)[0] : ''
-          for (var j = 0; j < parsed.journals.length; j++) {
+          for (let j = 0; j < parsed.journals.length; j++) {
             if (parsed.journals[j].name === data[i].pubname) {
               parsed.journals[j].articles.push(data[i])
               found = true

@@ -1,11 +1,11 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { CheckinService } from '../../services/checkin-service.service';
-import { MacrostratService } from '../../services/macrostrat.service';
-import { ModalController } from 'ionic-angular'
-import { CheckinInfoModal } from '../checkin-info/checkin-info-modal';
-import { MapInfoModal } from '../map-info/map-info';
+import { Component } from '@angular/core'
+import { CheckinService } from '../../services/checkin-service.service'
+import { MacrostratService } from '../../services/macrostrat.service'
+import { ModalController, NavController } from 'ionic-angular'
+import { MapInfoModal } from '../map-info/map-info'
 
-import { AboutPage } from '../about/about';
+import { AboutPage } from '../about/about'
+import { CheckinPage } from '../checkin-page/checkin-page'
 
 // Ignore typings for Leaflet...it's a huge unnecessary pain
 declare const L
@@ -16,14 +16,16 @@ declare const L
 })
 
 export class HomePage {
-  mapInfo
+  public mapInfo
+  public map
 
-  aboutPage = AboutPage;
+  public aboutPage = AboutPage
 
   constructor(
     public checkinService: CheckinService,
     public macrostratService: MacrostratService,
-    public modalCtrl: ModalController
+    public modalCtrl: ModalController,
+    public navCtrl: NavController
   ) {
     this.mapInfo = {
       macrostrat: {},
@@ -35,17 +37,34 @@ export class HomePage {
     }
   }
 
+  ionViewDidLeave() {
+  //  console.log('remove')
+  //  this.map.remove()
+  }
+
+  ionViewDidEnter() {
+//    console.log('ionViewDidEnter')
+  //  this.initMap()
+  }
+
   ngAfterViewInit() {
-    const map = L.map('map', {
+    this.initMap()
+  }
+
+  initMap() {
+    if (this.map) {
+      return
+    }
+    this.map = L.map('main-map', {
       maxZoom: 14
     }).setView([30, -12], 3)
-  //  var hash = new L.Hash(map)
+
     // add tile layer
 
     let geologyTiles = L.tileLayer(`https://macrostrat.org/api/v2/maps/burwell/emphasized/{z}/{x}/{y}/tile.png`, {
       opacity: 0.5,
       zIndex: 100
-    }).addTo(map)
+    }).addTo(this.map)
 
     // let basemapTiles = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
     //   attribution: '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
@@ -55,14 +74,14 @@ export class HomePage {
     let basemapTiles = L.tileLayer('https://api.mapbox.com/styles/v1/jczaplewski/cigmamq4n000xaaknfpuj1zdk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg', {
       attribution: '© <a href="https://www.mapbox.com/about/maps/" target="_blank">Mapbox</a><span> © <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a></span><span> © <a href="https://www.digitalglobe.com/" target="_blank">DigitalGlobe</a></span>',
       zIndex: 1
-    }).addTo(map)
+    }).addTo(this.map)
 
 
-    setTimeout(function() {
-      map.invalidateSize(true)
+    setTimeout(() => {
+      this.map.invalidateSize(true)
     }, 100)
 
-    const points = L.featureGroup().addTo(map)
+    const points = L.featureGroup().addTo(this.map)
     const clusters = L.markerClusterGroup({
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true
@@ -75,12 +94,12 @@ export class HomePage {
         iconSize: [25,41],
         iconAnchor: [12, 41]
       })
-    }).addTo(map)
+    }).addTo(this.map)
 
-    map.on('click', (event) => {
-      infoMarker.setLatLng(event.latlng).addTo(map)
+    this.map.on('click', (event) => {
+      infoMarker.setLatLng(event.latlng).addTo(this.map)
 
-      let z = map.getZoom()
+      let z = this.map.getZoom()
       this.macrostratService.queryMap(event.latlng, z, (error, data) => {
         if (error) { console.log(error) }
 
@@ -101,7 +120,7 @@ export class HomePage {
 
     this.checkinService.getMap((error, data) =>
       data.features.forEach(d => {
-        var marker = L.circleMarker([d.geometry.coordinates[1], d.geometry.coordinates[0]], {
+        let marker = L.circleMarker([d.geometry.coordinates[1], d.geometry.coordinates[0]], {
           radius: 1,
           // stroke
           color: '#ffffff',
@@ -117,11 +136,12 @@ export class HomePage {
         marker.on('click', event => {
           L.DomEvent.stopPropagation(event)
 
-          this.checkinService.get({
-            checkin_id: event.target.options.checkin_id
-          }, null, (error, result) => {
-            this.openModal(result[0])
-          })
+          this.navCtrl.push(CheckinPage, { checkin_id: event.target.options.checkin_id })
+          // this.checkinService.get({
+          //   checkin_id: event.target.options.checkin_id
+          // }, null, (error, result) => {
+          //   this.openModal(result[0])
+          // })
         })
 
         points.addLayer(marker)
@@ -129,27 +149,29 @@ export class HomePage {
       })
     )
 
-    map.on('zoomstart, movestart', function() {
-      map.removeLayer(infoMarker)
+    this.map.on('zoomstart, movestart', () => {
+      this.map.removeLayer(infoMarker)
     })
 
-
+    this.map.on('viewreset', () => {
+      console.log('viewreset')
+    })
     // style
-    map.on('zoomend', function() {
-      let z = map.getZoom()
+    this.map.on('zoomend', () => {
+      let z = this.map.getZoom()
       if (z >= 12) {
-        if (map.hasLayer(points)) {
-          map.removeLayer(points)
-          map.addLayer(clusters)
+        if (this.map.hasLayer(points)) {
+          this.map.removeLayer(points)
+          this.map.addLayer(clusters)
         }
       }
       if (z < 12) {
-        if (map.hasLayer(clusters)) {
-          map.removeLayer(clusters)
-          map.addLayer(points)
+        if (this.map.hasLayer(clusters)) {
+          this.map.removeLayer(clusters)
+          this.map.addLayer(points)
         }
       }
-      var style = {}
+      let style = {}
       switch (z) {
         case 0:
         case 1:
@@ -250,10 +272,21 @@ export class HomePage {
 
       points.setStyle(style)
     })
+
+    const hash = new L.Hash(this.map, {
+      baseURI: '#/map/'
+    })
+    let location = window.location.hash.replace('#/map/', '')
+    if (location.length > 3) {
+      let hashLocation = L.Hash.parseHash(location)
+      this.map.setView(hashLocation.center, hashLocation.zoom)
+    }
+
   }
 
   openModal(checkin) {
-    this.modalCtrl.create(CheckinInfoModal, {checkin: checkin }).present()
+    this.navCtrl.push(CheckinPage, { checkin: checkin, checkin_id: checkin.checkin_id.replace('chk|', '') })
+  //  this.modalCtrl.create(CheckinInfoModal, {checkin: checkin }).present()
   }
   openMapInfoModal() {
     this.modalCtrl.create(MapInfoModal, {mapInfo: this.mapInfo}).present()

@@ -3,7 +3,7 @@ map-info {
     margin: 25px 10px 10px 10px;
   }
   .map-xyz {
-    color: #aaa;
+    color: #333333;
     text-align: right;
     font-size: 12px;
   }
@@ -25,7 +25,7 @@ map-info {
     text-decoration: none;
   }
   strong {
-    color: orange;
+    color: #555;
   }
 
   small {
@@ -53,5 +53,7 @@ map-info {
   .leaflet-marker-pane {
     z-index: 200;
   }
-
+  .close-button {
+	  color: #333;
+	}
 }

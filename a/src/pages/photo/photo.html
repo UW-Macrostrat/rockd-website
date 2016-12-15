@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar color="clear">
+    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
+    <ion-buttons end>
+      <button ion-button [navPush]="aboutPage">About</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="slide-container">
+    <ion-slides (ionDidChange)="onSlideChanged()" #photoSlider [options]="options" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
+      <ion-slide *ngFor="let photo of photos">
+        <div class="photo-holder">
+          <div class="photo-caption">
+            <div class="photo-caption-inner">
+              {{ photoData[photo].title ? photoData[photo].title : 'Placeholder' }}
+            </div>
+          </div>
+          <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo || ''}` class="swiper-image"/>
+          <!-- <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/> -->
+        </div>
+      </ion-slide>
+    </ion-slides>
+  </div>
+</ion-content>

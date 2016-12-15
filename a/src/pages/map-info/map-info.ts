@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
-import { NavParams, Platform, ViewController } from 'ionic-angular'
-import { Settings } from '../../services/settings.service'
+import { NavParams, ViewController } from 'ionic-angular'
 
 @Component({
   selector: 'map-info',
@@ -8,10 +7,9 @@ import { Settings } from '../../services/settings.service'
 })
 
 export class MapInfoModal {
-  mapInfo;
+  public mapInfo
 
   constructor(
-    public platform: Platform,
     public params: NavParams,
     public viewCtrl: ViewController
   ) {

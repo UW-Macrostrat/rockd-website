@@ -1,0 +1,169 @@
+checkin-page {
+	checkin-page {
+		width: 100%;
+	}
+	.checkin-page-content {
+		max-width: 900px;
+		margin: 0 auto;
+		position: relative;
+	}
+	.main-banner {
+		height: 225px;
+		position: relative;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+	.banner-info {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+		color: #ffffff;
+	}
+	.banner-inner {
+		height: 100%;
+		padding: 10px;
+		display: flex;
+		align-items: center;
+	}
+	.banner-avatar {
+		padding: 20px;
+	}
+	.huge-avatar {
+		max-height: 150px !important;
+		max-width: 150px !important;
+		border-radius: 75px !important;
+	}
+	.banner-name {
+		font-weight: 900;
+		font-size: 25px;
+	}
+	.banner-date {
+		margin-top: -10px;
+		font-size: 16px;
+		font-weight: 400;
+	}
+	.banner-near {
+		margin-top: -10px;
+		font-size: 14px;
+	}
+	.checkin-title {
+		color: #777777;
+		font-size: 32px;
+		padding: 20px;
+		font-weight: 300;
+	}
+	.checkin-subtitle {
+		display: flex;
+		align-items: center;
+		color: #333333;
+	}
+	.n-likes {
+		margin-left: 5px;
+	}
+
+	.banner-mask {
+		position: absolute;
+		width: 100%;
+		height: 263px;
+		margin-top: 5px;
+		background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+		color: #ffffff;
+	}
+	.no-background-color {
+		background-color: rgba(0,0,0,0);
+	}
+	.banner-mask .no-background-color {
+		color: #fff;
+	}
+	#checkin-map {
+		height: 250px;
+		width: 100%;
+	}
+	.checkin-map-title {
+		font-size: 14px;
+	}
+	::-webkit-scrollbar,
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+
+	.active {
+	  font-weight: 200;
+	  color: #777;
+	}
+	.wrap {
+		white-space: initial;
+	}
+
+	.notes-container {
+	  font-size: 14px;
+	  margin-left: -1px;
+	}
+	.observation-notes {
+	  min-height: 30px;
+	  margin-left: -1px;
+	  padding: 8px 0;
+	  white-space: normal;
+	  padding-left: 5px;
+	}
+	.observation-notes::-webkit-input-placeholder {
+	  color: #777;
+	}
+	.checkin-time, .checkin-lithologies {
+	  padding: 0;
+	  font-size: 30px;
+	}
+	.checkin-time.inactive, .checkin-lithologies.inactive {
+	  color: #888;
+	}
+	.checkin-time.inactive, .checkin-lithologies.inactive, .observation-location-container {
+	  font-size: 30px;
+	  color: #777;
+	  padding: 15px 0;
+	}
+	.checkin-attributes {
+	  padding: 10px;
+	  font-size: 14px;
+	  border-radius: 4px;
+	  line-height: 18px;
+	  white-space: initial;
+	  display: table;
+	  margin-top: 2px;
+	}
+	.observation-attribute:first-of-type {
+	  margin: 0;
+	}
+	.orientation-attribute {
+		border: 1px solid #aaaaaa;
+	}
+
+	.checkin-view-taxa {
+		font-size: 14px;
+	}
+	.taxon-thumb {
+		height: 20px !important;
+		width: 20px !important;
+	}
+
+	.checkin-info-observations {
+		// border-bottom: 1px solid #ddd;
+		border-bottom: 0;
+	}
+	ion-card-content [class~='checkin-info-observations']:only-of-type {
+		border-bottom: 0 !important;
+		margin-bottom: -5px;
+	}
+	.checkin-info-observations > ion-item {
+		border: 0;
+		margin: 0 !important;
+	}
+	ion-list .item .item-inner {
+	  border-bottom: 0 !important;
+	}
+	ion-thumbnail img {
+	  max-width: 80px;
+	  max-height: 80px;
+	}
+}
