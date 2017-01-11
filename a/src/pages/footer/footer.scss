@@ -1,0 +1,26 @@
+footer {
+  
+  .white-container {
+    background-color: #fff;
+    color: #777;
+  }
+  .white-container a {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  .white-container a:hover {
+    color: #000;
+    text-decoration: underline;
+  }
+  .footer-links {
+    list-style: none;
+  }
+  .footer-link-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

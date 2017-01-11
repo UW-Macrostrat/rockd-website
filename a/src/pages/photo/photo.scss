@@ -31,5 +31,36 @@ photo {
     width: 100%;
     background-color: rgba(255,255,255,0.8);
     color: #333333;
+    line-height: 30px;
+  }
+  .checkin-attributes {
+    display: inline;
+  }
+  .checkin-attribute {
+    border: 1px solid #aaa;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 5px;
+    white-space: nowrap;
+    margin-top: 5px;
+    display: inline-block;
+  }
+  .checkin-title {
+    font-size: 12px;
+  }
+	.taxon-thumb {
+		height: 20px !important;
+		width: 20px !important;
+    vertical-align: middle;
+	}
+  .mineral-formula {
+    font-size: 70%;
+  }
+  .notes {
+    font-size: 12px;
+    margin-left: 5px;
+    margin-top: 5px;
+    line-height: 15px;
   }
 }

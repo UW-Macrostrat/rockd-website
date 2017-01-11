@@ -72,9 +72,52 @@ export class CheckinService {
   }
 
   getMap(callback) {
-    this.http.get(`${Settings.APIURL}/protected/map-checkins`)
+    this.http.get(`${Settings.APIURL}/protected/checkins?all=true&format=geojson`)
       .toPromise()
-      .then(response => callback(null, response.json()))
+      .then(response => { return response.json() })
+      .then(json => {
+        json.success.data.features = json.success.data.features.map(d => {
+          d.properties.geom = d.geometry
+          d.properties = this.process(d.properties, {token: null, first_name: '', last_name: '' })
+          d.properties.likes = parseInt(d.properties.likes)
+          d.properties.createdParsed = Date.parse(d.properties.created)
+          d.properties.addedParsed = Date.parse(d.properties.added)
+          d.properties.n_obs = d.properties.observations.length
+
+          d.properties.strat_name_ids = d.properties.observations.map(j => {
+            if (Object.keys(j.rocks).length && Object.keys(j.rocks.strat_name).length) {
+              return j.rocks.strat_name.strat_name_id
+            }
+          }).filter(j => { if (j) return j })
+
+          d.properties.lith_ids = [].concat.apply([], d.properties.observations.map(j => {
+            if (Object.keys(j.rocks).length && j.rocks.liths.length) {
+              return j.rocks.liths.map(q => { return q.lith_id })
+            }
+          })).filter(j => { if (j) return j })
+
+          d.properties.mineral_ids = [].concat.apply([], d.properties.observations.map(j => {
+            if (Object.keys(j.minerals).length && j.minerals.minerals) {
+              return j.minerals.minerals.map(q => { return q.mineral_id })
+            }
+          })).filter(j => { if (j) return j })
+
+          let structure_ids = d.properties.observations.map(j => {
+            if (Object.keys(j.orientation).length && j.orientation.feature) {
+              return j.orientation.feature.structure_id
+            }
+          }).filter(j => { if (j) return j })
+
+          d.properties.age_ranges = d.properties.observations.map(j => {
+            if (j.hasOwnProperty('age_est')) {
+              return [ j.age_est.b_age, j.age_est.t_age ]
+            }
+          }).filter(j => { if (j) return j })
+
+          return d
+        })
+        callback(null, json.success.data)
+      })
       .catch(error => callback(error, null))
   }
 
@@ -225,18 +268,18 @@ export class CheckinService {
     }
 
     // This can be deleted...?
-    if (Object.keys(observation.rocks).length && parseInt(observation.rocks.photo) === observation.rocks.photo) {
-      observation.rocks.thumb = this.ImageURL(person_id, observation.rocks.photo, 'thumb', user.token)
-      observation.rocks.banner = this.ImageURL(person_id, observation.rocks.photo, 'banner', user.token)
-      observation.rocks.full = this.ImageURL(person_id, observation.rocks.photo, 'full', user.token)
-      observation.rocks.photo = observation.rocks.full
-    }
-    if (Object.keys(observation.fossils).length && parseInt(observation.fossils.photo) === observation.fossils.photo) {
-      observation.fossils.thumb = this.ImageURL(person_id, observation.fossils.photo, 'thumb', user.token)
-      observation.fossils.banner = this.ImageURL(person_id, observation.fossils.photo, 'banner', user.token)
-      observation.fossils.full = this.ImageURL(person_id, observation.fossils.photo, 'full', user.token)
-      observation.fossils.photo = observation.fossils.full
-    }
+    // if (Object.keys(observation.rocks).length && parseInt(observation.rocks.photo) === observation.rocks.photo) {
+    //   observation.rocks.thumb = this.ImageURL(person_id, observation.rocks.photo, 'thumb', user.token)
+    //   observation.rocks.banner = this.ImageURL(person_id, observation.rocks.photo, 'banner', user.token)
+    //   observation.rocks.full = this.ImageURL(person_id, observation.rocks.photo, 'full', user.token)
+    //   observation.rocks.photo = observation.rocks.full
+    // }
+    // if (Object.keys(observation.fossils).length && parseInt(observation.fossils.photo) === observation.fossils.photo) {
+    //   observation.fossils.thumb = this.ImageURL(person_id, observation.fossils.photo, 'thumb', user.token)
+    //   observation.fossils.banner = this.ImageURL(person_id, observation.fossils.photo, 'banner', user.token)
+    //   observation.fossils.full = this.ImageURL(person_id, observation.fossils.photo, 'full', user.token)
+    //   observation.fossils.photo = observation.fossils.full
+    // }
 
     if (Object.keys(observation.orientation).length) {
       if (observation.orientation.strike != null) {

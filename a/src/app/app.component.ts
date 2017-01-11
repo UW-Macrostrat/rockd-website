@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { Platform } from 'ionic-angular';
- import { HomePage } from '../pages/home/home';
+ import { NewHomePage } from '../pages/new-home/new-home';
 
 
 @Component({
   template: `<ion-nav [root]="rootPage"></ion-nav>`
 })
 export class MyApp {
-  rootPage = HomePage;
+  rootPage = NewHomePage
 
   constructor(platform: Platform) {
     platform.ready().then(() => {

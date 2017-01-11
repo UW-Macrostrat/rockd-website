@@ -59,4 +59,28 @@ export class MacrostratService {
       })
       .catch(error => callback(error, null))
   }
+
+  autocomplete(query, callback) {
+    this.http.get(`${Settings.MACROSTRATURL}/defs/autocomplete?include=strat_name_concepts,strat_name_orphans,lithologies,intervals,minerals,structures&query=${query}`)
+      .toPromise()
+      .then(response => { return response.json() })
+      .then(json => callback(null, json.success.data))
+      .catch(error => callback(error, null))
+  }
+
+  defineInterval(int_id, callback) {
+    this.http.get(`${Settings.MACROSTRATURL}/defs/intervals?int_id=${int_id}`)
+      .toPromise()
+      .then(response => { return response.json() })
+      .then(json => callback(null, json.success.data))
+      .catch(error => callback(error, null))
+  }
+
+  defineStratName(id, type, callback) {
+    this.http.get(`${Settings.MACROSTRATURL}/defs/strat_names?${type === 'strat_name_concept' ? 'concept_id' : 'strat_name_id'}=${id}&rule=down`)
+      .toPromise()
+      .then(response => { return response.json() })
+      .then(json => callback(null, json.success.data))
+      .catch(error => callback(error, null))
+  }
 }

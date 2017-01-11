@@ -21,6 +21,7 @@ export class PhotoPage {
   public photos
   public checkin
   public photoData
+  public PBDBURL
   public loading = true
 
   public options = {
@@ -36,6 +37,7 @@ export class PhotoPage {
     public appCtrl: App
   ) {
     this.photos = []
+    this.PBDBURL = Settings.PBDBURL
   }
 
   ionViewDidEnter() {
@@ -57,6 +59,19 @@ export class PhotoPage {
     }
   }
 
+  hasKeys(obj) {
+    if (!obj) {
+      return false
+    }
+    return (Object.keys(obj).length > 0) ? true : false
+  }
+  hasKey(obj, key) {
+    if (Object.keys(obj).indexOf(key) > -1) {
+      return true
+    }
+    return false
+  }
+
   setup(fresh) {
     let photos = [ this.checkin.photo_id ].concat(this.checkin.observations.map(d => { return d.photo }))
     photos = photos.filter(d => { if (d) return d })
@@ -66,6 +81,8 @@ export class PhotoPage {
     this.photoData[this.checkin.photo_id] = {
       title: this.checkin.notes
     }
+
+    console.log(this.photoData)
 
     this.checkin.observations.forEach(obs => {
       if (obs.photo) {

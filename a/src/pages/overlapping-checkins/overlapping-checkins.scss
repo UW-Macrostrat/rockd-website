@@ -1,0 +1,17 @@
+overlapping-checkins {
+  .title-col {
+    align-content: center;
+    justify-content: center;
+    flex-direction: column;
+    display: flex;
+    height: 100%;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .title-row, .more-info {
+    color: #333 !important;
+  }
+  .close-button {
+	  color: #333;
+	}
+}

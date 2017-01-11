@@ -1,0 +1,156 @@
+<ion-header>
+  <ion-navbar color="clear" hideBackButton="true">
+    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
+    <ion-buttons end>
+      <button ion-button [navPush]="aboutPage">About</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="home" scroll="false" data-tap-disabled="true">
+  <ion-grid class="main-grid">
+    <ion-row>
+      <ion-col width-33 class="sidebar">
+        <ion-searchbar
+          class="search"
+          [(ngModel)]="searchText"
+          [placeholder]="'Filter checkins'"
+          [showCancelButton]="true"
+          (ionFocus)="showSearch()"
+          (ionCancel)="hideSearch()"
+          (ionInput)="autocomplete($event)"
+
+        ></ion-searchbar>
+        <!-- <ion-row wrap>
+          <ion-col *ngFor="let filter of filters" (click)="removeFilter(filter)" width-33 text-wrap>
+            <div class="filter">
+              <div class="filter-inner">
+                {{ filter.name }} <ion-icon name="ios-close-circle-outline"></ion-icon>
+              </div>
+            </div>
+          </ion-col>
+        </ion-row> -->
+        <ion-list [hidden]="!filters.length">
+          <ion-item-divider>Filters</ion-item-divider>
+          <ion-item *ngFor="let filter of filters" (click)="removeFilter(filter)">
+            {{ filter.name }}
+            <ion-icon name="remove" item-right class="remove-filter"></ion-icon>
+          </ion-item>
+        </ion-list>
+        <!-- <button ion-button icon-only clear color="dark" class="filter-button">
+          <ion-icon name="options"></ion-icon>
+        </button> -->
+        <ion-list [hidden]="!searchIsFocused">
+          <ion-item text-wrap>
+            You can search for time intervals, stratigraphic names, minerals, lithologies, and text in checkin notes
+          </ion-item>
+          <ion-item-group>
+            <ion-item-divider
+              color="light"
+              [hidden]="!autocompleteResults.strat_name_concepts.length">
+              Stratigraphic names
+            </ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.strat_name_concepts" (click)="addFilter(item, 'strat_name_concept')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.strat_name_orphans.length">Other names</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.strat_name_orphans" (click)="addFilter(item, 'strat_name_orphan')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.lithologies.length">Lithologies</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.lithologies" (click)="addFilter(item, 'lithologies')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.intervals.length">Intervals</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.intervals" (click)="addFilter(item, 'intervals')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.minerals.length">Minerals</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.minerals" (click)="addFilter(item, 'minerals')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.structures.length">Structures</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.structures" (click)="addFilter(item, 'structures')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+
+        </ion-list>
+        <ion-row [hidden]="searchIsFocused">
+          <ion-list class="filter-menu">
+            <ion-item>
+              <ion-label>Sort by</ion-label>
+              <ion-select [(ngModel)]="sortby" (ionChange)="changeSort($event)">
+                <ion-option value="added">Date added</ion-option>
+                <ion-option value="created">Date observed</ion-option>
+                <ion-option value="likes">Most liked</ion-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+        </ion-row>
+        <ion-list class="checkin-list" [hidden]="searchIsFocused">
+          <ion-item *ngFor="let checkin of visibleCheckins" class="home-card-item">
+            <ion-card class="home-card" (mouseenter)="setActiveCheckin(checkin)" (mouseleave)="removeActiveCheckin(checkin)">
+
+              <ion-item>
+                <ion-thumbnail item-left>
+                  <img [src]="checkin.gravatar || ''"/>
+                </ion-thumbnail>
+                <h2>{{ checkin.first_name }} {{ checkin.last_name }}</h2>
+                <p><small>{{ checkin.created }}</small></p>
+                <p class="near"><ion-icon name="pin"></ion-icon> Near {{ checkin.near }}</p>
+                <p class="checkin-title">{{ checkin.title }}</p>
+              </ion-item>
+
+              <ion-card-content no-padding class="main-content">
+                <img class="banner" [src]="checkin.banner || ''"/>
+                <div class="detail-options" [hidden]="!checkin.mousedOver">
+                  <div class="detail-option" (click)="pushCheckinPage(checkin.checkin_id)">
+                    <ion-icon name="ios-arrow-dropright"></ion-icon><br>
+                    <p>Details</p>
+                  </div>
+                  <div class="detail-option" (click)="zoomTo(checkin.lng, checkin.lat)">
+                    <ion-icon name="search"></ion-icon><br>
+                    <p>Zoom to</p>
+                  </div>
+                </div>
+              </ion-card-content>
+
+              <ion-row no-padding>
+                <ion-col width-33 class="checkin-footer">
+                  <ion-icon name="paper"></ion-icon> {{ checkin.n_obs }}
+                </ion-col>
+                <ion-col width-33 class="checkin-footer">
+                  <ion-icon name="camera"></ion-icon> {{ checkin.n_photos }}
+                </ion-col>
+                <ion-col width-33 class="checkin-footer">
+                  <ion-icon name="thumbs-up"></ion-icon> {{ checkin.likes }}
+                </ion-col>
+              </ion-row>
+
+            </ion-card>
+          </ion-item>
+
+          <ion-item [hidden]="!visibleCheckins.length">
+            <button ion-button block outline color="light" class="show-more" (click)="loadMore()">
+              Load more
+            </button>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+      <ion-col width-67 class="map-col">
+        <map [mapType]="" [filters]="filters" [focalLng]="focalLng" [focalLat]="focalLat" (visibleCheckins)="updateVisible($event)"></map>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

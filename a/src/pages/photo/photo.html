@@ -14,11 +14,106 @@
         <div class="photo-holder">
           <div class="photo-caption">
             <div class="photo-caption-inner">
-              {{ photoData[photo].title ? photoData[photo].title : 'Placeholder' }}
+              <span class="checkin-title">
+                {{ photoData[photo].title ? photoData[photo].title : '' }}
+              </span>
+
+              <div tags>
+                <span class="checkin-attribute"
+                      *ngIf="hasKey(photoData[photo], 'rocks') && hasKeys(photoData[photo].rocks.strat_name)"
+                      [hidden]="!hasKey(photoData[photo], 'rocks') || !hasKeys(photoData[photo].rocks.strat_name)">
+                  {{ photoData[photo].rocks.strat_name.strat_name_long }}
+                </span>
+
+                <span class="checkin-attribute"
+                      *ngIf="hasKeys(photoData[photo].rocks) && hasKeys(photoData[photo].rocks.map_unit)"
+                      [hidden]="!hasKeys(photoData[photo].rocks) || !hasKeys(photoData[photo].rocks.map_unit)">
+                  {{ photoData[photo].rocks.map_unit.unit_name }}
+                </span>
+
+                <span class="checkin-attribute"
+                      *ngIf="hasKeys(photoData[photo].rocks) && hasKeys(photoData[photo].rocks.interval)"
+                      [hidden]="!hasKeys(photoData[photo].rocks) || !hasKeys(photoData[photo].rocks.interval)"
+                      [ngStyle]="{'backgroundColor': (hasKeys(photoData[photo].rocks) && hasKeys(photoData[photo].rocks.interval)) ? ('rgba(' + photoData[photo].rocks.interval.color + ')') : '#ffffff' }">
+                  {{ photoData[photo].rocks.interval.name }}
+                </span>
+
+                <div class="checkin-attributes"
+                     [hidden]="!hasKeys(photoData[photo].rocks) || !photoData[photo].rocks.liths.length"
+                     *ngIf="hasKeys(photoData[photo].rocks) && photoData[photo].rocks.liths.length">
+                  <span class="checkin-attribute"
+                        *ngFor="let lith of photoData[photo].rocks.liths"
+                        [ngStyle]="{'backgroundColor': (hasKeys(photoData[photo].rocks) && photoData[photo].rocks.liths.length) ? ('rgba(' + lith.color + ')') : '#ffffff' }">
+                    <span *ngIf="hasKey(lith, 'attributes')">
+                      <span *ngFor="let attr of lith.attributes">{{ attr.name }} </span>
+                    </span>
+                    {{ (hasKeys(photoData[photo].rocks) && photoData[photo].rocks.liths.length) ? lith.name  : '' }}
+                  </span>
+                </div>
+
+                <span [hidden]="!hasKeys(photoData[photo].fossils) || !photoData[photo].fossils.taxon.length"
+                      *ngIf="hasKeys(photoData[photo].fossils) && photoData[photo].fossils.taxon.length">
+                    <span class="checkin-attribute"
+                          *ngFor="let taxon of photoData[photo].fossils.taxon">
+                      <img class="taxon-thumb" [src]="(PBDBURL + '/taxa/thumb.png?taxon_id=' + taxon.oid) || ''"/>
+                      {{taxon.name}}
+                    </span>
+                </span>
+
+                <span [hidden]="!hasKeys(photoData[photo].minerals) || !photoData[photo].minerals.minerals.length"
+                      *ngIf="hasKeys(photoData[photo].minerals) && photoData[photo].minerals.minerals.length">
+                    <span class="checkin-attribute"
+                          *ngFor="let mineral of photoData[photo].minerals.minerals">
+                        {{ mineral.mineral }} <span class="mineral-formula" [innerHTML]="mineral.formula_tags"></span>
+                    </span>
+                </span>
+
+                <span class="checkin-attribute"
+                      [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.feature)"
+                      *ngIf="hasKeys(photoData[photo].orientation) && hasKeys(photoData[photo].orientation.feature)">
+                    {{ photoData[photo].orientation.feature.name }}
+                </span>
+
+                <span class="checkin-attribute"
+                      [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.strike === null)"
+                      *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.strike != null">
+                    Strike: {{ observation.orientation.strikeCardinal  }}({{ observation.orientation.strike }}&deg;)
+                </span>
+
+                <span class="checkin-attribute"
+                      [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.dip === null)"
+                      *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.dip != null">
+                    Dip: <span [hidden]="photoData[photo].orientation.dip == null">{{ photoData[photo].orientation.dip }}&deg;</span><span [hidden]="photoData[photo].orientation.dip_dir == null">{{ photoData[photo].orientation.dip_dirCardinal  }}</span>
+                </span>
+              </div>
+
+              <div class="notes"
+                   [hidden]="!hasKeys(photoData[photo].rocks) || !photoData[photo].rocks.notes"
+                   *ngIf="hasKeys(photoData[photo].rocks) && photoData[photo].rocks.notes">
+                {{ photoData[photo].rocks.notes }}
+              </div>
+
+              <div class="notes"
+                   [hidden]="!hasKeys(photoData[photo].fossils) || !photoData[photo].fossils.notes"
+                   *ngIf="hasKeys(photoData[photo].fossils) && photoData[photo].fossils.notes">
+                {{ photoData[photo].fossils.notes }}
+              </div>
+
+              <div class="notes"
+                   [hidden]="!hasKeys(photoData[photo].minerals) || !photoData[photo].minerals.notes"
+                   *ngIf="hasKeys(photoData[photo].minerals) && photoData[photo].minerals.notes">
+                {{ photoData[photo].minerals.notes }}
+              </div>
+
+              <div class="notes"
+                   [hidden]="!hasKeys(photoData[photo].orientation) || !photoData[photo].orientation.notes"
+                   *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.notes">
+                {{ photoData[photo].orientation.notes }}
+              </div>
             </div>
           </div>
-          <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo || ''}` class="swiper-image"/>
-          <!-- <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/> -->
+          <!-- <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo}` class="swiper-image"/> -->
+          <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/>
         </div>
       </ion-slide>
     </ion-slides>
