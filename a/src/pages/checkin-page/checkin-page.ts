@@ -6,6 +6,8 @@ import { Settings } from '../../services/settings.service'
 import { PhotoPage } from '../photo/photo'
 import { TheMap } from '../map/map'
 
+import { CheckinMap } from '../checkin-map/checkin-map'
+
 //import mapboxgl from '../../../assets/js/mapbox-gl.js'
 // Ignore mapboxgl...
 declare const mapboxgl
@@ -56,6 +58,7 @@ export class CheckinPage {
   }
   ionViewDidLeave() {
     this.map.remove()
+    this.map = null
   }
 
   getRating(rating) {
@@ -66,6 +69,12 @@ export class CheckinPage {
       return false
     }
     return (Object.keys(obj).length > 0) ? true : false
+  }
+  hasKey(obj, key) {
+    if (Object.keys(obj).indexOf(key) > -1) {
+      return true
+    }
+    return false
   }
 
   openPhoto(photo_id) {
@@ -82,7 +91,8 @@ export class CheckinPage {
   }
 
   openMap() {
-    this.navCtrl.push(TheMap, {
+    this.navCtrl.push(CheckinMap, {
+      checkin_id: this.checkin.checkin_id.replace('chk|', ''),
       config: {
         mapType: 'checkin',
         checkin: {
@@ -99,6 +109,7 @@ export class CheckinPage {
 
   initializeMap(center) {
     if (!center || !center.length) {
+      console.log('skip')
       return
     }
     mapboxgl.accessToken = 'pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg'
@@ -111,6 +122,12 @@ export class CheckinPage {
       touchZoomRotate: false,
       center: center,
       zoom: 6
+    })
+
+    this.map.panTo(center, {
+      duration: 0,
+      offset: [150, 0],
+      animate: false
     })
 
     this.map.on('load', () => {
@@ -133,7 +150,8 @@ export class CheckinPage {
         type: 'symbol',
         source: 'markers',
         layout: {
-          'icon-image': 'marker-15'
+          'icon-image': 'marker-15',
+          'icon-offset': [0, -5]
         }
       })
     })

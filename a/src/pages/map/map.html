@@ -1,12 +1,1 @@
-<ion-header>
-  <ion-navbar color="clear">
-    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
-    <ion-buttons end>
-      <button ion-button [navPush]="aboutPage">About</button>
-    </ion-buttons>
-  </ion-navbar>
-</ion-header>
-
-<ion-content class="map-container" scroll="false" data-tap-disabled="true">
-  <div id="the-map"></div>
-</ion-content>
+<div class="map" id="the-map-{{mapType}}"></div>

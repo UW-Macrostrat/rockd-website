@@ -1,0 +1,101 @@
+new-home {
+  ::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  .home {
+    padding:0;
+    margin:0;
+  }
+  .home > scroll-content {
+    padding: 0;
+  }
+  .main-grid, .main-grid > ion-row {
+    height: 100%;
+    padding: 0;
+  }
+  .map-col {
+    padding: 0;
+  }
+  .search {
+  // width: 80%;
+    display: inline-block;
+  }
+  .filter-button {
+    display: inline;
+  }
+  .filter-menu {
+    width: 100%;
+  }
+  .home-card {
+    padding: 0;
+    margin-top: 0;
+  }
+  .sidebar {
+    overflow-y: scroll;
+  }
+  .checkin-list {
+    margin-top: -30px;
+  }
+  .checkin-footer {
+    text-align: center;
+    border-right: 1px solid #ddd;
+  }
+  .checkin-footer:last-child {
+    border-right: 0;
+  }
+  .show-more {
+    color: #333;
+  }
+  .home-card-item > .item-inner {
+    border: 0 !important;
+  }
+  .near {
+    color: #333;
+  }
+  .checkin-title {
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .main-content {
+    position: relative;
+  }
+  .detail-options {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background-color: rgba(255,255,255,0.83);
+    font-size: 23px;
+  }
+
+  .detail-option {
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    line-height: 3px;
+    padding: 20px;
+    cursor: pointer;
+  }
+  .detail-option:first-child {
+    border-bottom: 1px solid #ccc;
+  }
+  .detail-option:hover {
+    background-color: #eee;
+  }
+  ion-item-divider {
+    font-weight: bold !important;
+  }
+  .filter {
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+  }
+  .remove-filter {
+    color: #f53d3d;
+  }
+}

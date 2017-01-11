@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Checkins at this location</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngFor="let checkin of overlappingCheckins">
+    <ion-item>
+      <ion-avatar item-left>
+        <img [src]="checkin.gravatar || ''"/>
+      </ion-avatar>
+      <h2>{{ checkin.first_name }} {{ checkin.last_name }}</h2>
+      <p>{{ checkin.created }}</p>
+    </ion-item>
+    <img [src]="checkin.banner || ''"/>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row class="title-row">
+          <ion-col width-80>
+            <div class="title-col">
+              {{ checkin.notes }}
+            </div>
+          </ion-col>
+          <ion-col width-20>
+            <button ion-button icon-right small clear class="more-info" (click)="goToCheckin(checkin)">
+              <div>More info</div>
+              <ion-icon name="arrow-round-forward"></ion-icon>
+            </button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <button ion-button icon-right (click)="dismiss()" outline full clear class="close-button">
+      Close <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-toolbar>
+</ion-footer>

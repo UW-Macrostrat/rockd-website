@@ -2,7 +2,7 @@
   <ion-card class="xyz-card">
     <ion-item class="map-xyz">
       <span class="map-xyz-label">x, y, z</span>
-      {{ mapInfo.lng }}, {{ mapInfo.lat }}, {{ mapInfo.elevation + 'm' + ' / ' + (mapInfo.elevation * 3.28084).toFixed(0) + 'ft'}}
+      {{ mapInfo.lng }}, {{ mapInfo.lat }} {{ (mapInfo.elevation) ? (', ' + mapInfo.elevation + 'm' + ' / ' + (mapInfo.elevation * 3.28084).toFixed(0) + 'ft') : ''}}
     </ion-item>
   </ion-card>
 
