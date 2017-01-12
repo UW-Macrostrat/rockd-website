@@ -102,7 +102,7 @@ export class CheckinService {
             }
           })).filter(j => { if (j) return j })
 
-          let structure_ids = d.properties.observations.map(j => {
+          d.properties.structure_ids = d.properties.observations.map(j => {
             if (Object.keys(j.orientation).length && j.orientation.feature) {
               return j.orientation.feature.structure_id
             }

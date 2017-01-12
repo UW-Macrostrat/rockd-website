@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="clear">
-    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
+    <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
     <ion-buttons end>
       <button ion-button [navPush]="aboutPage">About</button>
     </ion-buttons>
@@ -9,7 +9,7 @@
 
 <ion-content>
   <div class="slide-container">
-    <ion-slides (ionDidChange)="onSlideChanged()" #photoSlider [options]="options" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
+    <ion-slides (ionSlideDidChange)="onSlideChanged()" #photoSlider [pager]="true" [paginationType]="'bullets'" [initialSlide]="options.initialSlide" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
       <ion-slide *ngFor="let photo of photos">
         <div class="photo-holder">
           <div class="photo-caption">
@@ -36,6 +36,13 @@
                       [hidden]="!hasKeys(photoData[photo].rocks) || !hasKeys(photoData[photo].rocks.interval)"
                       [ngStyle]="{'backgroundColor': (hasKeys(photoData[photo].rocks) && hasKeys(photoData[photo].rocks.interval)) ? ('rgba(' + photoData[photo].rocks.interval.color + ')') : '#ffffff' }">
                   {{ photoData[photo].rocks.interval.name }}
+                </span>
+
+                <span class="checkin-attribute age-estimate"
+                      *ngIf="hasKeys(photoData[photo].age_est)"
+                      [hidden]="!hasKeys(photoData[photo].age_est)">
+                  {{ photoData[photo].age_est.name }} <span class="age-estimate-age">({{ photoData[photo].age_est.b_age }} - {{ photoData[photo].age_est.t_age }}Ma)</span>
+                  <br><span class="estimated">(estimated)</span>
                 </span>
 
                 <div class="checkin-attributes"
@@ -83,7 +90,7 @@
                 <span class="checkin-attribute"
                       [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.dip === null)"
                       *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.dip != null">
-                    Dip: <span [hidden]="photoData[photo].orientation.dip == null">{{ photoData[photo].orientation.dip }}&deg;</span><span [hidden]="photoData[photo].orientation.dip_dir == null">{{ photoData[photo].orientation.dip_dirCardinal  }}</span>
+                    Dip: <span *ngIf="hasKeys(photoData[photo].orientation)" [hidden]="photoData[photo].orientation.dip == null">{{ photoData[photo].orientation.dip }}&deg;</span><span *ngIf="hasKeys(photoData[photo].orientation)" [hidden]="photoData[photo].orientation.dip_dir == null">{{ photoData[photo].orientation.dip_dirCardinal  }}</span>
                 </span>
               </div>
 

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnInit, OnDestroy, Input, EventEmitter } from '@angular/core'
+import { Component, ChangeDetectorRef, Input, EventEmitter } from '@angular/core'
 import { NavParams, NavController, ViewController, ModalController } from 'ionic-angular'
 import buffer from '@turf/buffer'
 import bbox from '@turf/bbox'
@@ -148,7 +148,7 @@ export class TheMap {
       }
 
       let filteredFeatures = this.checkins.features.filter(checkin => {
-        let found = false
+        let found = []
         Object.keys(this._filters).forEach(f => {
           // Handle ids
           if (f.indexOf('_id') > -1) {
@@ -156,21 +156,21 @@ export class TheMap {
               return checkin.properties[f].indexOf(j) != -1
             })
             if (intersection.length) {
-              found = true
+              found.push(f)
             }
           } else {
             // Handle ages
             this._filters[f].forEach(range => {
               checkin.properties.age_ranges.forEach(range2 => {
                 if (range[0] >= range2[1] && range2[0] >= range[1]) {
-                  found = true
+                  found.push(f)
                 }
               })
             })
           }
         })
 
-        if (found) { return checkin }
+        if (found.length === Object.keys(this._filters).length) { return checkin }
       })
 
       this.map.getSource('checkin-clusters').setData({
@@ -395,7 +395,7 @@ export class TheMap {
 
       // Checkin point clicks
       } else if (checkinPoints.length) {
-        this.navCtrl.push(CheckinPage, { checkin_id: checkinPoints[0].properties.checkin_id })
+        this.navCtrl.push(CheckinPage, { checkin_id: checkinPoints[0].properties.checkin_id.replace('chk|', '') })
         return
       }
 

@@ -63,4 +63,18 @@ photo {
     margin-top: 5px;
     line-height: 15px;
   }
+  .age-estimate {
+		border: 1px dotted #aaa;
+		text-align: center;
+    line-height: 14px;
+	}
+	.estimated {
+		font-size: 10px;
+		font-style: italic;
+		display: block;
+	}
+	.age-estimate-age {
+		font-size: 12px;
+		color: #777777;
+	}
 }

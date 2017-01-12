@@ -25,7 +25,6 @@ export class PhotoPage {
   public loading = true
 
   public options = {
-    pager: true,
     initialSlide: 0
   }
 
@@ -82,8 +81,6 @@ export class PhotoPage {
       title: this.checkin.notes
     }
 
-    console.log(this.photoData)
-
     this.checkin.observations.forEach(obs => {
       if (obs.photo) {
         this.photoData[obs.photo] = obs
@@ -109,6 +106,11 @@ export class PhotoPage {
 
   onSlideChanged() {
     let currentIndex = this.slider.getActiveIndex()
+
+    // There is a bug in rc-5 that pushes an index that doesn't exist if you swipe past the last image
+    if ((currentIndex + 1) > this.photos.length) {
+      return
+    }
     let hash = window.location.hash.split('/')
     hash.pop()
     history.replaceState(null, 'Rockd', hash.join('/') + '/' + this.photos[currentIndex])

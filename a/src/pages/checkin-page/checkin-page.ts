@@ -4,7 +4,6 @@ import { CheckinService } from '../../services/checkin-service.service'
 import { Settings } from '../../services/settings.service'
 
 import { PhotoPage } from '../photo/photo'
-import { TheMap } from '../map/map'
 
 import { CheckinMap } from '../checkin-map/checkin-map'
 
@@ -57,8 +56,10 @@ export class CheckinPage {
     })
   }
   ionViewDidLeave() {
-    this.map.remove()
-    this.map = null
+    if (this.map) {
+      this.map.remove()
+      this.map = null
+    }
   }
 
   getRating(rating) {

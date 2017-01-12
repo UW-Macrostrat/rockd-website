@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="clear" hideBackButton="true">
-    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
+    <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
     <ion-buttons end>
       <button ion-button [navPush]="aboutPage">About</button>
     </ion-buttons>
@@ -17,19 +17,10 @@
           [placeholder]="'Filter checkins'"
           [showCancelButton]="true"
           (ionFocus)="showSearch()"
-          (ionCancel)="hideSearch()"
+          (ionBlur)="hideSearch()"
           (ionInput)="autocomplete($event)"
 
         ></ion-searchbar>
-        <!-- <ion-row wrap>
-          <ion-col *ngFor="let filter of filters" (click)="removeFilter(filter)" width-33 text-wrap>
-            <div class="filter">
-              <div class="filter-inner">
-                {{ filter.name }} <ion-icon name="ios-close-circle-outline"></ion-icon>
-              </div>
-            </div>
-          </ion-col>
-        </ion-row> -->
         <ion-list [hidden]="!filters.length">
           <ion-item-divider>Filters</ion-item-divider>
           <ion-item *ngFor="let filter of filters" (click)="removeFilter(filter)">
@@ -99,6 +90,9 @@
           </ion-list>
         </ion-row>
         <ion-list class="checkin-list" [hidden]="searchIsFocused">
+          <ion-item [hidden]="visibleCheckins.length" text-wrap>
+            There are no checkins in the current map view that match the applied filters
+          </ion-item>
           <ion-item *ngFor="let checkin of visibleCheckins" class="home-card-item">
             <ion-card class="home-card" (mouseenter)="setActiveCheckin(checkin)" (mouseleave)="removeActiveCheckin(checkin)">
 

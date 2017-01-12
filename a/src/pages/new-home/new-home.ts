@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { CheckinService } from '../../services/checkin-service.service'
 import { MacrostratService } from '../../services/macrostrat.service'
 import { ModalController, NavController } from 'ionic-angular'
@@ -110,7 +110,9 @@ export class NewHomePage {
     this.searchIsFocused = true
   }
   hideSearch() {
-    this.searchIsFocused = false
+    setTimeout(() => {
+      this.searchIsFocused = false
+    }, 300)
   }
 
   autocomplete($event) {
