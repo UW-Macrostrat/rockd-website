@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavParams, NavController, ViewController, ModalController, App } from 'ionic-angular'
+import { NavParams, NavController, ViewController, App } from 'ionic-angular'
 import { CheckinPage } from '../checkin-page/checkin-page'
 
 @Component({

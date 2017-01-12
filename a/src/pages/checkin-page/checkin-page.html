@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="clear">
-    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
+    <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
     <ion-buttons end>
       <button ion-button [navPush]="aboutPage">About</button>
     </ion-buttons>
@@ -81,6 +81,13 @@
                     [hidden]="!hasKeys(observation.rocks) || !hasKeys(observation.rocks.interval)"
                     [ngStyle]="{'backgroundColor': (hasKeys(observation.rocks) && hasKeys(observation.rocks.interval)) ? ('rgba(' + observation.rocks.interval.color + ')') : '#ffffff' }">
                 {{ observation.rocks.interval.name }}
+              </span>
+
+              <span class="checkin-attribute age-estimate"
+                    *ngIf="hasKeys(observation.age_est)"
+                    [hidden]="!hasKeys(observation.age_est)">
+                {{ observation.age_est.name }} <span class="age-estimate-age">({{ observation.age_est.b_age }} - {{ observation.age_est.t_age }}Ma)</span>
+                <br><span class="estimated">(estimated)</span>
               </span>
 
               <div class="checkin-attributes"

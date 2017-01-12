@@ -4,7 +4,6 @@ import { IonicApp, IonicModule, DeepLinkConfig } from 'ionic-angular';
 import { MyApp } from './app.component';
 
 import { AboutPage } from '../pages/about/about';
-import { CheckinInfoModal } from '../pages/checkin-info-modal/checkin-info-modal';
 import { MapInfoModal } from '../pages/map-info/map-info';
 import { NewHomePage } from '../pages/new-home/new-home';
 import { CheckinPage } from '../pages/checkin-page/checkin-page';
@@ -25,7 +24,6 @@ export const deepLinkConfig: DeepLinkConfig = {
     { component: CheckinPage, name: 'Checkin Page', segment: 'checkin/:checkin_id' },
     { component: CheckinMap, name: 'Checkin Page Map', segment: 'checkin/:checkin_id/map' },
     { component: PhotoPage, name: 'Photo Page', segment: 'photo/:photo_id', defaultHistory: [CheckinPage]},
-    { component: TheMap, name: 'Map', segment: 'merp' },
   ]
 };
 
@@ -40,7 +38,6 @@ export const deepLinkConfig: DeepLinkConfig = {
     TheMap,
     CheckinMap,
 
-    CheckinInfoModal,
     MapInfoModal,
     OverlappingCheckins,
     Footer
@@ -61,7 +58,6 @@ export const deepLinkConfig: DeepLinkConfig = {
     TheMap,
     CheckinMap,
 
-    CheckinInfoModal,
     MapInfoModal,
     OverlappingCheckins,
     Footer
