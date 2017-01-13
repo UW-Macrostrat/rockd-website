@@ -107,10 +107,31 @@ new-home {
   .mode-button {
     margin-top: 0;
   }
+  map {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+  }
   @media(max-width: 1000px) {
     .sidebar, .map-col {
       max-width: 100%;
 			flex: 0 0 100%;
+    }
+    .search {
+      padding-top: 5px;
+    }
+    .home-card-item, .home-card-item > .item-inner {
+      padding: 0 !important;
+    }
+    .home-card-item > .item-inner > .input-wrapper > ion-label {
+      margin: 10px 0;
+    }
+
+    .detail-option {
+      height: 100%;
+      border: 0 !important;
+      font-size: 15px;
+      padding: 10px;
     }
   }
 }

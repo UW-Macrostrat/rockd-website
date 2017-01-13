@@ -127,7 +127,7 @@
                     <ion-icon name="ios-arrow-dropright"></ion-icon><br>
                     <p>Details</p>
                   </div>
-                  <div class="detail-option" (click)="zoomTo(checkin.lng, checkin.lat)">
+                  <div class="detail-option" (click)="zoomTo(checkin.lng, checkin.lat)" [hidden]="mode === 'mobile'">
                     <ion-icon name="search"></ion-icon><br>
                     <p>Zoom to</p>
                   </div>

@@ -115,7 +115,6 @@ export class NewHomePage {
   }
 
   toggleMap() {
-    console.log('toggleMap')
     this.showList = false
   }
 
