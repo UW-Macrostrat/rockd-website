@@ -9,3 +9,5 @@ sed -i .bak 's#base href=""#base href="/a"#g' index.html
 sed -i .bak 's#link href="#link href="./a/#g' index.html
 sed -i .bak 's#src="#src="./a/#g' index.html
 cd ..
+
+cp -r www/* ../a/

@@ -1,17 +1,28 @@
 <ion-header>
   <ion-navbar color="clear">
-    <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
+    <ion-title><img class="header-logo" src="../assets/logo-light.png"/></ion-title>
     <ion-buttons end>
       <button ion-button [navPush]="aboutPage">About</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content class="checkin-page-content has-footer">
+<ion-content class="checkin-page-content">
   <ion-grid>
     <ion-row>
       <ion-col width-90 class="checkin-title">
-        {{ checkin.notes }}
+        <div class="banner-inner">
+          <div class="banner-avatar">
+            <ion-avatar>
+              <img [src]="checkin.gravatar || ''" class="huge-avatar">
+            </ion-avatar>
+          </div>
+          <div class="banner-name-date">
+            <h2 class="banner-name">{{ checkin.first_name }} {{ checkin.last_name }}</h2>
+            <h3 class="banner-date"><ion-icon name="star" *ngFor="let star of getRating(checkin.rating)"></ion-icon></h3>
+            <h3 class="banner-date">{{ checkin.created }}</h3>
+          </div>
+        </div>
       </ion-col>
       <ion-col width-10 class="checkin-subtitle">
         <ion-icon name="thumbs-up"></ion-icon> <span class="n-likes">{{ checkin.likes }}</span>
@@ -23,16 +34,15 @@
         <div class="main-banner" (click)="openMap()">
           <div class="banner-info">
             <div class="banner-inner">
-              <div class="banner-avatar">
-                <ion-avatar>
-                  <img [src]="checkin.gravatar || ''" class="huge-avatar">
-                </ion-avatar>
+              <div>
+                <span class="title title-notes">
+                  {{ checkin.notes }}
+                </span>
+                <span class="title near-label">
+                  <ion-icon name="pin"></ion-icon> Near {{ checkin.near }}
+                </span>
               </div>
-              <div class="banner-name-date">
-                <h2 class="banner-name">{{ checkin.first_name }} {{ checkin.last_name }}</h2>
-                <h3 class="banner-date"><ion-icon name="star" *ngFor="let star of getRating(checkin.rating)"></ion-icon></h3>
-                <h3 class="banner-date">{{ checkin.created }}</h3>
-              </div>
+
             </div>
           </div>
           <div id="checkin-map"></div>
@@ -43,23 +53,25 @@
 
   <ion-grid>
     <ion-row wrap>
+
       <ion-col width-33>
         <ion-card>
           <img [src]="checkin.thumb || ''" (click)="openPhoto(checkin.photo_id)" item-left [hidden]="!checkin.thumb" />
           <ion-card-content>
             <ion-card-title>
-              <div class="notes">
+              <span class="notes">
                 {{ checkin.notes }}
-              </div>
+              </span>
             </ion-card-title>
           </ion-card-content>
         </ion-card>
       </ion-col>
+
       <ion-col width-33 *ngFor="let observation of checkin.observations">
         <ion-card>
           <img [src]="observation.thumb || observation.photo || ''" (click)="openPhoto(observation.photo)" item-left [hidden]="!observation.photo" />
           <ion-card-content>
-            <ion-card-title [hidden]="!hasKeys(observation.rocks) || !hasKeys(observation.rocks.strat_name)">
+            <ion-card-title [hidden]="!hasKeys(observation.rocks)" >
               {{ (observation.rocks.strat_name) ? observation.rocks.strat_name.strat_name_long : '' }}
             </ion-card-title>
 
@@ -81,13 +93,6 @@
                     [hidden]="!hasKeys(observation.rocks) || !hasKeys(observation.rocks.interval)"
                     [ngStyle]="{'backgroundColor': (hasKeys(observation.rocks) && hasKeys(observation.rocks.interval)) ? ('rgba(' + observation.rocks.interval.color + ')') : '#ffffff' }">
                 {{ observation.rocks.interval.name }}
-              </span>
-
-              <span class="checkin-attribute age-estimate"
-                    *ngIf="hasKeys(observation.age_est)"
-                    [hidden]="!hasKeys(observation.age_est)">
-                {{ observation.age_est.name }} <span class="age-estimate-age">({{ observation.age_est.b_age }} - {{ observation.age_est.t_age }}Ma)</span>
-                <br><span class="estimated">(estimated)</span>
               </span>
 
               <div class="checkin-attributes"
@@ -167,9 +172,4 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <ion-footer class="main-footer">
-    <footer></footer>
-  </ion-footer>
-
 </ion-content>

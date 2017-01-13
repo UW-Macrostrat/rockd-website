@@ -14,6 +14,11 @@ new-home {
     height: 100%;
     padding: 0;
   }
+  .tab-row {
+    height: auto !important;
+    padding: 20px;
+    text-align: center;
+  }
   .map-col {
     padding: 0;
   }
@@ -97,5 +102,15 @@ new-home {
   }
   .remove-filter {
     color: #f53d3d;
+  }
+
+  .mode-button {
+    margin-top: 0;
+  }
+  @media(max-width: 1000px) {
+    .sidebar, .map-col {
+      max-width: 100%;
+			flex: 0 0 100%;
+    }
   }
 }

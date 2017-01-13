@@ -4,6 +4,7 @@ import { CheckinService } from '../../services/checkin-service.service'
 import { Settings } from '../../services/settings.service'
 
 import { CheckinPage } from '../checkin-page/checkin-page'
+import { ENV } from '../../config/environment'
 
 @Component({
   templateUrl: 'photo.html',
@@ -113,6 +114,7 @@ export class PhotoPage {
     }
     let hash = window.location.hash.split('/')
     hash.pop()
-    history.replaceState(null, 'Rockd', hash.join('/') + '/' + this.photos[currentIndex])
+//    history.replaceState(null, 'Rockd', hash.join('/') + '/' + this.photos[currentIndex])
+    history.replaceState(null, 'Rockd', (ENV.PRODUCTION) ? `${ENV.BASE_URI}/photo/${this.photos[currentIndex]}` : (hash.join('/') + '/' + this.photos[currentIndex]))
   }
 }

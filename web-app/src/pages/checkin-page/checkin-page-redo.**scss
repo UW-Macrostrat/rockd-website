@@ -1,0 +1,134 @@
+checkin-page {
+	checkin-page {
+		width: 100%;
+	}
+	.checkin-page-content {
+		max-width: 900px;
+		margin: 0 auto;
+		position: relative;
+	}
+	.main-banner {
+		height: 225px;
+		position: relative;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+	.banner-info {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+		color: #ffffff;
+		z-index: 999;
+	}
+	.banner-inner {
+		height: 100%;
+		padding: 10px;
+		display: flex;
+		align-items: center;
+	}
+	.banner-avatar {
+		padding: 20px;
+	}
+	.huge-avatar {
+		max-height: 75px !important;
+		max-width: 75px !important;
+		border-radius: 75px !important;
+	}
+	.banner-name {
+		font-weight: 900;
+		font-size: 20px;
+	}
+	.banner-date {
+		margin-top: -10px;
+		font-size: 14px;
+		font-weight: 400;
+	}
+	.banner-near {
+		margin-top: -10px;
+		font-size: 14px;
+	}
+	.checkin-title {
+		color: #777777;
+		font-size: 32px;
+		font-weight: 300;
+	}
+	.checkin-subtitle {
+		display: flex;
+		align-items: center;
+		color: #333333;
+	}
+	.n-likes {
+		margin-left: 5px;
+	}
+
+	.banner-mask {
+		position: absolute;
+		width: 100%;
+		height: 263px;
+		margin-top: 5px;
+		background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+		color: #ffffff;
+	}
+	.no-background-color {
+		background-color: rgba(0,0,0,0);
+	}
+	.banner-mask .no-background-color {
+		color: #fff;
+	}
+	#checkin-map {
+		height: 225px;
+		width: 100%;
+	}
+	.checkin-map-title {
+		font-size: 14px;
+	}
+	::-webkit-scrollbar,
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+	.active {
+	  font-weight: 200;
+	  color: #777;
+	}
+	.wrap {
+		white-space: initial;
+	}
+
+	.checkin-attributes {
+		display: inline;
+	}
+	.checkin-attribute {
+		border: 1px solid #aaa;
+		padding: 5px;
+		border-radius: 4px;
+		font-size: 12px;
+		margin-left: 5px;
+		white-space: nowrap;
+		margin-top: 5px;
+		display: inline-block;
+	}
+	.taxon-thumb {
+		height: 20px !important;
+		width: 20px !important;
+		vertical-align: middle;
+	}
+	.mineral-formula {
+		font-size: 70%;
+	}
+	.notes {
+		font-size: 12px;
+		margin-left: 5px;
+	}
+	.title {
+		display: block;
+	}
+	.title.title-notes {
+		font-size: 25px;
+		font-weight: 700;
+	}
+	.near-label {
+		display: block;
+	}
+}
