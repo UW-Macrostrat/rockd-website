@@ -21,3 +21,9 @@
   position: relative !important;
   margin-top: 50px;
 }
+
+@media (max-width: 700px) {
+  footer {
+    padding: 20px;
+  }
+}

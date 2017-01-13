@@ -17,6 +17,8 @@ import { CheckinService } from '../services/checkin-service.service';
 import { MacrostratService } from '../services/macrostrat.service';
 import { Settings } from '../services/settings.service'
 
+import { ENV } from '../config/environment'
+
 export const deepLinkConfig: DeepLinkConfig = {
   links: [
     { component: NewHomePage, name: 'Home Page', segment: '' },
@@ -44,7 +46,7 @@ export const deepLinkConfig: DeepLinkConfig = {
   ],
   imports: [
     IonicModule.forRoot(MyApp, {
-      locationStrategy: 'hash'
+      locationStrategy: ENV.LOCATIONSTRATEGY
   }, deepLinkConfig)
   ],
   bootstrap: [IonicApp],
@@ -66,7 +68,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     Settings,
     CheckinService,
     MacrostratService,
-    { provide: APP_BASE_HREF, useValue: '/' }
+    { provide: APP_BASE_HREF, useValue: ENV.BASE_URI }
   ]
 })
 export class AppModule {}

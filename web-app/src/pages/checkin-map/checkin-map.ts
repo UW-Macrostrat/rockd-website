@@ -21,7 +21,6 @@ export class CheckinMap {
     let incomingConfig = this.params.get('config')
 
     this.config = incomingConfig.checkin
-
   }
 
   dismiss() {

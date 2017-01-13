@@ -36,15 +36,10 @@ export class NewHomePage {
     structures: []
   }
   public loadingAutocomplete:boolean = false
-  // public filters:any = {
-  //   strat_name_ids: [],
-  //   lith_ids: [],
-  //   mineral_ids: [],
-  //   structure_ids: [],
-  //   ages: []
-  // }
-
   public filters: any = []
+
+  public mode = (window.innerWidth < 1000) ? 'mobile' : 'desktop'
+  public showList = true
 
   constructor(
     public checkinService: CheckinService,
@@ -113,6 +108,15 @@ export class NewHomePage {
     setTimeout(() => {
       this.searchIsFocused = false
     }, 300)
+  }
+
+  toggleList() {
+    this.showList = true
+  }
+
+  toggleMap() {
+    console.log('toggleMap')
+    this.showList = false
   }
 
   autocomplete($event) {
