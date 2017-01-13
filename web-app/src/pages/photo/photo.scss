@@ -80,4 +80,13 @@ photo {
   .swiper-pagination-bullet-active {
     background: #333333;
   }
+
+  @media(max-width: 1000px) {
+    .slide-zoom {
+      padding-bottom: 0;
+    }
+    .photo-caption {
+      padding-bottom: 20px;
+    }
+  }
 }

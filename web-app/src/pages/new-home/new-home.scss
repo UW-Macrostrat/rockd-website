@@ -21,6 +21,7 @@ new-home {
   }
   .map-col {
     padding: 0;
+    position: relative;
   }
   .search {
   // width: 80%;
@@ -107,10 +108,14 @@ new-home {
   .mode-button {
     margin-top: 0;
   }
-  map {
+  map, .map-scroller {
     height: 100%;
     width: 100%;
     position: absolute;
+    margin-bottom: 42px;
+  }
+  .tab-button {
+    z-index: 999;
   }
   @media(max-width: 1000px) {
     .sidebar, .map-col {
@@ -133,5 +138,8 @@ new-home {
       font-size: 15px;
       padding: 10px;
     }
+    // .content-row {
+    //   margin-bottom: 42px;
+    // }
   }
 }
