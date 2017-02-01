@@ -9,6 +9,8 @@ new-home {
   }
   .home > scroll-content {
     padding: 0;
+    height: 100%;
+    overflow-y: hidden;
   }
   .main-grid, .main-grid > ion-row {
     height: 100%;
