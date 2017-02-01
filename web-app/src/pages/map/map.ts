@@ -268,13 +268,17 @@ export class TheMap {
         sources: {
           satellite: {
             type: 'raster',
-            tiles: ['https://api.mapbox.com/styles/v1/jczaplewski/cigmamq4n000xaaknfpuj1zdk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg'],
+            url: 'mapbox://mapbox.satellite',
             tileSize: 256
           },
           burwell: {
             type: 'raster',
             tiles: ['https://macrostrat.org/api/v2/maps/burwell/emphasized/{z}/{x}/{y}/tile.png'],
-            tileSize: 256
+            tileSize: 512
+          },
+          checkins: {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] }
           },
           info_marker: {
             type: 'geojson',
@@ -307,7 +311,17 @@ export class TheMap {
             paint: {
               'raster-opacity': 0.5
             }
-          }
+          },
+          {
+            id: 'checkins',
+            type: 'circle',
+            source: 'checkins',
+            paint: {
+              'circle-radius': 5,
+              'circle-color': '#ffffff',
+              'circle-opacity': 0,
+            }
+          },
         ]
       },
       attributionControl: false,
@@ -319,6 +333,10 @@ export class TheMap {
       maxZoom: 17,
       zoom: this.mapState.z || 1
     })
+
+    setTimeout(() => {
+      this.map.resize()
+    }, 400)
 
     const nav = new mapboxgl.NavigationControl()
     this.map.addControl(nav, 'top-right')
@@ -505,10 +523,11 @@ export class TheMap {
       case 'all':
       default:
         if (data) {
-          this.map.addSource('checkins', {
-            type: 'geojson',
-            data: data
-          })
+          this.map.getSource('checkins').setData(data)
+          // this.map.addSource('checkins', {
+          //   type: 'geojson',
+          //   data: data
+          // })
           // this.map.addLayer({
           //   id: 'checkins',
           //   type: 'circle',
@@ -528,26 +547,27 @@ export class TheMap {
 
               this.checkins = data
 
-              this.map.addSource('checkins', {
-                type: 'geojson',
-                data: data
-              })
+              this.map.getSource('checkins').setData(data)
+              // this.map.addSource('checkins', {
+              //   type: 'geojson',
+              //   data: data
+              // })
               this.map.addSource('checkin-clusters', {
                 type: 'geojson',
                 cluster: true,
                 data: data
               })
 
-              this.map.addLayer({
-                id: 'checkins',
-                type: 'circle',
-                source: 'checkins',
-                paint: {
-                  'circle-radius': 5,
-                  'circle-color': '#ffffff',
-                  'circle-opacity': 0,
-                }
-              })
+              // this.map.addLayer({
+              //   id: 'checkins',
+              //   type: 'circle',
+              //   source: 'checkins',
+              //   paint: {
+              //     'circle-radius': 5,
+              //     'circle-color': '#ffffff',
+              //     'circle-opacity': 0,
+              //   }
+              // })
 
               var categories = [
                 [500, '#08519c'],

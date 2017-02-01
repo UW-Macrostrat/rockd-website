@@ -1,9 +1,6 @@
 <ion-header>
   <ion-navbar color="clear">
     <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
-    <ion-buttons end>
-      <button ion-button [navPush]="aboutPage">About</button>
-    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
@@ -119,8 +116,11 @@
               </div>
             </div>
           </div>
+          <div class="img" [ngStyle]="{'backgroundImage': 'url(' + 'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + (photo || '') + ')'}">
+
+          </div>
           <!-- <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo}` class="swiper-image"/> -->
-          <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/>
+          <!-- <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/> -->
         </div>
       </ion-slide>
     </ion-slides>
