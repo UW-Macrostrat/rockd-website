@@ -24,7 +24,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     { component: NewHomePage, name: 'Home Page', segment: '' },
     { component: AboutPage, name: 'About Page', segment: 'about' },
     { component: CheckinPage, name: 'Checkin Page', segment: 'checkin/:checkin_id' },
-    { component: CheckinMap, name: 'Checkin Page Map', segment: 'checkin/:checkin_id/map' },
+    { component: CheckinMap, name: 'Checkin Page Map', segment: 'checkin/:checkin_id/map', defaultHistory: [CheckinPage] },
     { component: PhotoPage, name: 'Photo Page', segment: 'photo/:photo_id', defaultHistory: [CheckinPage]},
   ]
 };

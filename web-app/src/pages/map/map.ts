@@ -441,6 +441,9 @@ export class TheMap {
 
     switch(type) {
       case 'checkin':
+        if (!data.checkin.length) {
+          return
+        }
         this.map.on('load', () => {
           this.map.flyTo({
             center: data.checkin,
