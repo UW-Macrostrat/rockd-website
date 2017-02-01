@@ -197,10 +197,9 @@ export class CheckinService {
     // Tally the number of photos this checkin has
     if (checkin.observations) {
       checkin.n_photos = checkin.observations.map(d => {
-        if (d.rocks && d.rocks.photo) return d.rocks.photo
-      }).concat(checkin.observations.map(d => {
-        if (d.fossils && d.fossils.photo) return d.fossils.photo })
-      ).concat([checkin.photo]).filter(d => {
+        if (d.photo) return d.photo
+
+      }).concat([checkin.photo]).filter(d => {
         if (d) return d
       }).length
     } else {
