@@ -86,7 +86,7 @@
               <span class="checkin-attribute age-estimate"
                     *ngIf="hasKeys(observation.age_est)"
                     [hidden]="!hasKeys(observation.age_est)">
-                {{ observation.age_est.name }} <span class="age-estimate-age">({{ observation.age_est.b_age }} - {{ observation.age_est.t_age }}Ma)</span>
+                {{ observation.age_est.name }} <span class="age-estimate-age">({{ observation.age_est.b_age.toFixed(1) }} - {{ observation.age_est.t_age.toFixed(1) }}Ma)</span>
                 <br><span class="estimated">(estimated)</span>
               </span>
 
