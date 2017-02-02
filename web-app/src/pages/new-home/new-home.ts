@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-import { CheckinService } from '../../services/checkin-service.service'
 import { MacrostratService } from '../../services/macrostrat.service'
 import { ModalController, NavController } from 'ionic-angular'
 
@@ -42,7 +41,6 @@ export class NewHomePage {
   public showList = true
 
   constructor(
-    public checkinService: CheckinService,
     public macrostratService: MacrostratService,
     public modalCtrl: ModalController,
     public navCtrl: NavController

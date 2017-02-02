@@ -15,7 +15,7 @@
                 {{ photoData[photo].title ? photoData[photo].title : '' }}
               </span>
 
-              <div tags>
+              <div class="tags">
                 <span class="checkin-attribute"
                       *ngIf="hasKey(photoData[photo], 'rocks') && hasKeys(photoData[photo].rocks.strat_name)"
                       [hidden]="!hasKey(photoData[photo], 'rocks') || !hasKeys(photoData[photo].rocks.strat_name)">
@@ -36,9 +36,9 @@
                 </span>
 
                 <span class="checkin-attribute age-estimate"
-                      *ngIf="hasKeys(photoData[photo].age_est)"
+                      *ngIf="hasKeys(photoData[photo].age_est) && (photoData[photo].age_est.int_id != photoData[photo].rocks.interval.int_id)"
                       [hidden]="!hasKeys(photoData[photo].age_est)">
-                  {{ photoData[photo].age_est.name }} <span class="age-estimate-age">({{ photoData[photo].age_est.b_age }} - {{ photoData[photo].age_est.t_age }}Ma)</span>
+                  {{ photoData[photo].age_est.name }} <span class="age-estimate-age">({{ photoData[photo].age_est.b_age.toFixed(1) }} - {{ photoData[photo].age_est.t_age.toFixed(1) }}Ma)</span>
                   <br><span class="estimated">(estimated)</span>
                 </span>
 

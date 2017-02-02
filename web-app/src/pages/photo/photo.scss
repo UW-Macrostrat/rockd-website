@@ -1,4 +1,9 @@
 photo {
+  .tags {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .img {
     background-size: contain;
     background-repeat: no-repeat;
