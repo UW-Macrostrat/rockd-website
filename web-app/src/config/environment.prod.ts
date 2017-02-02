@@ -1,5 +1,5 @@
 export const ENV = {
   PRODUCTION: true,
-  BASE_URI: '/',
+  BASE_URI: '',
   LOCATIONSTRATEGY: 'path'
 }
