@@ -84,7 +84,7 @@
               </span>
 
               <span class="checkin-attribute age-estimate"
-                    *ngIf="hasKeys(observation.age_est)"
+                    *ngIf="hasKeys(observation.age_est) && (observation.age_est.int_id != observation.rocks.interval.int_id)"
                     [hidden]="!hasKeys(observation.age_est)">
                 {{ observation.age_est.name }} <span class="age-estimate-age">({{ observation.age_est.b_age.toFixed(1) }} - {{ observation.age_est.t_age.toFixed(1) }}Ma)</span>
                 <br><span class="estimated">(estimated)</span>

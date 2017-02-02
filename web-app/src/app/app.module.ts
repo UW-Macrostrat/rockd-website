@@ -21,7 +21,7 @@ import { ENV } from '../config/environment'
 
 export const deepLinkConfig: DeepLinkConfig = {
   links: [
-    { component: NewHomePage, name: 'Home Page', segment: '' },
+    { component: NewHomePage, name: 'Home Page', segment: 'explore' },
     { component: AboutPage, name: 'About Page', segment: 'about' },
     { component: CheckinPage, name: 'Checkin Page', segment: 'checkin/:checkin_id' },
     { component: CheckinMap, name: 'Checkin Page Map', segment: 'checkin/:checkin_id/map', defaultHistory: [CheckinPage] },

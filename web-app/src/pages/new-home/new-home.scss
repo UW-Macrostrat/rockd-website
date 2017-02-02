@@ -7,7 +7,7 @@ new-home {
     padding:0;
     margin:0;
   }
-  .home > scroll-content {
+  .home > .scroll-content {
     padding: 0;
     height: 100%;
     overflow-y: hidden;
@@ -41,6 +41,7 @@ new-home {
   }
   .sidebar {
     overflow-y: scroll;
+    margin-bottom: 50px;
   }
   .checkin-list {
     margin-top: -30px;
