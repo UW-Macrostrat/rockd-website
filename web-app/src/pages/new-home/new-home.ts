@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { MacrostratService } from '../../services/macrostrat.service'
+import { AutocompleteService } from '../../services/autocomplete.service'
 import { ModalController, NavController } from 'ionic-angular'
 
 import { AboutPage } from '../about/about'
@@ -27,12 +28,14 @@ export class NewHomePage {
   public searchIsFocused:boolean = false
   public searchText:string = ''
   public autocompleteResults = {
-    strat_name_concepts: [],
-    strat_name_orphans: [],
-    lithologies: [],
-    intervals: [],
+    taxa: [],
     minerals: [],
-    structures: []
+    structures: [],
+    strat_names: [],
+    people: [],
+    intervals: [],
+    liths: [],
+    lith_atts: []
   }
   public loadingAutocomplete:boolean = false
   public filters: any = []
@@ -42,6 +45,7 @@ export class NewHomePage {
 
   constructor(
     public macrostratService: MacrostratService,
+    public autocompleteService: AutocompleteService,
     public modalCtrl: ModalController,
     public navCtrl: NavController
   ) { }
@@ -122,36 +126,39 @@ export class NewHomePage {
       return
     }
     this.loadingAutocomplete = true
-    this.macrostratService.autocomplete($event.target.value, (error, results) => {
-      this.autocompleteResults = {
-        strat_name_concepts: results.strat_name_concepts || [],
-        strat_name_orphans: results.strat_name_orphans || [],
-        lithologies: results.lithologies || [],
-        intervals: results.intervals || [],
-        minerals: results.minerals || [],
-        structures: results.structures || []
-      }
+    this.autocompleteService.search($event.target.value, (error, results) => {
+      this.autocompleteResults = results
       this.loadingAutocomplete = false
     })
+    // this.macrostratService.autocomplete($event.target.value, (error, results) => {
+    //   this.autocompleteResults = {
+    //     strat_name_concepts: results.strat_name_concepts || [],
+    //     strat_name_orphans: results.strat_name_orphans || [],
+    //     lithologies: results.lithologies || [],
+    //     intervals: results.intervals || [],
+    //     minerals: results.minerals || [],
+    //     structures: results.structures || []
+    //   }
+    //   this.loadingAutocomplete = false
+    // })
   }
 
   addFilter(item, type) {
     // Need a query to get hierarchy for strat_name_concepts and strat_name_orphans
     // Lithologies, intervals, minerals, and structures can be applied right away
     switch(type) {
-      case 'strat_name_concept':
-      case 'strat_name_orphan':
-        this.macrostratService.defineStratName(item.id, type, (error, result) => {
+      case 'strat_name':
+        this.macrostratService.defineStratName(item.strat_name_id, type, (error, result) => {
           if (error || !result || !result.length) { return }
           this.filters = [{
             cat: type,
-            name: item.name,
+            name: item.strat_name,
             vals: result.map(d => { return d.strat_name_id })
           }].concat(this.filters)
         })
         break
       case 'intervals':
-        this.macrostratService.defineInterval(item.id, (error, result) => {
+        this.macrostratService.defineInterval(item.int_id, (error, result) => {
           if (error || !result || !result.length) { return }
           this.filters = [{
             cat: type,
@@ -160,13 +167,46 @@ export class NewHomePage {
           }].concat(this.filters)
         })
         break
-      case 'lithologies':
+      case 'liths':
+        this.filters = [{
+          cat: type,
+          name: item.name,
+          vals: [ item.lith_id ]
+        }].concat(this.filters)
+        break
+      case 'lith_atts':
+        this.filters = [{
+          cat: type,
+          name: item.name,
+          vals: [ item.lith_att_id ]
+        }].concat(this.filters)
+        break
       case 'minerals':
+        this.filters = [{
+          cat: type,
+          name: item.name,
+          vals: [ item.mineral_id ]
+        }].concat(this.filters)
+        break
+      case 'taxa':
+        this.filters = [{
+          cat: type,
+          name: item.name,
+          vals: [ item.taxon_id ]
+        }].concat(this.filters)
+        break
       case 'structures':
         this.filters = [{
           cat: type,
           name: item.name,
-          vals: [ item.id ]
+          vals: [ item.structure_id ]
+        }].concat(this.filters)
+        break
+      case 'people':
+        this.filters = [{
+          cat: type,
+          name: item.name,
+          vals: [ item.person_id ]
         }].concat(this.filters)
         break
     }

@@ -9,7 +9,7 @@
   <ion-card *ngFor="let b of mapInfo.burwell">
     <ion-card-content>
       <h2 class="title-two">{{ b.name }}</h2>
-      <p class="info-attr">
+      <p class="info-attr" [hidden]="!b.t_int_name">
         <strong>Age: </strong>
         {{ b.t_int_name === b.b_int_name ? b.t_int_name : b.b_int_name + ' - ' + b.t_int_name}}
         ({{ b.b_int_age }} - {{ b.t_int_age }} <small> Ma</small>)
@@ -40,6 +40,31 @@
     </ion-card-content>
   </ion-card>
 
+  <ion-card [hidden]="!hasKeys(mapInfo.lines)" *ngIf="hasKeys(mapInfo.lines)">
+    <ion-card-content>
+      <h2 class="title-two">{{mapInfo.lines.name ? mapInfo.lines.name : (mapInfo.lines.type ? mapInfo.lines.type : 'Lines')}}</h2>
+
+      <p class="info-attr" [hidden]="!mapInfo.lines.type || !mapInfo.lines.name">
+        <strong>Type: </strong> {{ mapInfo.lines.type }}
+      </p>
+
+      <p class="info-attr" [hidden]="!mapInfo.lines.direction">
+        <strong>Direction: </strong> {{ mapInfo.lines.direction }}
+      </p>
+
+      <p class="info-attr" [hidden]="!mapInfo.lines.descrip">
+        <strong>Description: </strong> {{ mapInfo.lines.descrip }}
+      </p>
+
+      <p class="info-attr reference" [hidden]="!mapInfo.lines.ref">
+        <strong>Reference: </strong>
+        {{ mapInfo.lines.ref.authors }}, <span [hidden]="!mapInfo.lines.ref.ref_year.length">{{ mapInfo.lines.ref.ref_year }}, </span><a class="reference-url" href="{{ mapInfo.lines.ref.url }}">{{ mapInfo.lines.ref.ref_title }}</a><span [hidden]="!mapInfo.lines.ref.ref_source.length">: {{ mapInfo.lines.ref.ref_source }}</span><span [hidden]="!mapInfo.lines.ref.isbn_doi.length">, {{ mapInfo.lines.ref.isbn_doi }}</span>.
+      </p>
+
+    </ion-card-content>
+  </ion-card>
+
+
   <ion-card [hidden]="!hasKeys(mapInfo.macrostrat)">
     <ion-card-content>
       <h2 class="title-two">{{mapInfo.macrostrat.rank_names}}</h2>
@@ -48,7 +73,7 @@
       </p>
 
       <p class="info-attr">
-        <strong>Thickness: </strong>≤ {{ mapInfo.macrostrat.max_thick }} <small>m</small>
+        <strong>Thickness: </strong> {{ mapInfo.macrostrat.max_thick }} <small>m</small>
       </p>
 
       <p class="info-attr">
@@ -73,7 +98,6 @@
 
     </ion-card-content>
   </ion-card>
-
 
   <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.rank_names.length">
     <ion-card-content>
