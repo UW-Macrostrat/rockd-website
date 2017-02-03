@@ -15,6 +15,7 @@ import { CheckinMap } from '../pages/checkin-map/checkin-map';
 
 import { CheckinService } from '../services/checkin-service.service';
 import { MacrostratService } from '../services/macrostrat.service';
+import { AutocompleteService } from '../services/autocomplete.service';
 import { Settings } from '../services/settings.service'
 
 import { ENV } from '../config/environment'
@@ -68,6 +69,7 @@ export const deepLinkConfig: DeepLinkConfig = {
     Settings,
     CheckinService,
     MacrostratService,
+    AutocompleteService,
     { provide: APP_BASE_HREF, useValue: ENV.BASE_URI }
   ]
 })

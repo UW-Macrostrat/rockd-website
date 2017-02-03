@@ -52,22 +52,28 @@
           <ion-item-group>
             <ion-item-divider
               color="light"
-              [hidden]="!autocompleteResults.strat_name_concepts.length">
+              [hidden]="!autocompleteResults.strat_names.length">
               Stratigraphic names
             </ion-item-divider>
-            <ion-item *ngFor="let item of autocompleteResults.strat_name_concepts" (click)="addFilter(item, 'strat_name_concept')">
+            <ion-item *ngFor="let item of autocompleteResults.strat_names" (click)="addFilter(item, 'strat_name_concept')">
+              {{ item.strat_name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.people.length">Users</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.people" (click)="addFilter(item, 'people')">
               {{ item.name }}
             </ion-item>
           </ion-item-group>
           <ion-item-group>
-            <ion-item-divider color="light" [hidden]="!autocompleteResults.strat_name_orphans.length">Other names</ion-item-divider>
-            <ion-item *ngFor="let item of autocompleteResults.strat_name_orphans" (click)="addFilter(item, 'strat_name_orphan')">
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.liths.length">Lithologies</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.liths" (click)="addFilter(item, 'liths')">
               {{ item.name }}
             </ion-item>
           </ion-item-group>
           <ion-item-group>
-            <ion-item-divider color="light" [hidden]="!autocompleteResults.lithologies.length">Lithologies</ion-item-divider>
-            <ion-item *ngFor="let item of autocompleteResults.lithologies" (click)="addFilter(item, 'lithologies')">
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.lith_atts.length">Lithology Attributes</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.lith_atts" (click)="addFilter(item, 'lith_atts')">
               {{ item.name }}
             </ion-item>
           </ion-item-group>
@@ -86,6 +92,12 @@
           <ion-item-group>
             <ion-item-divider color="light" [hidden]="!autocompleteResults.structures.length">Structures</ion-item-divider>
             <ion-item *ngFor="let item of autocompleteResults.structures" (click)="addFilter(item, 'structures')">
+              {{ item.name }}
+            </ion-item>
+          </ion-item-group>
+          <ion-item-group>
+            <ion-item-divider color="light" [hidden]="!autocompleteResults.taxa.length">Taxa</ion-item-divider>
+            <ion-item *ngFor="let item of autocompleteResults.taxa" (click)="addFilter(item, 'taxa')">
               {{ item.name }}
             </ion-item>
           </ion-item-group>
@@ -142,7 +154,20 @@
                   <ion-icon name="camera"></ion-icon> {{ checkin.n_photos }}
                 </ion-col>
                 <ion-col width-33 class="checkin-footer">
-                  <ion-icon name="thumbs-up"></ion-icon> {{ checkin.likes }}
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     width="17px" height="17px" viewBox="440.584 525.124 125.994 120.954"
+                     enable-background="new 440.584 525.124 125.994 120.954" xml:space="preserve"
+                     class="pick ng-class: s.selectedCheckin.liked ? 'liked-checkin-pick' : 'unliked-checkin-pick'">
+                    <g>
+                      <path d="M498.788,533.069l3.391,3.391c0,0,2.072,2.26-0.662,4.978l-2.256,2.256c-0.98,0.985-2.298,1.935-3.073,1.992l-1.693,0.363
+                        c-2.766,0.696-10.043,6.866-7.902,9.162l2.295,2.295c0,0,0.481,0.929,0.126,1.818l1.349,1.951c0,0,8.217,9.295,11.841,12.905
+                        l41.821,41.549c0,0,8.056,7.822,10.527,8.463c0,0,3.336,2.349,4.633,4.633c1.299,2.287-2.302,6.01-2.302,6.01
+                        s-3.724,3.601-6.01,2.302c-2.286-1.299-4.633-4.633-4.633-4.633c-0.639-2.471-8.463-10.527-8.463-10.527l-41.552-41.821
+                        c-3.611-3.625-12.905-11.841-12.905-11.841l-1.862-1.287c-0.461,0.308-1.293,0.581-2.29-0.417l-1.454-1.454
+                        c0,0-3.104-4.079-9.793,1.377c-5.574,4.551-18.548,21.491-18.548,21.491s5.565-24.493,45.944-54.628
+                        C495.319,533.396,497.332,531.745,498.788,533.069z"/>
+                    </g>
+                  </svg> {{ checkin.likes }}
                 </ion-col>
               </ion-row>
 

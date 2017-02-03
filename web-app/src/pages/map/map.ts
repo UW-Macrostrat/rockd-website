@@ -101,12 +101,14 @@ export class TheMap {
   }
 
   public filterMap = {
-    strat_name_concept: 'strat_name_ids',
-    strat_name_orphan: 'strat_name_ids',
-    lithologies: 'lith_ids',
+    strat_names: 'strat_name_ids',
+    people: 'person_ids',
+    liths: 'lith_ids',
+    lith_atts: 'lith_att_ids',
     intervals: 'ages',
     minerals: 'mineral_ids',
-    structures: 'structure_ids'
+    structures: 'structure_ids',
+    taxa: 'taxon_ids'
   }
 
   ngOnChanges(changes: any) {
@@ -147,31 +149,80 @@ export class TheMap {
         return
       }
 
-      let filteredFeatures = this.checkins.features.filter(checkin => {
-        let found = []
+      let filterMatches = {
+        strat_name_ids: [],
+        person_ids: [],
+        lith_ids: [],
+        lith_att_ids: [],
+        ages: [],
+        mineral_ids: [],
+        structure_ids: [],
+        taxon_ids: []
+      }
+
+
+      for (var i = 0; i < this.checkins.features.length; i++) {
         Object.keys(this._filters).forEach(f => {
-          // Handle ids
           if (f.indexOf('_id') > -1) {
             let intersection = this._filters[f].filter(j => {
-              return checkin.properties[f].indexOf(j) != -1
+              return this.checkins.features[i].properties[f].indexOf(j) != -1
             })
             if (intersection.length) {
-              found.push(f)
+              filterMatches[f].push(this.checkins.features[i].properties.checkin_id)
             }
           } else {
             // Handle ages
             this._filters[f].forEach(range => {
-              checkin.properties.age_ranges.forEach(range2 => {
+              this.checkins.features[i].properties.age_ranges.forEach(range2 => {
                 if (range[0] >= range2[1] && range2[0] >= range[1]) {
-                  found.push(f)
+                  filterMatches[f].push(this.checkins.features[i].properties.checkin_id)
                 }
               })
             })
           }
         })
+      }
 
-        if (found.length === Object.keys(this._filters).length) { return checkin }
+      let presentFilters = Object.keys(filterMatches).filter(d => { if (filterMatches[d].length) return d }).map(d => { return filterMatches[d] })
+
+      // Interesection of multiple arrays via http://stackoverflow.com/a/11076082/1956065
+      let checkinMatches = presentFilters.shift().filter(function(v) {
+          return presentFilters.every(function(a) {
+              return a.indexOf(v) !== -1;
+          })
       })
+
+      let filteredFeatures = this.checkins.features.filter(checkin => {
+        if (checkinMatches.indexOf(checkin.properties.checkin_id) > -1) {
+          return checkin
+        }
+      })
+
+      // let filteredFeatures = this.checkins.features.filter(checkin => {
+      //   let found = []
+      //   Object.keys(this._filters).forEach(f => {
+      //     // Handle ids
+      //     if (f.indexOf('_id') > -1) {
+      //       let intersection = this._filters[f].filter(j => {
+      //         return checkin.properties[f].indexOf(j) != -1
+      //       })
+      //       if (intersection.length) {
+      //         found.push(f)
+      //       }
+      //     } else {
+      //       // Handle ages
+      //       this._filters[f].forEach(range => {
+      //         checkin.properties.age_ranges.forEach(range2 => {
+      //           if (range[0] >= range2[1] && range2[0] >= range[1]) {
+      //             found.push(f)
+      //           }
+      //         })
+      //       })
+      //     }
+      //   })
+      //
+      //   if (found.length === Object.keys(this._filters).length) { return checkin }
+      // })
 
       this.map.getSource('checkin-clusters').setData({
         type: 'FeatureCollection',

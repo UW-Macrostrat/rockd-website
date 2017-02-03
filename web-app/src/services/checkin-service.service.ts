@@ -102,6 +102,24 @@ export class CheckinService {
             }
           })).filter(j => { if (j) return j })
 
+          d.properties.taxon_ids = [].concat.apply([], d.properties.observations.map(j => {
+            if (Object.keys(j.fossils).length && j.fossils.taxon) {
+              return j.fossils.taxon.map(q => { return q.oid })
+            }
+          })).filter(j => { if (j) return j })
+
+          d.properties.lith_att_ids = [].concat.apply([], d.properties.observations.map(j => {
+            if (Object.keys(j.rocks).length && j.rocks.liths.length) {
+              return [].concat.apply([], j.rocks.liths.map(q => {
+                if (!q.attributes) {
+                  return []
+                } else {
+                  return q.attributes.map(r => { return r.lith_att_id })
+                }
+              }))
+            }
+          }))
+
           d.properties.structure_ids = d.properties.observations.map(j => {
             if (Object.keys(j.orientation).length && j.orientation.feature) {
               return j.orientation.feature.structure_id
@@ -113,6 +131,8 @@ export class CheckinService {
               return [ j.age_est.b_age, j.age_est.t_age ]
             }
           }).filter(j => { if (j) return j })
+
+          d.properties.person_ids = [ d.properties.person_id ]
 
           return d
         })
@@ -265,20 +285,6 @@ export class CheckinService {
       observation.banner = this.ImageURL(person_id, observation.photo, 'banner', user.token)
       observation.full = this.ImageURL(person_id, observation.photo, 'full', user.token)
     }
-
-    // This can be deleted...?
-    // if (Object.keys(observation.rocks).length && parseInt(observation.rocks.photo) === observation.rocks.photo) {
-    //   observation.rocks.thumb = this.ImageURL(person_id, observation.rocks.photo, 'thumb', user.token)
-    //   observation.rocks.banner = this.ImageURL(person_id, observation.rocks.photo, 'banner', user.token)
-    //   observation.rocks.full = this.ImageURL(person_id, observation.rocks.photo, 'full', user.token)
-    //   observation.rocks.photo = observation.rocks.full
-    // }
-    // if (Object.keys(observation.fossils).length && parseInt(observation.fossils.photo) === observation.fossils.photo) {
-    //   observation.fossils.thumb = this.ImageURL(person_id, observation.fossils.photo, 'thumb', user.token)
-    //   observation.fossils.banner = this.ImageURL(person_id, observation.fossils.photo, 'banner', user.token)
-    //   observation.fossils.full = this.ImageURL(person_id, observation.fossils.photo, 'full', user.token)
-    //   observation.fossils.photo = observation.fossils.full
-    // }
 
     if (Object.keys(observation.orientation).length) {
       if (observation.orientation.strike != null) {
