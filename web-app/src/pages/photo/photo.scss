@@ -59,6 +59,7 @@ photo {
     white-space: nowrap;
     margin-top: 5px;
     display: inline-block;
+    max-width: 100%;
   }
   .checkin-title {
     font-size: 12px;
@@ -101,6 +102,10 @@ photo {
     }
     .photo-caption {
       padding-bottom: 20px;
+    }
+    .checkin-attribute {
+      white-space: normal;
+      line-height: 14px;
     }
   }
 }
