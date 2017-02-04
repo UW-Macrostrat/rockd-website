@@ -44,6 +44,7 @@ export class TheMap {
   public mapState
   public checkins: any
   public _filters: any = {}
+  public loading = false
   // The map emits an observable `visibleCheckins` that simply returns a list of all visible checkins on the map
   visibleCheckins: EventEmitter<any>
 
@@ -198,32 +199,6 @@ export class TheMap {
         }
       })
 
-      // let filteredFeatures = this.checkins.features.filter(checkin => {
-      //   let found = []
-      //   Object.keys(this._filters).forEach(f => {
-      //     // Handle ids
-      //     if (f.indexOf('_id') > -1) {
-      //       let intersection = this._filters[f].filter(j => {
-      //         return checkin.properties[f].indexOf(j) != -1
-      //       })
-      //       if (intersection.length) {
-      //         found.push(f)
-      //       }
-      //     } else {
-      //       // Handle ages
-      //       this._filters[f].forEach(range => {
-      //         checkin.properties.age_ranges.forEach(range2 => {
-      //           if (range[0] >= range2[1] && range2[0] >= range[1]) {
-      //             found.push(f)
-      //           }
-      //         })
-      //       })
-      //     }
-      //   })
-      //
-      //   if (found.length === Object.keys(this._filters).length) { return checkin }
-      // })
-
       this.map.getSource('checkin-clusters').setData({
         type: 'FeatureCollection',
         features: filteredFeatures
@@ -296,19 +271,6 @@ export class TheMap {
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg'
 
-    let infoMarkerLayer = {
-      id: 'infoMarker',
-      type: 'circle',
-      source: 'info_marker',
-      paint: {
-        'circle-radius': 8,
-        'circle-color': '#333',
-        'circle-opacity': 0.9,
-  // Not available yet...  'circle-stroke-width': 1,
-      //  'circle-stroke-color': '#333333'
-      }
-    }
-
     this.map = new mapboxgl.Map({
       container: 'the-map-' + this.mapType,
       //container: 'the-map',
@@ -372,7 +334,18 @@ export class TheMap {
               'circle-color': '#ffffff',
               'circle-opacity': 0,
             }
-          },
+          }, {
+            id: 'infoMarker',
+            type: 'circle',
+            source: 'info_marker',
+            paint: {
+              'circle-radius': 8,
+              'circle-color': '#333',
+              'circle-opacity': 0.9,
+              //'circle-stroke-width': 1,
+              'circle-stroke-color': '#555'
+            }
+          }
         ]
       },
       attributionControl: false,
@@ -393,9 +366,7 @@ export class TheMap {
     this.map.addControl(nav, 'top-right')
 
     this.map.on('movestart', () => {
-      if (this.map.getLayer('infoMarker')) {
-        this.map.removeLayer('infoMarker')
-      }
+      this.map.setPaintProperty('infoMarker', 'circle-opacity', 0)
     })
     this.map.on('moveend', event => {
       let center = this.map.getCenter()
@@ -472,6 +443,9 @@ export class TheMap {
       * If the click wasn't on a cluster or marker, query the geologic map and add a marker
       */
       // Reposition and add the info marker to the spot of the click
+      this.loading = true
+
+
       this.map.getSource('info_marker').setData({
         type: 'FeatureCollection',
         features: [{
@@ -483,7 +457,7 @@ export class TheMap {
         }]
       })
 
-      this.map.addLayer(infoMarkerLayer)
+      this.map.setPaintProperty('infoMarker', 'circle-opacity', 0.9)
 
       let z = parseInt(this.map.getZoom())
       this.macrostratService.queryMap(event.lngLat, z, (error, data) => {
@@ -503,6 +477,7 @@ export class TheMap {
               this.mapInfo.literature = literature
           })
         }
+        this.loading = false
         this.openMapInfoModal()
       })
     })
@@ -592,33 +567,17 @@ export class TheMap {
         } else {
           this.map.on('load', () => {
             this.checkinService.getMap((error, data) => {
-              this.visibleCheckins.emit(data.features.map(d => {
-                return d.properties
-              }))
-
+              // Save the data for later
               this.checkins = data
 
+              // Update the checkin source
               this.map.getSource('checkins').setData(data)
-              // this.map.addSource('checkins', {
-              //   type: 'geojson',
-              //   data: data
-              // })
+
               this.map.addSource('checkin-clusters', {
                 type: 'geojson',
                 cluster: true,
                 data: data
               })
-
-              // this.map.addLayer({
-              //   id: 'checkins',
-              //   type: 'circle',
-              //   source: 'checkins',
-              //   paint: {
-              //     'circle-radius': 5,
-              //     'circle-color': '#ffffff',
-              //     'circle-opacity': 0,
-              //   }
-              // })
 
               var categories = [
                 [500, '#08519c'],
@@ -673,6 +632,10 @@ export class TheMap {
                   'text-size': 12
                 }
               })
+
+              this.visibleCheckins.emit(data.features.map(d => {
+                return d.properties
+              }))
             })
           })
 
