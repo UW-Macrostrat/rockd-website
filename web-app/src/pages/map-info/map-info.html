@@ -6,6 +6,10 @@
     </ion-item>
   </ion-card>
 
+  <div class="loading" [hidden]="!loading">
+    <ion-spinner name="dots"></ion-spinner>
+  </div>
+
   <ion-card *ngFor="let b of mapInfo.burwell">
     <ion-card-content>
       <h2 class="title-two">{{ b.name }}</h2>

@@ -3,6 +3,9 @@ new-home {
   *::-webkit-scrollbar {
     display: none;
   }
+  .banner {
+    min-height: 100px;
+  }
   .home {
     padding:0;
     margin:0;

@@ -79,13 +79,13 @@
                 </span>
 
                 <span class="checkin-attribute"
-                      [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.strike === null)"
+                      [hidden]="!hasKeys(photoData[photo].orientation) || photoData[photo].orientation.strike === null"
                       *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.strike != null">
-                    Strike: {{ observation.orientation.strikeCardinal  }}({{ observation.orientation.strike }}&deg;)
+                    Strike: {{ photoData[photo].orientation.strikeCardinal  }}({{ photoData[photo].orientation.strike }}&deg;)
                 </span>
 
                 <span class="checkin-attribute"
-                      [hidden]="!hasKeys(photoData[photo].orientation) || !hasKeys(photoData[photo].orientation.dip === null)"
+                      [hidden]="!hasKeys(photoData[photo].orientation) || photoData[photo].orientation.dip === null"
                       *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.dip != null">
                     Dip: <span *ngIf="hasKeys(photoData[photo].orientation)" [hidden]="photoData[photo].orientation.dip == null">{{ photoData[photo].orientation.dip }}&deg;</span><span *ngIf="hasKeys(photoData[photo].orientation)" [hidden]="photoData[photo].orientation.dip_dir == null">{{ photoData[photo].orientation.dip_dirCardinal  }}</span>
                 </span>
