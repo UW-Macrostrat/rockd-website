@@ -55,7 +55,7 @@
               [hidden]="!autocompleteResults.strat_names.length">
               Stratigraphic names
             </ion-item-divider>
-            <ion-item *ngFor="let item of autocompleteResults.strat_names" (click)="addFilter(item, 'strat_name_concept')">
+            <ion-item *ngFor="let item of autocompleteResults.strat_names" (click)="addFilter(item, 'strat_name')">
               {{ item.strat_name }}
             </ion-item>
           </ion-item-group>

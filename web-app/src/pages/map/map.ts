@@ -102,7 +102,7 @@ export class TheMap {
   }
 
   public filterMap = {
-    strat_names: 'strat_name_ids',
+    strat_name: 'strat_name_ids',
     people: 'person_ids',
     liths: 'lith_ids',
     lith_atts: 'lith_att_ids',
@@ -116,6 +116,7 @@ export class TheMap {
     if (!this.map) {
       return
     }
+
     if (changes.focalLng && changes.focalLng.currentValue != changes.focalLng.previousValue) {
       this.map.easeTo({
         zoom: 14,
