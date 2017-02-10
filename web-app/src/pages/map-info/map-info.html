@@ -121,7 +121,7 @@
             <h2 class="title-two">{{ journal.name }}</h2>
           </div>
           <div class="reference" *ngFor="let article of journal.articles">
-            {{ article.authors ? article.authors : 'Unknown' }}, <span [hidden]="!article.year">{{ article.year }}. </span><a class="reference-url" href="{{ article.url }}">{{ article.title }}</a>: {{ article.source }}.
+            {{ article.displayAuthors ? article.displayAuthors : 'Unknown' }}, <span [hidden]="!article.year">{{ article.year }}. </span><a class="reference-url" href="{{ article.url }}">{{ article.title }}</a>: {{ article.publisher }}.
           </div>
         </ion-item>
       </ion-list>

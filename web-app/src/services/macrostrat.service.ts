@@ -21,7 +21,7 @@ export class MacrostratService {
   }
 
   fetchArticles(stratNames, callback) {
-    this.http.get(`${Settings.GEODEEPDIVEURL}/snippets?term=${stratNames}`)
+    this.http.get(`${Settings.GEODEEPDIVEURL}/excerpts?term=${stratNames}`)
       .toPromise()
       .then(response => { return response.json() })
       .then(response => {
@@ -36,11 +36,17 @@ export class MacrostratService {
 
         // Group articles by journal
         for (let i = 0; i < data.length; i++) {
-          data[i].url = (data[i].URL.indexOf('elsevier') > -1) ? 'http://www.sciencedirect.com/science/article/pii/' + data[i].URL.split('pii/')[1] : data[i].URL
+          try {
+            data[i].year = (data[i].coverdate) ? data[i].coverdate.match(/\d{4}/)[0] : ''
+          } catch(e) {
+            data[i].year = ''
+          }
+          var authors = (data[i].hasOwnProperty('authors')) ? data[i].authors.map(function(d) { return d.name }) : []
+          data[i].displayAuthors = (authors.length && authors.length >= 4) ? authors.slice(0, 4).join(', ') + ' et al.' : authors.join(', ')
+
           let found = false
-          data[i].year = (data[i].coverDate) ? data[i].coverDate.match(/\d{4}/)[0] : ''
           for (let j = 0; j < parsed.journals.length; j++) {
-            if (parsed.journals[j].name === data[i].pubname) {
+            if (parsed.journals[j].name === data[i].journal) {
               parsed.journals[j].articles.push(data[i])
               found = true
             }
@@ -48,8 +54,8 @@ export class MacrostratService {
 
           if (!found) {
             parsed.journals.push({
-              name: data[i].pubname,
-              reference: data[i].source,
+              name: data[i].journal,
+              publisher: data[i].publisher,
               articles: [data[i]]
             })
           }
