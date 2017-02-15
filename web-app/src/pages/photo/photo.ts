@@ -71,6 +71,10 @@ export class PhotoPage {
     }
     return false
   }
+  urlify(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1" target="_blank" class="external-link">$1</a>')
+  }
 
   setup(fresh) {
     let photos = [ this.checkin.photo_id ].concat(this.checkin.observations.map(d => { return d.photo }))

@@ -155,26 +155,26 @@
 
             <div class="notes"
                  [hidden]="!hasKeys(observation.rocks) || !observation.rocks.notes"
-                 *ngIf="hasKeys(observation.rocks) && observation.rocks.notes">
-              {{ observation.rocks.notes }}
+                 *ngIf="hasKeys(observation.rocks) && observation.rocks.notes"
+                 [innerHTML]="urlify(observation.rocks.notes)">
             </div>
 
             <div class="notes"
                  [hidden]="!hasKeys(observation.fossils) || !observation.fossils.notes"
-                 *ngIf="hasKeys(observation.fossils) && observation.fossils.notes">
-              {{ observation.fossils.notes }}
+                 *ngIf="hasKeys(observation.fossils) && observation.fossils.notes"
+                 [innerHTML]="urlify(observation.fossils.notes)">
             </div>
 
             <div class="notes"
                  [hidden]="!hasKeys(observation.minerals) || !observation.minerals.notes"
-                 *ngIf="hasKeys(observation.minerals) && observation.minerals.notes">
-              {{ observation.minerals.notes }}
+                 *ngIf="hasKeys(observation.minerals) && observation.minerals.notes"
+                 [innerHTML]="urlify(observation.minerals.notes)">
             </div>
 
             <div class="notes"
                  [hidden]="!hasKeys(observation.orientation) || !observation.orientation.notes"
-                 *ngIf="hasKeys(observation.orientation) && observation.orientation.notes">
-              {{ observation.orientation.notes }}
+                 *ngIf="hasKeys(observation.orientation) && observation.orientation.notes"
+                 [innerHTML]="urlify(observation.orientation.notes)">
             </div>
           </ion-card-content>
         </ion-card>

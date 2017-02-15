@@ -95,7 +95,11 @@ photo {
   .swiper-pagination-bullet-active {
     background: #333333;
   }
-
+  .external-link {
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+  }
   @media(max-width: 1000px) {
     .slide-zoom {
       padding-bottom: 0;

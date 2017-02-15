@@ -93,26 +93,26 @@
 
               <div class="notes"
                    [hidden]="!hasKeys(photoData[photo].rocks) || !photoData[photo].rocks.notes"
-                   *ngIf="hasKeys(photoData[photo].rocks) && photoData[photo].rocks.notes">
-                {{ photoData[photo].rocks.notes }}
+                   *ngIf="hasKeys(photoData[photo].rocks) && photoData[photo].rocks.notes"
+                   [innerHTML]="urlify(photoData[photo].rocks.notes)">
               </div>
 
               <div class="notes"
                    [hidden]="!hasKeys(photoData[photo].fossils) || !photoData[photo].fossils.notes"
-                   *ngIf="hasKeys(photoData[photo].fossils) && photoData[photo].fossils.notes">
-                {{ photoData[photo].fossils.notes }}
+                   *ngIf="hasKeys(photoData[photo].fossils) && photoData[photo].fossils.notes"
+                   [innerHTML]="urlify(photoData[photo].fossils.notes)">
               </div>
 
               <div class="notes"
                    [hidden]="!hasKeys(photoData[photo].minerals) || !photoData[photo].minerals.notes"
-                   *ngIf="hasKeys(photoData[photo].minerals) && photoData[photo].minerals.notes">
-                {{ photoData[photo].minerals.notes }}
+                   *ngIf="hasKeys(photoData[photo].minerals) && photoData[photo].minerals.notes"
+                   [innerHTML]="urlify(photoData[photo].minerals.notes)">
               </div>
 
               <div class="notes"
                    [hidden]="!hasKeys(photoData[photo].orientation) || !photoData[photo].orientation.notes"
-                   *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.notes">
-                {{ photoData[photo].orientation.notes }}
+                   *ngIf="hasKeys(photoData[photo].orientation) && photoData[photo].orientation.notes"
+                   [innerHTML]="urlify(photoData[photo].orientation.notes)">
               </div>
             </div>
           </div>

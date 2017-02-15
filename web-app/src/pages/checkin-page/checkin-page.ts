@@ -78,6 +78,11 @@ export class CheckinPage {
     return false
   }
 
+  urlify(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1" target="_blank" class="external-link">$1</a>')
+  }
+
   openPhoto(photo_id) {
     let photos = [this.checkin.photo_id].concat(this.checkin.observations.map(d => { return d.photo }))
     photos = photos.filter(d => { if (d) return d })
