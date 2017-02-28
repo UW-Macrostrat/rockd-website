@@ -34,7 +34,7 @@
 
     <ion-row>
       <ion-col width-100>
-        <div class="main-banner" (click)="openMap()">
+        <div class="main-banner" (click)="openMap()" [ngStyle]="{'backgroundImage': 'url(' + checkin.mapURL + ')' }">
           <div class="banner-info">
             <div class="banner-inner">
               <div class="banner-avatar">
@@ -44,8 +44,9 @@
               </div>
               <div class="banner-name-date">
                 <h2 class="banner-name">{{ checkin.first_name }} {{ checkin.last_name }}</h2>
+                <h3 class="banner-date created">{{ checkin.created }}</h3>
+                <h3 class="banner-date"><ion-icon name="pin"></ion-icon> Near {{ checkin.near }}</h3>
                 <h3 class="banner-date"><ion-icon name="star" *ngFor="let star of getRating(checkin.rating)"></ion-icon></h3>
-                <h3 class="banner-date">{{ checkin.created }}</h3>
               </div>
             </div>
           </div>

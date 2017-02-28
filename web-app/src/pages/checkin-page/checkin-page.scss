@@ -12,6 +12,11 @@ checkin-page {
 		position: relative;
 		background-repeat: no-repeat;
 		background-size: cover;
+		cursor: pointer;
+	}
+	.created {
+		font-size: 14px;
+		color: #777;
 	}
 	.banner-info {
 		position: absolute;
@@ -43,6 +48,7 @@ checkin-page {
 		margin-top: -10px;
 		font-size: 16px;
 		font-weight: 400;
+		line-height: 27px;
 	}
 	.banner-near {
 		margin-top: -10px;

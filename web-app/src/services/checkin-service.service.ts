@@ -200,6 +200,7 @@ export class CheckinService {
 
     // If it has a blob URL or no photo, ignore it
 
+    checkin.mapURL = `'https://api.mapbox.com/styles/v1/mapbox/light-v9/static/pin-s(${checkin.geom.coordinates[0].toFixed(2)},${checkin.geom.coordinates[1].toFixed(2)})/${checkin.geom.coordinates[0].toFixed(2) - 1.5},${checkin.geom.coordinates[1].toFixed(2)},6,0,0/800x225@2x?access_token=${Settings.MAPBOXAPIKEY}'`
 
     checkin.ownedByUser = checkin.person_id == user.person_id ? true : false
 

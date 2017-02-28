@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ChangeDetectorRef } from '@angular/core'
 import { NavParams, NavController, Platform, ViewController } from 'ionic-angular'
 import { CheckinService } from '../../services/checkin-service.service'
 import { Settings } from '../../services/settings.service'
@@ -27,7 +27,8 @@ export class CheckinPage {
     public params: NavParams,
     public viewCtrl: ViewController,
     public navCtrl: NavController,
-    public checkinService: CheckinService
+    public checkinService: CheckinService,
+    public changeDetector: ChangeDetectorRef,
   ) {
     this.checkin = {
       checkin_id: null,
@@ -42,7 +43,8 @@ export class CheckinPage {
       photo: null,
       liked: false,
       likes: '',
-      observations: []
+      observations: [],
+      mapURL: ''
     }
     this.PBDBURL = Settings.PBDBURL
   }
@@ -52,9 +54,9 @@ export class CheckinPage {
       checkin_id: this.params.get('checkin_id')
     }, null, (error, result) => {
       this.checkin = result[0]
-      this.initializeMap(this.checkin.geom.coordinates)
     })
   }
+
   ionViewDidLeave() {
     if (this.map) {
       this.map.remove()
@@ -111,55 +113,5 @@ export class CheckinPage {
 
   dismiss() {
     this.viewCtrl.dismiss()
-  }
-
-  initializeMap(center) {
-    if (!center || !center.length) {
-      console.log('skip')
-      return
-    }
-    mapboxgl.accessToken = 'pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg'
-    this.map = new mapboxgl.Map({
-      container: 'checkin-map',
-      style: 'mapbox://styles/mapbox/light-v9',
-      attributionControl: false,
-      interactive: false,
-      dragRotate: false,
-      touchZoomRotate: false,
-      center: center,
-      zoom: 6
-    })
-
-    this.map.panTo(center, {
-      duration: 0,
-      offset: [150, 0],
-      animate: false
-    })
-
-    this.map.on('load', () => {
-      this.map.addSource('markers', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: center
-            }
-          }]
-        }
-      })
-
-      this.map.addLayer({
-        id: 'marker',
-        type: 'symbol',
-        source: 'markers',
-        layout: {
-          'icon-image': 'marker-15',
-          'icon-offset': [0, -5]
-        }
-      })
-    })
   }
 }
