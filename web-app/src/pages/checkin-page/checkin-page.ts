@@ -21,6 +21,7 @@ export class CheckinPage {
   public checkin
   public PBDBURL
   public map
+  public ERROR
 
   constructor(
     public platform: Platform,
@@ -47,12 +48,17 @@ export class CheckinPage {
       mapURL: ''
     }
     this.PBDBURL = Settings.PBDBURL
+    this.ERROR = false
   }
 
   ionViewDidEnter() {
     this.checkinService.get({
       checkin_id: this.params.get('checkin_id')
     }, null, (error, result) => {
+      if (error || !result || !result.length) {
+        this.ERROR = true
+        return
+      }
       this.checkin = result[0]
     })
   }

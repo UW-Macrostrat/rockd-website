@@ -1,14 +1,21 @@
 <ion-header>
   <ion-navbar color="clear">
-    <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
-    <!-- <ion-buttons end>
-      <button ion-button [navPush]="aboutPage">About</button>
-    </ion-buttons> -->
+    <ion-title>
+      <a href="/explore">
+        <img class="header-logo" src="./assets/logo-light.png"/>
+      </a>
+    </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content class="checkin-page-content has-footer">
-  <ion-grid>
+  <ion-grid [hidden]="!ERROR">
+    <ion-col width-100>
+      <img src="./assets/img/404.jpg"/>
+    </ion-col>
+  </ion-grid>
+
+  <ion-grid [hidden]="ERROR">
     <ion-row>
       <ion-col width-90 class="checkin-title">
         {{ checkin.notes }}
@@ -56,7 +63,7 @@
     </ion-row>
   </ion-grid>
 
-  <ion-grid>
+  <ion-grid [hidden]="ERROR">
     <ion-row wrap>
       <ion-col width-33>
         <ion-card>

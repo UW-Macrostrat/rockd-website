@@ -24,6 +24,7 @@ export class PhotoPage {
   public photoData
   public PBDBURL
   public loading = true
+  public ERROR = false
 
   public options = {
     initialSlide: 0
@@ -41,7 +42,6 @@ export class PhotoPage {
   }
 
   ionViewDidEnter() {
-    this.viewCtrl.setBackButtonText('Checkin')
     this.loading = true
 
     if (this.params.get('checkin')) {
@@ -53,6 +53,11 @@ export class PhotoPage {
       this.checkinService.get({
         photo_id: this.params.get('photo_id')
       }, null, (error, result) => {
+        if (error || !result || !result.length) {
+          this.ERROR = true
+          this.viewCtrl.showBackButton(false);
+          return
+        }
         this.checkin = result[0]
         this.setup(true)
       })
@@ -77,6 +82,7 @@ export class PhotoPage {
   }
 
   setup(fresh) {
+    this.viewCtrl.setBackButtonText('Checkin')
     let photos = [ this.checkin.photo_id ].concat(this.checkin.observations.map(d => { return d.photo }))
     photos = photos.filter(d => { if (d) return d })
     this.photos = photos
