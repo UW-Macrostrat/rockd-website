@@ -16,7 +16,7 @@
   </ion-grid>
 
   <div class="slide-container" [hidden]="ERROR">
-    <ion-slides (ionSlideDidChange)="onSlideChanged()" #photoSlider [pager]="true" [paginationType]="'bullets'" [initialSlide]="options.initialSlide" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
+    <ion-slides (ionSlideDidChange)="onSlideChanged()" #photoSlider [pager]="true" [paginationType]="'bullets'" [initialSlide]="options.initialSlide" [zoom]="true" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
       <ion-slide *ngFor="let photo of photos">
         <div class="photo-holder">
           <div class="photo-caption">
@@ -126,7 +126,7 @@
               </div>
             </div>
           </div>
-          <div class="img" [ngStyle]="{'backgroundImage': 'url(' + 'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + (photo || '') + ')'}">
+          <div class="img" [ngStyle]="{'backgroundImage': 'url(' + 'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/large/' + (photo || '') + ')'}">
 
           </div>
           <!-- <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo}` class="swiper-image"/> -->

@@ -84,29 +84,33 @@ export class CheckinService {
           d.properties.addedParsed = Date.parse(d.properties.added)
           d.properties.n_obs = d.properties.observations.length
 
-          d.properties.strat_name_ids = d.properties.observations.map(j => {
+          let stratNameIDs = d.properties.observations.map(j => {
             if (Object.keys(j.rocks).length && Object.keys(j.rocks.strat_name).length) {
               return j.rocks.strat_name.strat_name_id
             }
           }).filter(j => { if (j) return j })
+          d.properties.strat_name_ids = this.uniques(stratNameIDs)
 
-          d.properties.lith_ids = [].concat.apply([], d.properties.observations.map(j => {
+          let lithIDs = [].concat.apply([], d.properties.observations.map(j => {
             if (Object.keys(j.rocks).length && j.rocks.liths.length) {
               return j.rocks.liths.map(q => { return q.lith_id })
             }
           })).filter(j => { if (j) return j })
+          d.properties.lith_ids = this.uniques(lithIDs)
 
-          d.properties.mineral_ids = [].concat.apply([], d.properties.observations.map(j => {
+          let mineralsIDs = [].concat.apply([], d.properties.observations.map(j => {
             if (Object.keys(j.minerals).length && j.minerals.minerals) {
               return j.minerals.minerals.map(q => { return q.mineral_id })
             }
           })).filter(j => { if (j) return j })
+          d.properties.mineral_ids = this.uniques(mineralsIDs)
 
-          d.properties.taxon_ids = [].concat.apply([], d.properties.observations.map(j => {
+          let taxonIDs = [].concat.apply([], d.properties.observations.map(j => {
             if (Object.keys(j.fossils).length && j.fossils.taxon) {
               return j.fossils.taxon.map(q => { return q.oid })
             }
           })).filter(j => { if (j) return j })
+          d.properties.taxon_ids = this.uniques(taxonIDs)
 
           d.properties.lith_att_ids = [].concat.apply([], d.properties.observations.map(j => {
             if (Object.keys(j.rocks).length && j.rocks.liths.length) {
@@ -139,6 +143,16 @@ export class CheckinService {
         callback(null, json.success.data)
       })
       .catch(error => callback(error, null))
+  }
+
+  uniques(data) {
+    let unique = []
+    return data.filter(d => {
+      if (unique.indexOf(d) < 0) {
+        unique.push(d)
+        return d
+      }
+    })
   }
 
   get(params, user, callback) {
@@ -192,6 +206,7 @@ export class CheckinService {
     // If the checkin has an integer photo_id
     if (parseInt(checkin.photo) === checkin.photo) {
       checkin.thumb = this.ImageURL(checkin.person_id, checkin.photo, 'thumb', user.token)
+      checkin.thumbLarge = this.ImageURL(checkin.person_id, checkin.photo, 'thumb_large', user.token)
       checkin.banner = this.ImageURL(checkin.person_id, checkin.photo, 'banner', user.token)
       checkin.full = this.ImageURL(checkin.person_id, checkin.photo, 'full', user.token)
       // Make the default photo the full photo URL
@@ -283,6 +298,7 @@ export class CheckinService {
 
     if (observation.photo) {
       observation.thumb = this.ImageURL(person_id, observation.photo, 'thumb', user.token)
+      observation.thumbLarge = this.ImageURL(person_id, observation.photo, 'thumb_large', user.token)
       observation.banner = this.ImageURL(person_id, observation.photo, 'banner', user.token)
       observation.full = this.ImageURL(person_id, observation.photo, 'full', user.token)
     }
