@@ -133,7 +133,7 @@
               </ion-item>
 
               <ion-card-content no-padding class="main-content">
-                <img class="banner" [src]="checkin.banner || ''"/>
+                <img class="banner" [src]="checkin.banner || ''" (click)="pushCheckinPage(checkin.checkin_id)"/>
                 <div class="detail-options" [hidden]="!checkin.mousedOver && mode === 'desktop'">
                   <div class="detail-option" (click)="pushCheckinPage(checkin.checkin_id)">
                     <ion-icon name="ios-arrow-dropright"></ion-icon><br>

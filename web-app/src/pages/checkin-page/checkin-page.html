@@ -66,8 +66,8 @@
   <ion-grid [hidden]="ERROR">
     <ion-row wrap>
       <ion-col width-33>
-        <ion-card>
-          <img class="checkin-pic" [src]="checkin.thumb || ''" (click)="openPhoto(checkin.photo_id)" item-left [hidden]="!checkin.thumb" />
+        <ion-card class="observation-card">
+          <img class="checkin-pic" [src]="checkin.thumbLarge || ''" (click)="openPhoto(checkin.photo_id)" item-left [hidden]="!checkin.thumb" />
           <ion-card-content>
             <ion-card-title>
               <div class="notes">
@@ -78,8 +78,8 @@
         </ion-card>
       </ion-col>
       <ion-col width-33 *ngFor="let observation of checkin.observations">
-        <ion-card>
-          <img class="checkin-pic" [src]="observation.thumb || observation.photo || ''" (click)="openPhoto(observation.photo)" item-left [hidden]="!observation.photo" />
+        <ion-card class="observation-card">
+          <img class="checkin-pic" [src]="observation.thumbLarge || observation.photo || ''" (click)="openPhoto(observation.photo)" item-left [hidden]="!observation.photo" />
           <ion-card-content>
             <ion-card-title [hidden]="!hasKeys(observation.rocks) || !hasKeys(observation.rocks.strat_name)">
               {{ (observation.rocks.strat_name) ? observation.rocks.strat_name.strat_name_long : '' }}

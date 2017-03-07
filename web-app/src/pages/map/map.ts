@@ -42,7 +42,7 @@ export class TheMap {
   public mapInfo
   public overlappingCheckins
   public mapState
-  public checkins: any
+  public checkins: any = []
   public _filters: any = {}
   public loading = false
   // The map emits an observable `visibleCheckins` that simply returns a list of all visible checkins on the map
@@ -343,8 +343,8 @@ export class TheMap {
               'circle-radius': 8,
               'circle-color': '#333',
               'circle-opacity': 0.9,
-              //'circle-stroke-width': 1,
-              'circle-stroke-color': '#555'
+              // 'circle-stroke-width': 1,
+              // 'circle-stroke-color': '#777'
             }
           }
         ]
@@ -369,6 +369,7 @@ export class TheMap {
     this.map.on('movestart', () => {
       this.map.setPaintProperty('infoMarker', 'circle-opacity', 0)
     })
+
     this.map.on('moveend', event => {
       let center = this.map.getCenter()
       this.mapState = {
@@ -382,7 +383,6 @@ export class TheMap {
         let uniques = this.uniqueFeatures(checkins).map(d => {
           return d.properties
         })
-
         this.visibleCheckins.emit(uniques)
       }
     })
@@ -551,29 +551,13 @@ export class TheMap {
       default:
         if (data) {
           this.map.getSource('checkins').setData(data)
-          // this.map.addSource('checkins', {
-          //   type: 'geojson',
-          //   data: data
-          // })
-          // this.map.addLayer({
-          //   id: 'checkins',
-          //   type: 'circle',
-          //   source: 'checkins',
-          //   paint: {
-          //     'circle-radius': 5,
-          //     'circle-color': '#ffffff',
-          //     'circle-opacity': 0.5,
-          //   }
-          // })
         } else {
           this.map.on('load', () => {
             this.checkinService.getMap((error, data) => {
               // Save the data for later
               this.checkins = data
-
               // Update the checkin source
               this.map.getSource('checkins').setData(data)
-
               this.map.addSource('checkin-clusters', {
                 type: 'geojson',
                 cluster: true,

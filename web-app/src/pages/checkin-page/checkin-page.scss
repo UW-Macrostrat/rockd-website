@@ -153,13 +153,35 @@ checkin-page {
     font-weight: 500;
     text-decoration: none;
 	}
-	@media (max-width: 700px) {
+	@media (max-width: 540px) {
 		ion-col[width-33] {
 			max-width: 100%;
 			flex: 0 0 100%;
 		}
 		.checkin-title {
 			font-size: 20px;
+			font-weight: 400;
+		}
+		.huge-avatar {
+			max-height: 75px !important;
+		}
+		.main-banner {
+			height: 175px;
+			background-position-x: -100px;
+		}
+		.banner-name {
+			font-size: 20px;
+		}
+		.banner-date {
+			font-size: 13px;
+			line-height: 21px;
+		}
+		.checkin-pic {
+			max-width: 225px;
+			display: initial;
+		}
+		.observation-card {
+			text-align: center;
 		}
 	}
 }
