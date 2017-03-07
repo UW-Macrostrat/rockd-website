@@ -1,28 +1,11 @@
 <ion-header>
   <ion-navbar color="clear" hideBackButton="true">
     <ion-title><img class="header-logo" src="./assets/logo-light.png"/></ion-title>
-    <!-- <ion-buttons end>
-      <button ion-button [navPush]="aboutPage">About</button>
-    </ion-buttons> -->
   </ion-navbar>
 </ion-header>
 
-<ion-content class="home" data-tap-disabled="true">
+<ion-content class="home">
   <ion-grid class="main-grid">
-    <!-- <ion-row class="tab-row" [hidden]="mode === 'desktop'">
-      <ion-col width-50 no-padding>
-        <button no-padding no-margin ion-button full icon-left [clear]="!showList" color="dark" class="tab-button" (click)="toggleList()">
-          <ion-icon name="list"></ion-icon>
-          List
-        </button>
-      </ion-col>
-      <ion-col width-50 no-padding>
-        <button no-padding no-margin ion-button full icon-left [clear]="showList" color="dark" class="tab-button" (click)="toggleMap()">
-          <ion-icon name="map"></ion-icon>
-          Map
-        </button>
-      </ion-col>
-    </ion-row> -->
     <ion-row class="content-row">
       <ion-col width-33 class="sidebar" [hidden]="!showList">
         <ion-searchbar
@@ -181,7 +164,7 @@
           </ion-item>
         </ion-list>
       </ion-col>
-      <ion-col width-67 no-padding class="map-col" [hidden]="showList && mode === 'mobile'" disableScroll="true" zooming="false">
+      <ion-col width-67 no-padding class="map-col" [hidden]="showList && mode === 'mobile'" zooming="false">
         <map [mapType]="" [filters]="filters" [focalLng]="focalLng" [focalLat]="focalLat" (visibleCheckins)="updateVisible($event)" zooming="false"></map>
       </ion-col>
     </ion-row>
