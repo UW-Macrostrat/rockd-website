@@ -7,6 +7,6 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content class="map-container" scroll="false" data-tap-disabled="true">
+<ion-content class="map-container" disableScroll="true">
   <map *ngIf="config.checkin.length" [mapType]="'checkin'" [data]="config"></map>
 </ion-content>

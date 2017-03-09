@@ -165,6 +165,9 @@ checkin-page {
 		.huge-avatar {
 			max-height: 75px !important;
 		}
+		.banner-info {
+			background: rgba(255, 255, 255, 0.6);
+		}
 		.main-banner {
 			height: 175px;
 			background-position-x: -100px;
@@ -176,8 +179,12 @@ checkin-page {
 			font-size: 13px;
 			line-height: 21px;
 		}
+		.created {
+			color: #333;
+		}
 		.checkin-pic {
-			max-width: 225px;
+			max-width: 275px;
+			padding-top: 25px;
 			display: initial;
 		}
 		.observation-card {
