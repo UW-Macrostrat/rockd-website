@@ -8,7 +8,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content disableScroll="true">
   <ion-grid [hidden]="!ERROR">
     <ion-col width-100 text-center>
       <img src="./assets/img/404.jpg"/>
@@ -19,7 +19,8 @@
     <ion-slides (ionSlideDidChange)="onSlideChanged()" #photoSlider [pager]="true" [paginationType]="'bullets'" [initialSlide]="options.initialSlide" [zoom]="true" [ngStyle]="{visibility: (loading ? 'hidden' : 'visible') }">
       <ion-slide *ngFor="let photo of photos">
         <div class="photo-holder">
-          <div class="photo-caption">
+          <div class="photo-caption" [ngStyle]="{'transform': (showCaption) ? 'translateY(0%)' : 'translateY(200%)'}">
+            <div class="hide-caption" (click)="toggleCaption()"><ion-icon name="remove-circle"></ion-icon></div>
             <div class="photo-caption-inner">
               <span class="checkin-title">
                 {{ photoData[photo].title ? photoData[photo].title : '' }}
@@ -126,11 +127,8 @@
               </div>
             </div>
           </div>
-          <div class="img" [ngStyle]="{'backgroundImage': 'url(' + 'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/large/' + (photo || '') + ')'}">
-
-          </div>
-          <!-- <img [src]=`${settings.APIURL}/protected/image/${checkin.person_id}/full/${photo}` class="swiper-image"/> -->
-          <!-- <img [src]="'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/full/' + photo || ''" class="swiper-image"/> -->
+          <div class="img" [ngStyle]="{'backgroundImage': 'url(' + 'https://rockd.org/api/v1/protected/image/' + checkin.person_id + '/large/' + (photo || '') + ')'}"></div>
+          <div class="show-caption" (click)="toggleCaption()" [hidden]="showCaption"><ion-icon name="information-circle"></ion-icon></div>
         </div>
       </ion-slide>
     </ion-slides>

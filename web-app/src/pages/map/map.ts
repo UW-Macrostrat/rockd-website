@@ -359,6 +359,8 @@ export class TheMap {
       zoom: this.mapState.z || 1
     })
 
+    this.map.touchZoomRotate.disableRotation()
+
     setTimeout(() => {
       this.map.resize()
     }, 400)
@@ -490,7 +492,8 @@ export class TheMap {
           return
         }
         this.map.on('load', () => {
-          this.map.flyTo({
+
+          this.map.jumpTo({
             center: data.checkin,
             zoom: 12
           })

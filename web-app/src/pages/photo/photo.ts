@@ -25,6 +25,7 @@ export class PhotoPage {
   public PBDBURL
   public loading = true
   public ERROR = false
+  public showCaption = window.innerWidth > 540
 
   public options = {
     initialSlide: 0
@@ -41,6 +42,9 @@ export class PhotoPage {
     this.PBDBURL = Settings.PBDBURL
   }
 
+  toggleCaption() {
+    this.showCaption = !this.showCaption
+  }
   ionViewDidEnter() {
     this.loading = true
 
