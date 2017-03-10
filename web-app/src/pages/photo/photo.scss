@@ -9,7 +9,7 @@ photo {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    min-height: 90%;
+    min-height: 100%;
   }
   .slide-container {
     height: 100%;
@@ -39,6 +39,7 @@ photo {
     width: 100%;
     bottom: 0;
     transition: .4s ease-in-out;
+    box-shadow: 0px 0px 16px 6px rgba(0,0,0,0.2);
     // top: 56px;
   }
   .photo-caption.shown {
@@ -56,9 +57,8 @@ photo {
   }
   .show-caption {
     position: absolute;
-    bottom: 5px;
     right: 10px;
-    font-size: 30px;
+    font-size: 25px;
   }
   .hide-caption {
     position: absolute;
