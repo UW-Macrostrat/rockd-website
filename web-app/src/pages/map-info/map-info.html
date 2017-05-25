@@ -71,28 +71,28 @@
 
   <ion-card [hidden]="!hasKeys(mapInfo.macrostrat)">
     <ion-card-content>
-      <h2 class="title-two">{{mapInfo.macrostrat.rank_names}}</h2>
-      <p class="info-attr">
+      <h2 class="title-two" *ngIf="mapInfo.macrostrat.rank_names">{{mapInfo.macrostrat.rank_names}}</h2>
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.uniqueIntervals">
         <strong>Age: </strong>{{mapInfo.macrostrat.uniqueIntervals}} - ({{ mapInfo.macrostrat.b_age }} - {{ mapInfo.macrostrat.t_age}} <small> Ma</small>)
       </p>
 
-      <p class="info-attr">
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.max_thick">
         <strong>Thickness: </strong> {{ mapInfo.macrostrat.max_thick }} <small>m</small>
       </p>
 
-      <p class="info-attr">
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.pbdb_collections">
         <strong>PBDB Collections: </strong> {{ mapInfo.macrostrat.pbdb_collections}}
       </p>
 
-      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.lith.length">
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.lith" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.lith.length">
         <strong>Lithology: </strong> <span *ngFor="let lith of mapInfo.macrostrat.lith">{{lith.name}} - {{(lith.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
       </p>
 
-      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.environ.length">
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.environ" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.environ.length">
         <strong>Environment: </strong> <span *ngFor="let environ of mapInfo.macrostrat.environ">{{environ.name}} - {{(environ.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
       </p>
 
-      <p class="info-attr" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.econ.length">
+      <p class="info-attr" *ngIf="mapInfo.macrostrat.econ" [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.econ.length">
         <strong>Economic: </strong> <span *ngFor="let econ of mapInfo.macrostrat.econ">{{econ.name}} - {{(econ.prop*100).toFixed(0)}}%{{$last ? '' : ', '}}</span>
       </p>
 
@@ -103,7 +103,7 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.rank_names.length">
+  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) && !mapInfo.macrostrat.rank_names.length">
     <ion-card-content>
       <ion-item class="literature-header pull-left">
         <h2 class="title-two">Literature</h2>
