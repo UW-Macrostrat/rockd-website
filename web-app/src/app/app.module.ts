@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { IonicApp, IonicModule, DeepLinkConfig } from 'ionic-angular';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '@angular/http';
 import { MyApp } from './app.component';
 
 import { AboutPage } from '../pages/about/about';
@@ -46,6 +48,8 @@ export const deepLinkConfig: DeepLinkConfig = {
     Footer
   ],
   imports: [
+    BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp, {
       locationStrategy: ENV.LOCATIONSTRATEGY
   }, deepLinkConfig)

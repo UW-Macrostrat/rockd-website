@@ -1,6 +1,6 @@
 cp src/config/environment.prod.ts src/config/environment.ts
 npm run clean
-ionic build browser --release
+ionic cordova build browser --release
 npm build --prod
 npm run minify
 cp src/config/environment.dev.ts src/config/environment.ts

@@ -14,3 +14,5 @@
 declare module '*';
 declare module 'turf';
 declare module 'mapboxgl';
+declare var cordova:any;
+declare var window:Window;
