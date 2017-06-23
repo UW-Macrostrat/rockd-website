@@ -1,8 +1,8 @@
-<ion-content class="padding">
+<ion-content>
   <ion-card class="xyz-card">
     <ion-item class="map-xyz">
       <span class="map-xyz-label">x, y, z</span>
-      {{ mapInfo.lng }}, {{ mapInfo.lat }} {{ (mapInfo.elevation) ? (', ' + mapInfo.elevation + 'm' + ' / ' + (mapInfo.elevation * 3.28084).toFixed(0) + 'ft') : ''}}
+      {{ mapInfo.lng }}, {{ mapInfo.lat }} {{ (mapInfo.elevation) ? ('| ' + mapInfo.elevation + 'm' + ' / ' + (mapInfo.elevation * 3.28084).toFixed(0) + 'ft') : ''}}
     </ion-item>
   </ion-card>
 
@@ -103,25 +103,28 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) && !mapInfo.macrostrat.rank_names.length">
+  <ion-card [hidden]="!hasKeys(mapInfo.macrostrat) || !mapInfo.macrostrat.rank_names.length">
     <ion-card-content>
-      <ion-item class="literature-header pull-left">
+      <ion-item class="literature-header pull-left" text-wrap>
         <h2 class="title-two">Literature</h2>
-        <small>Relevant articles for this location</small>
+        <small>Relevant articles for this location via GeoDeepDive</small>
       </ion-item>
 
-      <div class="loading" [hidden]="mapInfo.literature.journals.length">
+      <div class="loading" [hidden]="!loadingGDD">
         <ion-spinner name="dots"></ion-spinner>
         <p><small>Loading literature from GeoDeepdDive...</small></p>
       </div>
 
       <ion-list>
+        <ion-item [hidden]="loadingGDD || mapInfo.literature.journals.length">
+          No articles found
+        </ion-item>
         <ion-item *ngFor="let journal of mapInfo.literature.journals" class="item-text-wrap pull-left">
-          <div class="journal-title">
-            <h2 class="title-two">{{ journal.name }}</h2>
+          <div class="journal-title" text-wrap>
+            <h2 class="journal">{{ journal.name }}</h2>
           </div>
           <div class="reference" *ngFor="let article of journal.articles">
-            {{ article.displayAuthors ? article.displayAuthors : 'Unknown' }}, <span [hidden]="!article.year">{{ article.year }}. </span><a class="reference-url" href="{{ article.url }}">{{ article.title }}</a>: {{ article.publisher }}.
+            {{ article.displayAuthors ? article.displayAuthors : 'Unknown' }}, <span class="article-year" [hidden]="!article.year">{{ article.year }}. </span><a class="reference-url" (click)="openExternalLink(article.url)">{{ article.title }}</a>: <span class="publisher">{{ article.publisher }}</span>.
           </div>
         </ion-item>
       </ion-list>
@@ -131,9 +134,13 @@
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar>
-    <button ion-button icon-right (click)="dismiss()" outline full clear class="close-button">
-      Close <ion-icon name="close-circle"></ion-icon>
-    </button>
-  </ion-toolbar>
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12 (click)="dismiss()">
+        <button ion-button full color="light">
+          Close <ion-icon name="close-circle"></ion-icon>
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-footer>
