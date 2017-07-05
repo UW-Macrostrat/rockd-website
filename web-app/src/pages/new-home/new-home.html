@@ -7,7 +7,7 @@
 <ion-content class="home">
   <ion-grid class="main-grid">
     <ion-row class="content-row">
-      <ion-col width-33 class="sidebar" [hidden]="!showList">
+      <ion-col col-4 class="sidebar" [hidden]="!showList">
         <ion-searchbar
           class="search"
           [(ngModel)]="searchText"
@@ -130,13 +130,13 @@
               </ion-card-content>
 
               <ion-row no-padding>
-                <ion-col width-33 class="checkin-footer">
+                <ion-col col-4 class="checkin-footer">
                   <ion-icon name="paper"></ion-icon> {{ checkin.n_obs }}
                 </ion-col>
-                <ion-col width-33 class="checkin-footer">
+                <ion-col col-4 class="checkin-footer">
                   <ion-icon name="camera"></ion-icon> {{ checkin.n_photos }}
                 </ion-col>
-                <ion-col width-33 class="checkin-footer">
+                <ion-col col-4 class="checkin-footer">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                      width="17px" height="17px" viewBox="440.584 525.124 125.994 120.954"
                      enable-background="new 440.584 525.124 125.994 120.954" xml:space="preserve"
@@ -164,7 +164,7 @@
           </ion-item>
         </ion-list>
       </ion-col>
-      <ion-col width-67 no-padding class="map-col" [hidden]="showList && mode === 'mobile'" zooming="false">
+      <ion-col col-8 no-padding class="map-col" [hidden]="showList && mode === 'mobile'" zooming="false">
         <map [mapType]="" [filters]="filters" [focalLng]="focalLng" [focalLat]="focalLat" (visibleCheckins)="updateVisible($event)" zooming="false"></map>
       </ion-col>
     </ion-row>
