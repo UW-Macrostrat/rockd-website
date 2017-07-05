@@ -10,17 +10,17 @@
 
 <ion-content class="checkin-page-content has-footer">
   <ion-grid [hidden]="!ERROR">
-    <ion-col width-100>
+    <ion-col col-12>
       <img src="./assets/img/404.jpg"/>
     </ion-col>
   </ion-grid>
 
   <ion-grid [hidden]="ERROR">
     <ion-row>
-      <ion-col width-90 class="checkin-title">
+      <ion-col col-10 class="checkin-title">
         {{ checkin.notes }}
       </ion-col>
-      <ion-col width-10 class="checkin-subtitle">
+      <ion-col col-2 class="checkin-subtitle">
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
            width="17px" height="17px" viewBox="440.584 525.124 125.994 120.954"
            enable-background="new 440.584 525.124 125.994 120.954" xml:space="preserve"
@@ -40,7 +40,7 @@
     </ion-row>
 
     <ion-row>
-      <ion-col width-100>
+      <ion-col col-12>
         <div class="main-banner" (click)="openMap()" [ngStyle]="{'backgroundImage': 'url(' + checkin.mapURL + ')' }">
           <div class="banner-info">
             <div class="banner-inner">
@@ -65,7 +65,7 @@
 
   <ion-grid [hidden]="ERROR">
     <ion-row wrap>
-      <ion-col width-33>
+      <ion-col col-4>
         <ion-card class="observation-card">
           <img class="checkin-pic" [src]="checkin.thumbLarge || ''" (click)="openPhoto(checkin.photo_id)" item-left [hidden]="!checkin.thumb" />
           <ion-card-content>
@@ -77,7 +77,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col width-33 *ngFor="let observation of checkin.observations">
+      <ion-col col-4 *ngFor="let observation of checkin.observations">
         <ion-card class="observation-card">
           <img class="checkin-pic" [src]="observation.thumbLarge || observation.photo || ''" (click)="openPhoto(observation.photo)" item-left [hidden]="!observation.photo" />
           <ion-card-content>
