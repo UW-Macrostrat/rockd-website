@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="skeleton.css" rel='stylesheet' type='text/css'/>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: orange;
+}
+
+.bar:hover {
+  fill: orangered ;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-size: 14px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+  text-align: center;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+.stat-col {
+  padding: 20px;
+  text-align: center;
+}
+.stat-value, .stat-label {
+  display: block;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+.stat-label {
+  font-size: 16px;
+}
+</style>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="four columns stat-col">
+        <span class="stat-value" id="people"></span>
+        <span class="stat-label">People</span>
+      </div>
+      <div class="four columns stat-col">
+        <span class="stat-value" id="active_people"></span>
+        <span class="stat-label">Active</span>
+      </div>
+      <div class="four columns stat-col">
+        <span class="stat-value" id="avid_people"></span>
+        <span class="stat-label">Avid (>5)</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="four columns stat-col">
+        <span class="stat-value" id="checkins"></span>
+        <span class="stat-label">Checkins</span>
+      </div>
+      <div class="four columns stat-col">
+        <span class="stat-value" id="observations"></span>
+        <span class="stat-label">Observations</span>
+      </div>
+      <div class="four columns stat-col">
+        <span class="stat-value" id="photos"></span>
+        <span class="stat-label">Photos</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="six columns">
+        <div id="checkins_by_week"></div>
+      </div>
+      <div class="six columns">
+        <div id="checkins_by_month"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="six columns">
+        <div id="checkins_by_week_clean"></div>
+      </div>
+      <div class="six columns">
+        <div id="checkins_by_month_clean"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="six columns">
+        <div id="signups_by_week"></div>
+      </div>
+      <div class="six columns">
+        <div id="signups_by_month"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="six columns">
+        <div id="active_users_by_week"></div>
+      </div>
+      <div class="six columns">
+        <div id="active_users_by_month"></div>
+      </div>
+    </div>
+  </div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+
+
+
+
+var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = 450 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+d3.json('https://rockd.org/api/v2/metrics', function(error, data) {
+  var results = data.success.data
+  Object.keys(results).forEach(function(dataset) {
+    if (dataset === 'summary') {
+      Object.keys(results[dataset]).forEach(function(key) {
+        d3.select('#' + key).html(results[dataset][key])
+      })
+      return
+    }
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .tickFormat("");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+
+    var tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d) {
+        return d.year + '-' + (d.week ? d.week : d.month) + "<br><strong>Total:</strong> <span style='color:red'>" + d.count + "</span>";
+      })
+
+    var svg = d3.select("#" + dataset).append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.call(tip);
+
+    x.domain(results[dataset].map(function(d) { return d.year + '-' + (d.week ? d.week : d.month); }));
+    y.domain([0, d3.max(results[dataset], function(d) { return parseInt(d.count); })]);
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Count");
+
+    svg.selectAll(".bar")
+        .data(results[dataset])
+      .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.year + '-' + (d.week ? d.week : d.month)); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(parseInt(d.count)); })
+        .attr("height", function(d) { return height - y(parseInt(d.count)); })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+
+    svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text(dataset.replace(/_/g, ' '));
+  })
+})
+
+</script>
