@@ -22,6 +22,152 @@
   margin-top: 50px;
 }
 
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+//@import "../node_modules/mapbox-gl/dist/mapbox-gl";
+
+// Remove all scrollbars
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
+}
+.scroll-content {
+   overflow-y: auto !important;
+}
+
+// Styles for the footer buttons in most pages
+ion-footer > ion-grid {
+  padding: 0 !important;
+}
+ion-footer > ion-grid > ion-row > ion-col,  ion-footer > ion-grid > ion-row > ion-col > button {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+button > span > ion-icon {
+  margin-left: 5px;
+}
+
+.grey-button {
+  border: 1px solid #aaa !important;
+  background-color: #fff !important;
+  color: #333 !important;
+  font-weight: 200 !important;
+}
+
+.has-refresher > .scroll-content {
+  margin-top: 0;
+  border-top: 0;
+}
+.pad-top > .scroll-content {
+  margin-top: 20px;
+  -webkit-transform: translateZ(0px);
+}
+.top-tabs .tab-button[aria-selected=true] {
+  border-bottom: 1px solid #333;
+}
+.tabbar {
+  background: #ffffff !important;
+}
+// For the loading component on a lot of pages
+.hundo {
+  height: 100%;
+}
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pick {
+	margin-right: 5px;
+	transition: 0.4s linear;
+}
+.unliked-checkin-pick {
+	transform: rotate(0deg);
+}
+.liked-checkin-pick {
+	transform: rotate(90deg);
+}
+.unliked-checkin {
+	fill: #b2b2b2;
+	color: #b2b2b2 !important;
+}
+.liked-checkin {
+	fill: #fff;
+  background-color: #387EF5;
+	color: #fff !important;
+}
+.selectable-item {
+  color: #444 !important;
+}
+.selectable-item-divider {
+  background-color: #646464;
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+.close-button {
+  color: #333;
+  background-color: #fff;
+  border-top: 1px solid #eee;
+}
+.mineral-formula {
+  font-size: 70%;
+}
+.moar-padding, .moar-padding > .scroll-content {
+  padding: 30px !important;
+}
+
+.shareToast {
+  z-index: 9999999999;
+}
+.toast-message {
+  text-align: center !important;
+}
+.observation-thumbnail {
+  height: 80px;
+  width: 80px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.pad-top {
+  padding-top: 10px;
+}
+
+.new-checkin-btn {
+  background-color: #2185C5 !important;
+}
+.new-checkin-btn ion-icon {
+  margin-left: 7px !important;
+}
+
+.orientation-error {
+  display: block;
+  font-size: 70%;
+  color: #777;
+  text-align: center;
+}
+
 @media (max-width: 700px) {
   footer {
     padding: 20px;

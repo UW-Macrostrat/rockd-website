@@ -131,4 +131,15 @@ export class PhotoPage {
 //    history.replaceState(null, 'Rockd', hash.join('/') + '/' + this.photos[currentIndex])
     history.replaceState(null, 'Rockd', (ENV.PRODUCTION) ? `${ENV.BASE_URI}/photo/${this.photos[currentIndex]}` : (hash.join('/') + '/' + this.photos[currentIndex]))
   }
+
+  updateMeta() {
+    let tags = ["meta[name='twitter:title']", "meta[name='twitter:description']", "meta[name='twitter:image']", "meta[name='og:image:secure_url']", "meta[name='og:image']"]
+    try {
+      tags.forEach(tag => {
+        document.querySelector(tag).remove()
+      })
+    } catch(e) {
+      
+    }
+  }
 }

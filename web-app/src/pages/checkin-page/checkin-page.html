@@ -9,7 +9,7 @@
 </ion-header>
 
 <ion-content class="checkin-page-content has-footer">
-  <ion-grid [hidden]="!ERROR">
+  <ion-grid [hidden]="!ERROR" *ngIf="ERROR" no-padding>
     <ion-col col-12>
       <img src="./assets/img/404.jpg"/>
     </ion-col>
@@ -63,9 +63,9 @@
     </ion-row>
   </ion-grid>
 
-  <ion-grid [hidden]="ERROR">
-    <ion-row wrap>
-      <ion-col col-4>
+  <ion-grid [hidden]="ERROR" no-padding>
+    <ion-row>
+      <ion-col col-12 col-sm-6 col-md-4>
         <ion-card class="observation-card">
           <img class="checkin-pic" [src]="checkin.thumbLarge || ''" (click)="openPhoto(checkin.photo_id)" item-left [hidden]="!checkin.thumb" />
           <ion-card-content>
@@ -77,7 +77,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col col-4 *ngFor="let observation of checkin.observations">
+      <ion-col col-12 col-sm-6 col-md-4 *ngFor="let observation of checkin.observations">
         <ion-card class="observation-card">
           <img class="checkin-pic" [src]="observation.thumbLarge || observation.photo || ''" (click)="openPhoto(observation.photo)" item-left [hidden]="!observation.photo" />
           <ion-card-content>
