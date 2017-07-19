@@ -25,7 +25,7 @@ map-info {
     text-decoration: none;
   }
   strong {
-    color: orange;
+    color: color($colors, orange);
   }
 
   small {
@@ -53,7 +53,14 @@ map-info {
   .leaflet-marker-pane {
     z-index: 200;
   }
-  .close-button {
-	  color: #333;
-	}
+  .article-year {
+    font-weight: bold;
+  }
+  .journal {
+    font-size: 18px;
+    font-style: italic;
+  }
+  .publisher {
+    color: #777;
+  }
 }

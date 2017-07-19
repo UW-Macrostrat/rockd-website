@@ -275,80 +275,7 @@ export class TheMap {
     this.map = new mapboxgl.Map({
       container: 'the-map-' + this.mapType,
       //container: 'the-map',
-      style: {
-        version: 8,
-        sprite: 'mapbox://styles/mapbox/light-v9',
-        glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
-        sources: {
-          satellite: {
-            type: 'raster',
-            url: 'mapbox://mapbox.satellite',
-            tileSize: 256
-          },
-          burwell: {
-            type: 'raster',
-            tiles: ['https://macrostrat.org/api/v2/maps/burwell/emphasized/{z}/{x}/{y}/tile.png'],
-            tileSize: 512
-          },
-          checkins: {
-            type: 'geojson',
-            data: { type: 'FeatureCollection', features: [] }
-          },
-          info_marker: {
-            type: 'geojson',
-            data: {
-              type: 'FeatureCollection',
-              features: [{
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [0, 0]
-                }
-              }]
-            }
-          }
-        },
-        layers: [
-          {
-            id: 'satellite',
-            type: 'raster',
-            source: 'satellite',
-            minzoom: 1,
-            maxzoom: 17
-          },
-          {
-            id: 'burwell',
-            type: 'raster',
-            source: 'burwell',
-            minzoom: 1,
-            maxzoom: 18,
-            paint: {
-              'raster-opacity': 0.5
-            }
-          },
-          {
-            id: 'checkins',
-            type: 'circle',
-            source: 'checkins',
-            paint: {
-              'circle-radius': 5,
-              'circle-color': '#ffffff',
-              'circle-opacity': 0,
-            }
-          }, {
-            id: 'infoMarker',
-            type: 'circle',
-            source: 'info_marker',
-            paint: {
-              'circle-radius': 8,
-              'circle-color': '#333',
-              'circle-opacity': 0.9,
-              // 'circle-stroke-width': 1,
-              // 'circle-stroke-color': '#777'
-            }
-          }
-        ]
-      },
+      style: 'mapbox://styles/jczaplewski/cj3bpe4xk00002rqndidf9dw4?optimize=true',
       attributionControl: false,
     //  hash: true,
       dragRotate: false,
@@ -360,17 +287,82 @@ export class TheMap {
     })
 
     this.map.touchZoomRotate.disableRotation()
-
-    setTimeout(() => {
-      this.map.resize()
-    }, 400)
-
     const nav = new mapboxgl.NavigationControl()
     this.map.addControl(nav, 'top-right')
 
-    this.map.on('movestart', () => {
-      this.map.setPaintProperty('infoMarker', 'circle-opacity', 0)
+    this.map.on('load', () => {
+      this.map.addSource('burwell', {
+        type: 'raster',
+        tiles: ['https://macrostrat.org/api/v2/maps/burwell/emphasized/{z}/{x}/{y}/tile.png'],
+        tileSize: 512
+      })
+      this.map.addSource('checkins', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+      this.map.addSource('info_marker', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [0, 0]
+            }
+          }]
+        }
+      })
+      this.map.addLayer({
+        id: 'burwell',
+        type: 'raster',
+        source: 'burwell',
+        minzoom: 1,
+        maxzoom: 18,
+        paint: {
+          'raster-opacity': 0.5
+        }
+      })
+
+      this.map.addLayer({
+        id: 'checkins',
+        type: 'symbol',
+        source: 'checkins',
+        layout: {
+          'icon-size': 0.045,
+          'icon-image': 'pin',
+          // FML. Removing this will break the querying of overlapping checkins!!!
+          'icon-allow-overlap': true
+        },
+        paint: {
+          'icon-opacity': 0
+        }
+      })
+
+      this.map.addLayer({
+        id: 'infoMarker',
+        type: 'symbol',
+        source: 'info_marker',
+        layout: {
+          'icon-size': 0.065,
+          'icon-image': 'pin-grey',
+          'icon-offset': [0, -180]
+        }
+      })
+
+      this.map.on('movestart', () => {
+        this.map.setLayoutProperty('infoMarker', 'visibility', 'none')
+      })
+
+      setTimeout(() => {
+        this.map.resize()
+      }, 400)
     })
+
+    this.map.on('style.load', () => {
+
+    })
+
 
     this.map.on('moveend', event => {
       let center = this.map.getCenter()
@@ -460,7 +452,7 @@ export class TheMap {
         }]
       })
 
-      this.map.setPaintProperty('infoMarker', 'circle-opacity', 0.9)
+      this.map.setLayoutProperty('infoMarker', 'visibility', 'visible')
 
       let z = parseInt(this.map.getZoom())
       this.macrostratService.queryMap(event.lngLat, z, (error, data) => {
@@ -528,11 +520,13 @@ export class TheMap {
           })
 
           this.map.addLayer({
-            id: 'chk',
+            id: 'checkin',
             type: 'symbol',
             source: 'checkin',
             layout: {
-              'icon-image': 'star-15'
+              'icon-size': 0.075,
+              'icon-image': 'pin',
+              'icon-offset': [0, -20]
             }
           })
           this.map.addLayer({
@@ -540,7 +534,9 @@ export class TheMap {
             type: 'symbol',
             source: 'observations',
             layout: {
-              'icon-image': 'marker-11'
+              'icon-size': 0.045,
+              'icon-image': 'pin',
+              'icon-offset': [0, -150]
             }
           })
         })
@@ -552,10 +548,11 @@ export class TheMap {
 
       case 'all':
       default:
-        if (data) {
-          this.map.getSource('checkins').setData(data)
-        } else {
-          this.map.on('load', () => {
+        this.map.on('style.load', () => {
+          if (data) {
+            this.map.getSource('checkins').setData(data)
+          } else {
+
             this.checkinService.getMap((error, data) => {
               // Save the data for later
               this.checkins = data
@@ -577,16 +574,13 @@ export class TheMap {
 
               this.map.addLayer({
                 id: 'unclustered',
-                type: 'circle',
+                type: 'symbol',
                 source: 'checkin-clusters',
                 filter: ['!has', 'point_count'],
-                paint: {
-                  'circle-radius': 6,
-                  'circle-color': '#ffffff',
-                  // update to 0.29 for goodness
-                  // 'circle-stroke-width': 1,
-                  // 'circle-stroke-color': '#ffffff',
-                  'circle-opacity': 1,
+                layout: {
+                  'icon-size': 0.045,
+                  'icon-image': 'pin',
+                  'icon-offset': [0, -150]
                 }
               })
 
@@ -625,9 +619,8 @@ export class TheMap {
                 return d.properties
               }))
             })
-          })
-
-        }
+          }
+        })
 
         break
     }
