@@ -1,0 +1,4 @@
+const Constants = {
+  MAPBOX_ACCESS_TOKEN: 'your-access-token'
+}
+export default Constants
