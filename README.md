@@ -1,10 +1,13 @@
-# website-starter
+# Rockd Trips
 
-A boilerplate for websites with React/Redux
+A viewer for Rockd trips
 
 ## Getting started
 
 Install dependencies with `npm install`
+
+
+Rename `src/js/Constants.js.example` to `src/js/Constants.js` and add your variables
 
 
 ## Gulp commands
