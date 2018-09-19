@@ -9,6 +9,12 @@ class App extends Component {
   constructor(props) {
     super(props)
   }
+  // componentDidMount() {
+  //   const jssStyles = document.getElementById('jss-server-side')
+  //   if (jssStyles && jssStyles.parentNode) {
+  //     jssStyles.parentNode.removeChild(jssStyles)
+  //   }
+  // }
 
   render() {
     return (

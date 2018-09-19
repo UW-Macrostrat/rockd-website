@@ -4,8 +4,9 @@ import Info from '../components/Info'
 
 const mapStateToProps = (state) => {
   return {
-    msg: state.handleInteraction.msg,
-    clicks: state.handleInteraction.clicks
+    msg: state.main.msg,
+    clicks: state.main.clicks,
+    trip: state.main.trip
   }
 }
 

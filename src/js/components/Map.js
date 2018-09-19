@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react'
-import mapboxgl from 'mapbox-gl'
+// import mapboxgl from 'mapbox-gl'
 import Constants from '../Constants'
-
-mapboxgl.accessToken = Constants.MAPBOX_ACCESS_TOKEN
 
 class Map extends Component {
   constructor(props) {
@@ -10,6 +8,12 @@ class Map extends Component {
   }
 
   componentDidMount() {
+    let mapboxgl;
+    if (__CLIENT__) {
+      mapboxgl = require('mapbox-gl')
+    }
+    mapboxgl.accessToken = Constants.MAPBOX_ACCESS_TOKEN
+
     var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',

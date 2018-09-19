@@ -7,6 +7,10 @@ export const RECIEVE_DATA = 'RECIEVE_DATA'
 export const REQUEST_DATA = 'REQUEST_DATA'
 
 // Define action functions
+
+export const getTrip = () => {
+  
+}
 export const pageClick = () => {
   return {
     type: PAGE_CLICK,

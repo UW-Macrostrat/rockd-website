@@ -6,11 +6,12 @@ class Info extends Component {
   }
 
   render() {
-    const { msg, clicks, onClick } = this.props
+    const { msg, clicks, onClick, trip } = this.props
 
     return (
       <div className='info-container'>
         <h1>I'm the sidebar!</h1>
+        <p>Displaying trip {trip.trip_id}</p>
       </div>
     )
   }

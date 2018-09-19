@@ -2,9 +2,9 @@ import { combineReducers } from 'redux'
 import { PAGE_CLICK, REQUEST_DATA, RECIEVE_DATA } from '../actions'
 
 // This is the initial state and the primary reducer
-const handleInteraction = (state = {
+const main = (state = {
   isFetching: false,
-  data: [],
+  trip: {},
   msg: '',
   clicks: 0
 }, action) => {
@@ -29,11 +29,9 @@ const handleInteraction = (state = {
   }
 }
 
-
-
 const reducers = combineReducers({
   // list reducers here
-  handleInteraction
+  main
 })
 
 export default reducers
