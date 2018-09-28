@@ -3,7 +3,7 @@ const app = express()
 const path = require('path')
 
 // Serve static files
-app.use('/dist', express.static(path.resolve(__dirname, 'dist')))
+app.use('/trip-dist', express.static(path.resolve(__dirname, 'dist')))
 
 // hide powered by express
 app.disable('x-powered-by')
