@@ -24,7 +24,7 @@ let initialState = {
 
 const ROCKD_API_URL = 'http://localhost:5500/api/v2'
 
-hexToRgba(hex) {
+function hexToRgba(hex) {
   if (!hex) {
     return hex
   }
