@@ -24,6 +24,24 @@ let initialState = {
 
 const ROCKD_API_URL = 'http://localhost:5500/api/v2'
 
+hexToRgba(hex) {
+  if (!hex) {
+    return hex
+  }
+  if (hex.indexOf('#') > -1) {
+    hex = hex.replace('#', '')
+  } else {
+    return hex
+  }
+
+  const bigint = parseInt(hex, 16)
+  const r = (bigint >> 16) & 255
+  const g = (bigint >> 8) & 255
+  const b = bigint & 255
+
+  return [r, g, b, 0.5].join(', ')
+}
+
 function processCheckin(checkin) {
   checkin.photo_id = (parseInt(checkin.photo) === checkin.photo) ? checkin.photo : 0
 
@@ -91,12 +109,12 @@ function processCheckin(checkin) {
 function processObservation(person_id, observation) {
   if (observation.rocks.liths) {
     observation.rocks.liths.forEach(l => {
-      l.color = this.hexToRgba(l.color)
+      l.color = hexToRgba(l.color)
     })
   }
 
   if (observation.age_est) {
-    observation.age_est.color = this.hexToRgba(observation.age_est.color)
+    observation.age_est.color = hexToRgba(observation.age_est.color)
   }
 
   observation.thumb = `${ROCKD_API_URL}/protected/image/${person_id}/thumb/${observation.photo}`
