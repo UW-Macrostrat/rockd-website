@@ -34,7 +34,6 @@ class Map extends Component {
       style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
       center: [0, 0],
       zoom: 1,
-      hash: true
     })
     // Add the zoom control
     let nav = new mapboxgl.NavigationControl({ showCompass: false })
@@ -130,7 +129,6 @@ class Map extends Component {
         mapInfo: json.data.success.data.mapData[0],
         showMapInfo: true
       })
-      console.log(json.data.success.data.mapData[0])
     })
 
     .catch(error => {
@@ -183,7 +181,6 @@ class Map extends Component {
   }
 
   render() {
-    console.log('render')
     const { trip } = this.props
     const { showBedrock, showMapInfo, mapInfo } = this.state
 

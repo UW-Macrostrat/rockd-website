@@ -20,7 +20,7 @@ app.start = () => {
 }
 
 // Route requests
-app.get('/:trip_id?', require('./routes/trip'))
+app.get('/trip/:trip_id?', require('./routes/trip'))
 
 if (!module.parent) {
   app.start()
