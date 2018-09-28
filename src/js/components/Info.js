@@ -1,4 +1,7 @@
 import React, { Component, PropTypes } from 'react'
+import Constants from '../Constants'
+import Paper from '@material-ui/core/Paper'
+import StopContainer from '../containers/StopContainer'
 
 class Info extends Component {
   constructor(props) {
@@ -6,12 +9,24 @@ class Info extends Component {
   }
 
   render() {
-    const { msg, clicks, onClick, trip } = this.props
+    const { trip } = this.props
 
     return (
       <div className='info-container'>
-        <h1>I'm the sidebar!</h1>
-        <p>Displaying trip {trip.trip_id}</p>
+        <div className='trip-meta'>
+          <img src={Constants.ROCKD_API_URL + "/protected/gravatar/" + trip.person_id} className='profile-pic'/>
+          <div className='trip-meta-text'>
+            <p className='person-name'>{trip.first_name} {trip.last_name}</p>
+            <p className='edited'>Edited {trip.updated.toString()}</p>
+          </div>
+
+        </div>
+        <h1 className='trip-title'>{trip.name}</h1>
+        <p className={trip.description ? 'trip-description' : 'hidden'}>{trip.description}</p>
+        {trip.stops.map((s, i) => {
+          return <StopContainer key={s.stop_id} stop={s} idx={i + 1}/>
+        })}
+
       </div>
     )
   }

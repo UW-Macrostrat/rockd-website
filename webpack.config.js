@@ -3,6 +3,7 @@ const webpack = require('webpack')
 
 module.exports = {
   mode: 'production',
+  performance: { hints: false },
   plugins: [
     new webpack.DefinePlugin({
       '__CLIENT__': true

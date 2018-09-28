@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 
 import { Provider } from 'react-redux'
 import configureStore from './js/redux/configureStore'
-import App from './js/components/App'
+import AppContainer from './js/containers/AppContainer'
 
 import { SheetsRegistry } from 'react-jss/lib/jss'
 import JssProvider from 'react-jss/lib/JssProvider'
@@ -15,7 +15,7 @@ import {
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 
-module.exports = function render(initialState) {
+module.exports = initialState => {
   // Configure the store with the initial state provided
   const store = configureStore(initialState)
 
@@ -36,7 +36,7 @@ module.exports = function render(initialState) {
     <JssProvider registry={sheetsRegistry} generateClassName={generateClassName}>
       <MuiThemeProvider theme={theme} sheetsManager={sheetsManager}>
         <Provider store={store} >
-           <App />
+           <AppContainer />
         </Provider>
       </MuiThemeProvider>
     </JssProvider>

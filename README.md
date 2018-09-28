@@ -10,6 +10,8 @@ Install dependencies with `npm install`
 Rename `src/js/Constants.js.example` to `src/js/Constants.js` and add your variables
 
 
-## Gulp commands
-+ `gulp deploy` - Uglify and compress all scripts and styles
-+ `gulp` - Compile scripts and styles and watch for changes (use during development)
+## Scripts
++ `npm run build` - Run webpack and babel
++ `npm run pack` - Run webpack using the config file `webpack.config.js`
++ `npm run babel` - Run babel
++ `npm start` - Start the express server

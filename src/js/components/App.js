@@ -9,27 +9,30 @@ class App extends Component {
   constructor(props) {
     super(props)
   }
-  // componentDidMount() {
-  //   const jssStyles = document.getElementById('jss-server-side')
-  //   if (jssStyles && jssStyles.parentNode) {
-  //     jssStyles.parentNode.removeChild(jssStyles)
-  //   }
-  // }
-
   render() {
-    return (
-      <div className='app'>
+    const { trip } = this.props
+    let content;
+    if (trip && trip.trip_id && trip.trip_id != null) {
+      content = (<div className='app'>
         <Grid container className='app'>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={8} className='map-container'>
             <MapContainer/>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={4} className="info-grid">
             <InfoContainer/>
           </Grid>
         </Grid>
-
-      </div>
-    )
+      </div>)
+    } else {
+      content = (
+        <div className='error'>
+          <div>
+            <h1>Trip not found</h1>
+          </div>
+        </div>
+      )
+    }
+    return content
   }
 }
 

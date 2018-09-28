@@ -1,25 +1,24 @@
 import { connect } from 'react-redux'
-import { pageClick } from '../actions'
-import Map from '../components/Map'
+import { goToStop } from '../actions'
+import Stop from '../components/Stop'
 
 const mapStateToProps = (state) => {
   return {
-    trip: state.main.trip,
     activeStop: state.main.activeStop
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onClick: () => {
-      dispatch(pageClick())
+    goToStop: (coordinate) => {
+      dispatch(goToStop(coordinate))
     }
   }
 }
 
-const MapContainer = connect(
+const StopContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(Map)
+)(Stop)
 
-export default MapContainer
+export default StopContainer

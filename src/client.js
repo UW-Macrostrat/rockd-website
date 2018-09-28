@@ -4,7 +4,7 @@ import React from 'react'
 import { hydrate } from 'react-dom'
 import { Provider } from 'react-redux'
 import configureStore from './js/redux/configureStore'
-import App from './js/components/app'
+import AppContainer from './js/containers/AppContainer'
 
 import JssProvider from 'react-jss/lib/JssProvider';
 import {
@@ -38,7 +38,7 @@ hydrate(
   <JssProvider generateClassName={generateClassName}>
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>
-         <App />
+         <AppContainer />
       </Provider>
     </MuiThemeProvider>
   </JssProvider>,

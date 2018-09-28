@@ -5,11 +5,15 @@ import { addCommas } from '../utils'
 export const PAGE_CLICK = 'PAGE_CLICK'
 export const RECIEVE_DATA = 'RECIEVE_DATA'
 export const REQUEST_DATA = 'REQUEST_DATA'
+export const GO_TO_STOP = 'GO_TO_STOP'
 
 // Define action functions
 
-export const getTrip = () => {
-  
+export const goToStop = (coordinate) => {
+  return {
+    type: GO_TO_STOP,
+    coordinate: coordinate
+  }
 }
 export const pageClick = () => {
   return {

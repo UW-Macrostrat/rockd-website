@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import reducers from './reducers'
-import App from './components/App'
+import AppContainer from './containers/AppContainer'
 
 const state = window.__STATE__
 delete window.__STATE__
@@ -21,7 +21,7 @@ let store = createStore(
 // Render the application
 render(
   <Provider store={store}>
-    <App/>
+    <AppContainer/>
   </Provider>,
   document.getElementById('react')
 )

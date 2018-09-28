@@ -1,15 +1,20 @@
 import { combineReducers } from 'redux'
-import { PAGE_CLICK, REQUEST_DATA, RECIEVE_DATA } from '../actions'
+import { PAGE_CLICK, REQUEST_DATA, RECIEVE_DATA, GO_TO_STOP } from '../actions'
+import Constants from '../Constants'
 
 // This is the initial state and the primary reducer
 const main = (state = {
   isFetching: false,
   trip: {},
   msg: '',
-  clicks: 0
+  clicks: 0,
+  activeStop: [0,0]
 }, action) => {
-
   switch (action.type) {
+    case GO_TO_STOP:
+      return Object.assign({}, state, {
+        activeStop: action.coordinate
+      })
     case PAGE_CLICK:
       return Object.assign({}, state, {
         msg: action.msg,
