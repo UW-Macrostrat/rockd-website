@@ -177,6 +177,9 @@ html, body, .wrapper, #react, .app, #map {
   font-weight: bold;
   text-decoration: none;
 }
+.download-kmz {
+  margin-bottom: 10px;
+}
 @media screen and (max-width: 600px) {
   .map-container {
     height: 50%;
