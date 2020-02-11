@@ -11,7 +11,7 @@ module.exports = `SELECT
   COALESCE(trip_likes.likes, 0)::integer AS likes,
   COALESCE(trip_likes.liked, FALSE) AS liked,
   COALESCE(trip_comments.comments, 0)::integer AS comments,
-  json_agg(row_to_json((SELECT x FROM (SELECT stops.stop_id, stops.name, stops.description, stops.trip_order, checkins.checkin_id, COALESCE(checkins.checkin, '{}') AS checkin) x))) AS stops
+  json_agg(row_to_json((SELECT x FROM (SELECT stops.stop_id, stops.name, stops.description, stops.trip_order, checkins.checkin_id, COALESCE(checkins.checkin, '{}') AS checkin) x)) ORDER BY trip_order) AS stops
 FROM trips
 LEFT JOIN stops ON stops.trip_id = trips.trip_id
 JOIN people ON trips.person_id = people.person_id
