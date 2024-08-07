@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { MacrostratIcon } from "~/components";
 
 export function Image({ src, className, width, height }) {
-    const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/web/main-page/" + src;
+    const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
     return h("img", {src: srcWithAddedPrefix, className, width, height})
 }
 
