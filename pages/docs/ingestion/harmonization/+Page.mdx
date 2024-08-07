@@ -1,0 +1,119 @@
+export { DocumentationPage as default } from "~/layouts";
+import { Icon } from "@blueprintjs/core";
+import { macrostratInstance } from "@macrostrat-web/settings";
+import { PageHeader } from "~/components";
+import { LinkCard } from "~/components/cards";
+
+<PageHeader title="Legend harmonization" showSiteName={false}>
+  <span className="subtitle">
+    <span className="tertiary">{macrostratInstance}</span>
+  </span>
+</PageHeader>
+
+To create the unified interface that Macrostrat provides, registered maps must be structurally harmonized to a small, semantically meaningful set of data fields.
+This step will align the geologic properties (lithologies, ages, types, etc.) with Macrostrat's internal representations. This alignment
+provides value to our ends users by allowing them to query for these geometry characteristics on a global scale.
+
+The following guide details how to use the purpose built user interface to harmonize new data to Macrostrat's internal
+representation.
+
+- [Features](#features)
+- [Overview](#process-overview)
+- [Starred columns](#starred-column-description)
+- [Table commands](#table-commands)
+
+## Features:
+
+### Hide, Group by and Copy/Paste columns
+
+To hide and group by columns, click on the column header and select the appropriate option. To reveal previously hidden
+columns, click on the menu icon ( <Icon icon="menu" /> ) in the top left corner of the table and click `Show all`.
+
+### Copy and Paste Columns
+
+To copy a column, click on the column header to select it, then using `cmd + c` copy that column. To then paste that column
+click on the column header where you would like to paste the column and use `cmd + v`.
+
+### Filtering Columns
+
+To filter a column, hover the column header to reveal the menu dropdown. Clicking on the menu dropdown will reveal the
+filtering options. The filter option can be selected from the selection input and the text input into the text box below.
+
+### Keyboard Navigation
+
+To navigate the table using the keyboard, use the following commands:
+
+- **tab/shift + tab** - Navigate Cells Horizontally
+- **enter/shift + enter** - Navigate Cells Vertically
+
+### Other Features
+
+- Purpose built interfaces for certain columns ( Example: Selection interface for all valid age intervals )
+- View of running operations, as well as push and clear functionality
+- Virtualized 'infinite' scrolling of table data to keep data downloads web friendly
+- Group based auth to prevent outside changes
+- Download the ingested map files to view metadata
+- <a href="https://github.com/UW-Macrostrat/web/issues/new" target="_blank">
+    Request a new feature
+  </a>
+
+## Process Overview
+
+### 1. Select the map you wish to process
+
+Log in and find the map that you wish to process on the ingestion page, clicking "Edit" will bring you into the ingestion interface.
+
+### 2. Download the ingested maps metadata
+
+Click on the `Download source` button to download the metadata for the ingested map, you may need this to provide more
+context about the values shown in the table if they are incomplete.
+
+### 3. Use the interface to reconcile the map
+
+Using the table interface the user manipulates the ingested data into standardized fields made easier through the above [features](#features).
+
+The starred columns (★) denote the columns
+that are intended to be populated by the non-star columns which are populated via the ingestion process.
+
+- [Starred Column Description](#starred-column-description)
+- [Table Commands](#table-commands)
+
+#### Starred columns
+
+All the columns in addition to these are filled in from the ingested map and can typically be transformed via the
+table interface to populate these values. Otherwise, we provide the original .zip file that was ingested to help locate the appropriate README files.
+
+**orig_id**
+
+Unique ids for each polygon. You can check a column for uniqueness by grouping by that column and asserting the row count has not changed.
+
+**descrip**
+
+Description of the polygon.
+
+**omit**
+
+This column is a **True/False** column used to omit the polygons from the final output and table view.
+
+**name**
+
+Name of the polygon, typically taken from the ingestion.
+
+**strat_name**
+
+Name of the stratigraphy.
+
+**age**
+
+Age of the polygon.
+
+_Note:_ This is one of the most important fields in Macrostrat, and is used to intersect the map with our age model.
+
+Often, age ranges can be inferred from the symbology used to discuss them. Further reading:
+
+- [Age abbreviations](https://pubs.usgs.gov/of/1999/of99-430/of99-430_sec38.pdf)
+- [Divisions of geologic time](https://pubs.usgs.gov/fs/2007/3015/fs2007-3015.pdf)
+
+**comments**
+
+Any comments that you or the authors made can be entered here.

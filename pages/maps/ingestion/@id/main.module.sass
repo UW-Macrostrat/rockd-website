@@ -1,0 +1,86 @@
+body
+  margin: 0
+  padding: 0
+
+:root
+  --map-detail-stack-width: fit-content
+
+.single-map
+  flex: 1
+  height: 100%
+  margin: 0
+  --map-context-stack-width: 16em
+
+.map-legend-container
+  overflow-y: scroll
+
+.map-legend
+  margin: 1em
+
+.legend-entry
+  margin: 0.5em 0
+
+.legend-title
+  display: flex
+  flex-direction: row
+  &:hover
+    cursor: pointer
+    background: #eee
+  h4
+    margin: 0
+    margin-right: 0.5em
+
+.legend-swatch
+  width: 1em
+  height: 1em
+  display: inline-block
+  margin-right: 0.5em
+
+.edit-menu
+    display: flex
+    flex-direction: column
+
+.m-0
+  margin: 0
+
+.pb-1
+  padding-bottom: 1rem
+
+.edit-page-header
+  padding-bottom: 1rem
+
+.page
+  display: flex
+  flex-direction: column
+  height: 100%
+  overflow: hidden
+
+.edit-menu
+  flex-grow: 1
+  button.icon-button
+    aspect-ratio: 1 / 1
+    margin: 5px
+    display: flex
+    flex-direction: column
+    border-radius: 10px
+    .icon-container
+      display: flex
+      margin: auto
+      padding: 6px
+    .icon-label
+      padding-bottom: 10px
+
+.ingestion-main-panel
+  display: flex
+  flex-direction: row
+  flex-grow: 1
+  position: relative
+  gap: 2em
+  padding-bottom: 3em
+
+.main-content
+  position: relative
+  flex-grow: 1
+  border-radius: 8px
+  overflow: hidden
+
