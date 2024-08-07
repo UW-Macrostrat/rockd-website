@@ -1,0 +1,71 @@
+export { DocumentationPage as default } from "~/layouts";
+import { LinkCard } from "~/components/cards";
+import { PageHeader } from "~/components";
+import { macrostratInstance } from "@macrostrat-web/settings";
+
+<PageHeader title="Ingestion" showSiteName={false}>
+  <span className="subtitle">
+    <span className="tertiary">{macrostratInstance}</span>
+  </span>
+</PageHeader>
+
+The Macrostrat ingestion process is built to enable the registration, processing and distribution of new maps.
+
+<img
+  style={{ maxWidth: "100%" }}
+  src={
+    "https://storage.macrostrat.org/web-assets/criticalmaas/docs/images/IngestionProcess.png"
+  }
+/>
+
+## Staging
+
+### Registering a Map for Ingestion
+
+Registration involves uploading all relevant files to an S3 bucket and
+recording them in Macrostrat's database via the API. Once a map has been
+registered, its progress through the ingestion process can be tracked.
+
+### Preprocessing
+
+After a map has been registered, the internal map processing pipeline can
+prepare the map for harmonization. This step involves determining the format
+of the map's data (e.g., Shapefiles, Geopackage, or TA1 output); parsing it
+into its component parts; and pulling out the points, lines, and polygons.
+
+### In Progress
+
+We are currently working on adding subcommands to the `macrostrat`
+command-line interface for taking a collection of files for a map and
+processing them through the staging process outlines above. Briefly:
+
+1. Install the `macrostrat` command by following the instructions in the
+   [UW-Macrostrat/macrostrat](https://github.com/UW-Macrostrat/macrostrat)
+   GitHub repository.
+
+2. Run `macrostrat maps run-pipeline --help` for an overview of how to
+   stage a map.
+
+We are also currently working to make the registration of a map more available via the web interface. In progress are the
+creation of API routes that will allow a user to provide the map files directly via the ingestion interface and have the
+automated pipelines that are currently in place translate this map into a new candidate in the Macrostrat system.
+
+## Integration
+
+### Harmonization
+
+This process is what allows Macrostrat to present heterogenous maps in a homogenized map interface. Using the data that
+is processed into our points, lines and polygon tables in the previous step we can begin to assign them with our curated
+set of geological properties. As you go through this process Macrostrat will continuously ( in progress ) update this maps
+tiles and associated metadata APIs. This allows you to continuously improve this map as new information comes in.
+
+[How to use this interface](/docs/ingestion/harmonization)
+
+### Prioritization
+
+After the harmonization process is deemed complete a expert will review the resulting map. Checking for novelty in the existing
+system and quality of ingestion they will decide whether to integrate this map into Macrostrat's Carto dataset that powers
+its main interface.
+
+**Note**: A map does not need to be integrated into the Carto dataset for its information/tiles to be exposed via API.
+Prioritization is a optional step that maps might not reach.
