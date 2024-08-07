@@ -1,583 +1,173 @@
 html, body
-  color: #E0E1E6
-  background-color: white 
-  margin: 0
-  margin-top: 35px
+  height 100%
+  width 100%
 
-#total
-  background-color: white
+body
+  background-color #363434
+  color #fff
+  font-family "Helvetica Neue","Segoe UI",sans-serif
+  font-size 15px
+
+p
+  line-height 20px
 
 a
-  color: white
+  color #fff
+  font-weight bold
+  &:hover
+    color #fff
+    text-decoration underline
 
-a:hover
-  text-decoration: none
+.container
+  height 100%
+  width 100%
+  display flex
+  align-items center
+  justify-content center
 
-.nohighlight
-  color: white
+.headline-alligner
+  display flex
+  align-items center
+  justify-content center
+  height 100%
 
-.start-card
-  margin-top: 75px
-  margin-top: 75px
-  display: flex;
-  justify-content: center;
-  align-items: center;  
-  height: 35vh
-  color: white
+.center
+  text-align center
+  line-height 35px
 
-  li
-    float: left
-    list-style-type: none
-    width: 33%
+img
+  width 100%
 
-  ul
-    display: inline-block
-    width: 100%
+.dashboard-img-container
+  display flex
+  flex-flow row wrap
+  justify-content center
+  margin-top 40px
+  img
+    max-width 160px
 
-  .start-header
-    text-shadow: black 1px 0 10px
-    text-align: center
+.not-huge
+  max-width 500px
 
-.text
-  position:absolute
-  z-index: 100
-  padding: 0 20px
-  display: grid
-  width: 50%
-  margin: auto
+.row-eq-height
+  display -webkit-box
+  display -webkit-flex
+  display -ms-flexbox
+  display flex
 
-.cover-img
-  position:absolute
-  z-index:5
-  height: 35vh
-  width: 60%
-  object-fit: cover
-  border-radius: 10px
+.download-badge
+  height 60px
+  width auto
 
-.sea-image
-  position:absolute
-  z-index: 6
-  height: 100vh
-  width: 30%
-  object-fit: cover   
+.ios
+  height 40px
 
-.parent
-  display: inline-flex
-  width: 100%
+.map-shot
+  padding 0
+  height 100%
+  background-size cover
+  background-repeat no-repeat
 
-.big
-  font-size: 72px
-  font-family: "Maven Pro", sans-serif;
-  text-align: center
+.grand_canyon
+  background-image url('./dist/img/grand_canyon.jpg')
 
-.big-text
-  display: grid
-  margin: auto
-  font-family: Helvetica, sans-serif
-  font-weight: 900
-  font-size: 20px
-  text-shadow: black 1px 0 10px
-  color: white
+.new_zealand
+  background-image url('./dist/img/new_zealand.jpg')
 
-.top-stat, .top-stat-label
-  display: grid
-  margin: auto
-  color: white
+.world
+  background-image url('./dist/img/world.jpg')
 
-.top-stat
-  font-size: 35px
-  font-family: Helvetica, sans-serif
+.appalachia
+  background-image url('./dist/img/appalachia.jpg')
 
-.stats
-  display: grid
-  grid-template-columns: 25% 25% 25% 25%
-  margin-bottom: 3%
-  margin-top: 30px
-  text-shadow: black 1px 0 10px;
+.half-height-row
+  height 50%
 
-  .stat
-    display: grid
-    margin: auto
+.map-container
+  height 100%
+  & > .row
+    height 50%
 
+.no-padding
+  padding 0
+
+.white-container
+  background-color #fff
+  color #777
   a
-    color: white
-    
-.rockd
-  background-color: green
-
-.btn
-  background-color: #363434;
-  border: none;
-  color: white;
-  padding: 13px 10px;
-  margin: 5% 15%
-  text-align: center;
-  text-decoration: none;
-  border-radius: 12px;
-
-  a 
-    color: white
-
-.btn:hover 
-  background-color: #545151 
-
-.buttons1 
-  font-size: 20px
-  padding: 0px
-  display: grid
-  grid-template-columns: 50% 50%
-
-  a 
-    color: white
-    text-decoration: none
-
-  a:hover
-    color: white
-
-.country_container 
-  height: 100vh
-
-.country
-  height: 100%
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: white
-
-.img
-  width: 50%
-  object-fit: cover
-
-.country-image
-  height: 50vh
-  width: 50%
-
-.rock-border
-  width: 100%
-  margin: 0
-  padding: 0
-
-.geologic-maps
-  height: 100vh
-  background-color: white
-  color: black
-  margin: 0
-
-.map-info
-  padding: 0 10vh
-  margin: 0
-
-.title
-  margin: 0
-  font-size: 72px
-  font-family: "Maven Pro", sans-serif;
-  padding: 20vh 0
-  text-align: center
-
-#main-title
-  display: inline-block
-  margin-bottom: 0
-  padding-bottom: 10px
-
-.version
-  display: inline-block
-  margin-left: 20px
-  font-size: 40px
-
-#about
-  height: 100vh
-  background-color: white
-  color: black
-  margin: 0
-
-#apps
-  height: 100vh
-  color: black
-  background-color: white
-
-#api
-  height: 100vh
-
-.donate-img
-  position:absolute
-  z-index:5
-  height: 30vh
-  width: 100%
-  object-fit: cover
-  border-radius: 10px
-
-.app-header
-  margin: 0
-  padding: 0
-
-.app-box 
-  height: 15vh
-  display: flex
-  width: 60%
-  margin: 0 20%
-  position: relative
-  color: black
-
-.app-background-text
-  margin: auto
-  padding-right: 20px
-  margin-right: 0
-  text-align: right
-  max-width: 55%
-  font-size: 72px
-
-.blurb
-  font-size: 15px
-
-.app-img
-  height: 80%
-  margin: auto
-  margin-left: 6%
-
-
-#api  
-  position: relative
-  height: 30vh
-  background-color: white
-
-#api-circle-text
-  display: table-cell;
-  vertical-align: middle;
-  color: #6bbe98;
-  font-size: 72px
-  font-weight: 500
-
-.api-circle
-  float: left
-  margin-left: 15%
-  margin-right: 50px
-  background-color: #fff;
-  height: 200px;
-  width: 200px;
-  border-radius: 50%;
-  text-align: center;
-  display: table;
-  border: 11px solid #6bbe98;
-  color: #4BABBf;
-
-#api-text
-  padding-top: 50px
-  margin-right: 15%
-  color: #4bab7f;
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: 400;
-
-#publications 
-  margin: 100px 10%
-
-#pub-title 
-  text-align: left
-  color: #E0E1E6
-  position: relative
-  padding-bottom: 0
-  margin-bottom: 0
-
-.pub-list
-  padding-top: 10px
-  margin-left: 20px
-  counter-reset: pub-counter 70
-  color: black
-
-  li
-    counter-increment: pub-counter -1
-
-  li::marker
-    font-size: 35px;
-    color: #babdc8;
-    content: counter(pub-counter) " "
-    counter-increment: pub-counter
-
-#about  
-  margin: 0 10%
-
-.about-row
-  margin: 4%
-  font-size: 18px;
-  line-height: 28px;
-  font-weight: 200;
-
-.about-body-subtitle
-  float: left
-  font-size: 22px;
-  font-weight: 200;
-
-.about-body
-  margin-left: 30%
-
-#about-title
-  text-align: left
-  color: #E0E1E6
-  position: relative
-  padding-bottom: 0
-
-.line
-  width: 100%;
-  border-bottom: 1px solid #E0E1E6;
-  position: absolute;
-
-.geology-img
-  position:absolute
-  z-index: 0
-  height: 100vh
-  width: 100%
-  object-fit: cover
-
-.map-info
-  position:absolute
-  z-index: 1
-  color: white
-  font-size: 20px
-  margin: 40vh 10%
-  padding: 20px
-  background-color: rgba(0,0,0,.4)
-
-.map-title
-  position:absolute
-  z-index: 1
-  color: white
-  width: 50%
-  margin: 0 25%
-
-.pub-line
-  width: 80%;
-  border-bottom: 1px solid #E0E1E6;
-  position: absolute;
-
-.location
-  display: grid;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 30vh;
-
-.t1
-  margin-left: 10%
-
-.t2
-  margin-right: 10%
-
-.location-img
-  width: 100%
-  height: 40vh
-  display: flex;
-  margin: auto
-  object-fit: cover
-
-.location-text
-  color: black
-  display: grid;
-  grid-template-rows: 50% 50%;
-  
-  h1
-    font-size: 45px
-    font-weight: 600
-    display: grid
-    margin: auto
-    margin-top: 33%
-
-.caption
-  font-size: 15px
-  font-weight: 600
-  display: grid
-  margin: auto
-
-.card-set
-  display: grid
-  grid-template-columns: 50% 50%
-  grid-template-rows: 30vh
-  width: 60%
-  margin: 0 20%
-
-.basic-card
-  background-color: white
-  width: 95%
-  margin: 2% 0
-  text-align: center
-  padding: 0 25px
-  padding-bottom: 30px
-  height: 25vh
-
-  .link-title 
-    font-size: 25px
-    
-    a
-      color: black
-
-  p
-    color: black
-    font-size: 16px
-
-  border-radius: 10px
-  box-shadow: black 1px 0 10px
-
-.right-card
-  margin-left: 5%
-
-.basic-card2
-  margin: 0
-  .link-title
-    padding-left: 10%
-
-    font-size: 35px
-
-    a
-      color: black
-
-  p
-    padding-left: 5%
-
-    color: black
-    font-size: 16px
-
-.card
-  background-color: white
-  padding: 0
-  margin: 2% 20%
-  width: 60%
-
-  .link-title 
-    font-size: 35px
-    
-    a
-      color: black
-
-  p
-    font-size: 16px
-
-  border-radius: 10px
-  box-shadow: black 1px 0 10px
-
-.location-card
-  display: grid
-  grid-template-rows: 30vh
-  
-  p
-    color: black
-    font-size: 16px
-
-  h1
-    color: black
-
-  .top
-    border-radius: 10px 0 0 0
-  
-  .bottom
-    border-radius: 0 0 10px 0
-
-.card-image
-  height: 30vh
-  width: 100%
-
-.location-text 
-  h1
-    diplay: grid
-    margin: auto
-    margin-bottom: 1%
-  p
-    display: grid
-    margin: auto
-    margin-top: 1%
-
-  height: 30vh
-
-.map-card
-  p
-    color: black
-    border-radius: 10px
-    padding: 30px
-
-  a 
-    color: white
-
-.donate-card
-  height: 30vh
-  position:relative
-
-  display: grid
-  margin: auto
-  margin-bottom: 50px
-
-.donate-text
-  position:relative
-  z-index: 100
-  width: 80%
-  display: grid
-  margin: auto
-  padding: 25px
-  background: rgba(255,255,255,0.7);
-  color: black
-  font-size: 18px
-  border-radius: 10px
-
-  a
-    color: black
-    font-weight: bold
-    text-decoration: none
-
-  p
-    margin-bottom: 0
-
-.caption-donate
-  display: grid
-  margin: auto
-  padding: 25px
-  margin-right: 25px
-  background: rgba(255,255,255,0.6);
-  color: black
-  font-size: 18px
-
-  a
-    color: black
-    font-weight: bold
-    text-decoration: none
-
-  p
-    margin-bottom: 0
-
-.header
-  width: 60%
-  margin-left: 20%
-
-  h1
-    color: black
-    font-size: 60px
-
-  h2
-    color: black
-    margin-top: 0
-
-.map-element
-  font-size: 20px
-
-  a 
-    color: #015eab
-
-.mobile-card
-  height: 10vh
-  display: grid
-  grid-template-columns: 10vh 80%
-
-  a
-    color: black
-
-  h1
-    display: grid
-    margin: auto
-    font-size: 50px
-
-.rockd-png
-  height: 10vh
-  width: 10vh
-  padding-top: 0
-  border-radius: 10px 0 0 10px
-
-.search-card
-  h1 
-    display: grid
-    margin: auto
-    font-size: 50px
+    color #000
+    font-weight bold
+    &:hover
+      color #000
+      text-decoration underline
+
+.red_rock
+  background-size cover
+  background-repeat no-repeat
+  background-image url('./dist/img/red_rock.jpg')
+
+.stats-img
+  height 500px
+  width auto
+
+.stats-container
+  text-align center
+
+.record-block
+  padding-top 40px
+  padding-bottom 40px
+  padding-right 20px
+  padding-left 20px
+  overflow-x hidden
+
+.record-img
+  height 500px
+  width auto
+
+.record-img-caption
+  margin-top 10px
+  font-size 90%
+  & > span
+    padding 10px
+    background-color rgba(100, 100, 100, 0.5)
+    border-radius 4px
+
+.full-width
+  width 100%
+
+.full-height
+  height 100%
+
+.footer-links
+  list-style none
+
+.footer-link-container
+  height 100%
+  width 100%
+  display flex
+  align-items center
+  justify-content center
+
+.field
+  background-size cover
+  background-repeat no-repeat
+  background-image url('./dist/img/field.jpg')
+  padding 0
+
+.mask
+  height 100%
+  width 100%
+  display flex
+  align-items center
+  justify-content center
+  padding 0 20px
+  background-color rgba(0,0,0,0.6)
+
+.center-me
+  display flex
+  align-items center
+  justify-content center
+
+.explore-link
+  font-weight 400
+  color #dddddd
