@@ -4,9 +4,12 @@ import "./main.styl";
 import "../main.styl";
 import { MacrostratIcon } from "~/components";
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></link>
+
 <div class="container field">
   <div class="mask">
-    <div class="row row-eq-height">
+    <Image src="main-page/field.jpg" className="start-img back-img"></Image>
+    <div class="main-content row row-eq-height">
       <div class="col-sm-6 center-me">
         <div class="headline-alligner">
           <div class="center">
@@ -28,15 +31,11 @@ import { MacrostratIcon } from "~/components";
 
 <div class="container map-container">
   <div class="row row-eq-height">
-    <div class="col-sm-7 full-height">
-      <div class="row half-height-row">
-        <div class="col-sm-6 map-shot grand_canyon"></div>
-        <div class="col-sm-6 map-shot new_zealand"></div>
-      </div>
-      <div class="row half-height-row">
-        <div class="col-sm-6 map-shot world"></div>
-        <div class="col-sm-6 map-shot appalachia"></div>
-      </div>
+    <div class="map-imgs">
+      <Image src="main-page/grand_canyon.jpg" className="map-shot grand_canyon"></Image>
+      <Image src="main-page/new_zealand.jpg" className="map-shot new_zealand"></Image>
+      <Image src="main-page/world.jpg" className="map-shot world"></Image>
+      <Image src="main-page/appalachia.jpg" className="map-shot appalachia"></Image>
     </div>
 
     <div class="col-sm-5 center-me">
@@ -70,27 +69,15 @@ import { MacrostratIcon } from "~/components";
       <Image src="main-page/ozark-plateau.png"></Image>
       <Image src="main-page/eastern-australia.png"></Image>
 
-      <Image src="main-page/hueco-formation.png"></Image>
-
-      <Image src="main-page/south-island-new-zealand.png"></Image>
-      <Image src="main-page/colombia.png"></Image>
-      <Image src="main-page/hobart-tasmania.png"></Image>
-      <Image src="main-page/nacimiento-franciscan.png"></Image>
-
-      <Image src="main-page/santa-maria-brazil.png"></Image>
-      <Image src="main-page/mesa-verde.png"></Image>
-      <Image src="main-page/santa-barbara.png"></Image>
-
-      <Image src="main-page/hualalai-hawaii.png"></Image>
-
     </div>
   </div>
 </div>
 
 <div class="container red_rock">
-  <div class="row row-eq-height">
+  <Image src="main-page/red_rock.jpg" className="back-img red-rock-img"></Image>
+  <div class="img-container row row-eq-height">
     <div class="col-sm-6 stats-container">
-      <Image src="main-page/profile.png"></Image>
+      <Image src="main-page/profile.png" className="profile-img"></Image>
     </div>
 
     <div class="col-sm-6 center-me">
@@ -119,7 +106,7 @@ import { MacrostratIcon } from "~/components";
     <div class="col-sm-6">
       <div class="headline-alligner">
         <div class="center">
-          <Image src="main-page/checkin.png"></Image>
+          <Image src="main-page/checkin.png" className="record-block-img"></Image>
           <p class="record-img-caption"><span>Take pictures of and rate features</span></p>
         </div>
       </div>
@@ -128,7 +115,7 @@ import { MacrostratIcon } from "~/components";
     <div class="col-sm-6">
       <div class="headline-alligner">
         <div class="center">
-          <Image src="main-page/strat-names.png"></Image>
+          <Image src="main-page/strat-names.png" className="record-block-img"></Image>
           <p class="record-img-caption"><span>Tag stratigraphic names, even offline</span></p>
         </div>
       </div>
@@ -137,7 +124,7 @@ import { MacrostratIcon } from "~/components";
     <div class="col-sm-6">
       <div class="headline-alligner">
         <div class="center">
-          <Image src="main-page/strike-dip.png"></Image>
+          <Image src="main-page/strike-dip.png" className="record-block-img"></Image>
           <p class="record-img-caption"><span>Use your phone's compass to record strike and dip</span></p>
         </div>
       </div>
@@ -146,7 +133,7 @@ import { MacrostratIcon } from "~/components";
     <div class="col-sm-6">
       <div class="headline-alligner">
         <div class="center">
-          <Image src="main-page/taxa.png"></Image>
+          <Image src="main-page/taxa.png" className="record-block-img"></Image>
           <p class="record-img-caption"><span>Search for and tag <a href="https://paleobiodb.org">Paleobiology Database</a> taxa.</span></p>
         </div>
       </div>

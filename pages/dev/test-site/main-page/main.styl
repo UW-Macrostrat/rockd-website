@@ -3,7 +3,7 @@ html, body
   width 100%
 
 body
-  background-color #363434
+  background-color: #363434
   color #fff
   font-family "Helvetica Neue","Segoe UI",sans-serif
   font-size 15px
@@ -19,7 +19,7 @@ a
     text-decoration underline
 
 .container
-  height 100%
+  height 100vh
   width 100%
   display flex
   align-items center
@@ -63,28 +63,17 @@ img
   height 40px
 
 .map-shot
+  object-fit cover
   padding 0
   height 100%
   background-size cover
   background-repeat no-repeat
 
-.grand_canyon
-  background-image url('./dist/img/grand_canyon.jpg')
-
-.new_zealand
-  background-image url('./dist/img/new_zealand.jpg')
-
-.world
-  background-image url('./dist/img/world.jpg')
-
-.appalachia
-  background-image url('./dist/img/appalachia.jpg')
-
 .half-height-row
   height 50%
 
 .map-container
-  height 100%
+  height 100vh
   & > .row
     height 50%
 
@@ -102,9 +91,7 @@ img
       text-decoration underline
 
 .red_rock
-  background-size cover
-  background-repeat no-repeat
-  background-image url('./dist/img/red_rock.jpg')
+  height 100vh
 
 .stats-img
   height 500px
@@ -148,12 +135,6 @@ img
   align-items center
   justify-content center
 
-.field
-  background-size cover
-  background-repeat no-repeat
-  background-image url('./dist/img/field.jpg')
-  padding 0
-
 .mask
   height 100%
   width 100%
@@ -163,6 +144,7 @@ img
   padding 0 20px
   background-color rgba(0,0,0,0.6)
 
+
 .center-me
   display flex
   align-items center
@@ -171,3 +153,38 @@ img
 .explore-link
   font-weight 400
   color #dddddd
+
+.back-img
+  position absolute
+  z-index 1
+
+.img-container
+  position absolute
+  z-index 2
+
+.main-content
+  position absolute
+  z-index 2
+  background-color rgba(0,0,0,0.6)
+  height 100vh
+  width 100%
+
+.start-img
+  height: 100vh
+  width 100%
+  object-fit cover
+
+.red-rock-img
+  object-fit cover
+  height 100vh
+
+.profile-img
+  width 300px
+
+.record-block-img
+  width 300px
+
+.map-imgs
+  display grid
+  grid-template-columns 45% 45%
+  grid-template-rows 45% 45%
