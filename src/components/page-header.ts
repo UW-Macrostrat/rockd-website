@@ -8,12 +8,12 @@ const h = hyper.styled(styles);
 
 export function PageHeader(props) {
   const {
-    title = "Macrostrat",
+    title = "Rockd",
     showSiteName = true,
     children,
     className,
   } = props;
-  const siteName = "Macrostrat";
+  const siteName = "Rockd";
   let _showSiteName = showSiteName;
   if (title == siteName) {
     _showSiteName = false;
