@@ -1,9 +1,17 @@
 import h from "@macrostrat/hyper";
-import MapContainer from '../containers/MapContainer'
-import InfoContainer from '../containers/InfoContainer'
+import { usePageContext } from 'vike-react/usePageContext'
+
+export function Page() {
+    const pageContext = usePageContext();
+    const val = 'urlPathname' in pageContext && pageContext.urlPathname
+    return h("p", val);
+}
 
 export function App() {
-    if(1 != 1) {
+    const pageContext = usePageContext();
+    const path = 'urlPathname' in pageContext && pageContext.urlPathname
+
+    if(path == "/dev/test-site/trip") {
         return h("div", { className: 'error'}, [
             h("div", [
                 h("h1", "Trip found")
