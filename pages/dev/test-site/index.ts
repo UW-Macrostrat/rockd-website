@@ -37,7 +37,7 @@ export function Footer() {
             h("li", h("a", {href: "/dev/test-site/explore"}, "Explore")),
             h("li", h("a", {href: "/dev/test-site/privacy"}, "Privacy Policy")),
             h("li", h("a", {href: "/dev/test-site/terms"}, "Terms and Conditions")),
-            h("li", h("a", {href: "/dev/test-site/trips"}, "Trips")),
+            h("li", h("a", {href: "/dev/test-site/trip"}, "Trips")),
         ])
     ]);
 }
