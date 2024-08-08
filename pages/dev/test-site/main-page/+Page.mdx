@@ -6,31 +6,28 @@ import { MacrostratIcon } from "~/components";
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></link>
 
-<div class="container field">
+<div class="new_container field">
   <div class="mask">
     <Image src="main-page/field.jpg" className="start-img back-img"></Image>
     <div class="main-content row row-eq-height">
-      <div class="col-sm-6 center-me">
-        <div class="headline-alligner">
-          <div class="center">
-            <Image src="main-page/rockd_transparent.png" className="not-huge"></Image>
-            <p>Learn, explore, and document your geologic world</p>
-            <a href="https://itunes.apple.com/us/app/id1153056624"><Image src="main-page/appstore.png" className="download-badge ios"></Image></a>
-            <a href="https://play.google.com/store/apps/details?id=org.macrostrat.rockd"><Image src="main-page/google-play-badge.png" className="download-badge android"></Image></a>
-            <p><a class="explore-link" href="/explore">Explore the data</a></p>
+      <div class="side">
+        <div class="center-me">
+            <div class="center">
+              <Image src="main-page/rockd_transparent.png" className="not-huge"></Image>
+              <p>Learn, explore, and document your geologic world</p>
+              <a href="https://itunes.apple.com/us/app/id1153056624"><Image src="main-page/appstore.png" className="download-badge ios"></Image></a>
+              <a href="https://play.google.com/store/apps/details?id=org.macrostrat.rockd"><Image src="main-page/google-play-badge.png" className="download-badge android"></Image></a>
+              <p><a class="explore-link" href="/explore">Explore the data</a></p>
           </div>
         </div>
-
-      </div>
-      <div class="col-sm-6">
-        <Image src="main-page/main.png"></Image>
+        <Image src="main-page/main.png" className="main-img"></Image>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container map-container">
-  <div class="row row-eq-height">
+<div class="new_container map-container">
+  <div class="side">
     <div class="map-imgs">
       <Image src="main-page/grand_canyon.jpg" className="map-shot grand_canyon"></Image>
       <Image src="main-page/new_zealand.jpg" className="map-shot new_zealand"></Image>
@@ -38,22 +35,18 @@ import { MacrostratIcon } from "~/components";
       <Image src="main-page/appalachia.jpg" className="map-shot appalachia"></Image>
     </div>
 
-    <div class="col-sm-5 center-me">
-      <div class="headline-alligner">
-        <div class="center">
-          <h1>Instant access to more than 290 <a href="https://macrostrat.org/map/sources">geologic maps</a> globally</h1>
-          <p>Includes direct links to <a href="https://macrostrat.org">Macrostrat</a> and <a href="https://xdd.wisc.edu">xDD</a> (where available)</p>
-        </div>
-      </div>
+    <div class="center map-info">
+      <h1>Instant access to more than 290 <a href="https://macrostrat.org/map/sources">geologic maps</a> globally</h1>
+      <p>Includes direct links to <a href="https://macrostrat.org">Macrostrat</a> and <a href="https://xdd.wisc.edu">xDD</a> (where available)</p>
     </div>
   </div>
 </div>
 
-<div class="container white-container">
+<div class="new_container white-container">
   <div class="row">
     <div class="col-sm-6 col-sm-offset-3">
       <div class="headline-alligner">
-        <div class="center">
+        <div class="center curious">
           <h1>Curious what you're standing on?</h1>
           <p>The Dashboard distills key facts about your location into a single, easy-to-read interface</p>
         </div>
@@ -73,7 +66,7 @@ import { MacrostratIcon } from "~/components";
   </div>
 </div>
 
-<div class="container red_rock">
+<div class="new_container red_rock">
   <Image src="main-page/red_rock.jpg" className="back-img red-rock-img"></Image>
   <div class="img-container row row-eq-height">
     <div class="col-sm-6 stats-container">
@@ -141,7 +134,7 @@ import { MacrostratIcon } from "~/components";
   </div>
 </div>
 
-<div class="container container-fluid half-height-row white-container">
+<div class="new_container container-fluid half-height-row white-container">
   <div class="row full-width row-eq-height">
     <div class="col-sm-8">
       <h3>Produced by the <a href="https://macrostrat.org">UW Macrostrat Lab</a></h3>
