@@ -27,3 +27,11 @@ docker-compose.yaml
 *.jpg
 
 .vite
+
+#from rockd
+package-lock.json
+node_modules
+dist
+
+src/js/Constants.js
+src-compiled
