@@ -1,0 +1,6 @@
+const Constants = {
+  MAPBOX_ACCESS_TOKEN: 'your-access-token',
+  ROCKD_API_URL: '',
+  MACROSTRAT_TILE_URL: ''
+}
+export default Constants
