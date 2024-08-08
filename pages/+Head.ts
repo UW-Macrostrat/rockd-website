@@ -22,13 +22,13 @@ export default function Head() {
       rel: "icon",
       type: "image/png",
       sizes: "32x32",
-      href: "/favicon-32x32.png",
+      href: "https://storage.macrostrat.org/assets/web/main-page/rockd.jpg",
     }),
     h("link", {
       rel: "icon",
       type: "image/png",
       sizes: "16x16",
-      href: "/favicon-16x16.png",
+      href: "https://storage.macrostrat.org/assets/web/main-page/rockd.jpg",
     }),
     h("link", {
       rel: "apple-touch-icon",
