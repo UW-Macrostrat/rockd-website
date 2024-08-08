@@ -40,7 +40,7 @@ export default function Head() {
       href: "https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro",
       rel: "stylesheet",
     }),
-    h("meta", { name: "description", content: "Macrostrat" }),
+    h("meta", { name: "description", content: "Rockd" }),
     h("script", {
       type: "text/javascript",
       dangerouslySetInnerHTML: {
