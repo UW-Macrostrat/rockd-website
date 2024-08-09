@@ -1,27 +1,39 @@
+import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
 import { usePageContext } from 'vike-react/usePageContext'
 
-export function Page() {
+function getTrip() {
     const pageContext = usePageContext();
-    const val = 'urlPathname' in pageContext && pageContext.urlPathname
-    return h("p", val);
+    const trip = 'urlParsed' in pageContext && pageContext.urlParsed.search.trip;
+    return parseInt(trip);
 }
 
 export function App() {
-    const pageContext = usePageContext();
-    const path = 'urlPathname' in pageContext && pageContext.urlPathname
+    const trip = getTrip();
+    console.log("Trip", trip);
 
-    if(path == "/dev/test-site/trip") {
+    if(trip < 100) {
         return h("div", { className: 'error'}, [
             h("div", [
-                h("h1", "Trip found")
+                h("h1", "Trip " + trip + " found")
             ])
         ]);
     } else {
         return h("div", { className: 'error'}, [
             h("div", [
-                h("h1", "Trip not found")
+                h("h1", "Trip " + trip + " not found")
             ])
         ]);
     }
 }
+
+export function TripSearch() {
+    return h(
+        "div", { className: "trip-search" },[
+            h("h1", { className: "trip-q" }, "Trip Search:"),
+            h("input", {  className: "trip-input", type: "text", placeholder: "Enter Trip Number" }),
+            h("a", {  className: "search-btn", type: "button", href: "/dev/test-site/trip?trip=3" }, "Search")
+        ]
+    )
+}
+
