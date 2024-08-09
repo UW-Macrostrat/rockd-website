@@ -16,8 +16,8 @@ export function updatePageMeta<T extends PageContext | PageContextClient>(
     return pageContext;
   }
 
-  if (title != "Macrostrat") {
-    title = `${title} - Macrostrat`;
+  if (title != "Rockd") {
+    title = `${title} - Rockd`;
   }
 
   titleCfg.configValue = title;

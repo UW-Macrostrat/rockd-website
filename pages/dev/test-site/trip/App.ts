@@ -10,15 +10,15 @@ function getTrip() {
 
 export function App() {
     const trip = getTrip();
-    console.log("Trip", trip);
-
     if(trip < 100) {
+        console.log("Trip " + trip + " found");
         return h("div", { className: 'error'}, [
             h("div", [
                 h("h1", "Trip " + trip + " found")
             ])
         ]);
     } else {
+        console.log("Trip " + trip + " not found");
         return h("div", { className: 'error'}, [
             h("div", [
                 h("h1", "Trip " + trip + " not found")
@@ -37,3 +37,6 @@ export function TripSearch() {
     )
 }
 
+function searchClick() {
+    
+}
