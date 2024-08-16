@@ -10,36 +10,39 @@ function getTrip() {
 
 export function App() {
     const trip = getTrip();
-    let data  = ''
-
+    let data = '';
+    
     fetch("https://rockd.org/api/v2/trips/" + trip)
     .then(function(response) {
         return response.json();
     })
     .then(function(myJson) {
         data = myJson;
-
-        // change conidition to match total number of trips
-        if(trip < 100) {
-            console.log("Trip " + trip + " found");
-            console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-            return h("div", { className: 'error'}, [
-                h("div", [
-                    h("h1", "Trip " + String(trip) + " found"),
-                    h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
-                ])
-            ]);
-        } else {
-            console.log("Trip " + trip + " not found");
-            console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-            return h("div", { className: 'error'}, [
-                h("div", [
-                    h("h1", "Trip " + String(trip) + " not found"),
-                    h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
-                ])
-            ]);
-        }
+        data = data["success"]["data"][0];
+        console.log(data);
+        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
     });
+
+    // change conidition to match total number of trips
+    if(trip < 100) {
+        console.log("Trip " + trip + " found");
+        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+        return h("div", { className: 'error'}, [
+            h("div", [
+                h("h1", "Trip " + String(trip) + " found"),
+                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
+            ])
+        ]);
+    } else {
+        console.log("Trip " + trip + " not found");
+        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+        return h("div", { className: 'error'}, [
+            h("div", [
+                h("h1", "Trip " + String(trip) + " not found"),
+                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
+            ])
+        ]);
+    }
 }
 
 export function TripSearch() {
@@ -57,4 +60,18 @@ export function TripSearch() {
 
 function searchClick() {
     return "5";
+}
+
+export function Trip() {
+    return h("div", { className: 'trip-container'}, [
+        h(App),
+        h(TripSearch)
+    ]);
+}
+
+async function fetchTrip() {
+    const trip = getTrip();
+    const response = await fetch("https://rockd.org/api/v2/trips/" + trip);
+    const data = await response.json();
+    return data;
 }
