@@ -10,33 +10,38 @@ function getTrip() {
 
 export function App() {
     const trip = getTrip();
+
+    // change conidition to match total number of trips
     if(trip < 100) {
         console.log("Trip " + trip + " found");
         return h("div", { className: 'error'}, [
             h("div", [
-                h("h1", "Trip " + trip + " found")
+                h("h1", "Trip " + String(trip) + " found")
             ])
         ]);
     } else {
         console.log("Trip " + trip + " not found");
         return h("div", { className: 'error'}, [
             h("div", [
-                h("h1", "Trip " + trip + " not found")
+                h("h1", "Trip " + String(trip) + " not found")
             ])
         ]);
     }
 }
 
 export function TripSearch() {
+    const trip = searchClick();
+    var searchBtn = h("a", {  className: "search-btn", type: "button", href: "/dev/test-site/trip?trip=3" }, "Search");
+    
     return h(
         "div", { className: "trip-search" },[
             h("h1", { className: "trip-q" }, "Trip Search:"),
             h("input", {  className: "trip-input", type: "text", placeholder: "Enter Trip Number" }),
-            h("a", {  className: "search-btn", type: "button", href: "/dev/test-site/trip?trip=3" }, "Search")
+            searchBtn
         ]
     )
 }
 
 function searchClick() {
-    
+    return "5";
 }
