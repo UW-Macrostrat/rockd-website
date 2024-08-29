@@ -9,6 +9,16 @@ function getTrip() {
 }
 
 export function App() {
+    fetchTrip().then(data => {
+        console.log("got data");
+        return h("div", { className: 'trip-info'}, [
+            h("div", [
+                h("h1", "Trip " + String(trip) + " found"),
+                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
+            ])
+        ]);
+    });
+
     const trip = getTrip();
     let data = '';
     
@@ -19,15 +29,15 @@ export function App() {
     .then(function(myJson) {
         data = myJson;
         data = data["success"]["data"][0];
-        console.log(data);
         console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
     });
 
     // change conidition to match total number of trips
-    if(trip < 100) {
+    /*
+    if(data != '') {
         console.log("Trip " + trip + " found");
-        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-        return h("div", { className: 'error'}, [
+        // console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+        return h("div", { className: 'trip-info'}, [
             h("div", [
                 h("h1", "Trip " + String(trip) + " found"),
                 h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
@@ -35,7 +45,7 @@ export function App() {
         ]);
     } else {
         console.log("Trip " + trip + " not found");
-        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+        // console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
         return h("div", { className: 'error'}, [
             h("div", [
                 h("h1", "Trip " + String(trip) + " not found"),
@@ -43,6 +53,7 @@ export function App() {
             ])
         ]);
     }
+        */
 }
 
 export function TripSearch() {
