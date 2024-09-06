@@ -60,9 +60,10 @@ export function TripSearch() {
 
     return h(
         "div", { className: "trip-search" },[
-            h("h1", { className: "trip-q" }, "Trip Search:"),
-            h("input", {  className: "trip-input", type: "text", placeholder: "Enter Trip Number" }),
-            searchBtn
+            h("h1", { className: "trip-q" }, "Trip Search"),
+            h('div', { className: 'trip-input-container' }, [
+                h("input", {  className: "trip-input", type: "text", placeholder: "Enter Trip Number" }),
+                searchBtn]),
         ]
     )
 }
