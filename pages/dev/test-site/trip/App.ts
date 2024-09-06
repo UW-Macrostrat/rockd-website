@@ -33,7 +33,6 @@ export function App() {
     });
 
     // change conidition to match total number of trips
-    /*
     if(data != '') {
         console.log("Trip " + trip + " found");
         // console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
@@ -53,7 +52,6 @@ export function App() {
             ])
         ]);
     }
-        */
 }
 
 export function TripSearch() {
