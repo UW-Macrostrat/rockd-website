@@ -10,8 +10,7 @@ export function Map() {
 
     useEffect(() => {
         if (mapContainerRef.current) {
-            // update getting access key
-            mapboxgl.accessToken = "XXXX";
+            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_TOKEN;
 
             new mapboxgl.Map({
                 container: mapContainerRef.current,
