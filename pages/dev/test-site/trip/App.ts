@@ -1,5 +1,6 @@
 import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
+import { useEffect, useState } from "react";
 import { usePageContext } from 'vike-react/usePageContext'
 
 function getTrip() {
@@ -21,16 +22,22 @@ export function App() {
 
     const trip = getTrip();
     let data = '';
-    
-    fetch("https://rockd.org/api/v2/trips/" + trip)
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(myJson) {
-        data = myJson;
-        data = data["success"]["data"][0];
-        console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-    });
+
+    const [state, setState] = useState(null);
+
+    useEffect(() => {
+        fetch("https://rockd.org/api/v2/trips/" + trip)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(myJson) {
+            data = myJson;
+            data = data["success"]["data"][0];
+            console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+
+            setState(data);
+        });
+    }, []);
 
     // change conidition to match total number of trips
     if(data != '') {
