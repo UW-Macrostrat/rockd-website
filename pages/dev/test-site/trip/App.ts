@@ -1,6 +1,6 @@
 import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePageContext } from 'vike-react/usePageContext'
 
 function getTrip() {
@@ -10,16 +10,6 @@ function getTrip() {
 }
 
 export function App() {
-    fetchTrip().then(data => {
-        console.log("got data");
-        return h("div", { className: 'trip-info'}, [
-            h("div", [
-                h("h1", "Trip " + String(trip) + " found"),
-                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
-            ])
-        ]);
-    });
-
     const trip = getTrip();
     let data = '';
 
@@ -38,6 +28,8 @@ export function App() {
             setState(data);
         });
     }, []);
+
+    console.log("state:", state);
 
     // change conidition to match total number of trips
     if(data != '') {
