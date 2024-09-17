@@ -22,18 +22,18 @@ export default function Head() {
       rel: "icon",
       type: "image/png",
       sizes: "32x32",
-      href: "https://storage.macrostrat.org/assets/rockd/rockd.jpg",
+      href: "https://storage.macrostrat.org/assets/rockd/favicon-32x32.png",
     }),
     h("link", {
       rel: "icon",
       type: "image/png",
       sizes: "16x16",
-      href: "https://storage.macrostrat.org/assets/rockd/rockd.jpg",
+      href: "https://storage.macrostrat.org/assets/rockd/favicon-16x16.png",
     }),
     h("link", {
       rel: "apple-touch-icon",
       sizes: "180x180",
-      href: "/apple-touch-icon.png",
+      href: "https://storage.macrostrat.org/assets/rockd/apple-touch-icon.png",
     }),
     h("link", { rel: "manifest", href: "/site.webmanifest" }),
     h("link", {
