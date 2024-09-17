@@ -3,7 +3,7 @@ import h from "@macrostrat/hyper";
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Image } from "../index";
+import { BlankImage } from "../index";
 
 export function Map() {
     let data = {
@@ -820,26 +820,28 @@ export function Map() {
 
     // create stops
     let stops = [];
+    let temp;
     for(var i = 0; i < data.stops.length; i++) {
         data.stops[i].name = (i + 1) + ". " + data.stops[i].name;
-        stops.push(h('h2', {className: 'stop-title'}, data.stops[i].name));
-        stops.push(h('p', {className: 'stop-text'}, data.stops[i].description));
+        temp = h('div', {className: 'stop-description'}, [
+            h('h2', {className: 'stop-title'}, data.stops[i].name),
+            h('p', {className: 'stop-text'}, data.stops[i].description)
+        ])
+        stops.push(temp);
     }
 
     return h("div", {className: 'map'}, [
             h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '80vh' } }),
             h('div', { className: 'stop-container', style: { width: '100%', height: '80vh' } }, [
                 h('div', { className: 'stop-header' }, [
-                    h('h3', {className: 'profile-pic'}, h("Image", {src:"sample.jpg"})),
+                    h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.trip_id, className: "profile-pic", width: "100px", height: "50px"})),
                     h('div', {className: 'stop-main-info'}, [
                         h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                         h('h3', {className: 'edited'}, "Edited " + data.updated),
                     ]),
                 ]),
                 h('h1', {className: 'park'}, data.name),
-                h('div', {className: 'stop-description'}, [
-                    h('div', {className: 'stop'}, stops)
-                ]),
+                h('div', {className: 'stop-list'}, stops),
             ])
         ]);
 }
