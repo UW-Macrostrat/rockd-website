@@ -247,6 +247,7 @@ html, body, .wrapper, #react, .app, #map
   overflow scroll
   overflow-x hidden
   height 50vh
+  -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%);
 
 .map 
   height 75vh
@@ -257,12 +258,9 @@ html, body, .wrapper, #react, .app, #map
   margin auto
   margin-left 0
 
-.stop-box
-  border solid
-
 .box-header
   display grid
-  grid-template-columns 20% 80%
+  grid-template-columns 20% 60% 20%
   padding 10px
 
   .checkin-details
@@ -273,3 +271,7 @@ html, body, .wrapper, #react, .app, #map
     h4
       padding 0
       margin 0
+      font-weight 30
+
+.marker
+  height 7vh

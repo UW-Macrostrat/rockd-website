@@ -3,7 +3,7 @@ import h from "@macrostrat/hyper";
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage } from "../index";
+import { BlankImage, Image } from "../index";
 
 export function Map() {
     let data = {
@@ -815,6 +815,7 @@ export function Map() {
             let lats = [];
             let lngs = [];
 
+
             // add markers
             for(const stop of data.stops) {
                 const marker = new mapboxgl.Marker()
@@ -851,6 +852,7 @@ export function Map() {
                         h('h4', {className: 'location'}, data.stops[i].checkin.near),
                         h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
                     ]),
+                    h(Image, {src: "marker.png", className: "marker"}),
                 ]),
                 h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/1/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
             ]),
