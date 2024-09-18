@@ -804,12 +804,26 @@ export function Map() {
         if (mapContainerRef.current) {
             mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_TOKEN;
 
-            new mapboxgl.Map({
+            // intialize map
+            let map = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
-                center: [-89.4,43.072 ], // long, lat
+                center: [ data.stops[0].checkin.lng, data.stops[0].checkin.lat ], // long, lat
                 zoom: 12,
             });
+            
+            let lats = [];
+            let lngs = [];
+
+            // add markers
+            for(const stop of data.stops) {
+                const marker = new mapboxgl.Marker()
+                    .setLngLat([stop.checkin.lng, stop.checkin.lat])
+                    .addTo(map);
+
+                lats.push(stop.checkin.lat);
+                lngs.push(stop.checkin.lng);
+            }
         }
     }, []);
 
@@ -825,16 +839,20 @@ export function Map() {
         data.stops[i].name = (i + 1) + ". " + data.stops[i].name;
         temp = h('div', {className: 'stop-description'}, [
             h('h2', {className: 'stop-title'}, data.stops[i].name),
-            h('p', {className: 'stop-text'}, data.stops[i].description)
+            h('p', {className: 'stop-text'}, data.stops[i].description),
+            h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/1/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
         ])
         stops.push(temp);
     }
 
+    // profile pic
+    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
+
     return h("div", {className: 'map'}, [
-            h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '80vh' } }),
-            h('div', { className: 'stop-container', style: { width: '100%', height: '80vh' } }, [
+            h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '75vh' } }),
+            h('div', { className: 'stop-container', style: { width: '100%' } }, [
                 h('div', { className: 'stop-header' }, [
-                    h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.trip_id, className: "profile-pic", width: "100px", height: "50px"})),
+                    h('h3', {className: 'profile-pic'}, profile_pic),
                     h('div', {className: 'stop-main-info'}, [
                         h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                         h('h3', {className: 'edited'}, "Edited " + data.updated),
