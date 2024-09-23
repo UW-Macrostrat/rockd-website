@@ -1,7 +1,7 @@
 import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
-import { useEffect, useState, useRef } from "react";
-import { usePageContext } from 'vike-react/usePageContext'
+import React, { useEffect, useState } from 'react';
+import { usePageContext } from 'vike-react/usePageContext';
 
 function getTrip() {
     const pageContext = usePageContext();
@@ -10,77 +10,63 @@ function getTrip() {
 }
 
 export function App() {
-    const trip = getTrip();
-    let data = '';
-
-    const [state, setState] = useState(null);
+    let trip = getTrip();
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("https://rockd.org/api/v2/trips/" + trip)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(myJson) {
-            data = myJson;
-            data = data["success"]["data"][0];
-            console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
+        trip = 1;
 
-            setState(data);
-        });
-    }, []);
+        // Ensure trip ID is valid
+        if (isNaN(trip)) {
+            setLoading(false);
+            setError('Invalid trip ID.');
+            return;
+        }
 
-    console.log("state:", state);
+        fetch(`https://rockd.org/api/v2/trips/${trip}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.success.data.length > 0) {
+                    setUserData(data.success.data[0]);
+                } else {
+                    setUserData(null);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                setError(error.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [trip]);
 
-    // change conidition to match total number of trips
-    if(data != '') {
-        console.log("Trip " + trip + " found");
-        // console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-        return h("div", { className: 'trip-info'}, [
-            h("div", [
-                h("h1", "Trip " + String(trip) + " found"),
-                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
-            ])
-        ]);
-    } else {
-        console.log("Trip " + trip + " not found");
-        // console.log(data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]);
-        return h("div", { className: 'error'}, [
-            h("div", [
-                h("h1", "Trip " + String(trip) + " not found"),
-                h("p", data["first_name"] + " " + data['last_name'] + " took a trip to " + data["name"]),
-            ])
+    if (loading) {
+        return h("div", { className: 'loading' }, "Loading...");
+    }
+
+    if (error) {
+        return h("div", { className: 'error' }, [
+            h("h1", "Error"),
+            h("p", error)
         ]);
     }
-}
 
-export function TripSearch() {
-    const trip = searchClick();
-    var searchBtn = h("a", {  className: "search-btn", type: "button", href: "/dev/test-site/trip?trip=3" }, "Search");
+    if (!userData) {
+        return h("div", { className: 'error' }, [
+            h("h1", `Trip ${trip} not found`),
+        ]);
+    }
 
-    return h(
-        "div", { className: "trip-search" },[
-            h("h1", { className: "trip-q" }, "Trip Search"),
-            h('div', { className: 'trip-input-container' }, [
-                h("input", {  className: "trip-input", type: "text", placeholder: "Enter Trip Number" }),
-                searchBtn]),
-        ]
-    )
-}
-
-function searchClick() {
-    return "5";
-}
-
-export function Trip() {
-    return h("div", { className: 'trip-container'}, [
-        h(App),
-        h(TripSearch)
+    return h("div", { className: 'trip-info' }, [
+        h("h1", `Trip ${trip} found`),
+        h("p", `${userData.first_name} ${userData.last_name} took a trip to ${userData.name}`)
     ]);
-}
-
-async function fetchTrip() {
-    const trip = getTrip();
-    const response = await fetch("https://rockd.org/api/v2/trips/" + trip);
-    const data = await response.json();
-    return data;
 }
