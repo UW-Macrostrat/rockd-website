@@ -5,18 +5,21 @@ import { usePageContext } from 'vike-react/usePageContext';
 
 function getTrip() {
     const pageContext = usePageContext();
-    const trip = 'urlParsed' in pageContext && pageContext.urlParsed.search.trip;
+    console.log(pageContext.urlParsed);
+    let trip = 'urlParsed' in pageContext && pageContext.urlParsed.search.trip;
+    console.log(trip);
     return parseInt(trip);
 }
 
 export function App() {
-    let trip = getTrip();
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    const trip = getTrip(); // Call the function to get the trip ID
 
     useEffect(() => {
-        trip = 1;
+        console.log(`Fetching data for trip ID: ${trip}`);
 
         // Ensure trip ID is valid
         if (isNaN(trip)) {
@@ -33,6 +36,7 @@ export function App() {
                 return response.json();
             })
             .then(data => {
+                console.log('Fetched data:', data); // Log fetched data for debugging
                 if (data.success && data.success.data.length > 0) {
                     setUserData(data.success.data[0]);
                 } else {
@@ -46,7 +50,7 @@ export function App() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [trip]);
+    }, []); // Add trip to dependency array
 
     if (loading) {
         return h("div", { className: 'loading' }, "Loading...");
@@ -64,6 +68,8 @@ export function App() {
             h("h1", `Trip ${trip} not found`),
         ]);
     }
+
+    //
 
     return h("div", { className: 'trip-info' }, [
         h("h1", `Trip ${trip} found`),

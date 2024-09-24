@@ -815,10 +815,11 @@ export function Map() {
             let lats = [];
             let lngs = [];
 
+            const el = h('div', {className: 'marker'});
 
             // add markers
             for(const stop of data.stops) {
-                const marker = new mapboxgl.Marker()
+                const marker = new mapboxgl.Marker(el)
                     .setLngLat([stop.checkin.lng, stop.checkin.lat])
                     .addTo(map);
 
