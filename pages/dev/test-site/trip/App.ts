@@ -1,7 +1,9 @@
 import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
+import { parse } from "path";
 import React, { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
+import { getPageContext } from 'vike/getPageContext'
 
 function getTrip() {
     const pageContext = usePageContext();
@@ -12,13 +14,18 @@ function getTrip() {
 }
 
 export function App() {
+    const pageContext = usePageContext();
     const [userData, setUserData] = useState(null);
+    const [tripNum, setTrip] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
-    const trip = getTrip(); // Call the function to get the trip ID
+    let trip;
+
+
 
     useEffect(() => {
+        trip = 1;
+
         console.log(`Fetching data for trip ID: ${trip}`);
 
         // Ensure trip ID is valid
