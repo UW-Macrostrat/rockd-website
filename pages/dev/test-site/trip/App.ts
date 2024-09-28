@@ -105,12 +105,13 @@ export function App() {
         let map = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
-            center: [ data.stops[0].checkin.lng, data.stops[0].checkin.lat ], // long, lat
+            center: [ 0, 0 ],
             zoom: 12,
         });
         
         let lats = [];
         let lngs = [];
+        let markers = [];
 
         const el = h('div', {className: 'marker'});
 
@@ -122,7 +123,41 @@ export function App() {
 
             lats.push(stop.checkin.lat);
             lngs.push(stop.checkin.lng);
+            markers.push({
+                "lat": stop.checkin.lat,
+                "long": stop.checkin.lng
+            });
         }
+
+        // set center locaiton
+        map.fitBounds([
+            [ Math.max(...lngs), Math.max(...lats) ],
+            [ Math.min(...lngs), Math.min(...lats) ]
+          ], {
+            maxZoom: 12,
+            duration: 0,
+            padding: 75
+          });
+
+        map.on('click', (event) => {
+            console.log('Map clicked:', event);
+            console.log(markers);
+
+            markers.forEach(marker => {
+                // did we click on a marker?
+                if(Math.abs(marker.lat - event.lngLat.lat) < .005 && Math.abs(marker.long - event.lngLat.lng) < .005 ) {
+                    map.flyTo({
+                        center: [marker.long, marker.lat],
+                        zoom: 12,
+                        speed: 1,
+                        curve: 1,
+                        easing(t) {
+                            return t;
+                        }
+                    });
+                }
+            });
+        });
     }
 
     // format date
