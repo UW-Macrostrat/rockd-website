@@ -42,6 +42,7 @@ export function Footer() {
             h("li", h("a", {href: "/dev/test-site/privacy"}, "Privacy Policy")),
             h("li", h("a", {href: "/dev/test-site/terms"}, "Terms and Conditions")),
             h("li", h("a", {href: "/dev/test-site/trip?trip=1"}, "Trips")),
+            h("li", h("a", {href: "/dev/test-site/metrics"}, "Metrics")),
         ])
     ]);
 }
