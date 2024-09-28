@@ -151,7 +151,7 @@ export function App() {
                     ]),
                     h(Image, {src: "marker.png", className: "marker"}),
                 ]),
-                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/1/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
+                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
             ]),
         ])
         stops.push(temp);
