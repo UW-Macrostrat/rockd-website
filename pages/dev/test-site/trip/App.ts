@@ -1,9 +1,12 @@
 import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
 import { parse } from "path";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
-import { getPageContext } from 'vike/getPageContext'
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { BlankImage, Image } from "../index";
+import { data } from "#/integrations/criticalmaas/ta1-results/@cog_id/@system/@system_version/+data";
 
 function getTrip() {
     const pageContext = usePageContext();
@@ -19,6 +22,8 @@ export function App() {
     const [tripNum, setTrip] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const mapContainerRef = useRef(null);
+
     let trip;
 
     useEffect(() => {
@@ -79,6 +84,84 @@ export function App() {
     }
 
     
+
+    // Data found correctly
+    let data = userData;
+
+    if (mapContainerRef.current) {
+        console.log('Initializing map');
+        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_TOKEN;
+
+        // intialize map
+        let map = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
+            center: [ data.stops[0].checkin.lng, data.stops[0].checkin.lat ], // long, lat
+            zoom: 12,
+        });
+        
+        let lats = [];
+        let lngs = [];
+
+        const el = h('div', {className: 'marker'});
+
+        // add markers
+        for(const stop of data.stops) {
+            const marker = new mapboxgl.Marker(el)
+                .setLngLat([stop.checkin.lng, stop.checkin.lat])
+                .addTo(map);
+
+            lats.push(stop.checkin.lat);
+            lngs.push(stop.checkin.lng);
+        }
+    }
+
+    // format date
+    let date = new Date(data.updated);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    data.updated = date.toLocaleDateString('en-US', options);
+
+    // profile pic
+    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
+
+    // create stops
+    let stops = [];
+    let temp;
+    for(var i = 0; i < data.stops.length; i++) {
+        data.stops[i].name = (i + 1) + ". " + data.stops[i].name;
+        temp = h('div', {className: 'stop-description'}, [
+            h('h2', {className: 'stop-title'}, data.stops[i].name),
+            h('p', {className: 'stop-text'}, data.stops[i].description),
+            h('div', {className: 'stop-box'},[
+                h('div', {className: 'box-header'},[
+                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
+                    h('div', {className: 'checkin-details'}, [
+                        h('h4', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
+                        h('h4', {className: 'location'}, data.stops[i].checkin.near),
+                        h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
+                    ]),
+                    h(Image, {src: "marker.png", className: "marker"}),
+                ]),
+                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/1/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
+            ]),
+        ])
+        stops.push(temp);
+    }
+
+    return h("div", {className: 'map'}, [
+            h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '75vh' } }),
+            h('div', { className: 'stop-container', style: { width: '100%' } }, [
+                h('div', { className: 'stop-header' }, [
+                    h('h3', {className: 'profile-pic'}, profile_pic),
+                    h('div', {className: 'stop-main-info'}, [
+                        h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
+                        h('h3', {className: 'edited'}, "Edited " + data.updated),
+                    ]),
+                ]),
+                h('h1', {className: 'park'}, data.name),
+                h('div', {className: 'stop-list'}, stops),
+            ])
+        ]);
 
     return h("div", { className: 'trip-info' }, [
         h("h1", "Trip " + tripNum + " found"),
