@@ -7,6 +7,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
 import { data } from "#/integrations/criticalmaas/ta1-results/@cog_id/@system/@system_version/+data";
+import { map } from "underscore";
 
 function getTrip() {
     const pageContext = usePageContext();
@@ -108,14 +109,18 @@ export function App() {
             center: [ 0, 0 ],
             zoom: 12,
         });
+
+        // zoom bar
+        let nav = new mapboxgl.NavigationControl({ showCompass: false })
+        map.addControl(nav, 'top-left')
         
+        // add markers
         let lats = [];
         let lngs = [];
         let markers = [];
 
-        const el = h('div', {className: 'marker'});
+        let el = h('div', {className: 'map_marker'});
 
-        // add markers
         for(const stop of data.stops) {
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([stop.checkin.lng, stop.checkin.lat])
@@ -140,9 +145,6 @@ export function App() {
           });
 
         map.on('click', (event) => {
-            console.log('Map clicked:', event);
-            console.log(markers);
-
             markers.forEach(marker => {
                 // did we click on a marker?
                 if(Math.abs(marker.lat - event.lngLat.lat) < .005 && Math.abs(marker.long - event.lngLat.lng) < .005 ) {
