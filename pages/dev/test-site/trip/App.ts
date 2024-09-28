@@ -21,12 +21,14 @@ export function App() {
     const [error, setError] = useState(null);
     let trip;
 
-
-
     useEffect(() => {
-        trip = 1;
-
-        console.log(`Fetching data for trip ID: ${trip}`);
+        if (pageContext.urlParsed) {
+            trip = parseInt(pageContext.urlParsed.search.trip);
+            setTrip(trip);
+        } else {
+            setTrip(0);
+        }
+        console.log(`Fetching data for trip ID: ` + trip);
 
         // Ensure trip ID is valid
         if (isNaN(trip)) {
@@ -72,14 +74,14 @@ export function App() {
 
     if (!userData) {
         return h("div", { className: 'error' }, [
-            h("h1", `Trip ${trip} not found`),
+            h("h1", "Trip " + tripNum + " not found"),  
         ]);
     }
 
-    //
+    
 
     return h("div", { className: 'trip-info' }, [
-        h("h1", `Trip ${trip} found`),
+        h("h1", "Trip " + tripNum + " found"),
         h("p", `${userData.first_name} ${userData.last_name} took a trip to ${userData.name}`)
     ]);
 }
