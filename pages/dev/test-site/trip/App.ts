@@ -67,7 +67,16 @@ export function App() {
     }, []); // Add trip to dependency array
 
     if (loading) {
-        return h("div", { className: 'loading' }, "Loading...");
+        if(tripNum == null) {
+            return h("div", { className: 'loading' }, [
+                h("h1", "Loading trip..."),
+            ]);
+        } else {
+            return h("div", { className: 'loading' }, [
+                h("h1", "Loading trip " + tripNum + "..."),
+            ]);
+        }
+
     }
 
     if (error) {
@@ -162,9 +171,4 @@ export function App() {
                 h('div', {className: 'stop-list'}, stops),
             ])
         ]);
-
-    return h("div", { className: 'trip-info' }, [
-        h("h1", "Trip " + tripNum + " found"),
-        h("p", `${userData.first_name} ${userData.last_name} took a trip to ${userData.name}`)
-    ]);
 }
