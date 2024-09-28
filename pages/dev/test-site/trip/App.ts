@@ -65,7 +65,7 @@ export function App() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []); // Add trip to dependency array
+    }, []); 
 
     if (loading) {
         if(tripNum == null) {
