@@ -4298,6 +4298,7 @@ __metadata:
     d3-shape: "npm:^3.2.0"
     esbuild: "npm:^0.20.0"
     esbuild-register: "npm:^3.5.0"
+    eslint-plugin-react-hooks: "npm:^4.6.2"
     esprima: "npm:^4.0.1"
     express: "npm:^4.18.2"
     express-http-proxy: "npm:^2.0.0"
@@ -15310,6 +15311,15 @@ __metadata:
     escodegen: ./bin/escodegen.js
     esgenerate: ./bin/esgenerate.js
   checksum: 10/546be0474a0ae10f0adef82a1553cce183dc15aecb410c62923b1b431d841a897b5b40b26b2a7fa9af6eb70d48f97325dc94f9e89550c69552d2139fef6a5bf2
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-react-hooks@npm:^4.6.2":
+  version: 4.6.2
+  resolution: "eslint-plugin-react-hooks@npm:4.6.2"
+  peerDependencies:
+    eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
+  checksum: 10/5a0680941f34e70cf505bcb6082df31a3e445d193ee95a88ff3483041eb944f4cefdaf7e81b0eb1feb4eeceee8c7c6ddb8a2a6e8c4c0388514a42e16ac7b7a69
   languageName: node
   linkType: hard
 
