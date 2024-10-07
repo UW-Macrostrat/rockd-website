@@ -174,9 +174,8 @@ export function App() {
     let stops = [];
     let temp;
     for(var i = 0; i < data.stops.length; i++) {
-        data.stops[i].name = (i + 1) + ". " + data.stops[i].name;
         temp = h('div', {className: 'stop-description'}, [
-            h('h2', {className: 'stop-title'}, data.stops[i].name),
+            h('h2', {className: 'stop-title'}, (i + 1) + ". " + data.stops[i].name),
             h('p', {className: 'stop-text'}, data.stops[i].description),
             h('div', {className: 'stop-box'},[
                 h('div', {className: 'box-header'},[
