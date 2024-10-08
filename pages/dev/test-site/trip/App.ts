@@ -204,6 +204,9 @@ export function App() {
                     ]),
                 ]),
                 h('h1', {className: 'park'}, data.name),
+                h('p', {className: 'download-button'}, [
+                    h('a', {className: 'kmz', href: "https://rockd.org/api/v2/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                ]),
                 h('div', {className: 'stop-list'}, stops),
             ])
         ]);
