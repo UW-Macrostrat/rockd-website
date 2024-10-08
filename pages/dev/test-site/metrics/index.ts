@@ -1,6 +1,14 @@
 import h from "@macrostrat/hyper";
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 
+import { Bar } from '@visx/shape';
+import { Group } from '@visx/group';
+import { GradientTealBlue } from '@visx/gradient';
+import { scaleBand, scaleLinear } from '@visx/scale';
+
+export function Example() {
+    return h(Bar, { x: 0, y: 0, width: 100, height: 100, fill: "red" });
+}
 
 export function Metrics() {
     const [userData, setUserData] = useState(null);
