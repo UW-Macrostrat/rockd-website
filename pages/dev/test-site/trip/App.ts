@@ -194,7 +194,7 @@ export function App() {
     }
 
     return h("div", {className: 'map'}, [
-            h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '75vh' } }),
+            h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '100vh' } }),
             h('div', { className: 'stop-container', style: { width: '100%' } }, [
                 h('div', { className: 'stop-header' }, [
                     h('h3', {className: 'profile-pic'}, profile_pic),
