@@ -119,9 +119,32 @@ export function App() {
         let lngs = [];
         let markers = [];
 
-        let el = h('div', {className: 'map_marker'});
-
         for(const stop of data.stops) {
+            const el = document.createElement('div');
+            el.className = 'marker';
+            el.style.backgroundImage = `url(https://storage.macrostrat.org/assets/rockd/marker_red.png)`;
+            el.style.width = `60px`;
+            el.style.height = `60px`;
+            el.style.backgroundSize = '50%';
+            el.style.display = 'block';
+            el.style.border = 'none';
+            el.style.cursor = 'pointer';
+            el.style.backgroundRepeat = 'no-repeat';
+            el.style.backgroundPosition = 'center';
+
+            const number = document.createElement('span');
+            number.innerText = stop.stop_id; 
+            number.style.position = 'absolute';
+            number.style.top = '45%'; 
+            number.style.left = '50%';
+            number.style.transform = 'translate(-50%, -50%)'; 
+            number.style.color = 'white'; 
+            number.style.fontSize = '12px'; 
+            number.style.fontWeight = 'bold'; 
+
+            // Append the number to the marker
+            el.appendChild(number);
+
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([stop.checkin.lng, stop.checkin.lat])
                 .addTo(map);
