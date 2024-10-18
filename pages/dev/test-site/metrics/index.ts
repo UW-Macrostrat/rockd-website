@@ -1,13 +1,52 @@
 import h from "@macrostrat/hyper";
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 
-import { Bar } from '@visx/shape';
-import { Group } from '@visx/group';
-import { GradientTealBlue } from '@visx/gradient';
-import { scaleBand, scaleLinear } from '@visx/scale';
+import { Group } from "@visx/group"
+import { Bar } from "@visx/shape"
+import { scaleLinear, scaleBand } from "@visx/scale"
+import { Text } from "@visx/text"
+
+const data = [
+  { item: "Item 1", amount: 400 },
+  { item: "Item 2", amount: 300 },
+  { item: "Item 3", amount: 350 },
+  { item: "Item 4", amount: 200 },
+  { item: "Item 5", amount: 280 }
+]
+
+// dimensions and margins
+const width = 600
+const height = 300
+const margin = { top: 10, bottom: 10, left: 10, right: 10 }
+
+// creating bounds
+const xMax = width - margin.left - margin.right
+const yMax = height - margin.top - margin.bottom
+
+// helpers for accessing the data
+const x = (dt) => dt.item
+const y = (dt) => +dt.amount
+
+// scaling the graph with the available data
+const xScale = scaleBand({
+  range: [0, xMax],
+  round: true,
+  domain: data.map(x),
+  padding: 0.4
+})
+const yScale = scaleLinear({
+  range: [yMax, 0],
+  round: true,
+  domain: [0, Math.max(...data.map(y))]
+})
+
+// Calculate point functions
+const compose = (scale, accessor) => (data) => scale(accessor(data))
+const xPoint = compose(xScale, x)
+const yPoint = compose(yScale, y)
 
 export function Example() {
-    return h(Bar, { x: 0, y: 0, width: 100, height: 100, fill: "red" });
+    return h(svg);
 }
 
 export function Metrics() {
