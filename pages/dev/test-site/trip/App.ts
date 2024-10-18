@@ -119,9 +119,21 @@ export function App() {
         let lngs = [];
         let markers = [];
 
-        let el = h('div', {className: 'map_marker'});
+        
 
         for(const stop of data.stops) {
+            const el = document.createElement('div');
+            el.className = 'marker';
+            el.style.backgroundImage = `url(https://storage.macrostrat.org/assets/rockd/trip-marker.png)`;
+            el.style.width = `50px`;
+            el.style.height = `50px`;
+            el.style.backgroundSize = '50%';
+            el.style.display = 'block';
+            el.style.border = 'none';
+            el.style.cursor = 'pointer';
+            el.style.backgroundRepeat = 'no-repeat';
+            el.style.backgroundPosition = 'center';
+
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([stop.checkin.lng, stop.checkin.lat])
                 .addTo(map);
