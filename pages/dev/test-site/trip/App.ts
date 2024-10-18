@@ -118,8 +118,11 @@ export function App() {
         let lats = [];
         let lngs = [];
         let markers = [];
+        let count = 0;
 
         for(const stop of data.stops) {
+            count++;
+
             const el = document.createElement('div');
             el.className = 'marker';
             el.style.backgroundImage = `url(https://storage.macrostrat.org/assets/rockd/marker_red.png)`;
@@ -133,7 +136,14 @@ export function App() {
             el.style.backgroundPosition = 'center';
 
             const number = document.createElement('span');
-            number.innerText = stop.stop_id; 
+            number.innerText = count;
+            number.style.position = 'absolute';
+            number.style.top = '48%'; // Move it up by 2 pixels
+            number.style.left = '50%';
+            number.style.transform = 'translate(-50%, -50%)'; // Center the number
+            number.style.color = 'white'; // Change the color as needed
+            number.style.fontSize = '12px'; // Adjust font size
+            number.style.fontWeight = 'bold'; // Optional: make it bold; 
             number.style.position = 'absolute';
             number.style.top = '45%'; 
             number.style.left = '50%';
