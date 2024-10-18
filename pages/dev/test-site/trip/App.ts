@@ -177,17 +177,19 @@ export function App() {
         temp = h('div', {className: 'stop-description'}, [
             h('h2', {className: 'stop-title'}, (i + 1) + ". " + data.stops[i].name),
             h('p', {className: 'stop-text'}, data.stops[i].description),
-            h('div', {className: 'stop-box'},[
-                h('div', {className: 'box-header'},[
-                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
-                    h('div', {className: 'checkin-details'}, [
-                        h('h4', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
-                        h('h4', {className: 'location'}, data.stops[i].checkin.near),
-                        h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
+            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?trip=" + data.trip_id + "&checkin=" + i}, [
+                h('div', {className: 'stop-box'},[
+                    h('div', {className: 'box-header'},[
+                        h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
+                        h('div', {className: 'checkin-details'}, [
+                            h('h4', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
+                            h('h4', {className: 'location'}, data.stops[i].checkin.near),
+                            h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
+                        ]),
+                        h(Image, {src: "marker.png", className: "marker"}),
                     ]),
-                    h(Image, {src: "marker.png", className: "marker"}),
+                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
                 ]),
-                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
             ]),
         ])
         stops.push(temp);
