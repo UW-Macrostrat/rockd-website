@@ -96,8 +96,33 @@ export function App() {
     let checkin = userData.stops[checkinNum];
     console.log(checkin)
 
+    let data = userData;
+    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
+
+    // format date
+    let date = new Date(data.updated);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    data.updated = date.toLocaleDateString('en-US', options);
+
+    // format rating
+    let ratingArr = [];
+    for(var i = 0; i < checkin.checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+    }
+
     return h('div', { className: 'main'}, [
-        h('h1', checkin.description),
-        h(BlankImage, { src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/300x200?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
+        h('h1', { className: "checkin-header" }, checkin.description),
+        h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/1200x300?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
+        h('div', { className: 'stop-header' }, [
+            h('h3', {className: 'profile-pic'}, profile_pic),
+            h('div', {className: 'stop-main-info'}, [
+                h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
+                h('h4', {className: 'edited'}, data.updated),
+                h('p', {className: 'location'}, [
+                    h('p', "Near " + checkin.checkin.near),
+                ]),
+                h('h3', {className: 'rating'}, ratingArr),
+            ]),
+        ]),
     ]);
 }
