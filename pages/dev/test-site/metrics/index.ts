@@ -5,6 +5,16 @@ import { Bar } from '@visx/shape';
 import { Group } from '@visx/group';
 import { GradientTealBlue } from '@visx/gradient';
 import { scaleBand, scaleLinear } from '@visx/scale';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+  } from "recharts";
+
 
 export function Example() {
     return h(Bar, { x: 0, y: 0, width: 100, height: 100, fill: "red" });
@@ -58,7 +68,69 @@ export function Metrics() {
 
     let data = userData.success.data;
 
-    console.log(data.summary);
+    // format data
+    interface InputData {
+        year: number;
+        week: number;
+        count: string;
+    }
+    
+    interface TransformedData {
+        name: string;
+        Total: number;
+    }
+
+    const checkins_by_week: TransformedData[] = [];
+    const checkins_by_month: TransformedData[] = [];
+    const signups_by_week: TransformedData[] = [];
+    const signups_by_month: TransformedData[] = [];
+    const active_users_by_week: TransformedData[] = [];
+    const active_users_by_month: TransformedData[] = [];
+
+    for (const item of data.checkins_by_week) {
+        checkins_by_week.push({
+            name: `${item.year}-W${item.week}`, 
+            Total: parseInt(item.count)
+        });
+    }
+    for (const item of data.checkins_by_month) {
+        checkins_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            Total: parseInt(item.count)
+        });
+    }      
+    for (const item of data.signups_by_week) {
+        signups_by_week.push({
+            name: `${item.year}-W${item.week}`,
+            Total: parseInt(item.count) 
+        });
+    }
+    for (const item of data.signups_by_month) {
+        signups_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`,
+            Total: parseInt(item.count) 
+        });
+    }  
+    for (const item of data.active_users_by_week) {
+        active_users_by_week.push({
+            name: `${item.year}-W${item.week}`,
+            Total: parseInt(item.count)
+        });
+    }
+    for (const item of data.active_users_by_month) {
+        active_users_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            Total: parseInt(item.count)
+        });
+    }     
+
+    let chartArr = [
+        h(CartesianGrid, { strokeDasharray: "3 3" }),
+        h(XAxis, { dataKey: "name", padding: { left: 10, right: 10 }}),
+        h(YAxis),
+        h(Tooltip),
+        h(Line, { type: "monotone", dataKey: "Total", stroke: "#8884d8", dot: { r: 1 } }),
+    ];
 
     return h("div", { className: 'metrics' }, [
         h("h1", "Metrics"),
@@ -91,21 +163,27 @@ export function Metrics() {
         h("div", { className: 'graphs' }, [
             h("div", { className: 'checkins_week' }, [
                 h("h2", "Checkins by week"),
+                h(LineChart, { className: "chart", data: checkins_by_week, width: 500, height: 300 }, chartArr),
             ]),
             h("div", { className: 'checkins_month' }, [
                 h("h2", "Checkins by month"),
+                h(LineChart, { className: "chart", data: checkins_by_month, width: 500, height: 300 }, chartArr),
             ]),
             h("div", { className: 'signups_week' }, [
                 h("h2", "Signups by week"),
+                h(LineChart, { className: "chart", data: signups_by_week, width: 500, height: 300 }, chartArr),
             ]),
             h("div", { className: 'signups_month' }, [
                 h("h2", "Signups by month"),
+                h(LineChart, { className: "chart", data: signups_by_month, width: 500, height: 300 }, chartArr),
             ]),
             h("div", { className: 'users_week' }, [
                 h("h2", "Active Users by week"),
+                h(LineChart, { className: "chart", data: active_users_by_week, width: 500, height: 300 }, chartArr),
             ]),
             h("div", { className: 'users_month' }, [
                 h("h2", "Active Users by month"),
+                h(LineChart, { className: "chart", data: active_users_by_month, width: 500, height: 300 }, chartArr),
             ]),
         ])
     ]);
