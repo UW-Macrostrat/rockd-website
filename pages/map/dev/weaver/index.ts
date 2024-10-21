@@ -31,10 +31,9 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 
 export function WeaverPage() {
-  return h(
-    "div.weaver-page",
-    h(WeaverMap, { mapboxToken: SETTINGS.mapboxAccessToken })
-  );
+  return h("div.weaver-page",[
+    h(WeaverMap, { mapboxToken: SETTINGS.mapboxAccessToken }),
+  ]);
 }
 
 mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
@@ -128,7 +127,7 @@ function FeatureDetails({ position, model_name }) {
 }
 
 function WeaverMap({
-  title = "Weaver",
+  title = "Explore",
   headerElement = null,
   mapboxToken,
 }: {
