@@ -126,7 +126,7 @@ export function App() {
 
     return h('div', { className: 'main'}, [
         h('h1', { className: "checkin-header" }, checkin.description),
-        h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/1200x300?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
+        h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.checkin.lng + "%2C" + checkin.checkin.lat + "%5D%7D)/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/1200x400?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
         h('div', { className: 'stop-header' }, [
             h('h3', {className: 'profile-pic'}, profile_pic),
             h('div', {className: 'stop-main-info'}, [
