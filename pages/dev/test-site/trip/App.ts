@@ -160,7 +160,7 @@ export function App() {
                         map.flyTo({
                             center: [marker.long, marker.lat],
                             zoom: 12,
-                            speed: 1,
+                            speed: .25,
                             curve: 1,
                             easing(t) {
                                 return t;
