@@ -110,6 +110,20 @@ export function App() {
         ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
     }
 
+    // get observations
+    let observations = [];
+    for(var i = 0; i < checkin.checkin.observations.length; i++) {
+        let observation = checkin.checkin.observations[i];
+        if(observation.photo != null) {
+            observations.push(
+                h('div', {className: 'observation'}, [
+                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/1/thumb_large/" + observation.photo}),
+                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name.strat_name_long),
+                ])
+            );
+        }
+    }
+
     return h('div', { className: 'main'}, [
         h('h1', { className: "checkin-header" }, checkin.description),
         h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/1200x300?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
@@ -124,5 +138,6 @@ export function App() {
                 h('h3', {className: 'rating'}, ratingArr),
             ]),
         ]),
+        h('div', { className: 'observations' }, observations)
     ]);
 }
