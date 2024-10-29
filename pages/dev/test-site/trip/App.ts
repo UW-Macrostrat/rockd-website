@@ -198,15 +198,18 @@ export function App() {
     }
 
     if (error) {
-        return h("div", { className: 'error' }, [
-            h("h1", "Error"),
-            h("p", error)
+        return h("div", { className: 'error-main' }, [
+            h("div", { className: 'error' }, [
+                h("h1", "Error"),
+                h("p", error)
+            ]),
         ]);
     }
 
     if (!userData) {
         return h("div", { className: 'error' }, [
-            h("h1", "Trip " + tripNum + " not found"),  
+            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
+            h("h1", "Trip " + tripNum + " not found!"),  
         ]);
     }
 
