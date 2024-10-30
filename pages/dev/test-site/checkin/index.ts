@@ -114,10 +114,18 @@ export function App() {
     let observations = [];
     for(var i = 0; i < checkin.checkin.observations.length; i++) {
         let observation = checkin.checkin.observations[i];
-        if(observation.photo != null) {
+
+        // no oberservation names
+        if(observation.rocks.strat_name == null) {
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/1/thumb_large/" + observation.photo}),
+                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + data.person_id + "/thumb_large/" + observation.photo}),
+                ])
+            );
+        } else if(observation.photo != null) {
+            observations.push(
+                h('div', {className: 'observation'}, [
+                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + data.person_id + "/thumb_large/" + observation.photo}),
                     h('h4', {className: 'observation-header'}, observation.rocks.strat_name.strat_name_long),
                 ])
             );
