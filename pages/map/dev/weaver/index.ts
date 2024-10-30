@@ -46,12 +46,6 @@ const _macrostratStyle = buildMacrostratStyle({
 
 const types = [
   {
-    id: "MineralResourceSite",
-    name: "Mineral Resource Site",
-    color: "dodgerblue",
-  },
-  { id: "AgeSpectrum", name: "Detrital Zircon Age Spectrum", color: "red" },
-  {
     id: "Sample",
     name: "Sample",
     color: "purple",
@@ -204,11 +198,6 @@ function WeaverMap({
               item.name.toLowerCase().includes(query.toLowerCase()),
             onItemSelect: (item) => setType(item),
           },
-          h(Button, {
-            text: type?.name,
-            placeholder: "Select type",
-            rightIcon: "caret-down",
-          })
         ),
       ]),
       detailPanel: detailElement,
@@ -233,8 +222,17 @@ function useMapStyle(type, mapboxToken) {
 
   const [actualStyle, setActualStyle] = useState(baseStyle);
 
+  // Auto select sample type
+  const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
+    buildInspectorStyle(baseStyle, overlayStyle, {
+      mapboxToken,
+      inDarkMode: isEnabled,
+    }).then((s) => {
+      setActualStyle(s);
+    });
+
   useEffect(() => {
-    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
+    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
     buildInspectorStyle(baseStyle, overlayStyle, {
       mapboxToken,
       inDarkMode: isEnabled,
