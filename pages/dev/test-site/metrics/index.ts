@@ -13,6 +13,8 @@ import {
     CartesianGrid,
     Tooltip,
     Legend,
+    Area,
+    AreaChart,
   } from "recharts";
 
 
@@ -86,6 +88,13 @@ export function Metrics() {
     const signups_by_month: TransformedData[] = [];
     const active_users_by_week: TransformedData[] = [];
     const active_users_by_month: TransformedData[] = [];
+    let currentDate = new Date(); // Get today's date
+    let currentMonth = currentDate.getMonth(); // Get current month (0-based)
+    let currentYear = currentDate.getFullYear(); // Get current year
+    let days = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let date = new Date().getDate();
+    let scale = days / date;
+    let currentTotal;
 
     for (const item of data.checkins_by_week) {
         checkins_by_week.push({
@@ -99,6 +108,9 @@ export function Metrics() {
             Total: parseInt(item.count)
         });
     }      
+    currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
+    checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
+
     for (const item of data.signups_by_week) {
         signups_by_week.push({
             name: `${item.year}-W${item.week}`,
@@ -111,26 +123,34 @@ export function Metrics() {
             Total: parseInt(item.count) 
         });
     }  
+    currentTotal = signups_by_month[signups_by_month.length - 1].Total;
+    signups_by_month[signups_by_month.length - 1].Total = Math.round(currentTotal * scale);
+
     for (const item of data.active_users_by_week) {
         active_users_by_week.push({
             name: `${item.year}-W${item.week}`,
             Total: parseInt(item.count)
         });
     }
+
     for (const item of data.active_users_by_month) {
         active_users_by_month.push({
             name: `${item.month}/${String(item.year).slice(-2)}`, 
             Total: parseInt(item.count)
         });
     }     
+    currentTotal = active_users_by_month[active_users_by_month.length - 1].Total;
+    active_users_by_month[active_users_by_month.length - 1].Total = Math.round(currentTotal * scale);
 
-    let chartArr = [
+    // chart array
+
+    let areaArr = [
         h(CartesianGrid, { strokeDasharray: "3 3" }),
-        h(XAxis, { dataKey: "name", padding: { left: 10, right: 10 }}),
+        h(XAxis, { dataKey: "name" }),
         h(YAxis),
         h(Tooltip),
-        h(Line, { type: "monotone", dataKey: "Total", stroke: "#8884d8", dot: { r: 1 } }),
-    ];
+        h(Area, { type: "monotone", dataKey: "Total", stroke: "#8884d8", fill: "#8884d8" }),
+    ]
 
     return h("div", { className: 'metrics' }, [
         h("h1", "Metrics"),
@@ -163,27 +183,27 @@ export function Metrics() {
         h("div", { className: 'graphs' }, [
             h("div", { className: 'checkins_week' }, [
                 h("h2", "Checkins by week"),
-                h(LineChart, { className: "chart", data: checkins_by_week, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr)
             ]),
             h("div", { className: 'checkins_month' }, [
                 h("h2", "Checkins by month"),
-                h(LineChart, { className: "chart", data: checkins_by_month, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_month }, areaArr)
             ]),
             h("div", { className: 'signups_week' }, [
                 h("h2", "Signups by week"),
-                h(LineChart, { className: "chart", data: signups_by_week, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr)
             ]),
             h("div", { className: 'signups_month' }, [
                 h("h2", "Signups by month"),
-                h(LineChart, { className: "chart", data: signups_by_month, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_month }, areaArr)
             ]),
             h("div", { className: 'users_week' }, [
                 h("h2", "Active Users by week"),
-                h(LineChart, { className: "chart", data: active_users_by_week, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr)
             ]),
             h("div", { className: 'users_month' }, [
                 h("h2", "Active Users by month"),
-                h(LineChart, { className: "chart", data: active_users_by_month, width: 500, height: 300 }, chartArr),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_month }, areaArr)
             ]),
         ])
     ]);
