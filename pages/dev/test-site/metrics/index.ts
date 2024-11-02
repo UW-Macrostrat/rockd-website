@@ -95,6 +95,7 @@ export function Metrics() {
     let date = new Date().getDate();
     let scale = days / date;
     let currentTotal;
+    let currentName;
 
     for (const item of data.checkins_by_week) {
         checkins_by_week.push({
@@ -109,7 +110,9 @@ export function Metrics() {
         });
     }      
     currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
+    currentName = checkins_by_month[checkins_by_month.length - 1].name;
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    checkins_by_month[checkins_by_month.length - 1].name = currentName + ` (est)`;
 
     for (const item of data.signups_by_week) {
         signups_by_week.push({
@@ -124,7 +127,9 @@ export function Metrics() {
         });
     }  
     currentTotal = signups_by_month[signups_by_month.length - 1].Total;
+    currentName = signups_by_month[signups_by_month.length - 1].name;
     signups_by_month[signups_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    signups_by_month[signups_by_month.length - 1].name = currentName + ` (est)`;
 
     for (const item of data.active_users_by_week) {
         active_users_by_week.push({
@@ -140,7 +145,9 @@ export function Metrics() {
         });
     }     
     currentTotal = active_users_by_month[active_users_by_month.length - 1].Total;
+    currentName = active_users_by_month[active_users_by_month.length - 1].name;
     active_users_by_month[active_users_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    active_users_by_month[active_users_by_month.length - 1].name = currentName + ` (est)`;
 
     // chart array
 
