@@ -17,7 +17,6 @@ function getTrip() {
 export function App() {
     const pageContext = usePageContext();
     const [userData, setUserData] = useState(null);
-    const [tripNum, setTrip] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [checkinNum, setCheckin] = useState(null);
@@ -27,23 +26,21 @@ export function App() {
 
     useEffect(() => {
         if (pageContext.urlParsed) {
-            trip = parseInt(pageContext.urlParsed.search.trip);
             stop = parseInt(pageContext.urlParsed.search.checkin);
-            setTrip(trip);
             setCheckin(stop);
         } else {
-            setTrip(0);
+            setCheckin(0);
         }
-        console.log(`Fetching data for trip ID: ` + trip);
+        console.log(`Fetching data for checkin ID: ` + stop);
 
         // Ensure trip ID is valid
-        if (isNaN(trip)) {
+        if (isNaN(stop)) {
             setLoading(false);
-            setError('Invalid trip ID.');
+            setError('Invalid checkin ID.');
             return;
         }
 
-        fetch(`https://rockd.org/api/v2/trips/${trip}`)
+        fetch("https://rockd.org/api/v2/protected/checkins?checkin_id=" + stop)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -68,13 +65,13 @@ export function App() {
     }, []); 
 
     if (loading) {
-        if(tripNum == null) {
+        if(checkinNum == null) {
             return h("div", { className: 'loading' }, [
-                h("h1", "Loading trip..."),
+                h("h1", "Loading checkin..."),
             ]);
         } else {
             return h("div", { className: 'loading' }, [
-                h("h1", "Loading trip " + tripNum + "..."),
+                h("h1", "Loading checkin " + checkinNum + "..."),
             ]);
         }
 
@@ -89,31 +86,26 @@ export function App() {
 
     if (!userData) {
         return h("div", { className: 'error' }, [
-            h("h1", "Trip " + tripNum + " not found"),  
+            h("h1", "Trip " + checkinNum + " not found"),  
         ]);
     }
 
-    let checkin = userData.stops[checkinNum];
+    let checkin = userData;
     console.log(checkin)
 
     let data = userData;
     let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
-
-    // format date
-    let date = new Date(data.updated);
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    data.updated = date.toLocaleDateString('en-US', options);
-
+    
     // format rating
     let ratingArr = [];
-    for(var i = 0; i < checkin.checkin.rating; i++) {
+    for(var i = 0; i < checkin.rating; i++) {
         ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
     }
 
     // get observations
     let observations = [];
-    for(var i = 0; i < checkin.checkin.observations.length; i++) {
-        let observation = checkin.checkin.observations[i];
+    for(var i = 0; i < checkin.observations.length; i++) {
+        let observation = checkin.observations[i];
 
         // no oberservation names
         if(observation.rocks.strat_name == null) {
@@ -134,14 +126,14 @@ export function App() {
 
     return h('div', { className: 'main'}, [
         h('h1', { className: "checkin-header" }, checkin.description),
-        h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.checkin.lng + "%2C" + checkin.checkin.lat + "%5D%7D)/" + checkin.checkin.lng + "," + checkin.checkin.lat + ",5,0/1200x400?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
+        h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + import.meta.env.VITE_MAPBOX_API_TOKEN }),
         h('div', { className: 'stop-header' }, [
             h('h3', {className: 'profile-pic'}, profile_pic),
             h('div', {className: 'stop-main-info'}, [
                 h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
-                h('h4', {className: 'edited'}, data.updated),
+                h('h4', {className: 'edited'}, data.created),
                 h('p', {className: 'location'}, [
-                    h('p', "Near " + checkin.checkin.near),
+                    h('p', "Near " + checkin.near),
                 ]),
                 h('h3', {className: 'rating'}, ratingArr),
             ]),
