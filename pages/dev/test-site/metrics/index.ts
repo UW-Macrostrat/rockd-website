@@ -17,16 +17,36 @@ import {
     AreaChart,
   } from "recharts";
 
-
 export function Example() {
     return h(Bar, { x: 0, y: 0, width: 100, height: 100, fill: "red" });
 }
 
+function getDateFromYearAndWeek(year: number, week: number): Date {
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysToAdd = (week - 1) * 7; // Calculate days to add for the given week
+
+    // Get the first Monday of the year
+    const firstMonday = firstDayOfYear.getDay() <= 1 ? firstDayOfYear : new Date(year, 0, 1 + (8 - firstDayOfYear.getDay()));
+
+    // Calculate the date of the first day of the given week
+    const targetDate = new Date(firstMonday);
+    targetDate.setDate(firstMonday.getDate() + daysToAdd);
+
+    return targetDate;
+}
+
 export function Metrics() {
+    let currentDate = new Date(); // Get today's date
+    let lower = new Date();
+    lower.setFullYear(currentDate.getFullYear() - 1);
+    let upper = new Date();
+
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [checkinBound, setCheckin] = useState([lower, upper]);    
+    const [signupBound, setSignup] = useState([lower, upper]);
+    const [activeBound, setActive] = useState([lower, upper]);
 
     useEffect(() => {
         fetch("https://rockd.org/api/v2/metrics")
@@ -88,7 +108,6 @@ export function Metrics() {
     const signups_by_month: TransformedData[] = [];
     const active_users_by_week: TransformedData[] = [];
     const active_users_by_month: TransformedData[] = [];
-    let currentDate = new Date(); // Get today's date
     let currentMonth = currentDate.getMonth(); // Get current month (0-based)
     let currentYear = currentDate.getFullYear(); // Get current year
     let days = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -96,13 +115,21 @@ export function Metrics() {
     let scale = days / date;
     let currentTotal;
     let currentName;
+    let tempDate;
 
+    // checkins by week
     for (const item of data.checkins_by_week) {
-        checkins_by_week.push({
-            name: `${item.year}-W${item.week}`, 
-            Total: parseInt(item.count)
-        });
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(checkinBound[0] <= tempDate && tempDate <= checkinBound[1]) {
+            checkins_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
     }
+
+    // checkins by month
     for (const item of data.checkins_by_month) {
         checkins_by_month.push({
             name: `${item.month}/${String(item.year).slice(-2)}`, 
@@ -114,12 +141,19 @@ export function Metrics() {
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
     checkins_by_month[checkins_by_month.length - 1].name = currentName + ` (est)`;
 
+    // sign ups by week
     for (const item of data.signups_by_week) {
-        signups_by_week.push({
-            name: `${item.year}-W${item.week}`,
-            Total: parseInt(item.count) 
-        });
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(signupBound[0] <= tempDate && tempDate <= signupBound[1]) {
+            signups_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
     }
+
+    // sign ups by month
     for (const item of data.signups_by_month) {
         signups_by_month.push({
             name: `${item.month}/${String(item.year).slice(-2)}`,
@@ -132,10 +166,14 @@ export function Metrics() {
     signups_by_month[signups_by_month.length - 1].name = currentName + ` (est)`;
 
     for (const item of data.active_users_by_week) {
-        active_users_by_week.push({
-            name: `${item.year}-W${item.week}`,
-            Total: parseInt(item.count)
-        });
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(activeBound[0] <= tempDate && tempDate <= activeBound[1]) {
+            active_users_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
     }
 
     for (const item of data.active_users_by_month) {
@@ -150,7 +188,6 @@ export function Metrics() {
     active_users_by_month[active_users_by_month.length - 1].name = currentName + ` (est)`;
 
     // chart array
-
     let areaArr = [
         h(CartesianGrid, { strokeDasharray: "3 3" }),
         h(XAxis, { dataKey: "name" }),
