@@ -186,7 +186,7 @@ export function App() {
                             h('h4', {className: 'location'}, data.stops[i].checkin.near),
                             h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
                         ]),
-                        h(Image, {src: "marker.png", className: "marker"}),
+                        h(Image, {src: "marker_red.png", className: "marker"}),
                     ]),
                     h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
                 ]),
