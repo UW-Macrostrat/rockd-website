@@ -1,5 +1,9 @@
 import h from "@macrostrat/hyper";
 import React, { useMemo, useEffect, useState, useRef } from 'react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+
 
 import { Bar } from '@visx/shape';
 import { Group } from '@visx/group';
@@ -227,7 +231,13 @@ export function Metrics() {
         h("div", { className: 'graphs' }, [
             h("div", { className: 'checkins_week' }, [
                 h("h2", "Checkins by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr)
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: checkinBound[0], onChange: (date) => setCheckin([date, checkinBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: checkinBound[1], onChange: (date) => setCheckin([checkinBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'checkins_month' }, [
                 h("h2", "Checkins by month"),
@@ -235,7 +245,13 @@ export function Metrics() {
             ]),
             h("div", { className: 'signups_week' }, [
                 h("h2", "Signups by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr)
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: signupBound[0], onChange: (date) => setSignup([date, signupBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: signupBound[1], onChange: (date) => setSignup([signupBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'signups_month' }, [
                 h("h2", "Signups by month"),
@@ -243,7 +259,13 @@ export function Metrics() {
             ]),
             h("div", { className: 'users_week' }, [
                 h("h2", "Active Users by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr)
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: activeBound[0], onChange: (date) => setActive([date, activeBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: activeBound[1], onChange: (date) => setActive([activeBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'users_month' }, [
                 h("h2", "Active Users by month"),
