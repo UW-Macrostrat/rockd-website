@@ -93,8 +93,7 @@ export function App() {
     let checkin = userData;
     console.log(checkin)
 
-    let data = userData;
-    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
     // format rating
     let ratingArr = [];
@@ -111,13 +110,13 @@ export function App() {
         if(observation.rocks.strat_name == null) {
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + data.person_id + "/thumb_large/" + observation.photo}),
+                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
                 ])
             );
         } else if(observation.photo != null) {
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + data.person_id + "/thumb_large/" + observation.photo}),
+                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
                     h('h4', {className: 'observation-header'}, observation.rocks.strat_name.strat_name_long),
                 ])
             );
@@ -130,8 +129,8 @@ export function App() {
         h('div', { className: 'stop-header' }, [
             h('h3', {className: 'profile-pic'}, profile_pic),
             h('div', {className: 'stop-main-info'}, [
-                h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
-                h('h4', {className: 'edited'}, data.created),
+                h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                h('h4', {className: 'edited'}, checkin.created),
                 h('p', {className: 'location'}, [
                     h('p', "Near " + checkin.near),
                 ]),

@@ -177,7 +177,7 @@ export function App() {
         temp = h('div', {className: 'stop-description'}, [
             h('h2', {className: 'stop-title'}, (i + 1) + ". " + data.stops[i].name),
             h('p', {className: 'stop-text'}, data.stops[i].description),
-            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?trip=" + data.trip_id + "&checkin=" + i}, [
+            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id}, [
                 h('div', {className: 'stop-box'},[
                     h('div', {className: 'box-header'},[
                         h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
