@@ -1,29 +1,15 @@
 import h from "@macrostrat/hyper";
-import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, PureComponent } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-
-
-import { Bar } from '@visx/shape';
-import { Group } from '@visx/group';
-import { GradientTealBlue } from '@visx/gradient';
-import { scaleBand, scaleLinear } from '@visx/scale';
 import {
-    LineChart,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     Area,
     AreaChart,
   } from "recharts";
-
-export function Example() {
-    return h(Bar, { x: 0, y: 0, width: 100, height: 100, fill: "red" });
-}
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
