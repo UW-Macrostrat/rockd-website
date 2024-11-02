@@ -233,7 +233,7 @@ export function App() {
         let stop = data.stops[i];
 
         temp = h('div', {className: 'stop-description'}, [
-            h('h2', {className: 'stop-title'}, (i + 1) + ". " + data.stops[i].name),
+            h('h2', {className: 'stop-title'}, data.stops[i].name),
             h('p', {className: 'stop-text'}, data.stops[i].description),
             h('div', {className: 'stop-box'},[
                 h('div', {className: 'box-header'},[
@@ -243,14 +243,15 @@ export function App() {
                         h('h4', {className: 'location'}, data.stops[i].checkin.near),
                         h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
                     ]),
-                    h(Image, {
-                        src: "marker.png",
-                        className: "marker",
+                    h('div', {className: 'marker-container',
                         onClick: (event) => {
                             console.log('Clicked. Stop data:', stop); // Use 'stop' instead of data.stops[i]
                             setCenter({ lat: stop.checkin.lat, lng: stop.checkin.lng }); // Update center if needed
                         }
-                    }),                    
+                    }, [
+                        h(Image, { src: "marker_red.png", className: "marker" }),
+                        h('span', { className: 'marker-number' }, i + 1), 
+                    ]),               
                 ]),
                 h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
             ]),
