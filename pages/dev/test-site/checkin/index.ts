@@ -101,24 +101,50 @@ export function App() {
 
     // get observations
     let observations = [];
+
+    // add checkin photo and notes
+    observations.push(
+        h('div', {className: 'observation'}, [
+            h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo}),
+            h('h4', {className: 'observation-header'}, checkin.notes),
+        ])
+    );
+
+    // add observations
     for(var i = 0; i < checkin.observations.length; i++) {
         let observation = checkin.observations[i];
+        
+        // get liths
+        let liths = [];
+        for(var j = 0; j < observation.rocks.liths.length; j++) {                
+            liths.push(h('p', observation.rocks.liths[j].name));
+        }
 
-        // no oberservation names
-        if(observation.rocks.strat_name == null) {
+
+        // if photo exists
+        if (observation.photo) {
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
+                    h(BlankImage, { className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
+                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                    h('div', {className: 'observation-details'}, [
+                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                        h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
+                        h('p', {className: 'observation-detail'}, liths),
+                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                    ]),
                 ])
             );
-        } else if(observation.photo != null) {
+        } else {
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
-                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name.strat_name_long),
+                    h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"}),
+                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
                 ])
             );
         }
+        
     }
 
     return h('div', { className: 'main'}, [
