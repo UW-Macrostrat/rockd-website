@@ -1,7 +1,6 @@
-import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
-import { parse } from "path";
-import React, { useEffect, useState, useRef } from 'react';
+import "@macrostrat/ui-components";
+import { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
@@ -21,7 +20,6 @@ export function App() {
     const [error, setError] = useState(null);
     const [checkinNum, setCheckin] = useState(null);
 
-    let trip;
     let stop;
 
     useEffect(() => {
