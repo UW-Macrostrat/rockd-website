@@ -25,6 +25,7 @@ export function App() {
     const [error, setError] = useState(null);
     const mapContainerRef = useRef(null);
     const [center, setCenter] = useState();
+    const mapRef = useRef(null);
 
     let trip;
 
@@ -71,118 +72,104 @@ export function App() {
     }, []); 
 
     useEffect(() => {
-        // Initialize map
-        console.log("Data: ", userData);
+        // Check if the map instance already exists
+        if (mapRef.current || !mapContainerRef.current) return;
 
-        if (mapContainerRef.current) {
-            console.log('Initializing map');
+        try {
+            // Initialize Mapbox map
             mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_TOKEN;
-    
-            // intialize map
-            let map = new mapboxgl.Map({
+
+            mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
-                center: [ 0, 0 ],
+                center: [10, 10],
                 zoom: 12,
             });
-    
-            // zoom bar
-            let nav = new mapboxgl.NavigationControl({ showCompass: false })
-            map.addControl(nav, 'top-left')
-            
-            // add markers
-            let lats = [];
-            let lngs = [];
-            let markers = [];
-            let count = 0;
-    
-            for(const stop of userData.stops) {
-                count++;
-    
-                const el = document.createElement('div');
-                el.className = 'marker';
-                el.style.backgroundImage = `url(https://storage.macrostrat.org/assets/rockd/marker_red.png)`;
-                el.style.width = `60px`;
-                el.style.height = `60px`;
-                el.style.backgroundSize = '50%';
-                el.style.display = 'block';
-                el.style.border = 'none';
-                el.style.cursor = 'pointer';
-                el.style.backgroundRepeat = 'no-repeat';
-                el.style.backgroundPosition = 'center';
-    
-                const number = document.createElement('span');
-                number.innerText = count;
-                number.style.position = 'absolute';
-                number.style.top = '48%'; // Move it up by 2 pixels
-                number.style.left = '50%';
-                number.style.transform = 'translate(-50%, -50%)'; // Center the number
-                number.style.color = 'white'; // Change the color as needed
-                number.style.fontSize = '12px'; // Adjust font size
-                number.style.fontWeight = 'bold'; // Optional: make it bold; 
-                number.style.position = 'absolute';
-                number.style.top = '45%'; 
-                number.style.left = '50%';
-                number.style.transform = 'translate(-50%, -50%)'; 
-                number.style.color = 'white'; 
-                number.style.fontSize = '12px'; 
-                number.style.fontWeight = 'bold'; 
-    
-                // Append the number to the marker
-                el.appendChild(number);
-    
-                const marker = new mapboxgl.Marker(el)
-                    .setLngLat([stop.checkin.lng, stop.checkin.lat])
-                    .addTo(map);
-    
-                lats.push(stop.checkin.lat);
-                lngs.push(stop.checkin.lng);
-                markers.push({
-                    "lat": stop.checkin.lat,
-                    "long": stop.checkin.lng
-                });
-            }
-    
-            // set center locaiton
-            map.fitBounds([
-                [ Math.max(...lngs), Math.max(...lats) ],
-                [ Math.min(...lngs), Math.min(...lats) ]
-            ], {
-                maxZoom: 12,
-                duration: 0,
-                padding: 75
-            });
-    
-            map.on('click', (event) => {
-                markers.forEach(marker => {
-                    // did we click on a marker?
-                    if(Math.abs(marker.lat - event.lngLat.lat) < .005 && Math.abs(marker.long - event.lngLat.lng) < .005 ) {
-                        map.flyTo({
-                            center: [marker.long, marker.lat],
-                            zoom: 12,
-                            speed: .25,
-                            curve: 1,
-                            easing(t) {
-                                return t;
-                            }
-                        });
-                    }
+
+            // Add navigation controls
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+        } catch (error) {
+            console.error("Error initializing the map:", error);
+        }
+
+        let lats = [];
+        let lngs = [];
+        const map = mapRef.current;
+        userData.stops.forEach((stop, index) => {
+            const count = index + 1;
+            const el = document.createElement('div');
+            el.className = 'marker';
+            el.style.backgroundImage = `url(https://storage.macrostrat.org/assets/rockd/marker_red.png)`;
+            el.style.width = `60px`;
+            el.style.height = `60px`;
+            el.style.backgroundSize = '50%';
+            el.style.display = 'block';
+            el.style.border = 'none';
+            el.style.cursor = 'pointer';
+            el.style.backgroundRepeat = 'no-repeat';
+            el.style.backgroundPosition = 'center';
+
+            const number = document.createElement('span');
+            number.innerText = count;
+            number.style.position = 'absolute';
+            number.style.top = '48%'; // Move it up by 2 pixels
+            number.style.left = '50%';
+            number.style.transform = 'translate(-50%, -50%)'; // Center the number
+            number.style.color = 'white'; // Change the color as needed
+            number.style.fontSize = '12px'; // Adjust font size
+            number.style.fontWeight = 'bold'; // Optional: make it bold; 
+            number.style.position = 'absolute';
+            number.style.top = '45%'; 
+            number.style.left = '50%';
+            number.style.transform = 'translate(-50%, -50%)'; 
+            number.style.color = 'white'; 
+            number.style.fontSize = '12px'; 
+            number.style.fontWeight = 'bold'; 
+
+            // Append the number to the marker
+            el.appendChild(number);
+
+            // Create marker
+            new mapboxgl.Marker(el)
+                .setLngLat([stop.checkin.lng, stop.checkin.lat])
+                .addTo(map);
+
+            el.addEventListener('click', () => {
+                map.flyTo({
+                    center: [stop.checkin.lng, stop.checkin.lat],
+                    zoom: 12,
                 });
             });
 
-            if(center != null) {
-                map.flyTo({
-                    center: [center.lng, center.lat],
-                    zoom: 12,
-                    speed: .25,
-                    curve: 1,
-                    easing(t) {
-                        return t;
-                    }
-                });
-            }
-        } 
-    });
+            // add to array
+            lats.push(stop.checkin.lat);
+            lngs.push(stop.checkin.lng);
+        });
+
+        
+         // set center locaiton
+         mapRef.current.fitBounds([
+            [ Math.max(...lngs), Math.max(...lats) ],
+            [ Math.min(...lngs), Math.min(...lats) ]
+        ], {
+            maxZoom: 12,
+            duration: 0,
+            padding: 75
+        });
+    }, [userData]);
+
+    // when outside marker is clicked
+    useEffect(() => {
+        if (mapRef.current && center) {
+            mapRef.current.flyTo({
+                center: [center.lng, center.lat],
+                zoom: 12,
+                speed: 1,
+                curve: 1,
+            });
+        }
+    }, [center]);
 
     if (loading) {
         if(tripNum == null) {
