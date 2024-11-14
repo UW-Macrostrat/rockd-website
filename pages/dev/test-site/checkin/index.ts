@@ -1,17 +1,9 @@
 import h from "@macrostrat/hyper";
-import "@macrostrat/ui-components";
+import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
-
-function getTrip() {
-    const pageContext = usePageContext();
-    console.log(pageContext.urlParsed);
-    let trip = 'urlParsed' in pageContext && pageContext.urlParsed.search.trip;
-    console.log(trip);
-    return parseInt(trip);
-}
 
 export function App() {
     const pageContext = usePageContext();
@@ -120,6 +112,17 @@ export function App() {
             liths.push(h('p', observation.rocks.liths[j].name));
         }
 
+        let LngLatProps = {
+            position: {
+                lat: observation.lat,
+                lng: observation.lng
+            },
+            precision: 3,
+            zoom: 10
+        };
+
+        // LngLatCoords(LngLatProps);
+
 
         // if photo exists
         if (observation.photo) {
@@ -141,6 +144,13 @@ export function App() {
                 h('div', {className: 'observation'}, [
                     h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"}),
                     h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                    h('div', {className: 'observation-details'}, [
+                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                        h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
+                        h('p', {className: 'observation-detail'}, liths),
+                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                    ]),
                 ])
             );
         }
@@ -161,6 +171,6 @@ export function App() {
                 h('h3', {className: 'rating'}, ratingArr),
             ]),
         ]),
-        h('div', { className: 'observations' }, observations)
+        h('div', { className: 'observations' }, observations),
     ]);
 }
