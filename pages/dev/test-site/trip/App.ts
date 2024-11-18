@@ -177,7 +177,6 @@ export function App() {
         temp = h('div', {className: 'stop-description'}, [
             h('h2', {className: 'stop-title'}, (i + 1) + ". " + data.stops[i].name),
             h('p', {className: 'stop-text'}, data.stops[i].description),
-            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id}, [
                 h('div', {className: 'stop-box'},[
                     h('div', {className: 'box-header'},[
                         h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
@@ -188,9 +187,10 @@ export function App() {
                         ]),
                         h(Image, {src: "marker_red.png", className: "marker"}),
                     ]),
-                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
+                    h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id}, [
+                        h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
+                    ]),
                 ]),
-            ]),
         ])
         stops.push(temp);
     }
