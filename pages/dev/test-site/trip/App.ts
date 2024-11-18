@@ -6,8 +6,6 @@ import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
-import { data } from "#/integrations/criticalmaas/ta1-results/@cog_id/@system/@system_version/+data";
-import { map } from "underscore";
 
 function getTrip() {
     const pageContext = usePageContext();
