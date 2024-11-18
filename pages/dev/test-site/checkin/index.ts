@@ -136,6 +136,7 @@ export function App() {
                         h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
                         h('p', {className: 'observation-detail'}, liths),
                         h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                        h('p', {className: 'observation-detail'}, "Coords: " + observation.lat + ", " + observation.lng),
                     ]),
                 ])
             );
