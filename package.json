@@ -78,7 +78,6 @@
     "@macrostrat/feedback-components": "workspace:*",
     "@macrostrat/hyper": "^2.2.1",
     "@macrostrat/map-components": "workspace:*",
-    "@macrostrat/map-interface": "workspace:*",
     "@macrostrat/mapbox-react": "workspace:^2.1.0",
     "@macrostrat/mapbox-styles": "workspace:*",
     "@macrostrat/mapbox-utils": "workspace:*",
