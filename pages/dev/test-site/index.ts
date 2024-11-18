@@ -1,9 +1,9 @@
 import h from "@macrostrat/hyper";
 import { MacrostratIcon } from "~/components";
 
-export function Image({ src, className, width, height }) {
+export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
-    return h("img", {src: srcWithAddedPrefix, className, width, height})
+    return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
 }
 
 export function BlankImage({ src, className, width, height }) {
