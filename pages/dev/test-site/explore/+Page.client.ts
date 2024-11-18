@@ -111,8 +111,6 @@ function FeatureDetails({ position, model_name }) {
     }
   );
 
-  alert(mapRef.current.getBounds());
-
   if (result == null) return h(Spinner);
 
   return h(
