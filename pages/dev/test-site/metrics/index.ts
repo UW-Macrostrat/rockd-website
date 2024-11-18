@@ -1,59 +1,42 @@
 import h from "@macrostrat/hyper";
-import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, PureComponent } from 'react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import {
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Area,
+    AreaChart,
+  } from "recharts";
 
-import { Group } from "@visx/group"
-import { Bar } from "@visx/shape"
-import { scaleLinear, scaleBand } from "@visx/scale"
-import { Text } from "@visx/text"
+function getDateFromYearAndWeek(year: number, week: number): Date {
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysToAdd = (week - 1) * 7; // Calculate days to add for the given week
 
-const data = [
-  { item: "Item 1", amount: 400 },
-  { item: "Item 2", amount: 300 },
-  { item: "Item 3", amount: 350 },
-  { item: "Item 4", amount: 200 },
-  { item: "Item 5", amount: 280 }
-]
+    // Get the first Monday of the year
+    const firstMonday = firstDayOfYear.getDay() <= 1 ? firstDayOfYear : new Date(year, 0, 1 + (8 - firstDayOfYear.getDay()));
 
-// dimensions and margins
-const width = 600
-const height = 300
-const margin = { top: 10, bottom: 10, left: 10, right: 10 }
+    // Calculate the date of the first day of the given week
+    const targetDate = new Date(firstMonday);
+    targetDate.setDate(firstMonday.getDate() + daysToAdd);
 
-// creating bounds
-const xMax = width - margin.left - margin.right
-const yMax = height - margin.top - margin.bottom
-
-// helpers for accessing the data
-const x = (dt) => dt.item
-const y = (dt) => +dt.amount
-
-// scaling the graph with the available data
-const xScale = scaleBand({
-  range: [0, xMax],
-  round: true,
-  domain: data.map(x),
-  padding: 0.4
-})
-const yScale = scaleLinear({
-  range: [yMax, 0],
-  round: true,
-  domain: [0, Math.max(...data.map(y))]
-})
-
-// Calculate point functions
-const compose = (scale, accessor) => (data) => scale(accessor(data))
-const xPoint = compose(xScale, x)
-const yPoint = compose(yScale, y)
-
-export function Example() {
-    return h(svg);
+    return targetDate;
 }
 
 export function Metrics() {
+    let currentDate = new Date(); // Get today's date
+    let lower = new Date();
+    lower.setFullYear(currentDate.getFullYear() - 1);
+    let upper = new Date();
+
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [checkinBound, setCheckin] = useState([lower, upper]);    
+    const [signupBound, setSignup] = useState([lower, upper]);
+    const [activeBound, setActive] = useState([lower, upper]);
 
     useEffect(() => {
         fetch("https://rockd.org/api/v2/metrics")
@@ -97,7 +80,111 @@ export function Metrics() {
 
     let data = userData.success.data;
 
-    console.log(data.summary);
+    // format data
+    interface InputData {
+        year: number;
+        week: number;
+        count: string;
+    }
+    
+    interface TransformedData {
+        name: string;
+        Total: number;
+    }
+
+    const checkins_by_week: TransformedData[] = [];
+    const checkins_by_month: TransformedData[] = [];
+    const signups_by_week: TransformedData[] = [];
+    const signups_by_month: TransformedData[] = [];
+    const active_users_by_week: TransformedData[] = [];
+    const active_users_by_month: TransformedData[] = [];
+    let currentMonth = currentDate.getMonth(); // Get current month (0-based)
+    let currentYear = currentDate.getFullYear(); // Get current year
+    let days = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let date = new Date().getDate();
+    let scale = days / date;
+    let currentTotal;
+    let currentName;
+    let tempDate;
+
+    // checkins by week
+    for (const item of data.checkins_by_week) {
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(checkinBound[0] <= tempDate && tempDate <= checkinBound[1]) {
+            checkins_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
+    }
+
+    // checkins by month
+    for (const item of data.checkins_by_month) {
+        checkins_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            Total: parseInt(item.count)
+        });
+    }      
+    currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
+    currentName = checkins_by_month[checkins_by_month.length - 1].name;
+    checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    checkins_by_month[checkins_by_month.length - 1].name = currentName + ` (est)`;
+
+    // sign ups by week
+    for (const item of data.signups_by_week) {
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(signupBound[0] <= tempDate && tempDate <= signupBound[1]) {
+            signups_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
+    }
+
+    // sign ups by month
+    for (const item of data.signups_by_month) {
+        signups_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`,
+            Total: parseInt(item.count) 
+        });
+    }  
+    currentTotal = signups_by_month[signups_by_month.length - 1].Total;
+    currentName = signups_by_month[signups_by_month.length - 1].name;
+    signups_by_month[signups_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    signups_by_month[signups_by_month.length - 1].name = currentName + ` (est)`;
+
+    for (const item of data.active_users_by_week) {
+        tempDate = getDateFromYearAndWeek(item.year, item.week);
+
+        if(activeBound[0] <= tempDate && tempDate <= activeBound[1]) {
+            active_users_by_week.push({
+                name: `${item.year}-W${item.week}`, 
+                Total: parseInt(item.count)
+            });
+        }
+    }
+
+    for (const item of data.active_users_by_month) {
+        active_users_by_month.push({
+            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            Total: parseInt(item.count)
+        });
+    }     
+    currentTotal = active_users_by_month[active_users_by_month.length - 1].Total;
+    currentName = active_users_by_month[active_users_by_month.length - 1].name;
+    active_users_by_month[active_users_by_month.length - 1].Total = Math.round(currentTotal * scale);
+    active_users_by_month[active_users_by_month.length - 1].name = currentName + ` (est)`;
+
+    // chart array
+    let areaArr = [
+        h(CartesianGrid, { strokeDasharray: "3 3" }),
+        h(XAxis, { dataKey: "name" }),
+        h(YAxis),
+        h(Tooltip),
+        h(Area, { type: "monotone", dataKey: "Total", stroke: "#8884d8", fill: "#8884d8" }),
+    ]
 
     return h("div", { className: 'metrics' }, [
         h("h1", "Metrics"),
@@ -130,21 +217,45 @@ export function Metrics() {
         h("div", { className: 'graphs' }, [
             h("div", { className: 'checkins_week' }, [
                 h("h2", "Checkins by week"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: checkinBound[0], onChange: (date) => setCheckin([date, checkinBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: checkinBound[1], onChange: (date) => setCheckin([checkinBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'checkins_month' }, [
                 h("h2", "Checkins by month"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_month }, areaArr)
             ]),
             h("div", { className: 'signups_week' }, [
                 h("h2", "Signups by week"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: signupBound[0], onChange: (date) => setSignup([date, signupBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: signupBound[1], onChange: (date) => setSignup([signupBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'signups_month' }, [
                 h("h2", "Signups by month"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_month }, areaArr)
             ]),
             h("div", { className: 'users_week' }, [
                 h("h2", "Active Users by week"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr),
+                h('div', { className: 'date-picker' }, [
+                    h('p', 'Select date range:'),
+                    h(DatePicker, { className: 'picker', selected: activeBound[0], onChange: (date) => setActive([date, activeBound[1]]) }),
+                    h('p', 'to'),
+                    h(DatePicker, { className: 'picker', selected: activeBound[1], onChange: (date) => setActive([activeBound[0], date]) }),
+                ]),
             ]),
             h("div", { className: 'users_month' }, [
                 h("h2", "Active Users by month"),
+                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_month }, areaArr)
             ]),
         ])
     ]);
