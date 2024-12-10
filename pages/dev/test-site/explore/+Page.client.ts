@@ -4,6 +4,7 @@
 
 import h from "@macrostrat/hyper";
 
+import { useMapRef } from "@macrostrat/mapbox-react"; // Ensure this is imported
 import { Button, MenuItem, Spinner } from "@blueprintjs/core";
 import { Select2 } from "@blueprintjs/select";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -30,6 +31,10 @@ import {
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
+import "./main.styl";
+import { max } from "underscore";
+import { l } from "vite/dist/node/types.d-aGj9QkWt";
+import { BlankImage, Image } from "../index";
 
 export function Page() {
   return h(
@@ -99,23 +104,29 @@ function weaverStyle(type: object) {
 
 function FeatureDetails({ position, model_name }) {
   const mapRef = useMapRef();
-  const result = useAPIResult(
-    "https://dev.macrostrat.org/weaver-api/rpc/nearby_data",
-    {
-      x: position.lng,
-      y: position.lat,
-      zoom: Math.round(mapRef.current?.getZoom()) ?? 10,
-      model_name,
-    }
-  );
+
+  // abitrary bounds around click point
+  let minLat = position.lat - .5;
+  let maxLat = position.lat + .5;
+  let minLng = position.lng - .5;
+  let maxLng = position.lng + .5;
+
+  // change use map coords
+  const result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng);
 
   if (result == null) return h(Spinner);
 
+  let checkins = [];
+  result.success.data.forEach((checkin) => {
+    checkins.push(h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}));
+  });
   return h(
     "div.features",
-    result.map((f, i) => {
-      return h(FeatureProperties, { data: f.data, key: i, expandLevel: 1 });
-    })
+    h("h3", "Features"),
+    h('div', checkins)
   );
 }
 
@@ -147,6 +158,7 @@ function WeaverMap({
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
+    console.log("find me", Math.trunc(position.lat));
   }, []);
 
   let detailElement = null;
