@@ -18,15 +18,13 @@ export function Page() {
     return mergeStyles(_macrostratStyle, buildCheckinStyle(inDarkMode));
   }, [inDarkMode]);
 
-  return h('div.rockd-checkins-page',
-      h(DevMapPage, {
-      title: "Explore",
-      overlayStyle: style,
-      mapboxToken: mapboxAccessToken,
-      // Start off showing the continental US, where there are lots of checkins
-      bounds: [-125, 24, -66, 49],
-    })
-  );
+  return h(DevMapPage, {
+    title: "Rockd checkins",
+    overlayStyle: style,
+    mapboxToken: mapboxAccessToken,
+    // Start off showing the continental US, where there are lots of checkins
+    bounds: [-125, 24, -66, 49],
+  });
 }
 
 const _macrostratStyle = buildMacrostratStyle({
@@ -54,23 +52,8 @@ function buildCheckinStyle(darkMode) {
         source: "rockdCheckins",
         "source-layer": "default",
         paint: {
-          "circle-radius": [
-            "step",
-            ["get", "n"],
-            2,
-            1,
-            2,
-            5,
-            4,
-            10,
-            8,
-            50,
-            12,
-            100,
-            16,
-            200,
-            20,
-          ],
+          // Increase the size of the circles as we zoom in
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3, 16, 12],
           "circle-color": color,
           "circle-opacity": 0.8,
           "circle-stroke-width": 0.5,
