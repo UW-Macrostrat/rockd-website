@@ -19,7 +19,7 @@ export function Page() {
   }, [inDarkMode]);
 
   return h(DevMapPage, {
-    title: "Rockd checkins",
+    title: "Rockd Checkins",
     overlayStyle: style,
     mapboxToken: mapboxAccessToken,
     // Start off showing the continental US, where there are lots of checkins
