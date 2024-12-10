@@ -29,6 +29,7 @@ import {
 } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
+import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
 
 export function Page() {
   return h(
@@ -59,10 +60,7 @@ function weaverStyle(type: object) {
     sources: {
       weaver: {
         type: "vector",
-        tiles: [
-          "https://dev.macrostrat.org/tiles/weaver-tile/{z}/{x}/{y}?model_name=" +
-            type.id,
-        ],
+        tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
       },
     },
     layers: [
