@@ -123,21 +123,21 @@ function FeatureDetails({ position, model_name }) {
   let checkins = [];
   result.forEach((checkin) => {
     let temp = h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-      h('div', {className: 'checkin'}, [
-        h('h2', {className: 'checkin-title'}, checkin.near),
-        h('p', {className: 'checkin-text'}, checkin.notes),
-        h('div', {className: 'checkin-box'},[
-            h('div', {className: 'box-header'},[
-                h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}),
-                h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-            ]),
-            /*
-            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ checkin.person_id + "/banner/" + checkin.photo, className: "checkin-card-img"}),
-            ]),
-            */
-        ]),
-      ])
+        h('div', {className: 'checkin'}, [
+          h('h2', {className: 'checkin-title'}, checkin.near),
+          h('p', {className: 'checkin-text'}, checkin.notes),
+          h('div', {className: 'checkin-box'},[
+              h('div', {className: 'box-header'},[
+                  h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}),
+                  h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+              ]),
+              /*
+              h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+                  h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ checkin.person_id + "/banner/" + checkin.photo, className: "checkin-card-img"}),
+              ]),
+              */
+          ]),
+        ])
       ]);
       
     checkins.push(temp);
