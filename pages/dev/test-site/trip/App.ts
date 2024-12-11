@@ -6,6 +6,12 @@ import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
+import {
+    DarkModeButton,
+    Spacer,
+    useAPIResult,
+    useDarkMode,
+  } from "@macrostrat/ui-components";
 
 function getTrip() {
     const pageContext = usePageContext();

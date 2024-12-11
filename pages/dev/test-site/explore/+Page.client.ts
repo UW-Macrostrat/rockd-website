@@ -95,6 +95,7 @@ function weaverStyle(type: object) {
           "circle-stroke-width": 0.5,
           "circle-stroke-color": color,
         },
+        cluster: true,
       },
     ],
   };
