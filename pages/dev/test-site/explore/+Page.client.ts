@@ -103,8 +103,6 @@ function weaverStyle(type: object) {
 function FeatureDetails() {
   const mapRef = useMapRef();
   let checkins = [];
-
-
   const bounds = mapRef.current?.getBounds();
 
   // abitrary bounds around click point
@@ -112,9 +110,6 @@ function FeatureDetails() {
   let maxLat = Math.floor(bounds.getNorth() * 100) / 100;
   let minLng = Math.floor(bounds.getEast() * 100) / 100;
   let maxLng = Math.floor(bounds.getWest() * 100) / 100;
-
-
-  console.log("Bounds: " + minLat + ", " + maxLat + ", " + minLng + ", " + maxLng);
 
   // change use map coords
   let result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
@@ -125,10 +120,12 @@ function FeatureDetails() {
   if (result == null) return h(Spinner);
   result = result.success.data;
 
+  let count = 0;
   result.forEach((checkin) => {
+    count++;
     let temp = h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
         h('div', {className: 'checkin'}, [
-          h('h2', {className: 'checkin-title'}, checkin.near),
+          h('h2', {className: 'checkin-title'}, (count + ". " + checkin.near)),
           h('p', {className: 'checkin-text'}, checkin.notes),
           h('div', {className: 'checkin-box'},[
               h('div', {className: 'box-header'},[
