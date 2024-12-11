@@ -112,22 +112,41 @@ function FeatureDetails({ position, model_name }) {
   let maxLng = position.lng + .5;
 
   // change use map coords
-  const result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+  let result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
 
   if (result == null) return h(Spinner);
+  result = result.success.data;
 
   let checkins = [];
-  result.success.data.forEach((checkin) => {
-    checkins.push(h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}));
+  result.forEach((checkin) => {
+    let temp = h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+      h('div', {className: 'checkin'}, [
+        h('h2', {className: 'checkin-title'}, checkin.near),
+        h('p', {className: 'checkin-text'}, checkin.notes),
+        h('div', {className: 'checkin-box'},[
+            h('div', {className: 'box-header'},[
+                h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}),
+                h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+            ]),
+            /*
+            h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+                h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ checkin.person_id + "/banner/" + checkin.photo, className: "checkin-card-img"}),
+            ]),
+            */
+        ]),
+      ])
+      ]);
+      
+    checkins.push(temp);
   });
-  return h(
-    "div.features",
-    h("h3", "Features"),
-    h('div', checkins)
-  );
+
+  return h("div", {className: 'checkin-container'}, [
+      h("h3", "Top Checkins"),
+      h('div', checkins)
+    ]);
 }
 
 function WeaverMap({
