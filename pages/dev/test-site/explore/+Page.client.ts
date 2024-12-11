@@ -32,8 +32,6 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
-import { max } from "underscore";
-import { l } from "vite/dist/node/types.d-aGj9QkWt";
 import { BlankImage, Image } from "../index";
 
 export function Page() {
@@ -102,14 +100,21 @@ function weaverStyle(type: object) {
   };
 }
 
-function FeatureDetails({ position, model_name }) {
+function FeatureDetails() {
   const mapRef = useMapRef();
+  let checkins = [];
+
+
+  const bounds = mapRef.current?.getBounds();
 
   // abitrary bounds around click point
-  let minLat = position.lat - .5;
-  let maxLat = position.lat + .5;
-  let minLng = position.lng - .5;
-  let maxLng = position.lng + .5;
+  let minLat = Math.floor(bounds.getSouth() * 100) / 100;
+  let maxLat = Math.floor(bounds.getNorth() * 100) / 100;
+  let minLng = Math.floor(bounds.getEast() * 100) / 100;
+  let maxLng = Math.floor(bounds.getWest() * 100) / 100;
+
+
+  console.log("Bounds: " + minLat + ", " + maxLat + ", " + minLng + ", " + maxLng);
 
   // change use map coords
   let result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
@@ -120,7 +125,6 @@ function FeatureDetails({ position, model_name }) {
   if (result == null) return h(Spinner);
   result = result.success.data;
 
-  let checkins = [];
   result.forEach((checkin) => {
     let temp = h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
         h('div', {className: 'checkin'}, [
@@ -142,6 +146,7 @@ function FeatureDetails({ position, model_name }) {
       
     checkins.push(temp);
   });
+  
 
   return h("div", {className: 'checkin-container'}, [
       h("h3", "Top Checkins"),
@@ -177,7 +182,6 @@ function WeaverMap({
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
-    console.log("find me", Math.trunc(position.lat));
   }, []);
 
   let detailElement = null;
@@ -191,7 +195,7 @@ function WeaverMap({
         position: inspectPosition,
       },
 
-      h(FeatureDetails, { position: inspectPosition, model_name: type.id })
+      h(FeatureDetails)
     );
   }
 
