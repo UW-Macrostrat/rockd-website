@@ -95,6 +95,7 @@ export function App() {
     let observations = [];
 
     // add checkin photo and notes
+    console.log(checkin.photo);
     observations.push(
         h('div', {className: 'observation'}, [
             h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo}),
@@ -105,57 +106,61 @@ export function App() {
     // add observations
     for(var i = 0; i < checkin.observations.length; i++) {
         let observation = checkin.observations[i];
-        
-        // get liths
-        let liths = [];
-        for(var j = 0; j < observation.rocks.liths.length; j++) {                
-            liths.push(h('p', observation.rocks.liths[j].name));
-        }
+        console.log("Observation " + i);
+        console.log(observation);
 
-        let LngLatProps = {
-            position: {
-                lat: observation.lat,
-                lng: observation.lng
-            },
-            precision: 3,
-            zoom: 10
-        };
+        if(Object.keys(observation.rocks).length != 0) {
+            // get liths
+            let liths = [];
+            for(var j = 0; j < observation.rocks.liths.length; j++) {                
+                liths.push(h('p', observation.rocks.liths[j].name));
+            }
+            
 
-        // LngLatCoords(LngLatProps);
+            let LngLatProps = {
+                position: {
+                    lat: observation.lat,
+                    lng: observation.lng
+                },
+                precision: 3,
+                zoom: 10
+            };
+
+            // LngLatCoords(LngLatProps);
 
 
-        // if photo exists
-        if (observation.photo) {
-            observations.push(
-                h('div', {className: 'observation'}, [
-                    h(BlankImage, { className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
-                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                    h('div', {className: 'observation-details'}, [
-                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                        h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
-                        h('p', {className: 'observation-detail'}, liths),
-                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                        h('p', {className: 'observation-detail'}, "Coords: " + observation.lat + ", " + observation.lng),
-                    ]),
-                ])
-            );
-        } else {
-            observations.push(
-                h('div', {className: 'observation'}, [
-                    h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"}),
-                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                    h('div', {className: 'observation-details'}, [
-                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                        h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
-                        h('p', {className: 'observation-detail'}, liths),
-                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                    ]),
-                ])
-            );
-        }
-        
+            // if photo exists
+            if (observation.photo) {
+                observations.push(
+                    h('div', {className: 'observation'}, [
+                        h(BlankImage, { className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
+                        h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                        h('div', {className: 'observation-details'}, [
+                            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                            h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
+                            h('p', {className: 'observation-detail'}, liths),
+                            h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                            h('p', {className: 'observation-detail'}, "Coords: " + observation.lat + ", " + observation.lng),
+                        ]),
+                    ])
+                );
+            } else {
+                observations.push(
+                    h('div', {className: 'observation'}, [
+                        h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"}),
+                        h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                        h('div', {className: 'observation-details'}, [
+                            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                            h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
+                            h('p', {className: 'observation-detail'}, liths),
+                            h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                        ]),
+                    ])
+                );
+            }
+        }        
     }
 
     return h('div', { className: 'main'}, [
