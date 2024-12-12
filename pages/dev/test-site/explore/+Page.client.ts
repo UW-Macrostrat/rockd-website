@@ -64,6 +64,9 @@ function weaverStyle(type: object) {
       weaver: {
         type: "vector",
         tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50,
       },
     },
     layers: [
@@ -91,7 +94,7 @@ function weaverStyle(type: object) {
             20,
           ],
           "circle-color": color,
-          "circle-opacity": 0.8,
+          "circle-opacity": .8,
           "circle-stroke-width": 0.5,
           "circle-stroke-color": color,
         },
