@@ -5,6 +5,15 @@ import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image } from "../index";
 
+function imageExists(image_url){
+    var http = new XMLHttpRequest();
+  
+    http.open('HEAD', image_url, false);
+    http.send();
+  
+    return http.status != 404;
+}
+
 export function App() {
     const pageContext = usePageContext();
     const [userData, setUserData] = useState(null);
@@ -95,10 +104,17 @@ export function App() {
     let observations = [];
 
     // add checkin photo and notes
-    console.log(checkin.photo);
+    console.log("Checkin photo: ", checkin.photo != null);
+    let headerImg;
+    if(imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null) {
+        headerImg = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo})
+    } else {
+        headerImg = h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"})
+    }
+
     observations.push(
         h('div', {className: 'observation'}, [
-            h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo}),
+            headerImg,
             h('h4', {className: 'observation-header'}, checkin.notes),
         ])
     );
@@ -130,7 +146,7 @@ export function App() {
 
 
             // if photo exists
-            if (observation.photo) {
+            if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo)) {
                 observations.push(
                     h('div', {className: 'observation'}, [
                         h(BlankImage, { className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),

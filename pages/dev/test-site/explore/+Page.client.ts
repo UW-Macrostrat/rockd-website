@@ -100,6 +100,15 @@ function weaverStyle(type: object) {
   };
 }
 
+function imageExists(image_url){
+  var http = new XMLHttpRequest();
+
+  http.open('HEAD', image_url, false);
+  http.send();
+
+  return http.status != 404;
+}
+
 function FeatureDetails() {
   const mapRef = useMapRef();
   let checkins = [];
@@ -120,36 +129,34 @@ function FeatureDetails() {
   if (result == null) return h(Spinner);
   result = result.success.data;
 
-  let count = 0;
   result.forEach((checkin) => {
-
      // format rating
      let ratingArr = [];
      for(var i = 0; i < checkin.rating; i++) {
          ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
      }
+    let image;
 
-    count++;
+    if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+      image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+    }
+    
+
     let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-        h('div', {className: 'checkin'}, [
-          h('h2', {className: 'checkin-title'}, (count + ". " + checkin.near)),
-          h('p', {className: 'checkin-text'}, checkin.notes),
-          h('div', {className: 'checkin-box'},[
-              h('div', {className: 'box-header'},[
-                  h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}),
-                  h('div', {className: 'name-rating'}, [
-                    h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                    h('div', {className: 'rating'}, ratingArr),
-                  ]),
-              ]), 
-              /*
-              h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-                  h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ checkin.person_id + "/banner/" + checkin.photo, className: "checkin-card-img"}),
-              ]),
-              */
+      h('div', { className: 'checkin' }, [
+        h('div', {className: 'checkin-header'}, [
+          h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+          h('div', {className: 'checkin-info'}, [
+              h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+              h('h4', {className: 'edited'}, checkin.created),
+              h('p', "Near " + checkin.near),
+              h('h3', {className: 'rating'}, ratingArr),
           ]),
-        ])
-      ]);
+        ]),
+        h('p', {className: 'description'}, checkin.notes),
+        image
+      ]),
+    ]);
       
     checkins.push(temp);
   });
