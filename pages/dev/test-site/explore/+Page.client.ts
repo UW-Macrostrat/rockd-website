@@ -95,7 +95,6 @@ function weaverStyle(type: object) {
           "circle-stroke-width": 0.5,
           "circle-stroke-color": color,
         },
-        cluster: true,
       },
     ],
   };
@@ -123,16 +122,26 @@ function FeatureDetails() {
 
   let count = 0;
   result.forEach((checkin) => {
+
+     // format rating
+     let ratingArr = [];
+     for(var i = 0; i < checkin.rating; i++) {
+         ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+     }
+
     count++;
-    let temp = h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
         h('div', {className: 'checkin'}, [
           h('h2', {className: 'checkin-title'}, (count + ". " + checkin.near)),
           h('p', {className: 'checkin-text'}, checkin.notes),
           h('div', {className: 'checkin-box'},[
               h('div', {className: 'box-header'},[
                   h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"}),
-                  h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-              ]),
+                  h('div', {className: 'name-rating'}, [
+                    h('h4', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                    h('div', {className: 'rating'}, ratingArr),
+                  ]),
+              ]), 
               /*
               h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
                   h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ checkin.person_id + "/banner/" + checkin.photo, className: "checkin-card-img"}),
