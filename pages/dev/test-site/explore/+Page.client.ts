@@ -171,7 +171,7 @@ function FeatureDetails() {
   
 
   return h("div", {className: 'checkin-container'}, [
-      h("h3", "Top Checkins"),
+      h("h3", "Featured Checkins"),
       h('div', checkins)
     ]);
 }
@@ -207,7 +207,7 @@ function WeaverMap({
   }, []);
 
   let detailElement = null;
-  let navbar = null;
+  let selectedCheckin = null;
   let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
@@ -222,9 +222,9 @@ function WeaverMap({
       h(FeatureDetails)
     );
 
-    // Navbar
+    // Left Panel
     if (result == null) {
-      navbar = h(Spinner);
+      selectedCheckin = h(Spinner);
     } else {
       let checkins = [];
       result = result.success.data;
@@ -256,52 +256,50 @@ function WeaverMap({
            image
          ]),
        ]);
-         
+
        checkins.push(temp);
      });
 
-     navbar = h("div", {className: 'checkin-container'}, checkins);
+     selectedCheckin = h("div", {className: 'checkin-container'}, checkins);
     }
   }
 
+  let overlay = null;
+  if (selectedCheckin) {
+    overlay = h(
+      "div.overlay-div",
+      [
+        h('h1', "Selected Checkins"), [
+          selectedCheckin,
+        ]
+      ]);
+  }
+
   return h(
-    MapAreaContainer,
-    {
-      navbar: navbar,
-      contextPanel: h(PanelCard, [
-        h(DarkModeButton, { showText: true, minimal: true }),
-        h(
-          Select2,
-          {
-            items: types,
-            itemRenderer: (data, { handleClick, modifiers }) =>
-              h(MenuItem, {
-                roleStructure: "listoption",
-                active: modifiers.active,
-                disabled: modifiers.disabled,
-                text: data.name,
-                //style: { color: d.color },
-                key: data.id,
-                onClick() {
-                  handleClick();
-                },
-              }),
-            itemPredicate: (query, item) =>
-              item.name.toLowerCase().includes(query.toLowerCase()),
-            onItemSelect: (item) => setType(item),
-          },
-        ),
-      ]),
-      detailPanel: detailElement,
-      contextPanelOpen: isOpen,
-    },
-    h(MapView, { style, mapboxToken }, [
-      h(MapMarker, {
-        position: inspectPosition,
-        setPosition: onSelectPosition,
-      }),
-    ])
+    "div.map-container",
+    [
+      // The Map Area Container
+      h(
+        MapAreaContainer,
+        {
+          detailPanel: detailElement,
+          contextPanelOpen: isOpen,
+        },
+        [
+          h(MapView, { style, mapboxToken }, [
+            h(MapMarker, {
+              position: inspectPosition,
+              setPosition: onSelectPosition,
+            }),
+          ]),
+        ]
+      ),
+  
+      // The Overlay Div
+      overlay,
+    ]
   );
+  
 }
 
 
