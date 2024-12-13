@@ -112,22 +112,27 @@ function imageExists(image_url){
   return http.status != 404;
 }
 
+function getCheckins(lat1, lat2, lng1, lng2) {
+  // abitrary bounds around click point
+  let minLat = Math.floor(lat1 * 100) / 100;
+  let maxLat = Math.floor(lat2 * 100) / 100;
+  let minLng = Math.floor(lng1 * 100) / 100;
+  let maxLng = Math.floor(lng2 * 100) / 100;
+
+  // change use map coords
+  return useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng);
+}
+
 function FeatureDetails() {
   const mapRef = useMapRef();
   let checkins = [];
   const bounds = mapRef.current?.getBounds();
 
-  // abitrary bounds around click point
-  let minLat = Math.floor(bounds.getSouth() * 100) / 100;
-  let maxLat = Math.floor(bounds.getNorth() * 100) / 100;
-  let minLng = Math.floor(bounds.getEast() * 100) / 100;
-  let maxLng = Math.floor(bounds.getWest() * 100) / 100;
-
   // change use map coords
-  let result = useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
-    "&maxlat=" + maxLat +
-    "&minlng=" + minLng +
-    "&maxlng=" + maxLng);
+  let result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
 
   if (result == null) return h(Spinner);
   result = result.success.data;
@@ -202,6 +207,8 @@ function WeaverMap({
   }, []);
 
   let detailElement = null;
+  let navbar = null;
+  let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
       LocationPanel,
@@ -214,19 +221,53 @@ function WeaverMap({
 
       h(FeatureDetails)
     );
+
+    // Navbar
+    if (result == null) {
+      navbar = h(Spinner);
+    } else {
+      let checkins = [];
+      result = result.success.data;
+      result.forEach((checkin) => {
+        // format rating
+        let ratingArr = [];
+        for(var i = 0; i < checkin.rating; i++) {
+            ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+        }
+       let image;
+   
+       if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+         image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+       }
+       
+   
+       let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+         h('div', { className: 'checkin' }, [
+           h('div', {className: 'checkin-header'}, [
+             h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+             h('div', {className: 'checkin-info'}, [
+                 h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                 h('h4', {className: 'edited'}, checkin.created),
+                 h('p', "Near " + checkin.near),
+                 h('h3', {className: 'rating'}, ratingArr),
+             ]),
+           ]),
+           h('p', {className: 'description'}, checkin.notes),
+           image
+         ]),
+       ]);
+         
+       checkins.push(temp);
+     });
+
+     navbar = h("div", {className: 'checkin-container'}, checkins);
+    }
   }
 
   return h(
     MapAreaContainer,
     {
-      navbar: h(FloatingNavbar, [
-        headerElement ?? h("h2", title),
-        h(Spacer),
-        h(MapLoadingButton, {
-          active: isOpen,
-          onClick: () => setOpen(!isOpen),
-        }),
-      ]),
+      navbar: navbar,
       contextPanel: h(PanelCard, [
         h(DarkModeButton, { showText: true, minimal: true }),
         h(
