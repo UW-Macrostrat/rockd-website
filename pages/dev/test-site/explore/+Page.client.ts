@@ -33,6 +33,7 @@ import { useCallback, useEffect, useState } from "react";
 import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
+import { M } from "vite/dist/node/types.d-aGj9QkWt";
 
 export function Page() {
   return h(
@@ -223,10 +224,10 @@ function WeaverMap({
     );
 
     // Left Panel
+    let checkins = [];
     if (result == null) {
       selectedCheckin = h(Spinner);
     } else {
-      let checkins = [];
       result = result.success.data;
       result.forEach((checkin) => {
         // format rating
@@ -269,10 +270,9 @@ function WeaverMap({
     overlay = h(
       "div.overlay-div",
       [
-        h('h1', "Selected Checkins"), [
+          h('button', {className: 'dropdown-btn'}, "Selected Checkins"),
           selectedCheckin,
-        ]
-      ]);
+        ]);
   }
 
   return h(
