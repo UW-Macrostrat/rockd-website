@@ -16,7 +16,7 @@ import {
   MapLoadingButton,
   MapMarker,
   MapView,
-  PanelCard,
+  ExpansionPanel,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
@@ -209,6 +209,7 @@ function WeaverMap({
 
   let detailElement = null;
   let selectedCheckin = null;
+  let checkins = [];
   let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
@@ -224,7 +225,6 @@ function WeaverMap({
     );
 
     // Left Panel
-    let checkins = [];
     if (result == null) {
       selectedCheckin = h(Spinner);
     } else {
@@ -265,15 +265,17 @@ function WeaverMap({
     }
   }
 
-  let overlay = null;
+  let overlay = h("div.overlay-div", h(ExpansionPanel, {title: "Selected Checkins"}, 
+    h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")
+  ));
   if (selectedCheckin) {
+    console.log("CHECKINS LENGTH: " + checkins.length)
     overlay = h(
       "div.overlay-div",
       [
-          h('button', {className: 'dropdown-btn'}, "Selected Checkins"),
-          selectedCheckin,
-        ]);
-  }
+        h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
+      ]);
+  } 
 
   return h(
     "div.map-container",
