@@ -1,0 +1,15 @@
+export { ContentPage as default } from "~/layouts";
+import { macrostratInstance } from "@macrostrat-web/settings";
+import { PageHeader } from "~/components";
+import { LinkCard } from "~/components/cards";
+
+<PageHeader>
+  <span className="subtitle">
+    <span className="tertiary">{macrostratInstance}</span>
+  </span>
+</PageHeader>
+
+
+### Development pages
+
+<LinkCard href="/dev" title="Developer apps"></LinkCard>
