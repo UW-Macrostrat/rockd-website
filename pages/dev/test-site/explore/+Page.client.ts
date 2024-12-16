@@ -19,7 +19,6 @@ import {
   ExpansionPanel,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
-import { useMapRef } from "@macrostrat/mapbox-react";
 import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import {
@@ -65,9 +64,6 @@ function weaverStyle(type: object) {
       weaver: {
         type: "vector",
         tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50,
       },
     },
     layers: [
@@ -104,6 +100,55 @@ function weaverStyle(type: object) {
   };
 }
 
+function tempFeatures() {
+  // change use map coords
+  let checkins = [];
+  
+  // TODO Update w/ bounsd
+  let result = getCheckins(0, 100, 0, 100);
+
+  if (result == null) return h(Spinner);
+  result = result.success.data;
+
+  result.forEach((checkin) => {
+    // format rating
+    let ratingArr = [];
+    for(var i = 0; i < checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+    }
+
+    for(var i = 0; i < 5 - checkin.rating; i++) {
+      ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+    }
+    let image;
+
+    if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+      image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+    }
+    
+
+    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+      h('div', { className: 'checkin' }, [
+        h('div', {className: 'checkin-header'}, [
+          h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+          h('div', {className: 'checkin-info'}, [
+              h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+              h('h4', {className: 'edited'}, checkin.created),
+              h('p', "Near " + checkin.near),
+              h('h3', {className: 'rating'}, ratingArr),
+          ]),
+        ]),
+        h('p', {className: 'description'}, checkin.notes),
+        image
+      ]),
+    ]);
+      
+    checkins.push(temp);
+  });
+
+  return checkins;
+}
+
 function imageExists(image_url){
   var http = new XMLHttpRequest();
 
@@ -130,7 +175,7 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 function FeatureDetails() {
   const mapRef = useMapRef();
   let checkins = [];
-  const bounds = mapRef.current?.getBounds();
+  let bounds = mapRef.current?.getBounds();
 
   // change use map coords
   let result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
@@ -182,8 +227,6 @@ function FeatureDetails() {
 }
 
 function WeaverMap({
-  title = "Explore",
-  headerElement = null,
   mapboxToken,
 }: {
   headerElement?: React.ReactElement;
@@ -273,15 +316,19 @@ function WeaverMap({
     }
   }
 
-  let overlay = h("div.overlay-div", h(ExpansionPanel, {title: "Selected Checkins"}, 
-    h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")
-  ));
+  let featuredCheckin = tempFeatures();
+
+  let overlay = h("div.overlay-div", [
+    h(ExpansionPanel, {title: "Selected Checkins"}, h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")),
+    h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
+  ]);
+
   if (selectedCheckin) {
-    console.log("CHECKINS LENGTH: " + checkins.length)
     overlay = h(
       "div.overlay-div",
       [
         h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
+        h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
       ]);
   } 
 
