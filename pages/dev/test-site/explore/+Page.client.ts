@@ -139,11 +139,15 @@ function FeatureDetails() {
   result = result.success.data;
 
   result.forEach((checkin) => {
-     // format rating
-     let ratingArr = [];
-     for(var i = 0; i < checkin.rating; i++) {
-         ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-     }
+    // format rating
+    let ratingArr = [];
+    for(var i = 0; i < checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+    }
+
+    for(var i = 0; i < 5 - checkin.rating; i++) {
+      ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+    }
     let image;
 
     if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
@@ -235,6 +239,10 @@ function WeaverMap({
         for(var i = 0; i < checkin.rating; i++) {
             ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
         }
+
+        for(var i = 0; i < 5 - checkin.rating; i++) {
+          ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+        }
        let image;
    
        if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
@@ -324,14 +332,5 @@ function useMapStyle(type, mapboxToken) {
       setActualStyle(s);
     });
 
-  useEffect(() => {
-    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
-    buildInspectorStyle(baseStyle, overlayStyle, {
-      mapboxToken,
-      inDarkMode: isEnabled,
-    }).then((s) => {
-      setActualStyle(s);
-    });
-  }, [baseStyle, mapboxToken, isEnabled, type]);
   return actualStyle;
 }
