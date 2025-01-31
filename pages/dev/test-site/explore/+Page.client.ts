@@ -19,7 +19,6 @@ import {
   ExpansionPanel,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
-import { useMapRef } from "@macrostrat/mapbox-react";
 import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import {
@@ -34,6 +33,7 @@ import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
 import { M } from "vite/dist/node/types.d-aGj9QkWt";
+import { map } from "underscore";
 
 export function Page() {
   return h(
@@ -65,9 +65,6 @@ function weaverStyle(type: object) {
       weaver: {
         type: "vector",
         tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50,
       },
     },
     layers: [
@@ -130,20 +127,30 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 function FeatureDetails() {
   const mapRef = useMapRef();
   let checkins = [];
-  const bounds = mapRef.current?.getBounds();
+  let result;
 
-  // change use map coords
-  let result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+  if(mapRef == null) {
+    result = getCheckins(0, 100, 0, 100);
+  } else {
+    let bounds = mapRef.current?.getBounds();
+
+    // change use map coords
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+  }
 
   if (result == null) return h(Spinner);
   result = result.success.data;
 
   result.forEach((checkin) => {
-     // format rating
-     let ratingArr = [];
-     for(var i = 0; i < checkin.rating; i++) {
-         ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-     }
+    // format rating
+    let ratingArr = [];
+    for(var i = 0; i < checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+    }
+
+    for(var i = 0; i < 5 - checkin.rating; i++) {
+      ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+    }
     let image;
 
     if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
@@ -172,14 +179,11 @@ function FeatureDetails() {
   
 
   return h("div", {className: 'checkin-container'}, [
-      h("h3", "Featured Checkins"),
       h('div', checkins)
     ]);
 }
 
 function WeaverMap({
-  title = "Explore",
-  headerElement = null,
   mapboxToken,
 }: {
   headerElement?: React.ReactElement;
@@ -187,13 +191,6 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  /* We apply a custom style to the panel container when we are interacting
-    with the search bar, so that we can block map interactions until search
-    bar focus is lost.
-    We also apply a custom style when the infodrawer is open so we can hide
-    the search bar on mobile platforms
-  */
-
   const [isOpen, setOpen] = useState(false);
 
   const [type, setType] = useState(types[0]);
@@ -220,8 +217,6 @@ function WeaverMap({
         },
         position: inspectPosition,
       },
-
-      h(FeatureDetails)
     );
 
     // Left Panel
@@ -234,6 +229,10 @@ function WeaverMap({
         let ratingArr = [];
         for(var i = 0; i < checkin.rating; i++) {
             ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+        }
+
+        for(var i = 0; i < 5 - checkin.rating; i++) {
+          ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
         }
        let image;
    
@@ -265,17 +264,24 @@ function WeaverMap({
     }
   }
 
-  let overlay = h("div.overlay-div", h(ExpansionPanel, {title: "Selected Checkins"}, 
-    h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")
-  ));
-  if (selectedCheckin) {
-    console.log("CHECKINS LENGTH: " + checkins.length)
+  // TODO: have run depend on changing mapRef
+  let featuredCheckin = h(FeatureDetails);
+
+  let overlay = h("div.overlay-div", [
+    h(ExpansionPanel, {title: "Selected Checkins"}, h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")),
+    h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
+  ]);
+
+  if (checkins.length > 0) {
     overlay = h(
       "div.overlay-div",
       [
         h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
+        h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
       ]);
   } 
+
+  if(style == null) return null;
 
   return h(
     "div.map-container",
@@ -294,11 +300,11 @@ function WeaverMap({
               setPosition: onSelectPosition,
             }),
           ]),
+
+          // The Overlay Div
+          overlay,
         ]
       ),
-  
-      // The Overlay Div
-      overlay,
     ]
   );
   
@@ -313,25 +319,18 @@ function useMapStyle(type, mapboxToken) {
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
 
-  const [actualStyle, setActualStyle] = useState(baseStyle);
+  const [actualStyle, setActualStyle] = useState(null);
 
   // Auto select sample type
-  const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
-    buildInspectorStyle(baseStyle, overlayStyle, {
-      mapboxToken,
-      inDarkMode: isEnabled,
-    }).then((s) => {
-      setActualStyle(s);
-    });
-
   useEffect(() => {
     const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
-    buildInspectorStyle(baseStyle, overlayStyle, {
-      mapboxToken,
-      inDarkMode: isEnabled,
-    }).then((s) => {
-      setActualStyle(s);
-    });
-  }, [baseStyle, mapboxToken, isEnabled, type]);
+      buildInspectorStyle(baseStyle, overlayStyle, {
+        mapboxToken,
+        inDarkMode: isEnabled,
+      }).then((s) => {
+        setActualStyle(s);
+      });
+  }, []);
+
   return actualStyle;
 }
