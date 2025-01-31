@@ -131,11 +131,8 @@ function FeatureDetails() {
 
   if(mapRef == null) {
     result = getCheckins(0, 100, 0, 100);
-
-    console.log("MAP REF IS NULL");
   } else {
     let bounds = mapRef.current?.getBounds();
-    console.log("MAP REF IS NOT NULL");
 
     // change use map coords
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
@@ -267,6 +264,7 @@ function WeaverMap({
     }
   }
 
+  // TODO: have run depend on changing mapRef
   let featuredCheckin = h(FeatureDetails);
 
   let overlay = h("div.overlay-div", [
@@ -282,6 +280,8 @@ function WeaverMap({
         h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
       ]);
   } 
+
+  if(style == null) return null;
 
   return h(
     "div.map-container",
@@ -300,12 +300,11 @@ function WeaverMap({
               setPosition: onSelectPosition,
             }),
           ]),
+
           // The Overlay Div
           overlay,
         ]
       ),
-  
-
     ]
   );
   
@@ -320,16 +319,18 @@ function useMapStyle(type, mapboxToken) {
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
 
-  const [actualStyle, setActualStyle] = useState(baseStyle);
+  const [actualStyle, setActualStyle] = useState(null);
 
   // Auto select sample type
-  const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
-    buildInspectorStyle(baseStyle, overlayStyle, {
-      mapboxToken,
-      inDarkMode: isEnabled,
-    }).then((s) => {
-      setActualStyle(s);
-    });
+  useEffect(() => {
+    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
+      buildInspectorStyle(baseStyle, overlayStyle, {
+        mapboxToken,
+        inDarkMode: isEnabled,
+      }).then((s) => {
+        setActualStyle(s);
+      });
+  }, []);
 
   return actualStyle;
 }
