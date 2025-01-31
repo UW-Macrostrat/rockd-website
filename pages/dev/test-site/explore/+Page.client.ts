@@ -141,8 +141,6 @@ function FeatureDetails() {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
   }
 
-  
-
   if (result == null) return h(Spinner);
   result = result.success.data;
 
@@ -184,7 +182,6 @@ function FeatureDetails() {
   
 
   return h("div", {className: 'checkin-container'}, [
-      h("h3", "Featured Checkins"),
       h('div', checkins)
     ]);
 }
@@ -197,13 +194,6 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  /* We apply a custom style to the panel container when we are interacting
-    with the search bar, so that we can block map interactions until search
-    bar focus is lost.
-    We also apply a custom style when the infodrawer is open so we can hide
-    the search bar on mobile platforms
-  */
-
   const [isOpen, setOpen] = useState(false);
 
   const [type, setType] = useState(types[0]);
@@ -277,8 +267,6 @@ function WeaverMap({
     }
   }
 
-  
-
   let featuredCheckin = h(FeatureDetails);
 
   let overlay = h("div.overlay-div", [
@@ -312,11 +300,12 @@ function WeaverMap({
               setPosition: onSelectPosition,
             }),
           ]),
+          // The Overlay Div
+          overlay,
         ]
       ),
   
-      // The Overlay Div
-      overlay,
+
     ]
   );
   
