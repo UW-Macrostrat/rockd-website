@@ -1,39 +1,30 @@
 # Rockd website
 
+This is the code for Version 2 of Rockd's website, which replaced the large repository of flat HTML, CSS, some JS and images.
+It is a collection of TS files and references to an S3 bucket holding images.
 
-This is the code for Version 1 of Rockd's website.
-It is a collection of flat HTML files, with some CSS, JS, and image assets.
+The new website also contains an uopdated version of [trips viewer](https://github.com/UW-Macrostrat/rockd-trips) that shows maps for all trips.
 
-As of mid-2023, we're working on an updated
-Version 2 that uses Macrostrat's in-development [web component libraries](https://github.com/UW-Macrostrat/web-components)
-and adheres to modern development approaches.
+## Installation for local development
 
-The [web-app](./web-app) directory contains an older version of Rockd's Ionic "Progressive Web App" (PWA) codebase.
+1. Clone the repository
+2. Create and populate a `.env` file with the appropriate environment variables (See [
+   `.env.example`](https://github.com/UW-Macrostrat/web/blob/main/.env.example) for more information.)
+3. Run `make` to pull down submodules and update packages
+4. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
+   `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
+5. Run `yarn install` to update packages
+6. Start the live-reloading development server with `yarn run dev`. The server will be available at
+   `http://localhost:3000` by default.
 
-There is a companion [trips viewer](https://github.com/UW-Macrostrat/rockd-trips) that shows maps for all trips.
+ALTERNATIVLY
 
-To run a development server, simply start a file server, e.g.:
-
-  ```bash
-  python3 -m http.server
-  ```
-
-and navigate to `localhost:8000` in your browser.
-
-# Rockd Trips
-
-A viewer for Rockd trips
-
-## Getting started
-
-Install dependencies with `npm install`
-
-
-Rename `src/js/Constants.js.example` to `src/js/Constants.js` and add your variables
-
-
-## Scripts
-+ `npm run build` - Run webpack and babel
-+ `npm run pack` - Run webpack using the config file `webpack.config.js`
-+ `npm run babel` - Run babel
-+ `npm start` - Start the express server
+1. Clone the repository
+2. Pull down submodules (`git submodule update --init --recursive`)
+3. Create and populate a `.env` file with the appropriate environment variables (See [
+   `.env.example`](https://github.com/UW-Macrostrat/web/blob/main/.env.example) for more information.)
+4. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
+   `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
+5. Run `yarn install` to update packages
+6. Start the live-reloading development server with `yarn run dev`. The server will be available at
+   `http://localhost:3000` by default.
