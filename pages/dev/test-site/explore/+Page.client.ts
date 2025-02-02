@@ -22,7 +22,6 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
-import { get } from "underscore";
 
 export function Page() {
   return h(
@@ -180,6 +179,8 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
+  const mapRef = useMapRef();
+
   const [isOpen, setOpen] = useState(false);
 
   const [type, setType] = useState(types[0]);
@@ -207,7 +208,7 @@ function WeaverMap({
       },
     );
 
-    // Selected checkin
+    // Get sleected checkins
     selectedCheckin = getSelectedCheckins(result);
   }
 
