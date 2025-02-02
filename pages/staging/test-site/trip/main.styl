@@ -1,0 +1,323 @@
+html, body, .wrapper, #react, .app, #map
+  color #333
+  min-height 100%
+  height 100vh
+  width 100%
+  padding 0
+  margin 0
+  font-family 'Roboto', sans-serif
+
+.map-container
+  height 100vh
+  width 100%
+
+.hidden
+  display none
+
+.error
+  height 100vh
+  width 100%
+  text-align center
+  font-size 2em
+  font-weight 200
+  background-color white
+  color black
+  padding-top 5vh
+
+.error-img 
+  width 50%
+  text-align center
+
+.info-container
+  padding-left 15px
+  padding-right 15px
+  overflow-y scroll
+  height 100%
+
+.trip-title
+  font-weight 300
+  text-align center
+
+.profile-pic
+  height 80px
+  border-radius 50%
+  display inline-block
+
+.profile-pic-checkin
+  height 7vh
+  border-radius 50%
+  display inline-block
+
+.info-grid
+  box-shadow -4px 0px 7px #aaa
+  z-index 9
+
+.trip-meta
+  padding-top 10px
+  display flex
+  justify-content left
+  align-items center
+
+.trip-meta-text
+  display inline-block
+  margin-left 15px
+
+.person-name
+  font-size 18px
+  font-weight bold
+
+.edited
+  font-size 14px
+  margin-top -10px
+
+.stop
+  margin-bottom 15px
+
+.stop-content
+  padding 10px
+
+.stop-name
+  font-size 20px
+  font-weight 500
+  color #333
+  margin-bottom 0
+
+.stop-description
+  font-size 14px
+  color #666
+  margin-top 10px
+
+  a 
+    color: black
+    text-decoration none
+
+  a:hover
+    color: black
+
+.checkin-header
+  display flex
+  justify-content left
+  align-items center
+  padding 5px
+
+.checkin-header-content
+  padding-left 10px
+
+.checkin-content
+  line-height 17px
+  cursor pointer
+
+.checkin-avatar
+  width 56px
+  height 56px
+  border-radius 50%
+
+.checkin-name, .checkin-near, .checkin-title
+  margin 0
+
+.checkin-title
+  color #333
+  font-size 14px
+
+.checkin-near
+  font-size 12px
+  color #333
+
+.checkin-name
+  font-size 12px
+  color #333
+  margin-bottom -1px
+
+.checkin-card-img
+  width 100%
+
+.go-to-stop
+  float right
+  margin-top -75px !important
+
+.bedrock-control
+  position absolute !important
+  z-index 10
+  bottom 0
+  background-color #fff !important
+  margin-left calc((66.66667% / 2) - 53px) !important
+  bottom 5px
+  &.active
+    background-color #2196f3 !important
+    color #fff !important
+
+.mapInfo-paper
+  width 50%
+  margin 0 auto
+  padding 10px
+  margin-top 20px
+
+.map-source-attrs
+  padding 5px 10px 5px 10px
+
+.map-source-attr
+  display block
+  padding-top 10px
+  line-height 24px
+  &:last-child
+    margin-bottom 25px
+
+.attr
+  font-family 'Montserrat', sans-serif
+  font-weight 700
+
+.line-attr
+  font-family 'Montserrat', sans-serif
+  font-size 85%
+  display block
+  margin-left 15px
+
+.reference
+  font-size 12px
+  line-height 15px
+
+.ref-link
+  color #000
+  font-weight bold
+  text-decoration none
+
+.download-kmz
+  margin-bottom 10px !important
+
+@media screen and (max-width: 600px)
+  .map-container
+    height 50%
+  .info-grid
+    height 50%
+  .bedrock-control
+    margin-left calc(50% - 53px) !important
+    bottom 51%
+  .mapInfo-paper
+    width 100%
+
+  p
+    color white
+
+.trip-search
+  height 20vh
+  background-color black
+  color white
+  display grid
+  margin auto  
+
+  .trip-input
+    padding-left 5px
+  
+  .search-btn
+    margin-left 20px
+
+.trip-q
+  margin-top 0
+  padding-top 30px
+  text-align center
+
+.map  
+  display grid
+  grid-template-columns 70% 30%
+
+.stop-container
+  background-color white
+  color black
+  text-align center
+  box-shadow: -4px 0 7px #aaa
+  z-index 10
+  height 100vh
+
+.trip-input-container
+  width 40%
+  display grid 
+  grid-template-columns 80% 20%
+  margin auto
+  padding-bottom 30px
+
+.stop-header
+  display grid
+  margin auto
+  grid-template-columns 30% 70%
+  height 15vh
+
+.park
+  height 5vh
+
+.stop-description
+  color black
+  text-align left
+  box-shadow -4px 0px 7px #aaa
+  width 95%
+  margin-left 2.5%
+  padding 15px
+  border-radius 2%
+  
+.stop-list
+  overflow scroll
+  overflow-x hidden
+  height 70vh
+  -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%);
+
+.map 
+  height 100vh
+
+.stop-main-info
+  text-align left
+  display grid
+  margin auto
+  margin-left 0
+
+.box-header
+  display grid
+  grid-template-columns 20% 60% 20%
+  padding 10px
+
+  .checkin-details
+    display grid
+    margin auto
+    margin-left 0
+    text-align left
+    h4
+      padding 0
+      margin 0
+      font-weight 30
+
+.marker
+  height 7vh
+  display grid
+  margin auto
+
+.loading
+  height 75vh
+  padding-top 20vh
+  text-align center
+  background-color white
+  color black
+  font-style italic
+
+.kmz
+  border 2px solid black
+  border-radius 4px
+  padding 7px
+  
+.download-button
+  a
+    color black
+  a:hover
+    color black
+    background-color #cccccc
+    text-decoration none
+
+.marker-number
+  position absolute
+  font-weight bold
+  font-size 16px
+  transform translate(-50%, -50%)
+  top 40%
+  left 50%
+  color white
+
+.marker-container 
+  position relative
+  height 7vh
