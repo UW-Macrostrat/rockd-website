@@ -1,19 +1,11 @@
-/**
- * A development interface for the "Weaver" point data server.
- */
-
 import h from "@macrostrat/hyper";
 
-import { useMapRef } from "@macrostrat/mapbox-react"; // Ensure this is imported
-import { Button, MenuItem, Spinner } from "@blueprintjs/core";
-import { Select2 } from "@blueprintjs/select";
+import { useMapRef } from "@macrostrat/mapbox-react";
+import { Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
-  FeatureProperties,
-  FloatingNavbar,
   LocationPanel,
   MapAreaContainer,
-  MapLoadingButton,
   MapMarker,
   MapView,
   ExpansionPanel,
@@ -22,18 +14,15 @@ import {
 import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import {
-  DarkModeButton,
-  Spacer,
   useAPIResult,
   useDarkMode,
 } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
-import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
+import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
-import { M } from "vite/dist/node/types.d-aGj9QkWt";
-import { map } from "underscore";
+import { get } from "underscore";
 
 export function Page() {
   return h(
@@ -205,8 +194,7 @@ function WeaverMap({
   }, []);
 
   let detailElement = null;
-  let selectedCheckin = null;
-  let checkins = [];
+  let selectedCheckin = h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
   let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
@@ -219,67 +207,19 @@ function WeaverMap({
       },
     );
 
-    // Left Panel
-    if (result == null) {
-      selectedCheckin = h(Spinner);
-    } else {
-      result = result.success.data;
-      result.forEach((checkin) => {
-        // format rating
-        let ratingArr = [];
-        for(var i = 0; i < checkin.rating; i++) {
-            ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-        }
-
-        for(var i = 0; i < 5 - checkin.rating; i++) {
-          ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
-        }
-       let image;
-   
-       if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
-         image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-       }
-       
-   
-       let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-         h('div', { className: 'checkin' }, [
-           h('div', {className: 'checkin-header'}, [
-             h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-             h('div', {className: 'checkin-info'}, [
-                 h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                 h('h4', {className: 'edited'}, checkin.created),
-                 h('p', "Near " + checkin.near),
-                 h('h3', {className: 'rating'}, ratingArr),
-             ]),
-           ]),
-           h('p', {className: 'description'}, checkin.notes),
-           image
-         ]),
-       ]);
-
-       checkins.push(temp);
-     });
-
-     selectedCheckin = h("div", {className: 'checkin-container'}, checkins);
-    }
+    // Selected checkin
+    selectedCheckin = getSelectedCheckins(result);
   }
 
   // TODO: have run depend on changing mapRef
   let featuredCheckin = h(FeatureDetails);
 
-  let overlay = h("div.overlay-div", [
-    h(ExpansionPanel, {title: "Selected Checkins"}, h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected")),
-    h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
-  ]);
-
-  if (checkins.length > 0) {
-    overlay = h(
-      "div.overlay-div",
-      [
-        h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
-        h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
-      ]);
-  } 
+  let overlay = h(
+    "div.overlay-div",
+    [
+      h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
+      h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
+    ]);
 
   if(style == null) return null;
 
@@ -310,6 +250,58 @@ function WeaverMap({
   
 }
 
+function getSelectedCheckins(result) {
+  let checkins = [];
+  console.log("result", result);
+
+  // Selected checkin
+  if (result == null) {
+    return h(Spinner);
+  } else {
+    result = result.success.data;
+    result.forEach((checkin) => {
+      // format rating
+      let ratingArr = [];
+      for(var i = 0; i < checkin.rating; i++) {
+          ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+      }
+
+      for(var i = 0; i < 5 - checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+      }
+      let image;
+  
+      if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+        image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+      }
+      
+  
+      let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+        h('div', { className: 'checkin' }, [
+          h('div', {className: 'checkin-header'}, [
+            h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+            h('div', {className: 'checkin-info'}, [
+                h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                h('h4', {className: 'edited'}, checkin.created),
+                h('p', "Near " + checkin.near),
+                h('h3', {className: 'rating'}, ratingArr),
+            ]),
+          ]),
+          h('p', {className: 'description'}, checkin.notes),
+          image
+        ]),
+      ]);
+
+      checkins.push(temp);
+    });
+
+    if (checkins.length > 0) {
+      return h("div", {className: 'checkin-container'}, checkins);
+    } else {
+      return h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+    }
+  }
+}
 
 function useMapStyle(type, mapboxToken) {
   const dark = useDarkMode();
