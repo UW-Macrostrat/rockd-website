@@ -17,7 +17,7 @@ The new website also contains an uopdated version of [trips viewer](https://gith
 6. Start the live-reloading development server with `yarn run dev`. The server will be available at
    `http://localhost:3000` by default.
 
-ALTERNATIVLY
+ALTERNATIVELY
 
 1. Clone the repository
 2. Pull down submodules (`git submodule update --init --recursive`)
