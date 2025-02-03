@@ -117,7 +117,7 @@ function FeatureDetails() {
   let checkins = [];
   let result;
 
-  if(mapRef == null) {
+  if(mapRef?.current == null) {
     result = getCheckins(0, 100, 0, 100);
   } else {
     let bounds = mapRef.current?.getBounds();
@@ -195,7 +195,7 @@ function WeaverMap({
   }, []);
 
   let detailElement = null;
-  let selectedCheckin = h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+  let selectedCheckin = null;
   let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
@@ -214,13 +214,18 @@ function WeaverMap({
 
   // TODO: have run depend on changing mapRef
   let featuredCheckin = h(FeatureDetails);
+  let overlay;
 
-  let overlay = h(
-    "div.overlay-div",
-    [
-      h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
-      h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
+  if (selectedCheckin == null) {
+    overlay = h("div.overlay-div", [
+      h("h1", "Featured Checkins"),
+      featuredCheckin,
     ]);
+  } else {
+    overlay = h("div.overlay-div", [
+      h("h1", "Selected Checkins"),
+      selectedCheckin,
+    ]);  }
 
   if(style == null) return null;
 
@@ -257,7 +262,7 @@ function getSelectedCheckins(result) {
 
   // Selected checkin
   if (result == null) {
-    return h(Spinner);
+    return null;
   } else {
     result = result.success.data;
     result.forEach((checkin) => {
@@ -299,7 +304,7 @@ function getSelectedCheckins(result) {
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
     } else {
-      return h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+      return null;
     }
   }
 }
