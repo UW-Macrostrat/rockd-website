@@ -126,7 +126,7 @@ function FeatureDetails() {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
   }
 
-  if (result == null) return h(Spinner);
+  if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;
 
   result.forEach((checkin) => {
@@ -217,15 +217,16 @@ function WeaverMap({
   let overlay;
 
   if (selectedCheckin == null) {
-    overlay = h("div.overlay-div", [
+    overlay = h("div.sidebox", [
       h("h1", "Featured Checkins"),
-      featuredCheckin,
+      h("div.overlay-div", featuredCheckin)
     ]);
   } else {
-    overlay = h("div.overlay-div", [
-      h("h1", "Selected Checkins"),
-      selectedCheckin,
-    ]);  }
+    overlay = h("div.sidebox", [
+      h("h1", "Featured Checkins"),
+      h("div.overlay-div", selectedCheckin)
+    ]);
+  }
 
   if(style == null) return null;
 
