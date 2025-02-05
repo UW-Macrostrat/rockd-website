@@ -146,7 +146,7 @@ function FeatureDetails() {
     }
     
 
-    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
       h('div', { className: 'checkin' }, [
         h('div', {className: 'checkin-header'}, [
           h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
@@ -187,11 +187,16 @@ function WeaverMap({
 
   const style = useMapStyle(type, mapboxToken);
 
+  // overlay
+  const [isOpenSelected, setOpenSelected] = useState(true);
+
+
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
+    setOpenSelected(true);
   }, []);
 
   let detailElement = null;
@@ -216,7 +221,7 @@ function WeaverMap({
   let featuredCheckin = h(FeatureDetails);
   let overlay;
 
-  if (selectedCheckin == null) {
+  if (selectedCheckin == null || !isOpenSelected) {
     overlay = h("div.sidebox", [
       h("h1", "Featured Checkins"),
       h("div.overlay-div", featuredCheckin)
@@ -224,6 +229,10 @@ function WeaverMap({
   } else {
     overlay = h("div.sidebox", [
       h("h1", "Selected Checkins"),
+      h("button", {
+        className: "close-btn",
+        onClick: () => setOpenSelected(false)
+      }, "X"),
       h("div.overlay-div", selectedCheckin)
     ]);
   }
@@ -283,7 +292,7 @@ function getSelectedCheckins(result) {
       }
       
   
-      let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
+      let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
         h('div', { className: 'checkin' }, [
           h('div', {className: 'checkin-header'}, [
             h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
