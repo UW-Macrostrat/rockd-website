@@ -223,7 +223,7 @@ function WeaverMap({
     ]);
   } else {
     overlay = h("div.sidebox", [
-      h("h1", "Featured Checkins"),
+      h("h1", "Selected Checkins"),
       h("div.overlay-div", selectedCheckin)
     ]);
   }
