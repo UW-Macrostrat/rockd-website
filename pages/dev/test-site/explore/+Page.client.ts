@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
+import { get } from "underscore";
 
 export function Page() {
   return h(
@@ -128,6 +129,17 @@ function FeatureDetails() {
 
   if (result == null) return h(Spinner);
   result = result.success.data;
+  console.log("result:",result)
+
+  checkins = createCheckins(result);
+  
+  return h("div", {className: 'checkin-container'}, [
+      h('div', checkins)
+    ]);
+}
+
+function createCheckins(result) {
+  let checkins = [];
 
   result.forEach((checkin) => {
     // format rating
@@ -164,11 +176,8 @@ function FeatureDetails() {
       
     checkins.push(temp);
   });
-  
 
-  return h("div", {className: 'checkin-container'}, [
-      h('div', checkins)
-    ]);
+  return checkins;
 }
 
 function WeaverMap({
@@ -260,41 +269,7 @@ function getSelectedCheckins(result) {
     return h(Spinner);
   } else {
     result = result.success.data;
-    result.forEach((checkin) => {
-      // format rating
-      let ratingArr = [];
-      for(var i = 0; i < checkin.rating; i++) {
-          ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-      }
-
-      for(var i = 0; i < 5 - checkin.rating; i++) {
-        ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
-      }
-      let image;
-  
-      if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
-        image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-      }
-      
-  
-      let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-        h('div', { className: 'checkin' }, [
-          h('div', {className: 'checkin-header'}, [
-            h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-            h('div', {className: 'checkin-info'}, [
-                h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                h('h4', {className: 'edited'}, checkin.created),
-                h('p', "Near " + checkin.near),
-                h('h3', {className: 'rating'}, ratingArr),
-            ]),
-          ]),
-          h('p', {className: 'description'}, checkin.notes),
-          image
-        ]),
-      ]);
-
-      checkins.push(temp);
-    });
+    checkins = createCheckins(result);
 
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
