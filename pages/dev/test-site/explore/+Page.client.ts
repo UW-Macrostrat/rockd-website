@@ -158,8 +158,7 @@ function createCheckins(result) {
     }
     
 
-    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-      h('div', { className: 'checkin' }, [
+    let temp = h('div', { className: 'checkin' }, [
         h('div', {className: 'checkin-header'}, [
           h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
           h('div', {className: 'checkin-info'}, [
@@ -168,11 +167,24 @@ function createCheckins(result) {
               h('p', "Near " + checkin.near),
               h('h3', {className: 'rating'}, ratingArr),
           ]),
+          h(Image, { src: "marker_red.png", className: "marker" })
         ]),
         h('p', {className: 'description'}, checkin.notes),
-        image
-      ]),
-    ]);
+        h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
+          image,
+          h('h1', {className: "image-details"}, "Details ->")
+        ]),
+        h('div', {className: 'checkin-footer'}, [
+          h('div', {className: 'likes-container'}, [
+            h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
+            h('h3', {className: 'likes'}, checkin.likes),
+          ]),
+          h('div', {className: 'comments-container'}, [
+            h(Image, {className: 'comments-image', src: "explore/comment.png"}),
+            h('h3', {className: 'comments'}, checkin.comments),
+          ])
+        ]),
+      ]);
       
     checkins.push(temp);
   });
