@@ -172,7 +172,10 @@ function createCheckins(result) {
         h('p', {className: 'description'}, checkin.notes),
         h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
           image,
-          h('h1', {className: "image-details"}, "Details ->")
+          h('div', {className: "image-details"}, [
+            h('h1', "Details"),
+            h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
+          ])
         ]),
         h('div', {className: 'checkin-footer'}, [
           h('div', {className: 'likes-container'}, [
