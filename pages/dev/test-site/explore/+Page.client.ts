@@ -113,17 +113,53 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 }
 
 function FeatureDetails() {
+  console.log("FeatureDetails called");
+
   const mapRef = useMapRef();
   let checkins = [];
   let result;
 
+  
+
   if(mapRef == null) {
     result = getCheckins(0, 100, 0, 100);
   } else {
-    let bounds = mapRef.current?.getBounds();
+    let map = mapRef.current;
+    let bounds = map?.getBounds();
 
     // change use map coords
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+
+    // Define thresholds for movement
+    const MOVE_THRESHOLD = 0.5; // 0.1 degrees change in center
+    const ZOOM_THRESHOLD = 1; // 0.5 zoom level change
+
+    let lastCenter = map.getCenter();
+    let lastZoom = map.getZoom();
+
+    // Attach the 'move' event listener with thresholding
+    map.on('move', () => {
+        const currentCenter = map.getCenter();
+        const currentZoom = map.getZoom();
+
+        // Calculate the distance between last and current center coordinates
+        const distance = Math.sqrt(
+            Math.pow(currentCenter.lng - lastCenter.lng, 2) + Math.pow(currentCenter.lat - lastCenter.lat, 2)
+        );
+
+        // Check if movement exceeds the threshold for position or zoom
+        if (distance > MOVE_THRESHOLD || Math.abs(currentZoom - lastZoom) > ZOOM_THRESHOLD) {
+            console.log('Map has moved significantly!');
+            let bounds = mapRef.current?.getBounds();
+
+            // change use map coords
+            // result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+
+            // Update the last known values
+            lastCenter = currentCenter;
+            lastZoom = currentZoom;
+        }
+    });
   }
 
   if (result == null) return h(Spinner);
@@ -186,6 +222,8 @@ function WeaverMap({
   const [type, setType] = useState(types[0]);
 
   const style = useMapStyle(type, mapboxToken);
+
+  const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
 
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
