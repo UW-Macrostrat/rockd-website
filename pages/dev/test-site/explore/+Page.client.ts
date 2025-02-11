@@ -155,6 +155,8 @@ function createCheckins(result) {
 
     if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
       image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+    } else {
+      image = h(Image, { className: 'observation-img', src: "rockd.jpg"});
     }
     
 
