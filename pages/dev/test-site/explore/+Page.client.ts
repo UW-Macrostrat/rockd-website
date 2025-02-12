@@ -230,7 +230,7 @@ function WeaverMap({
     overlay = h("div.sidebox", [
       h('div.title', [
         h("h1", "Selected Checkins"),
-        h('h3', { className: "coordinates" }, "Coordinates: " + Math.round(inspectPosition.lat * 100) / 100 + ", " + Math.round(inspectPosition.lng * 100) / 100 ),
+        h('h3', { className: "coordinates" }, formatCoordinates(inspectPosition.lat, inspectPosition.lng)),
       ]),
       h("button", {
         className: "close-btn",
@@ -343,4 +343,16 @@ function useMapStyle(type, mapboxToken) {
   }, []);
 
   return actualStyle;
+}
+
+function formatCoordinates(latitude, longitude) {
+  // Round latitude and longitude to 4 decimal places
+  const roundedLatitude = latitude.toFixed(4);
+  const roundedLongitude = longitude.toFixed(4);
+
+  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
+  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
+
+  // Return the formatted string with rounded values
+  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
 }
