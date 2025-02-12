@@ -223,12 +223,15 @@ function WeaverMap({
 
   if (selectedCheckin == null || !isOpenSelected) {
     overlay = h("div.sidebox", [
-      h("h1", "Featured Checkins"),
-      h("div.overlay-div", featuredCheckin)
+      h('div.title', h("h1", "Featured Checkins")),
+      h("div.overlay-div", featuredCheckin),
     ]);
   } else {
     overlay = h("div.sidebox", [
-      h("h1", "Selected Checkins"),
+      h('div.title', [
+        h("h1", "Selected Checkins"),
+        h('h3', { className: "coordinates" }, "Coordinates: " + Math.round(inspectPosition.lat * 100) / 100 + ", " + Math.round(inspectPosition.lng * 100) / 100 ),
+      ]),
       h("button", {
         className: "close-btn",
         onClick: () => setOpenSelected(false)
@@ -246,7 +249,6 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          detailPanel: detailElement,
           contextPanelOpen: isOpen,
         },
         [
