@@ -3,9 +3,6 @@ FROM node:20
 # Install rsync
 RUN apt-get update && apt-get install -y rsync
 
-
-
-
 ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
