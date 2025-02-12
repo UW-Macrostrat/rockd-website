@@ -131,7 +131,7 @@ h3,h4,p
   left 0
   background rgba(255, 255, 255, 0.8)
 
-  h1
+  .title
     color black
     position fixed
     width 30%
@@ -139,8 +139,13 @@ h3,h4,p
     margin 0
     height 10vh
     display flex
+    flex-direction column
     align-items center
     justify-content center
+
+    h1
+      margin-bottom 0
+      margin-top 0
 
 .close-btn
   position absolute
@@ -163,8 +168,3 @@ h3,h4,p
 .close-btn:hover
   background-color #555
   box-shadow 0 6px 12px rgba(0, 0, 0, 0.3)
-
-
-
-
-    
