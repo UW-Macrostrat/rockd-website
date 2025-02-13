@@ -22,7 +22,6 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
-import { set } from "react-datepicker/dist/date_utils";
 
 export function Page() {
   return h(
@@ -114,14 +113,9 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 }
 
 function FeatureDetails() {
-  console.log("FeatureDetails called");
-
   const mapRef = useMapRef();
   let checkins = [];
   let result;
-
-
-  
 
   if(mapRef == null) {
     result = getCheckins(0, 100, 0, 100);
