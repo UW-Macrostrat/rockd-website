@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
-import { get } from "underscore";
+import { pipeNodeStream } from "vike/dist/esm/node/runtime/html/stream";
 
 export function Page() {
   return h(
@@ -131,17 +131,32 @@ function FeatureDetails() {
   result = result.success.data;
   console.log("result:",result)
 
-  checkins = createCheckins(result);
+  checkins = createCheckins(result, mapRef, true);
   
   return h("div", {className: 'checkin-container'}, [
       h('div', checkins)
     ]);
 }
 
-function createCheckins(result) {
+function createCheckins(result, mapRef, showPin) {
   let checkins = [];
+  let map = mapRef?.current;
 
   result.forEach((checkin) => {
+    let pin = null;
+
+    if(showPin) {
+      pin = h(Image, 
+        { src: "marker_red.png", 
+          className: "marker", 
+          onClick: () => { 
+            console.log("clicked at: ", checkin.lat + " " + checkin.lng);
+            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+          } 
+        })
+    }
+
+
     // format rating
     let ratingArr = [];
     for(var i = 0; i < checkin.rating; i++) {
@@ -169,7 +184,7 @@ function createCheckins(result) {
               h('p', "Near " + checkin.near),
               h('h3', {className: 'rating'}, ratingArr),
           ]),
-          h(Image, { src: "marker_red.png", className: "marker" })
+          pin,
         ]),
         h('p', {className: 'description'}, checkin.notes),
         h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
@@ -205,8 +220,6 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const mapRef = useMapRef();
-
   const [isOpen, setOpen] = useState(false);
 
   const [type, setType] = useState(types[0]);
@@ -279,14 +292,14 @@ function WeaverMap({
 
 function getSelectedCheckins(result) {
   let checkins = [];
-  console.log("result", result);
+  let mapRef = useMapRef();
 
   // Selected checkin
   if (result == null) {
     return h(Spinner);
   } else {
     result = result.success.data;
-    checkins = createCheckins(result);
+    checkins = createCheckins(result, mapRef, false);
 
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
