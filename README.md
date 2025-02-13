@@ -3,7 +3,7 @@
 This is the code for Version 2 of Rockd's website, which replaced the large repository of flat HTML, CSS, some JS and images.
 It is a collection of TS files and references to an S3 bucket holding images.
 
-The new website also contains an uopdated version of [trips viewer](https://github.com/UW-Macrostrat/rockd-trips) that shows maps for all trips.
+The new website also contains an updated version of [trips viewer](https://github.com/UW-Macrostrat/rockd-trips) that shows maps for all trips.
 
 ## Installation for local development
 
