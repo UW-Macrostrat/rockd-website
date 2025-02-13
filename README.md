@@ -10,21 +10,8 @@ The new website also contains an uopdated version of [trips viewer](https://gith
 1. Clone the repository
 2. Create and populate a `.env` file with the appropriate environment variables (See [
    `.env.example`](https://github.com/UW-Macrostrat/web/blob/main/.env.example) for more information.)
-3. Run `make` to pull down submodules and update packages
-4. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
+3. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
    `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
-5. Run `yarn install` to update packages
-6. Start the live-reloading development server with `yarn run dev`. The server will be available at
-   `http://localhost:3000` by default.
-
-ALTERNATIVELY
-
-1. Clone the repository
-2. Pull down submodules (`git submodule update --init --recursive`)
-3. Create and populate a `.env` file with the appropriate environment variables (See [
-   `.env.example`](https://github.com/UW-Macrostrat/web/blob/main/.env.example) for more information.)
-4. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
-   `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
-5. Run `yarn install` to update packages
-6. Start the live-reloading development server with `yarn run dev`. The server will be available at
+4. Run `make` (or `git submodule update --init --recursive` and `yarn install`) to pull down submodules and update packages
+5. Start the live-reloading development server with `yarn run dev`. The server will be available at
    `http://localhost:3000` by default.
