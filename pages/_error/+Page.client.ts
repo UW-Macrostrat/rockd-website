@@ -1,7 +1,19 @@
-// /pages/_error/+Page.ts
-  
 import { h } from '@macrostrat/map-interface'
 import { usePageContext } from 'vike-react/usePageContext'
+import "./main.styl"
+import { Image } from "../index"
+
+function pageDoesntExist() {
+
+
+  return h('div.error404', [
+    h(Image, { src: "earth-crust.jpg", className: "error-image", width: "100%", height: "100%" }),
+    h('div.error-text', [
+      h('h1', "404"),
+      h('h2', "The rock you are looking for doesn't exist. Keep digging."),
+    ])  
+  ])
+}
 
 export function Page() {
   const pageContext = usePageContext()
@@ -23,9 +35,9 @@ export function Page() {
   } else {
     // Fallback error message
     msg = pageContext.is404 ?
-      "This page doesn't exist." :
+      pageDoesntExist() :
       "Something went wrong. Try again (later)."
   }
 
-  return h('h1', msg)
+  return h('div.error', msg)
 }
