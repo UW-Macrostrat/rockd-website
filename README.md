@@ -9,7 +9,7 @@ The new website also contains an uopdated version of [trips viewer](https://gith
 
 1. Clone the repository
 2. Create and populate a `.env` file with the appropriate environment variables (See [
-   `.env.example`](https://github.com/UW-Macrostrat/web/blob/main/.env.example) for more information.)
+   `.env.example`](https://github.com/UW-Macrostrat/rockd-website/blob/main/.env.example) for more information.)
 3. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
    `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
 4. Run `make` (or `git submodule update --init --recursive` and `yarn install`) to pull down submodules and update packages
