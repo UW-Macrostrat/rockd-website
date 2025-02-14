@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y rsync
 
 ENV NODE_ENV=production
 
+
 WORKDIR /usr/src/app
 COPY .yarn/releases .yarn/releases
 COPY .yarnrc.yml yarn.lock package.json ./
@@ -22,6 +23,8 @@ RUN --mount=type=bind,target=/docker-context \
     find . -name "package.json" -mindepth 0 -maxdepth 5 -exec cp --parents "{}" /usr/src/app/ \;
 
 RUN yarn install --immutable
+
+
 
 # Load the cache from the previous build
 RUN --mount=type=cache,target=/yarn-cache \
