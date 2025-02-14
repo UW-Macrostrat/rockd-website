@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
+import { pipeNodeStream } from "vike/dist/esm/node/runtime/html/stream";
 
 export function Page() {
   return h(
@@ -141,8 +142,34 @@ function FeatureDetails() {
 
   if (result == null) return h(Spinner);
   result = result.success.data;
+  console.log("result:",result)
+
+  checkins = createCheckins(result, mapRef, true);
+  
+  return h("div", {className: 'checkin-container'}, [
+      h('div', checkins)
+    ]);
+}
+
+function createCheckins(result, mapRef, showPin) {
+  let checkins = [];
+  let map = mapRef?.current;
 
   result.forEach((checkin) => {
+    let pin = null;
+
+    if(showPin) {
+      pin = h(Image, 
+        { src: "marker_red.png", 
+          className: "marker", 
+          onClick: () => { 
+            console.log("clicked at: ", checkin.lat + " " + checkin.lng);
+            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+          } 
+        })
+    }
+
+
     // format rating
     let ratingArr = [];
     for(var i = 0; i < checkin.rating; i++) {
@@ -156,11 +183,12 @@ function FeatureDetails() {
 
     if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
       image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+    } else {
+      image = h(Image, { className: 'observation-img', src: "rockd.jpg"});
     }
     
 
-    let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-      h('div', { className: 'checkin' }, [
+    let temp = h('div', { className: 'checkin' }, [
         h('div', {className: 'checkin-header'}, [
           h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
           h('div', {className: 'checkin-info'}, [
@@ -169,19 +197,32 @@ function FeatureDetails() {
               h('p', "Near " + checkin.near),
               h('h3', {className: 'rating'}, ratingArr),
           ]),
+          pin,
         ]),
         h('p', {className: 'description'}, checkin.notes),
-        image
-      ]),
-    ]);
+        h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
+          image,
+          h('div', {className: "image-details"}, [
+            h('h1', "Details"),
+            h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
+          ])
+        ]),
+        h('div', {className: 'checkin-footer'}, [
+          h('div', {className: 'likes-container'}, [
+            h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
+            h('h3', {className: 'likes'}, checkin.likes),
+          ]),
+          h('div', {className: 'comments-container'}, [
+            h(Image, {className: 'comments-image', src: "explore/comment.png"}),
+            h('h3', {className: 'comments'}, checkin.comments),
+          ])
+        ]),
+      ]);
       
     checkins.push(temp);
   });
-  
 
-  return h("div", {className: 'checkin-container'}, [
-      h('div', checkins)
-    ]);
+  return checkins;
 }
 
 function WeaverMap({
@@ -192,8 +233,6 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const mapRef = useMapRef();
-
   const [isOpen, setOpen] = useState(false);
 
   const [type, setType] = useState(types[0]);
@@ -268,48 +307,14 @@ function WeaverMap({
 
 function getSelectedCheckins(result) {
   let checkins = [];
-  console.log("result", result);
+  let mapRef = useMapRef();
 
   // Selected checkin
   if (result == null) {
     return h(Spinner);
   } else {
     result = result.success.data;
-    result.forEach((checkin) => {
-      // format rating
-      let ratingArr = [];
-      for(var i = 0; i < checkin.rating; i++) {
-          ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-      }
-
-      for(var i = 0; i < 5 - checkin.rating; i++) {
-        ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
-      }
-      let image;
-  
-      if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
-        image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-      }
-      
-  
-      let temp = h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id}, [
-        h('div', { className: 'checkin' }, [
-          h('div', {className: 'checkin-header'}, [
-            h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-            h('div', {className: 'checkin-info'}, [
-                h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                h('h4', {className: 'edited'}, checkin.created),
-                h('p', "Near " + checkin.near),
-                h('h3', {className: 'rating'}, ratingArr),
-            ]),
-          ]),
-          h('p', {className: 'description'}, checkin.notes),
-          image
-        ]),
-      ]);
-
-      checkins.push(temp);
-    });
+    checkins = createCheckins(result, mapRef, false);
 
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
