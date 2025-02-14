@@ -120,10 +120,23 @@ function FeatureDetails() {
   if(mapRef == null) {
     result = getCheckins(0, 100, 0, 100);
   } else {
-    let bounds = mapRef.current?.getBounds();
+    let map = mapRef.current;
+
+    const [bounds, setBounds] = useState(map.getBounds());
 
     // change use map coords
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+
+    // Update bounds on move
+    useEffect(() => {
+      const listener = () => {
+        setBounds(map.getBounds());
+      };
+      map.on("moveend", listener);
+      return () => {
+        map.off("moveend", listener);
+      };
+    }, [bounds]);
   }
 
   if (result == null) return h(Spinner);
@@ -186,6 +199,8 @@ function WeaverMap({
   const [type, setType] = useState(types[0]);
 
   const style = useMapStyle(type, mapboxToken);
+
+  const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
 
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
