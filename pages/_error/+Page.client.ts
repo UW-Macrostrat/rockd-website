@@ -12,8 +12,8 @@ function pageDoesntExist() {
       h('h1', "404"),
       h('h2', "The rock you are looking for doesn't exist. Keep digging."),
       h('div.buttons', [
-        h('button', { onClick: () => history.back() }, "Go back"),
-        h('a', { href: "/dev/test-site/" }, "Go home")
+        h('button', { className: "btn", onClick: () => history.back() }, "Go back"),
+        h('a', { className: "btn", href: "/dev/test-site/" }, "Go home")
       ]),
     ])  
   ])
