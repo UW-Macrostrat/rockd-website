@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y rsync
 
 ENV NODE_ENV=production
 
+
 WORKDIR /usr/src/app
 COPY .yarn/releases .yarn/releases
 COPY .yarnrc.yml yarn.lock package.json ./
