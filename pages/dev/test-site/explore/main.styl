@@ -3,6 +3,7 @@
   text-align left
   box-shadow -4px 0px 7px #aaa
   padding 15px
+  padding-bottom 6px
   border-radius 2%
   font-size 14px
   color #666
@@ -48,29 +49,39 @@
   margin auto
   margin-left 0
 
-.checkin-link:hover
-  text-decoration none
-  background-color green
-
-  .checkin
-    background-color #c9c9c9
-
-.checkin-link
-  text-decoration none
-  background-color green
-
-  .checkin
+.checkin
     background-color white
 
 h3,h4,p
   margin 0
 
-.observation-img
-  margin-top 10px
-  width 100%
-  height 250px
-  object-fit cover
-  border-radius 2%
+.checkin-link
+  position relative
+
+  .image-details
+    position: absolute;
+    top: -250px;
+    left: 0;
+    right: 0;
+    bottom: 0
+    display: flex;
+    justify-content: center
+    align-items: center
+    display none
+    color white
+
+  .observation-img
+    margin-top 10px
+    width 100%
+    height 250px
+    object-fit cover
+    border-radius 2%
+
+.checkin-link:hover 
+  .observation-img 
+    -webkit-filter: brightness(70%)
+  .image-details 
+    display: flex
 
 .description
   margin-top 10px
@@ -124,3 +135,38 @@ h3,h4,p
 
 .no-checkins
   color black
+
+.checkin-footer
+  display flex
+  justify-content center
+
+  .likes-container
+    display grid
+    grid-template-columns 30% 30%
+    width 50%
+    justify-content end
+    place-items center
+
+
+    .likes-image
+      width 40px
+
+  .comments-container
+    display grid
+    grid-template-columns 30% 30%
+    width 50%
+    place-items center
+
+    .comments-image
+      width 40px
+
+.marker
+  height 7vh
+  display grid
+  margin auto
+  margin-right 10px
+
+.details-image
+  width 40px
+  margin-left 10px
+  margin-top 4px
