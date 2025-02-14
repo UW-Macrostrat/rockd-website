@@ -118,8 +118,8 @@ function FeatureDetails() {
   let checkins = [];
   let result;
 
-  if(mapRef == null) {
-    result = getCheckins(0, 100, 0, 100);
+  if(mapRef?.current == null) {
+    return h(Spinner)
   } else {
     let map = mapRef.current;
 
@@ -140,7 +140,7 @@ function FeatureDetails() {
     }, [bounds]);
   }
 
-  if (result == null) return h(Spinner);
+  if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;
   console.log("result:",result)
 
@@ -240,16 +240,20 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken);
 
   const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
+  // overlay
+  const [isOpenSelected, setOpenSelected] = useState(true);
+
 
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
+    setOpenSelected(true);
   }, []);
 
   let detailElement = null;
-  let selectedCheckin = h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+  let selectedCheckin = null;
   let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
     detailElement = h(
@@ -268,13 +272,26 @@ function WeaverMap({
 
   // TODO: have run depend on changing mapRef
   let featuredCheckin = h(FeatureDetails);
+  let overlay;
 
-  let overlay = h(
-    "div.overlay-div",
-    [
-      h(ExpansionPanel, {title: "Selected Checkins"}, selectedCheckin),
-      h(ExpansionPanel, {title: "Featured Checkins"}, featuredCheckin),
+  if (selectedCheckin == null || !isOpenSelected) {
+    overlay = h("div.sidebox", [
+      h('div.title', h("h1", "Featured Checkins")),
+      h("div.overlay-div", featuredCheckin),
     ]);
+  } else {
+    overlay = h("div.sidebox", [
+      h('div.title', [
+        h("h1", "Selected Checkins"),
+        h('h3', { className: "coordinates" }, formatCoordinates(inspectPosition.lat, inspectPosition.lng)),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => setOpenSelected(false)
+      }, "X"),
+      h("div.overlay-div", selectedCheckin)
+    ]);
+  }
 
   if(style == null) return null;
 
@@ -285,7 +302,6 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          detailPanel: detailElement,
           contextPanelOpen: isOpen,
         },
         [
@@ -311,7 +327,7 @@ function getSelectedCheckins(result) {
 
   // Selected checkin
   if (result == null) {
-    return h(Spinner);
+    return null;
   } else {
     result = result.success.data;
     checkins = createCheckins(result, mapRef, false);
@@ -319,7 +335,7 @@ function getSelectedCheckins(result) {
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
     } else {
-      return h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+      return null;
     }
   }
 }
@@ -346,4 +362,16 @@ function useMapStyle(type, mapboxToken) {
   }, []);
 
   return actualStyle;
+}
+
+function formatCoordinates(latitude, longitude) {
+  // Round latitude and longitude to 4 decimal places
+  const roundedLatitude = latitude.toFixed(4);
+  const roundedLongitude = longitude.toFixed(4);
+
+  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
+  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
+
+  // Return the formatted string with rounded values
+  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
 }
