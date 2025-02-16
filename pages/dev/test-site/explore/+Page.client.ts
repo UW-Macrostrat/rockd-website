@@ -24,6 +24,8 @@ import "./main.styl";
 import { BlankImage, Image } from "../index";
 import { pipeNodeStream } from "vike/dist/esm/node/runtime/html/stream";
 
+let count = 0;
+
 export function Page() {
   return h(
     "div.weaver-page",
@@ -54,7 +56,7 @@ function weaverStyle(type: object) {
       weaver: {
         type: "vector",
         tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
-      },
+      }
     },
     layers: [
       {
@@ -121,12 +123,50 @@ function FeatureDetails() {
   if(!mapRef.current) {
     return h(Spinner)
   } else {
+    count++;
     let map = mapRef.current;
 
     const [bounds, setBounds] = useState(map.getBounds());
 
     // change use map coords
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+
+    if(result != null) {
+      // get featured checkins coordinates
+      let features = [];
+      result.success.data.forEach((checkin) => {
+        features.push({
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [checkin.lng, checkin.lat]
+          },
+          "properties": {}
+        });
+      });
+
+      // add source
+      map.addSource("test" + count, {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: features,
+        },
+      });
+  
+      // add layer
+      map.addLayer({
+          id: "geojson" + count,
+          type: "circle",
+          source: "test" + count,
+          paint: {
+            "circle-radius": 10,
+            "circle-color": '#ff0000',
+            "circle-stroke-width": 2,
+            "circle-stroke-color": '#ffffff',
+          }
+        });
+    }
 
     // Update bounds on move
     useEffect(() => {
@@ -143,6 +183,7 @@ function FeatureDetails() {
   if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;
   console.log("result:",result)
+  
 
   checkins = createCheckins(result, mapRef, true);
   
