@@ -140,7 +140,7 @@ function FeatureDetails() {
     }, [bounds]);
   }
 
-  if (result == null) return h(Spinner);
+  if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;
   console.log("result:",result)
 
@@ -240,7 +240,6 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken);
 
   const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
-
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
 
@@ -292,7 +291,6 @@ function WeaverMap({
     ]);
   }
 
-
   if(style == null) return null;
 
   return h(
@@ -302,7 +300,6 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          detailPanel: detailElement,
           contextPanelOpen: isOpen,
         },
         [
@@ -328,7 +325,7 @@ function getSelectedCheckins(result) {
 
   // Selected checkin
   if (result == null) {
-    return h(Spinner);
+    return null;
   } else {
     result = result.success.data;
     checkins = createCheckins(result, mapRef, false);
@@ -336,7 +333,7 @@ function getSelectedCheckins(result) {
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
     } else {
-      return h('h1', { className: 'no-checkins' }, "No Checkin(s) Selected");
+      return null;
     }
   }
 }
