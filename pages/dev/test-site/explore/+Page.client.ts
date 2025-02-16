@@ -212,6 +212,10 @@ function createCheckins(result, mapRef, showPin) {
             h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
             h('h3', {className: 'likes'}, checkin.likes),
           ]),
+          h('div', {className: 'observations-container'}, [
+            h(Image, {className: 'observations-image', src: "explore/observations.png"}),
+            h('h3', {className: 'comments'}, checkin.observations.length),
+          ]),
           h('div', {className: 'comments-container'}, [
             h(Image, {className: 'comments-image', src: "explore/comment.png"}),
             h('h3', {className: 'comments'}, checkin.comments),
