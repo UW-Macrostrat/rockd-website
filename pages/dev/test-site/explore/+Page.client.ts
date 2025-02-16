@@ -145,6 +145,20 @@ function FeatureDetails() {
         });
       });
 
+      // delete unneeded layers
+      let layers = map.getStyle().layers;
+      layers.forEach((layer) => {
+        if (layer.id.includes('geojson')) {
+          // Remove the layer
+          map.removeLayer(layer.id);
+
+          // Remove the source associated with this layer (if any)
+          if (map.getSource(layer.source)) {
+            map.removeSource(layer.source);
+          }
+        }
+      });
+
       // add source
       map.addSource("test" + count, {
         type: "geojson",
