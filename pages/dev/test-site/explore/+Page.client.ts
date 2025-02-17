@@ -134,7 +134,10 @@ function FeatureDetails() {
     if(result != null) {
       // get featured checkins coordinates
       let features = [];
+      let coordinates = [];
+
       result.success.data.forEach((checkin) => {
+        /*
         features.push({
           "type": "Feature",
           "geometry": {
@@ -143,8 +146,12 @@ function FeatureDetails() {
           },
           "properties": {}
         });
+        */
+
+        coordinates.push([checkin.lng, checkin.lat]);
       });
 
+      /*
       // delete unneeded layers
       let layers = map.getStyle().layers;
       layers.forEach((layer) => {
@@ -159,6 +166,25 @@ function FeatureDetails() {
         }
       });
 
+      */
+
+      let previous = document.querySelectorAll('.marker_pin');
+      previous.forEach((marker) => {
+        marker.remove();
+      });
+
+      coordinates.forEach((coord) => {
+        // marker
+        const el = document.createElement('div');
+        el.className = 'marker_pin';
+
+        // Create marker
+        new mapboxgl.Marker(el)
+              .setLngLat(coord)
+              .addTo(map);
+      });
+      
+      /*
       // add source
       map.addSource("test" + count, {
         type: "geojson",
@@ -180,7 +206,9 @@ function FeatureDetails() {
             "circle-stroke-color": '#ffffff',
           }
         });
+        */
     }
+        
 
     // Update bounds on move
     useEffect(() => {
