@@ -118,110 +118,108 @@ function FeatureDetails() {
   let checkins = [];
   let result;
 
-  if(!mapRef.current) {
-    return h(Spinner)
-  } else {
-    count++;
-    let map = mapRef.current;
+  if(!mapRef.current) return h(Spinner); 
 
-    const [bounds, setBounds] = useState(map.getBounds());
+  count++;
+  let map = mapRef.current;
 
-    // change use map coords
-    let distance = Math.abs(bounds.getEast() - bounds.getWest());
-    let newWest = bounds.getWest() + distance * .3;
+  const [bounds, setBounds] = useState(map.getBounds());
 
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), newWest);
+  // change use map coords
+  let distance = Math.abs(bounds.getEast() - bounds.getWest());
+  let newWest = bounds.getWest() + distance * .3;
 
-    if(result != null) {
-      // get featured checkins coordinates
-      let features = [];
-      let coordinates = [];
+  result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), newWest);
 
-      result.success.data.forEach((checkin) => {
-        /*
-        features.push({
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [checkin.lng, checkin.lat]
-          },
-          "properties": {}
-        });
-        */
+  
+  if(result != null) {
+    // get featured checkins coordinates
+    let features = [];
+    let coordinates = [];
 
-        coordinates.push([checkin.lng, checkin.lat]);
-      });
-
+    result.success.data.forEach((checkin) => {
       /*
-      // delete unneeded layers
-      let layers = map.getStyle().layers;
-      layers.forEach((layer) => {
-        if (layer.id.includes('geojson')) {
-          // Remove the layer
-          map.removeLayer(layer.id);
-
-          // Remove the source associated with this layer (if any)
-          if (map.getSource(layer.source)) {
-            map.removeSource(layer.source);
-          }
-        }
+      features.push({
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [checkin.lng, checkin.lat]
+        },
+        "properties": {}
       });
-
       */
 
-      let previous = document.querySelectorAll('.marker_pin');
-      previous.forEach((marker) => {
-        marker.remove();
-      });
+      coordinates.push([checkin.lng, checkin.lat]);
+    });
 
-      coordinates.forEach((coord) => {
-        // marker
-        const el = document.createElement('div');
-        el.className = 'marker_pin';
+    /*
+    // delete unneeded layers
+    let layers = map.getStyle().layers;
+    layers.forEach((layer) => {
+      if (layer.id.includes('geojson')) {
+        // Remove the layer
+        map.removeLayer(layer.id);
 
-        // Create marker
-        new mapboxgl.Marker(el, { offset: [0, -el.offsetHeight] })
-          .setLngLat(coord)
-          .addTo(map);
-      });
-      
-      /*
-      // add source
-      map.addSource("test" + count, {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: features,
-        },
-      });
-  
-      // add layer
-      map.addLayer({
-          id: "geojson" + count,
-          type: "circle",
-          source: "test" + count,
-          paint: {
-            "circle-radius": 10,
-            "circle-color": '#ff0000',
-            "circle-stroke-width": 2,
-            "circle-stroke-color": '#ffffff',
-          }
-        });
-        */
-    }
-        
+        // Remove the source associated with this layer (if any)
+        if (map.getSource(layer.source)) {
+          map.removeSource(layer.source);
+        }
+      }
+    });
 
-    // Update bounds on move
-    useEffect(() => {
-      const listener = () => {
-        setBounds(map.getBounds());
-      };
-      map.on("moveend", listener);
-      return () => {
-        map.off("moveend", listener);
-      };
-    }, [bounds]);
+    */
+
+    let previous = document.querySelectorAll('.marker_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
+    coordinates.forEach((coord) => {
+      // marker
+      const el = document.createElement('div');
+      el.className = 'marker_pin';
+
+      // Create marker
+      new mapboxgl.Marker(el, { offset: [0, -el.offsetHeight] })
+        .setLngLat(coord)
+        .addTo(map);
+    });
+    
+    /*
+    // add source
+    map.addSource("test" + count, {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: features,
+      },
+    });
+
+    // add layer
+    map.addLayer({
+        id: "geojson" + count,
+        type: "circle",
+        source: "test" + count,
+        paint: {
+          "circle-radius": 10,
+          "circle-color": '#ff0000',
+          "circle-stroke-width": 2,
+          "circle-stroke-color": '#ffffff',
+        }
+      });
+      */
   }
+
+  // Update bounds on move
+  useEffect(() => {
+    const listener = () => {
+      setBounds(map.getBounds());
+    };
+    map.on("moveend", listener);
+    return () => {
+      map.off("moveend", listener);
+    };
+  }, [bounds]);
 
   if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;
