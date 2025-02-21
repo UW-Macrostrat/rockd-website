@@ -8,7 +8,6 @@ import {
   MapAreaContainer,
   MapMarker,
   MapView,
-  ExpansionPanel,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
@@ -22,7 +21,6 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
-import { pipeNodeStream } from "vike/dist/esm/node/runtime/html/stream";
 
 let count = 0;
 
@@ -129,7 +127,10 @@ function FeatureDetails() {
     const [bounds, setBounds] = useState(map.getBounds());
 
     // change use map coords
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+    let distance = Math.abs(bounds.getEast() - bounds.getWest());
+    let newWest = bounds.getWest() + distance * .3;
+
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), newWest);
 
     if(result != null) {
       // get featured checkins coordinates
@@ -179,9 +180,9 @@ function FeatureDetails() {
         el.className = 'marker_pin';
 
         // Create marker
-        new mapboxgl.Marker(el)
-              .setLngLat(coord)
-              .addTo(map);
+        new mapboxgl.Marker(el, { offset: [0, -el.offsetHeight] })
+          .setLngLat(coord)
+          .addTo(map);
       });
       
       /*
