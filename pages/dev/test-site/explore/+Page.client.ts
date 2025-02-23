@@ -130,7 +130,6 @@ function FeatureDetails() {
   let newWest = bounds.getWest() + distance * .3;
 
   result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), newWest);
-
   
   if(result != null) {
     // get featured checkins coordinates
