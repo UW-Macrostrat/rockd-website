@@ -174,13 +174,21 @@ function FeatureDetails() {
       marker.remove();
     });
 
+    let stop = 0;
     coordinates.forEach((coord) => {
+      stop++;
       // marker
       const el = document.createElement('div');
       el.className = 'marker_pin';
 
+      const number = document.createElement('span');
+      number.innerText = stop;
+
+      // Append the number to the marker
+      el.appendChild(number);
+
       // Create marker
-      new mapboxgl.Marker(el, { offset: [0, -el.offsetHeight] })
+      new mapboxgl.Marker(el)
         .setLngLat(coord)
         .addTo(map);
     });
@@ -222,9 +230,7 @@ function FeatureDetails() {
   }, [bounds]);
 
   if (result == null) return h("div.checkin-container",Spinner);
-  result = result.success.data;
-  console.log("result:",result)
-  
+  result = result.success.data;  
 
   checkins = createCheckins(result, mapRef, true);
   
@@ -236,19 +242,23 @@ function FeatureDetails() {
 function createCheckins(result, mapRef, showPin) {
   let checkins = [];
   let map = mapRef?.current;
+  let stop = 0;
 
   result.forEach((checkin) => {
     let pin = null;
 
     if(showPin) {
-      pin = h(Image, 
-        { src: "marker_red.png", 
-          className: "marker", 
+      stop++;
+      pin = h('div', 
+        { src: "marker_container.png", 
+          className: "marker_container", 
           onClick: () => { 
-            console.log("clicked at: ", checkin.lat + " " + checkin.lng);
             map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
           } 
-        })
+        }, [
+          h(Image, { src: "marker_red.png", className: "marker" }),
+          h('span', { className: "marker-number" }, stop)
+        ])
     }
 
 
