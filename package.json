@@ -69,14 +69,15 @@
     "@macrostrat/corelle": "^2.0.1",
     "@macrostrat/data-sheet2": "workspace:*",
     "@macrostrat/feedback-components": "workspace:*",
-    "@macrostrat/hyper": "^2.2.1",
-    "@macrostrat/map-components": "workspace:*",
-    "@macrostrat/mapbox-react": "workspace:^2.1.0",
-    "@macrostrat/mapbox-styles": "workspace:*",
-    "@macrostrat/mapbox-utils": "workspace:*",
-    "@macrostrat/style-system": "workspace:*",
-    "@macrostrat/timescale": "workspace:*",
-    "@macrostrat/ui-components": "workspace:*",
+    "@macrostrat/hyper": "^3.0.6",
+    "@macrostrat/map-interface": "^1.2.2",
+    "@macrostrat/map-styles": "^1.1.1",
+    "@macrostrat/mapbox-react": "^2.5.0",
+    "@macrostrat/mapbox-utils": "^1.4.0",
+    "@macrostrat/style-system": "^0.2.0",
+    "@macrostrat/svg-map-components": "^1.0.3",
+    "@macrostrat/timescale": "^2.1.1",
+    "@macrostrat/ui-components": "^4.1.2",
     "@react-hook/size": "^2.1.2",
     "@supabase/postgrest-js": "^1.11.0",
     "@turf/bbox": "^6.5.0",
@@ -147,6 +148,10 @@
     "vite-plugin-cesium": "^1.2.22",
     "vite-plugin-inspect": "^0.8.4",
     "zustand": "^4.5.1"
+  },
+  "resolutions": {
+    "cesium": "^1.123.1",
+    "resium:": "1.17.1"
   },
   "prettier": {
     "proseWrap": "always"
