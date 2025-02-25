@@ -98,6 +98,26 @@ export default defineConfig({
     // If not building for server context
   },
   ssr: {
-    noExternal: ["labella", "@supabase/postgrest-js"],
+    noExternal: [
+      /** All dependencies that cannot be bundled on the server (e.g., due to CSS imports)
+       * should be listed here.
+       */
+      "@macrostrat/form-components",
+      "@macrostrat/ui-components",
+      "@macrostrat/column-components",
+      "@macrostrat/column-views",
+      "@macrostrat/data-components",
+      "@macrostrat/svg-map-components",
+      "@macrostrat/map-interface",
+      "@macrostrat/feedback-components",
+      "@macrostrat/timescale",
+    ],
+  },
+  css: {
+    preprocessorOptions: {
+      sass: {
+        api: "modern-compiler",
+      },
+    },
   },
 });
