@@ -10,7 +10,7 @@ import {
   MapView,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
-import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
+import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import {
   useAPIResult,
