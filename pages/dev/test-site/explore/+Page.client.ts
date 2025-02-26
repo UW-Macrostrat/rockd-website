@@ -22,6 +22,9 @@ import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 import { BlankImage, Image } from "../index";
 
+import {} from "./storybook";
+import { get } from "underscore";
+
 let count = 0;
 
 export function Page() {
@@ -114,22 +117,32 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 }
 
 function FeatureDetails() {
+  // return null;
   const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [bounds, setBounds] = useState(map?.getBounds());
   let checkins = [];
   let result;
 
-  if(!mapRef.current) return h(Spinner); 
+  if(!map) {
+    console.log("Map not loaded");
+    result = getCheckins(0, 0, 0, 0);
+    return h(Spinner); 
+  } else if (bounds) {
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+  } else {
+    result = getCheckins(0, 0, 0, 0);
+  }
+
+  if (!bounds) {
+    setBounds(map.getBounds());
+  }
 
   count++;
-  let map = mapRef.current;
-
-  const [bounds, setBounds] = useState(map.getBounds());
 
   // change use map coords
-  let distance = Math.abs(bounds.getEast() - bounds.getWest());
-  let newWest = bounds.getWest() + distance * .3;
-
-  result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), newWest);
+  //let distance = Math.abs(bounds.getEast() - bounds.getWest());
+  //let newWest = bounds.getWest() + distance * .3;
   
   if(result != null) {
     // get featured checkins coordinates
@@ -216,7 +229,7 @@ function FeatureDetails() {
       });
       */
   }
-
+/*
   // Update bounds on move
   useEffect(() => {
     const listener = () => {
@@ -227,6 +240,7 @@ function FeatureDetails() {
       map.off("moveend", listener);
     };
   }, [bounds]);
+  */
 
   if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;  
@@ -320,6 +334,68 @@ function createCheckins(result, mapRef, showPin) {
   return checkins;
 }
 
+function createSelectedCheckins(result) {
+  let checkins = [];
+
+  result.forEach((checkin) => {
+    // format rating
+    let ratingArr = [];
+    for(var i = 0; i < checkin.rating; i++) {
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+    }
+
+    for(var i = 0; i < 5 - checkin.rating; i++) {
+      ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+    }
+    let image;
+
+    if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+      image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+    } else {
+      image = h(Image, { className: 'observation-img', src: "rockd.jpg"});
+    }
+    
+
+    let temp = h('div', { className: 'checkin' }, [
+        h('div', {className: 'checkin-header'}, [
+          h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+          h('div', {className: 'checkin-info'}, [
+              h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+              h('h4', {className: 'edited'}, checkin.created),
+              h('p', "Near " + checkin.near),
+              h('h3', {className: 'rating'}, ratingArr),
+          ]),
+        ]),
+        h('p', {className: 'description'}, checkin.notes),
+        h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
+          image,
+          h('div', {className: "image-details"}, [
+            h('h1', "Details"),
+            h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
+          ])
+        ]),
+        h('div', {className: 'checkin-footer'}, [
+          h('div', {className: 'likes-container'}, [
+            h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
+            h('h3', {className: 'likes'}, checkin.likes),
+          ]),
+          h('div', {className: 'observations-container'}, [
+            h(Image, {className: 'observations-image', src: "explore/observations.png"}),
+            h('h3', {className: 'comments'}, checkin.observations.length),
+          ]),
+          h('div', {className: 'comments-container'}, [
+            h(Image, {className: 'comments-image', src: "explore/comment.png"}),
+            h('h3', {className: 'comments'}, checkin.comments),
+          ])
+        ]),
+      ]);
+      
+    checkins.push(temp);
+  });
+
+  return checkins;
+}
+
 function WeaverMap({
   mapboxToken,
 }: {
@@ -334,7 +410,6 @@ function WeaverMap({
 
   const style = useMapStyle(type, mapboxToken);
 
-  const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
 
@@ -416,14 +491,13 @@ function WeaverMap({
 
 function getSelectedCheckins(result) {
   let checkins = [];
-  let mapRef = useMapRef();
 
   // Selected checkin
   if (result == null) {
     return null;
   } else {
     result = result.success.data;
-    checkins = createCheckins(result, mapRef, false);
+    checkins = createSelectedCheckins(result);
 
     if (checkins.length > 0) {
       return h("div", {className: 'checkin-container'}, checkins);
