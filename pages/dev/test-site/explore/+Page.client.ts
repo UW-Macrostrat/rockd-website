@@ -125,24 +125,20 @@ function FeatureDetails() {
   let result;
 
   if(!map) {
-    console.log("Map not loaded");
     result = getCheckins(0, 0, 0, 0);
-    return h(Spinner); 
   } else if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+    let distance = Math.abs(bounds.getEast() - bounds.getWest());
+    let newWest = bounds.getWest() + distance * .3;
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
   } else {
     result = getCheckins(0, 0, 0, 0);
   }
 
-  if (!bounds) {
+  if (!bounds && map) {
     setBounds(map.getBounds());
   }
 
   count++;
-
-  // change use map coords
-  //let distance = Math.abs(bounds.getEast() - bounds.getWest());
-  //let newWest = bounds.getWest() + distance * .3;
   
   if(result != null) {
     // get featured checkins coordinates
@@ -229,18 +225,19 @@ function FeatureDetails() {
       });
       */
   }
-/*
+
   // Update bounds on move
   useEffect(() => {
-    const listener = () => {
-      setBounds(map.getBounds());
-    };
-    map.on("moveend", listener);
-    return () => {
-      map.off("moveend", listener);
-    };
+    if(map) {
+      const listener = () => {
+        setBounds(map.getBounds());
+      };
+      map.on("moveend", listener);
+      return () => {
+        map.off("moveend", listener);
+      };
+    }
   }, [bounds]);
-  */
 
   if (result == null) return h("div.checkin-container",Spinner);
   result = result.success.data;  
