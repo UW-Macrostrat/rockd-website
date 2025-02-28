@@ -126,6 +126,7 @@ export function Metrics() {
             Total: parseInt(item.count)
         });
     }      
+    checkins_by_month.pop();
     currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
     currentName = checkins_by_month[checkins_by_month.length - 1].name;
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
@@ -150,6 +151,7 @@ export function Metrics() {
             Total: parseInt(item.count) 
         });
     }  
+    signups_by_month.pop();
     currentTotal = signups_by_month[signups_by_month.length - 1].Total;
     currentName = signups_by_month[signups_by_month.length - 1].name;
     signups_by_month[signups_by_month.length - 1].Total = Math.round(currentTotal * scale);
@@ -172,10 +174,13 @@ export function Metrics() {
             Total: parseInt(item.count)
         });
     }     
+    active_users_by_month.pop();
     currentTotal = active_users_by_month[active_users_by_month.length - 1].Total;
     currentName = active_users_by_month[active_users_by_month.length - 1].name;
     active_users_by_month[active_users_by_month.length - 1].Total = Math.round(currentTotal * scale);
     active_users_by_month[active_users_by_month.length - 1].name = currentName + ` (est)`;
+
+    console.log("Scaled the month: ", currentName)
 
     // chart array
     let areaArr = [
