@@ -1,6 +1,6 @@
 import h from "@macrostrat/hyper";
 
-import { useMapRef } from "@macrostrat/mapbox-react";
+import { useMap, useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
@@ -222,6 +222,15 @@ function FeatureDetails() {
     ]);
 }
 
+function test({selectedCheckins}) {
+  // return null;
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  
+  console.log("selected checkins", selectedCheckins);
+  return selectedCheckins;
+}
+
 function WeaverMap({
   mapboxToken,
 }: {
@@ -265,6 +274,7 @@ function WeaverMap({
     selectedCheckin = getSelectedCheckins(result);
   }
 
+  let done = h(test, {selectedCheckins: selectedCheckin});
   let featuredCheckin = h(FeatureDetails);
   let overlay;
 
