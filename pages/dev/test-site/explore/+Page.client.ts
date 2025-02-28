@@ -18,7 +18,7 @@ import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
 
-import { getCheckins, createFeaturedCheckins, getSelectedCheckins, formatCoordinates } from "./storybook"; // test for storybook
+import { getCheckins, createFeaturedCheckins, createSelectedCheckins, formatCoordinates } from "./storybook"; // test for storybook
 
 
 let count = 0;
@@ -337,4 +337,27 @@ function useMapStyle(type, mapboxToken) {
   }, []);
 
   return actualStyle;
+}
+
+function getSelectedCheckins(result) {
+  let checkins = [];
+
+  // Selected checkin
+  if (result == null) {
+    return null;
+  } else {
+    result = result.success.data;
+    checkins = createSelectedCheckins(result);
+    
+    let previous = document.querySelectorAll('.marker_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
+    if (checkins.length > 0) {
+      return h("div", {className: 'checkin-container'}, checkins);
+    } else {
+      return null;
+    }
+  }
 }
