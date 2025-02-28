@@ -8,21 +8,20 @@ import {
   MapAreaContainer,
   MapMarker,
   MapView,
-  ExpansionPanel,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
-import { buildMacrostratStyle } from "@macrostrat/mapbox-styles";
+import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-import {
-  useAPIResult,
-  useDarkMode,
-} from "@macrostrat/ui-components";
+import { useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
-import { BlankImage, Image } from "../index";
-import { pipeNodeStream } from "vike/dist/esm/node/runtime/html/stream";
+
+import { getCheckins, createFeaturedCheckins, getSelectedCheckins, formatCoordinates } from "./storybook"; // test for storybook
+
+
+let count = 0;
 
 export function Page() {
   return h(
@@ -54,7 +53,7 @@ function weaverStyle(type: object) {
       weaver: {
         type: "vector",
         tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
-      },
+      }
     },
     layers: [
       {
@@ -90,46 +89,119 @@ function weaverStyle(type: object) {
   };
 }
 
-function imageExists(image_url){
-  var http = new XMLHttpRequest();
-
-  http.open('HEAD', image_url, false);
-  http.send();
-
-  return http.status != 404;
-}
-
-function getCheckins(lat1, lat2, lng1, lng2) {
-  // abitrary bounds around click point
-  let minLat = Math.floor(lat1 * 100) / 100;
-  let maxLat = Math.floor(lat2 * 100) / 100;
-  let minLng = Math.floor(lng1 * 100) / 100;
-  let maxLng = Math.floor(lng2 * 100) / 100;
-
-  // change use map coords
-  return useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
-    "&maxlat=" + maxLat +
-    "&minlng=" + minLng +
-    "&maxlng=" + maxLng);
-}
-
 function FeatureDetails() {
+  // return null;
   const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [bounds, setBounds] = useState(map?.getBounds());
   let checkins = [];
   let result;
 
-  if(!mapRef.current) {
-    return h(Spinner)
+  if(!map) {
+    result = getCheckins(0, 0, 0, 0);
+  } else if (bounds) {
+    let distance = Math.abs(bounds.getEast() - bounds.getWest());
+    let newWest = bounds.getWest() + distance * .3;
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
   } else {
-    let map = mapRef.current;
+    result = getCheckins(0, 0, 0, 0);
+  }
 
-    const [bounds, setBounds] = useState(map.getBounds());
+  if (!bounds && map) {
+    setBounds(map.getBounds());
+  }
 
-    // change use map coords
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getEast(), bounds.getWest());
+  count++;
+  
+  if(result != null) {
+    // get featured checkins coordinates
+    let features = [];
+    let coordinates = [];
 
-    // Update bounds on move
-    useEffect(() => {
+    result.success.data.forEach((checkin) => {
+      /*
+      features.push({
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [checkin.lng, checkin.lat]
+        },
+        "properties": {}
+      });
+      */
+
+      coordinates.push([checkin.lng, checkin.lat]);
+    });
+
+    /*
+    // delete unneeded layers
+    let layers = map.getStyle().layers;
+    layers.forEach((layer) => {
+      if (layer.id.includes('geojson')) {
+        // Remove the layer
+        map.removeLayer(layer.id);
+
+        // Remove the source associated with this layer (if any)
+        if (map.getSource(layer.source)) {
+          map.removeSource(layer.source);
+        }
+      }
+    });
+
+    */
+
+    let previous = document.querySelectorAll('.marker_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
+    let stop = 0;
+    coordinates.forEach((coord) => {
+      stop++;
+      // marker
+      const el = document.createElement('div');
+      el.className = 'marker_pin';
+
+      const number = document.createElement('span');
+      number.innerText = stop;
+
+      // Append the number to the marker
+      el.appendChild(number);
+
+      // Create marker
+      new mapboxgl.Marker(el)
+        .setLngLat(coord)
+        .addTo(map);
+    });
+    
+    /*
+    // add source
+    map.addSource("test" + count, {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: features,
+      },
+    });
+
+    // add layer
+    map.addLayer({
+        id: "geojson" + count,
+        type: "circle",
+        source: "test" + count,
+        paint: {
+          "circle-radius": 10,
+          "circle-color": '#ff0000',
+          "circle-stroke-width": 2,
+          "circle-stroke-color": '#ffffff',
+        }
+      });
+      */
+  }
+
+  // Update bounds on move
+  useEffect(() => {
+    if(map) {
       const listener = () => {
         setBounds(map.getBounds());
       };
@@ -137,96 +209,17 @@ function FeatureDetails() {
       return () => {
         map.off("moveend", listener);
       };
-    }, [bounds]);
-  }
+    }
+  }, [bounds]);
 
   if (result == null) return h("div.checkin-container",Spinner);
-  result = result.success.data;
-  console.log("result:",result)
+  result = result.success.data;  
 
-  checkins = createCheckins(result, mapRef, true);
+  checkins = createFeaturedCheckins(result, mapRef);
   
   return h("div", {className: 'checkin-container'}, [
       h('div', checkins)
     ]);
-}
-
-function createCheckins(result, mapRef, showPin) {
-  let checkins = [];
-  let map = mapRef?.current;
-
-  result.forEach((checkin) => {
-    let pin = null;
-
-    if(showPin) {
-      pin = h(Image, 
-        { src: "marker_red.png", 
-          className: "marker", 
-          onClick: () => { 
-            console.log("clicked at: ", checkin.lat + " " + checkin.lng);
-            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-          } 
-        })
-    }
-
-
-    // format rating
-    let ratingArr = [];
-    for(var i = 0; i < checkin.rating; i++) {
-        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-    }
-
-    for(var i = 0; i < 5 - checkin.rating; i++) {
-      ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
-    }
-    let image;
-
-    if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
-      image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-    } else {
-      image = h(Image, { className: 'observation-img', src: "rockd.jpg"});
-    }
-    
-
-    let temp = h('div', { className: 'checkin' }, [
-        h('div', {className: 'checkin-header'}, [
-          h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-          h('div', {className: 'checkin-info'}, [
-              h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-              h('h4', {className: 'edited'}, checkin.created),
-              h('p', "Near " + checkin.near),
-              h('h3', {className: 'rating'}, ratingArr),
-          ]),
-          pin,
-        ]),
-        h('p', {className: 'description'}, checkin.notes),
-        h('a', {className: 'checkin-link', href: "/dev/test-site/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
-          image,
-          h('div', {className: "image-details"}, [
-            h('h1', "Details"),
-            h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
-          ])
-        ]),
-        h('div', {className: 'checkin-footer'}, [
-          h('div', {className: 'likes-container'}, [
-            h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
-            h('h3', {className: 'likes'}, checkin.likes),
-          ]),
-          h('div', {className: 'observations-container'}, [
-            h(Image, {className: 'observations-image', src: "explore/observations.png"}),
-            h('h3', {className: 'comments'}, checkin.observations.length),
-          ]),
-          h('div', {className: 'comments-container'}, [
-            h(Image, {className: 'comments-image', src: "explore/comment.png"}),
-            h('h3', {className: 'comments'}, checkin.comments),
-          ])
-        ]),
-      ]);
-      
-    checkins.push(temp);
-  });
-
-  return checkins;
 }
 
 function WeaverMap({
@@ -243,7 +236,6 @@ function WeaverMap({
 
   const style = useMapStyle(type, mapboxToken);
 
-  const [featuredCheckins, setFeaturedCheckin] = useState(h(Spinner));
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
 
@@ -323,25 +315,6 @@ function WeaverMap({
   
 }
 
-function getSelectedCheckins(result) {
-  let checkins = [];
-  let mapRef = useMapRef();
-
-  // Selected checkin
-  if (result == null) {
-    return null;
-  } else {
-    result = result.success.data;
-    checkins = createCheckins(result, mapRef, false);
-
-    if (checkins.length > 0) {
-      return h("div", {className: 'checkin-container'}, checkins);
-    } else {
-      return null;
-    }
-  }
-}
-
 function useMapStyle(type, mapboxToken) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
@@ -364,16 +337,4 @@ function useMapStyle(type, mapboxToken) {
   }, []);
 
   return actualStyle;
-}
-
-function formatCoordinates(latitude, longitude) {
-  // Round latitude and longitude to 4 decimal places
-  const roundedLatitude = latitude.toFixed(4);
-  const roundedLongitude = longitude.toFixed(4);
-
-  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
-  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
-
-  // Return the formatted string with rounded values
-  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
 }
