@@ -101,24 +101,6 @@ export function formatCoordinates(latitude, longitude) {
   return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
 }
 
-export function getSelectedCheckins(result) {
-  let checkins = [];
-
-  // Selected checkin
-  if (result == null) {
-    return null;
-  } else {
-    result = result.success.data;
-    checkins = createSelectedCheckins(result);
-
-    if (checkins.length > 0) {
-      return h("div", {className: 'checkin-container'}, checkins);
-    } else {
-      return null;
-    }
-  }
-}
-
 export function createFeaturedCheckins(result, mapRef) {
   let checkins = [];
   let map = mapRef?.current;
@@ -133,7 +115,7 @@ export function createFeaturedCheckins(result, mapRef) {
           map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
         } 
       }, [
-        h(Image, { src: "marker_red.png", className: "marker" }),
+        h(Image, { src: "explore/red-circle.png", className: "marker" }),
         h('span', { className: "marker-number" }, stop)
       ])
 
