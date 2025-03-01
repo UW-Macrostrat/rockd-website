@@ -12,14 +12,12 @@ import {
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode } from "@macrostrat/ui-components";
+import { useDarkMode, useAPIResult } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
-
-import { getCheckins, createFeaturedCheckins, createSelectedCheckins, formatCoordinates } from "./storybook"; // test for storybook
-
+import { createCheckins } from "../index";
 
 let count = 0;
 
@@ -128,22 +126,6 @@ function WeaverMap({
   let detailElement = null;
   let selectedCheckin = null;
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
-  if (inspectPosition != null) {
-    /*
-    detailElement = h(
-      LocationPanel,
-      {
-        onClose() {
-          setInspectPosition(null);
-        },
-        position: inspectPosition,
-      },
-    );
-    */
-
-    // Get sleected checkins
-    selectedCheckin = getSelectedCheckins(selectedResult);
-  }
 
   function FeatureDetails() {
     // return null;
@@ -183,7 +165,7 @@ function WeaverMap({
         marker.remove();
       });
       
-      if (!selectedCheckin || !isOpenSelected) {
+      if (!selectedResult || !isOpenSelected) {
         let stop = 0;
         coordinates.forEach((coord) => {
           stop++;
@@ -217,7 +199,7 @@ function WeaverMap({
       });
 
       if(selectedCheckins?.length > 0 && isOpenSelected) {
-        finalCheckins = createFeaturedCheckins(selectedCheckins, mapRef);
+        finalCheckins = createCheckins(selectedCheckins, mapRef, "blue-marker.png");
 
         selectedCheckins.forEach((checkin) => {
           selectedCords.push([checkin.lng, checkin.lat]);
@@ -261,12 +243,12 @@ function WeaverMap({
     if (result == null) return h("div.checkin-container",Spinner);
     result = result.success.data;  
   
-    checkins = createFeaturedCheckins(result, mapRef, "red");
+    checkins = createCheckins(result, mapRef, "red-circle.png");
 
     let selectedCheckins = selectedResult?.success.data;
 
     if (selectedCheckins?.length > 0 && isOpenSelected) {
-      return h("div", {className: 'checkin-container'}, createFeaturedCheckins(selectedCheckins, mapRef, "blue"));
+      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "blue-circle.png"));
     }
     
     return h("div", {className: 'checkin-container'}, [
@@ -277,16 +259,11 @@ function WeaverMap({
   let featuredCheckin = h(FeatureDetails);
   let overlay;
 
-  if (selectedCheckin == null || !isOpenSelected) {
-    overlay = h("div.sidebox", [
-      h('div.title', h("h1", "Featured Checkins")),
-      h("div.overlay-div", featuredCheckin),
-    ]);
-  } else {
+  if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h("h1", "Selected Checkins"),
-        h('h3', { className: "coordinates" }, formatCoordinates(inspectPosition.lat, inspectPosition.lng)),
+        h('h3', { className: "coordinates" }, formatCoordinates(inspectPosition?.lat ?? 0, inspectPosition?.lng ?? 0)),
       ]),
       h("button", {
         className: "close-btn",
@@ -294,6 +271,11 @@ function WeaverMap({
       }, "X"),
       h("div.overlay-div", featuredCheckin),
       h('div.hide', featuredCheckin)
+    ]);
+  } else {
+    overlay = h("div.sidebox", [
+      h('div.title', h("h1", "Featured Checkins")),
+      h("div.overlay-div", featuredCheckin),
     ]);
   }
 
@@ -349,29 +331,6 @@ function useMapStyle(type, mapboxToken) {
   return actualStyle;
 }
 
-function getSelectedCheckins(result) {
-  let checkins = [];
-
-  // Selected checkin
-  if (result == null) {
-    return null;
-  } else {
-    result = result.success.data;
-    checkins = createSelectedCheckins(result);
-    
-    let previous = document.querySelectorAll('.marker_pin');
-    previous.forEach((marker) => {
-      marker.remove();
-    });
-
-    if (checkins.length > 0) {
-      return h("div", {className: 'checkin-container'}, checkins);
-    } else {
-      return null;
-    }
-  }
-}
-
 export function formatCoordinates(latitude, longitude) {
   // Round latitude and longitude to 4 decimal places
   const roundedLatitude = latitude.toFixed(4);
@@ -382,4 +341,18 @@ export function formatCoordinates(latitude, longitude) {
 
   // Return the formatted string with rounded values
   return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
+}
+
+function getCheckins(lat1, lat2, lng1, lng2) {
+  // abitrary bounds around click point
+  let minLat = Math.floor(lat1 * 100) / 100;
+  let maxLat = Math.floor(lat2 * 100) / 100;
+  let minLng = Math.floor(lng1 * 100) / 100;
+  let maxLng = Math.floor(lng2 * 100) / 100;
+
+  // change use map coords
+  return useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng);
 }
