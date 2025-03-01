@@ -1,25 +1,10 @@
-import { isDetailPanelRouteInternal } from "#/map/map-interface/app-state";
 import h from "@macrostrat/hyper";
-import { parse } from "path";
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image } from "../index";
-import {
-    DarkModeButton,
-    Spacer,
-    useAPIResult,
-    useDarkMode,
-  } from "@macrostrat/ui-components";
-
-function getTrip() {
-    const pageContext = usePageContext();
-    console.log(pageContext.urlParsed);
-    let trip = 'urlParsed' in pageContext && pageContext.urlParsed.search.trip;
-    console.log(trip);
-    return parseInt(trip);
-}
+import { BlankImage, Image, createCheckins } from "../index";
+import "../main.styl";
 
 export function App() {
     const pageContext = usePageContext();
@@ -218,90 +203,45 @@ export function App() {
     let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
 
     // create stops
-    let stops = [];
-    let temp;
-    for(var i = 0; i < data.stops.length; i++) {
-        let stop = data.stops[i];
-        let image;
-        let imageUrl = "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo;
 
-        if (imageExists(imageUrl)) {
-        image = h(BlankImage, {className: 'checkin-card-img', src: imageUrl});
-        } else {
-        image = h(Image, { className: 'checkin-card-img', src: "rockd.jpg"});
-        }
+    let final = data.stops;
+    let arr = [];
+    final.forEach((stop) => { 
+        let temp = stop.checkin;
+        temp.name = stop.name; 
+        arr.push(stop.checkin);
+    });
 
-        let rating = data.stops[i].checkin.rating;
-        console.log("rating", rating);
-        
-        // format rating
-        let ratingArr = [];
-        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-
-        for(var k = 0; k < rating; k++) {
-            ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
-        }
-        for(var j = 0; j < 5 - rating; j++) {
-            ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
-        }
-
-        temp = h('div', {className: 'stop-description'}, [
-            h('h2', {className: 'stop-title'}, data.stops[i].name),
-            h('div', {className: 'stop-box'},[
-                h('div', {className: 'box-header'},[
-                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
-                    h('div', {className: 'checkin-details'}, [
-                        h('h3', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
-                        h('h4', {className: 'location'}, "Near " + data.stops[i].checkin.near),
-                        h('div', {className: 'rating'}, ratingArr),
-                    ]),
-                    h('div', {className: 'marker-container',
-                        onClick: (event) => {
-                            console.log('Clicked. Stop data:', stop); // Use 'stop' instead of data.stops[i]
-                            setCenter({ lat: stop.checkin.lat, lng: stop.checkin.lng }); // Update center if needed
-                        }
-                    }, [
-                        h(Image, { src: "marker_red.png", className: "marker" }),
-                        h('span', { className: 'marker-number' }, i + 1), 
-                    ]),   
-                ]),
-                h('p', {className: 'stop-text'}, data.stops[i].description),
-                h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id, target: '_blank'}, [
-                    image,
-                    h('div', {className: "image-details"}, [
-                        h('h1', "Details"),
-                        h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
-                    ])
-                ]),
-            ]),
-        ])
-        stops.push(temp);
-    }
+    let stops = createCheckins(arr, mapRef, "marker_red.png");
 
     return h("div", {className: 'map'}, [
             h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '100vh' } }),
             h('div', { className: 'stop-container', style: { width: '100%' } }, [
-                h('div', { className: 'stop-header' }, [
-                    h('h3', {className: 'profile-pic'}, profile_pic),
-                    h('div', {className: 'stop-main-info'}, [
-                        h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
-                        h('h3', {className: 'edited'}, "Edited " + data.updated),
+                h('div', { className: 'top' }, [
+                    h('div', { className: 'checkin-header' }, [
+                        h('h3', {className: 'profile-pic'}, profile_pic),
+                        h('div', {className: 'checkin-info'}, [
+                            h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
+                            h('h4', {className: 'edited'}, "Edited " + data.updated),
+                        ]),
+                    ]),
+                    h('h1', {className: 'park'}, data.name),
+                    h('p', {className: 'download-button'}, [
+                        h('a', {className: 'kmz', href: "https://rockd.org/api/v2/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                     ]),
                 ]),
-                h('h1', {className: 'park'}, data.name),
-                h('p', {className: 'download-button'}, [
-                    h('a', {className: 'kmz', href: "https://rockd.org/api/v2/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                h('div', { className: 'bottom' }, [
+                    h('div', {className: 'stop-list'}, stops),
                 ]),
-                h('div', {className: 'stop-list'}, stops),
             ])
         ]);
 }
 
 function imageExists(image_url){
-var http = new XMLHttpRequest();
+    var http = new XMLHttpRequest();
 
-http.open('HEAD', image_url, false);
-http.send();
+    http.open('HEAD', image_url, false);
+    http.send();
 
-return http.status != 404;
+    return http.status != 404;
 }

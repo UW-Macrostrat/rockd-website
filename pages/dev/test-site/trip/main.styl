@@ -38,7 +38,7 @@ html, body, .wrapper, #react, .app, #map
   font-weight 300
   text-align center
 
-.profile-pic
+.profile-pic-header
   height 80px
   border-radius 50%
   display inline-block
@@ -66,10 +66,6 @@ html, body, .wrapper, #react, .app, #map
   font-size 18px
   font-weight bold
 
-.edited
-  font-size 14px
-  margin-top -10px
-
 .stop
   margin-bottom 15px
 
@@ -93,43 +89,6 @@ html, body, .wrapper, #react, .app, #map
 
   a:hover
     color: black
-
-.checkin-header
-  display flex
-  justify-content left
-  align-items center
-  padding 5px
-
-.checkin-header-content
-  padding-left 10px
-
-.checkin-content
-  line-height 17px
-  cursor pointer
-
-.checkin-avatar
-  width 56px
-  height 56px
-  border-radius 50%
-
-.checkin-name, .checkin-near, .checkin-title
-  margin 0
-
-.checkin-title
-  color #333
-  font-size 14px
-
-.checkin-near
-  font-size 12px
-  color #333
-
-.checkin-name
-  font-size 12px
-  color #333
-  margin-bottom -1px
-
-.checkin-card-img
-  width 100%
 
 .go-to-stop
   float right
@@ -236,13 +195,13 @@ html, body, .wrapper, #react, .app, #map
   padding-bottom 30px
 
 .stop-header
-  display grid
-  margin auto
-  grid-template-columns 30% 70%
+  display flex
   height 15vh
 
 .park
   height 5vh
+  margin 0
+  margin-bottom 10px
 
 .stop-description
   color black
@@ -258,15 +217,10 @@ html, body, .wrapper, #react, .app, #map
   overflow-x hidden
   height 70vh
   -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%);
+  padding 20px 10px
 
 .map 
   height 100vh
-
-.stop-main-info
-  text-align left
-  display grid
-  margin auto
-  margin-left 0
 
 .box-header
   display grid
@@ -309,19 +263,6 @@ html, body, .wrapper, #react, .app, #map
     background-color #cccccc
     text-decoration none
 
-.marker-number
-  position absolute
-  font-weight bold
-  font-size 16px
-  transform translate(-50%, -50%)
-  top 40%
-  left 50%
-  color white
-
-.marker-container 
-  position relative
-  height 7vh
-
 .stop-link
   position relative
 
@@ -360,3 +301,16 @@ html, body, .wrapper, #react, .app, #map
 
 .rock
   margin 0
+
+.top 
+  height 30vh
+
+  .checkin-header
+    padding 30px
+
+.bottom
+  height 30vh
+
+.stop-main-info
+  text-align left
+
