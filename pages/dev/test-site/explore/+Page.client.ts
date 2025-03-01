@@ -371,3 +371,15 @@ function getSelectedCheckins(result) {
     }
   }
 }
+
+export function formatCoordinates(latitude, longitude) {
+  // Round latitude and longitude to 4 decimal places
+  const roundedLatitude = latitude.toFixed(4);
+  const roundedLongitude = longitude.toFixed(4);
+
+  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
+  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
+
+  // Return the formatted string with rounded values
+  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
+}

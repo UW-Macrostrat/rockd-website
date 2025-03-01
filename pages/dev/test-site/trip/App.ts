@@ -222,32 +222,58 @@ export function App() {
     let temp;
     for(var i = 0; i < data.stops.length; i++) {
         let stop = data.stops[i];
+        let image;
+        let imageUrl = "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo;
+
+        if (imageExists(imageUrl)) {
+        image = h(BlankImage, {className: 'checkin-card-img', src: imageUrl});
+        } else {
+        image = h(Image, { className: 'checkin-card-img', src: "rockd.jpg"});
+        }
+
+        let rating = data.stops[i].checkin.rating;
+        console.log("rating", rating);
+        
+        // format rating
+        let ratingArr = [];
+        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+
+        for(var k = 0; k < rating; k++) {
+            ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+        }
+        for(var j = 0; j < 5 - rating; j++) {
+            ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+        }
 
         temp = h('div', {className: 'stop-description'}, [
             h('h2', {className: 'stop-title'}, data.stops[i].name),
-            h('p', {className: 'stop-text'}, data.stops[i].description),
-                h('div', {className: 'stop-box'},[
-                    h('div', {className: 'box-header'},[
-                        h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
-                        h('div', {className: 'checkin-details'}, [
-                            h('h4', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
-                            h('h4', {className: 'location'}, data.stops[i].checkin.near),
-                            h('h4', {className: 'name'}, data.stops[i].checkin.first_name + " " + data.stops[i].checkin.last_name),
-                        ]),
-                        h('div', {className: 'marker-container',
-                            onClick: (event) => {
-                                console.log('Clicked. Stop data:', stop); // Use 'stop' instead of data.stops[i]
-                                setCenter({ lat: stop.checkin.lat, lng: stop.checkin.lng }); // Update center if needed
-                            }
-                        }, [
-                            h(Image, { src: "marker_red.png", className: "marker" }),
-                            h('span', { className: 'marker-number' }, i + 1), 
-                        ]),   
+            h('div', {className: 'stop-box'},[
+                h('div', {className: 'box-header'},[
+                    h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic-checkin"}),
+                    h('div', {className: 'checkin-details'}, [
+                        h('h3', {className: 'rock'}, data.stops[i].checkin.observations[0].rocks.strat_name.strat_name_long),
+                        h('h4', {className: 'location'}, "Near " + data.stops[i].checkin.near),
+                        h('div', {className: 'rating'}, ratingArr),
                     ]),
-                    h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id}, [
-                        h(BlankImage, {src: "https://rockd.org/api/v2/protected/image/"+ data.person_id + "/banner/" + data.stops[i].checkin.photo, className: "checkin-card-img"}),
-                    ]),
+                    h('div', {className: 'marker-container',
+                        onClick: (event) => {
+                            console.log('Clicked. Stop data:', stop); // Use 'stop' instead of data.stops[i]
+                            setCenter({ lat: stop.checkin.lat, lng: stop.checkin.lng }); // Update center if needed
+                        }
+                    }, [
+                        h(Image, { src: "marker_red.png", className: "marker" }),
+                        h('span', { className: 'marker-number' }, i + 1), 
+                    ]),   
                 ]),
+                h('p', {className: 'stop-text'}, data.stops[i].description),
+                h('a', {className: 'stop-link', href: "/dev/test-site/checkin?checkin=" + data.stops[i].checkin_id, target: '_blank'}, [
+                    image,
+                    h('div', {className: "image-details"}, [
+                        h('h1', "Details"),
+                        h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
+                    ])
+                ]),
+            ]),
         ])
         stops.push(temp);
     }
@@ -269,4 +295,13 @@ export function App() {
                 h('div', {className: 'stop-list'}, stops),
             ])
         ]);
+}
+
+function imageExists(image_url){
+var http = new XMLHttpRequest();
+
+http.open('HEAD', image_url, false);
+http.send();
+
+return http.status != 404;
 }
