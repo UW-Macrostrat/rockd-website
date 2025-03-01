@@ -107,10 +107,7 @@ export default defineConfig({
       "@macrostrat/column-components",
       "@macrostrat/column-views",
       "@macrostrat/data-components",
-      "@macrostrat/svg-map-components",
       "@macrostrat/map-interface",
-      "@macrostrat/feedback-components",
-      "@macrostrat/timescale",
     ],
   },
   css: {
