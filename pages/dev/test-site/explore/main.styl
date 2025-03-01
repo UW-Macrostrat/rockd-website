@@ -204,6 +204,24 @@ h3,h4,p
     font-size 12px
     font-weight bold
 
+.selected_pin
+  background-image url(https://storage.macrostrat.org/assets/rockd/explore/blue-circle.png)
+  width 60px
+  height 60px
+  background-size 50%
+  cursor pointer
+  background-repeat no-repeat
+  background-position center
+
+  span
+    position absolute
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    color white
+    font-size 12px
+    font-weight bold
+
 .marker_container 
   position relative
   height 7vh
@@ -311,3 +329,6 @@ h3,h4,p
 .close-btn:hover
   background-color #555
   box-shadow 0 6px 12px rgba(0, 0, 0, 0.3)
+
+.hide
+  display none

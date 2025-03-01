@@ -89,138 +89,7 @@ function weaverStyle(type: object) {
   };
 }
 
-function FeatureDetails() {
-  // return null;
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  const [bounds, setBounds] = useState(map?.getBounds());
-  let checkins = [];
-  let result;
 
-  if(!map) {
-    result = getCheckins(0, 0, 0, 0);
-  } else if (bounds) {
-    let distance = Math.abs(bounds.getEast() - bounds.getWest());
-    let newWest = bounds.getWest() + distance * .3;
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
-  } else {
-    result = getCheckins(0, 0, 0, 0);
-  }
-
-  if (!bounds && map) {
-    setBounds(map.getBounds());
-  }
-
-  count++;
-  
-  if(result != null) {
-    // get featured checkins coordinates
-    let features = [];
-    let coordinates = [];
-
-    result.success.data.forEach((checkin) => {
-      /*
-      features.push({
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [checkin.lng, checkin.lat]
-        },
-        "properties": {}
-      });
-      */
-
-      coordinates.push([checkin.lng, checkin.lat]);
-    });
-
-    /*
-    // delete unneeded layers
-    let layers = map.getStyle().layers;
-    layers.forEach((layer) => {
-      if (layer.id.includes('geojson')) {
-        // Remove the layer
-        map.removeLayer(layer.id);
-
-        // Remove the source associated with this layer (if any)
-        if (map.getSource(layer.source)) {
-          map.removeSource(layer.source);
-        }
-      }
-    });
-
-    */
-
-    let previous = document.querySelectorAll('.marker_pin');
-    previous.forEach((marker) => {
-      marker.remove();
-    });
-
-    let stop = 0;
-    coordinates.forEach((coord) => {
-      stop++;
-      // marker
-      const el = document.createElement('div');
-      el.className = 'marker_pin';
-
-      const number = document.createElement('span');
-      number.innerText = stop;
-
-      // Append the number to the marker
-      el.appendChild(number);
-
-      // Create marker
-      new mapboxgl.Marker(el)
-        .setLngLat(coord)
-        .addTo(map);
-    });
-    
-    /*
-    // add source
-    map.addSource("test" + count, {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: features,
-      },
-    });
-
-    // add layer
-    map.addLayer({
-        id: "geojson" + count,
-        type: "circle",
-        source: "test" + count,
-        paint: {
-          "circle-radius": 10,
-          "circle-color": '#ff0000',
-          "circle-stroke-width": 2,
-          "circle-stroke-color": '#ffffff',
-        }
-      });
-      */
-  }
-
-  // Update bounds on move
-  useEffect(() => {
-    if(map) {
-      const listener = () => {
-        setBounds(map.getBounds());
-      };
-      map.on("moveend", listener);
-      return () => {
-        map.off("moveend", listener);
-      };
-    }
-  }, [bounds]);
-
-  if (result == null) return h("div.checkin-container",Spinner);
-  result = result.success.data;  
-
-  checkins = createFeaturedCheckins(result, mapRef);
-  
-  return h("div", {className: 'checkin-container'}, [
-      h('div', checkins)
-    ]);
-}
 
 function test({selectedCheckins}) {
   // return null;
@@ -258,8 +127,9 @@ function WeaverMap({
 
   let detailElement = null;
   let selectedCheckin = null;
-  let result = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
+  let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
   if (inspectPosition != null) {
+    /*
     detailElement = h(
       LocationPanel,
       {
@@ -269,12 +139,141 @@ function WeaverMap({
         position: inspectPosition,
       },
     );
+    */
 
     // Get sleected checkins
-    selectedCheckin = getSelectedCheckins(result);
+    selectedCheckin = getSelectedCheckins(selectedResult);
   }
 
-  let done = h(test, {selectedCheckins: selectedCheckin});
+  function FeatureDetails() {
+    // return null;
+    const mapRef = useMapRef();
+    const map = mapRef.current;
+    const [bounds, setBounds] = useState(map?.getBounds());
+    let checkins = [];
+    let result;
+  
+    if(!map) {
+      result = getCheckins(0, 0, 0, 0);
+    } else if (bounds) {
+      let distance = Math.abs(bounds.getEast() - bounds.getWest());
+      let newWest = bounds.getWest() + distance * .3;
+      result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
+    } else {
+      result = getCheckins(0, 0, 0, 0);
+    }
+  
+    if (!bounds && map) {
+      setBounds(map.getBounds());
+    }
+  
+    count++;
+    
+    if(result != null) {
+      // get featured checkins coordinates
+      let features = [];
+      let coordinates = [];
+  
+      result.success.data.forEach((checkin) => {
+        coordinates.push([checkin.lng, checkin.lat]);
+      });
+  
+      let previous = document.querySelectorAll('.marker_pin');
+      previous.forEach((marker) => {
+        marker.remove();
+      });
+      
+      if (!selectedCheckin || !isOpenSelected) {
+        let stop = 0;
+        coordinates.forEach((coord) => {
+          stop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'marker_pin';
+    
+          const number = document.createElement('span');
+          number.innerText = stop;
+    
+          // Append the number to the marker
+          el.appendChild(number);
+    
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
+    }
+
+    // add selected checkin markers
+    useEffect(() => {
+      let selectedCheckins = selectedResult?.success.data;
+      let selectedCords = [];
+      let finalCheckins = null;
+
+      let previousSelected = document.querySelectorAll('.selected_pin');
+      previousSelected.forEach((marker) => {
+        marker.remove();
+      });
+
+      if(selectedCheckins?.length > 0 && isOpenSelected) {
+        finalCheckins = createFeaturedCheckins(selectedCheckins, mapRef);
+
+        selectedCheckins.forEach((checkin) => {
+          selectedCords.push([checkin.lng, checkin.lat]);
+        });
+
+        let selectedStop = 0;
+        selectedCords.forEach((coord) => {
+          console.log("selected cords", coord);
+          selectedStop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'selected_pin';
+
+          const number = document.createElement('span');
+          number.innerText = selectedStop;
+
+          // Append the number to the marker
+          el.appendChild(number);
+
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
+    }, [selectedResult]);
+  
+    // Update bounds on move
+    useEffect(() => {
+      if(map) {
+        const listener = () => {
+          setBounds(map.getBounds());
+        };
+        map.on("moveend", listener);
+        return () => {
+          map.off("moveend", listener);
+        };
+      }
+    }, [bounds]);
+  
+    if (result == null) return h("div.checkin-container",Spinner);
+    result = result.success.data;  
+  
+    checkins = createFeaturedCheckins(result, mapRef, "red");
+
+    let selectedCheckins = selectedResult?.success.data;
+
+    if (selectedCheckins?.length > 0 && isOpenSelected) {
+      return h("div", {className: 'checkin-container'}, createFeaturedCheckins(selectedCheckins, mapRef, "blue"));
+    }
+    
+    return h("div", {className: 'checkin-container'}, [
+        h('div', checkins)
+      ]);
+  }
+
   let featuredCheckin = h(FeatureDetails);
   let overlay;
 
@@ -293,7 +292,8 @@ function WeaverMap({
         className: "close-btn",
         onClick: () => setOpenSelected(false)
       }, "X"),
-      h("div.overlay-div", selectedCheckin)
+      h("div.overlay-div", featuredCheckin),
+      h('div.hide', featuredCheckin)
     ]);
   }
 

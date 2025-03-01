@@ -101,10 +101,16 @@ export function formatCoordinates(latitude, longitude) {
   return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
 }
 
-export function createFeaturedCheckins(result, mapRef) {
+export function createFeaturedCheckins(result, mapRef, color) {
   let checkins = [];
   let map = mapRef?.current;
   let stop = 0;
+
+  if(color == "red") {
+    color = "red-circle.png";
+  } else {
+    color = "blue-circle.png";
+  }
 
   result.forEach((checkin) => {
     stop++;
@@ -115,7 +121,7 @@ export function createFeaturedCheckins(result, mapRef) {
           map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
         } 
       }, [
-        h(Image, { src: "explore/red-circle.png", className: "marker" }),
+        h(Image, { src: "explore/" + color, className: "marker" }),
         h('span', { className: "marker-number" }, stop)
       ])
 
