@@ -199,7 +199,7 @@ function WeaverMap({
       });
 
       if(selectedCheckins?.length > 0 && isOpenSelected) {
-        finalCheckins = createCheckins(selectedCheckins, mapRef, "blue-marker.png");
+        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png");
 
         selectedCheckins.forEach((checkin) => {
           selectedCords.push([checkin.lng, checkin.lat]);
@@ -243,12 +243,12 @@ function WeaverMap({
     if (result == null) return h("div.checkin-container",Spinner);
     result = result.success.data;  
   
-    checkins = createCheckins(result, mapRef, "red-circle.png");
+    checkins = createCheckins(result, mapRef, "explore/red-circle.png");
 
     let selectedCheckins = selectedResult?.success.data;
 
     if (selectedCheckins?.length > 0 && isOpenSelected) {
-      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "blue-circle.png"));
+      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png"));
     }
     
     return h("div", {className: 'checkin-container'}, [
