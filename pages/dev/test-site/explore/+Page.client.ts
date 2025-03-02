@@ -17,6 +17,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "./main.styl";
+import "../main.styl";
 import { createCheckins } from "../index";
 
 let count = 0;

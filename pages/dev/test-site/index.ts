@@ -52,7 +52,10 @@ export function createCheckins(result, mapRef, marker) {
     let map = mapRef?.current;
     let stop = 0;
 
-    console.log("result", result);
+    let pinClass = "marker-number";
+    if (marker.includes("circle")) {
+        pinClass = "circle-number";
+    }
       
     result.forEach((checkin) => {
         stop++;
@@ -64,7 +67,7 @@ export function createCheckins(result, mapRef, marker) {
             } 
         }, [
             h(Image, { src: marker, className: "marker" }),
-            h('span', { className: "marker-number" }, stop)
+            h('span', { className: pinClass }, stop)
         ])
     
     
