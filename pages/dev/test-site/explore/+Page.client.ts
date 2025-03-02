@@ -271,7 +271,6 @@ function WeaverMap({
         onClick: () => setOpenSelected(false)
       }, "X"),
       h("div.overlay-div", featuredCheckin),
-      h('div.hide', featuredCheckin)
     ]);
   } else {
     overlay = h("div.sidebox", [

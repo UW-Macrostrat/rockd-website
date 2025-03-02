@@ -10,6 +10,9 @@ import {
     Area,
     AreaChart,
   } from "recharts";
+import { Footer } from "../index";
+import "./main.styl";
+import "../main.styl";
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -25,7 +28,7 @@ function getDateFromYearAndWeek(year: number, week: number): Date {
     return targetDate;
 }
 
-export function Metrics() {
+export function Page() {
     let currentDate = new Date(); // Get today's date
     let lower = new Date();
     lower.setFullYear(currentDate.getFullYear() - 1);
@@ -191,77 +194,80 @@ export function Metrics() {
         h(Area, { type: "monotone", dataKey: "Total", stroke: "#8884d8", fill: "#8884d8" }),
     ]
 
-    return h("div", { className: 'metrics' }, [
-        h("h1", "Metrics"),
-        h("div", { className: 'summary' }, [
-            h("div", { className: 'stat' }, [
-                h("h2", "Total Users"),
-                h("p", data.summary.people)
+    return h('div', [
+        h("div", { className: 'metrics' }, [
+            h("h1", "Metrics"),
+            h("div", { className: 'summary' }, [
+                h("div", { className: 'stat' }, [
+                    h("h2", "Total Users"),
+                    h("p", data.summary.people)
+                ]),
+                h("div", { className: 'stat' }, [
+                    h("h2", "Active Users"),
+                    h("p", data.summary.active_people)
+                ]),
+                h("div", { className: 'stat' }, [
+                    h("h2", "Avid Users (>5)"),
+                    h("p", data.summary.avid_people)
+                ]),
+                h("div", { className: 'stat' }, [
+                    h("h2", "Checkins"),
+                    h("p", data.summary.checkins)
+                ]),
+                h("div", { className: 'stat' }, [
+                    h("h2", "Observations"),
+                    h("p", data.summary.observations)
+                ]),
+                h("div", { className: 'stat' }, [
+                    h("h2", "Photos"),
+                    h("p", data.summary.photos)
+                ]),
             ]),
-            h("div", { className: 'stat' }, [
-                h("h2", "Active Users"),
-                h("p", data.summary.active_people)
-            ]),
-            h("div", { className: 'stat' }, [
-                h("h2", "Avid Users (>5)"),
-                h("p", data.summary.avid_people)
-            ]),
-            h("div", { className: 'stat' }, [
-                h("h2", "Checkins"),
-                h("p", data.summary.checkins)
-            ]),
-            h("div", { className: 'stat' }, [
-                h("h2", "Observations"),
-                h("p", data.summary.observations)
-            ]),
-            h("div", { className: 'stat' }, [
-                h("h2", "Photos"),
-                h("p", data.summary.photos)
-            ]),
+            h("div", { className: 'graphs' }, [
+                h("div", { className: 'checkins_week' }, [
+                    h("h2", "Checkins by week"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr),
+                    h('div', { className: 'date-picker' }, [
+                        h('p', 'Select date range:'),
+                        h(DatePicker, { className: 'picker', selected: checkinBound[0], onChange: (date) => setCheckin([date, checkinBound[1]]) }),
+                        h('p', 'to'),
+                        h(DatePicker, { className: 'picker', selected: checkinBound[1], onChange: (date) => setCheckin([checkinBound[0], date]) }),
+                    ]),
+                ]),
+                h("div", { className: 'checkins_month' }, [
+                    h("h2", "Checkins by month"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_month }, areaArr)
+                ]),
+                h("div", { className: 'signups_week' }, [
+                    h("h2", "Signups by week"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr),
+                    h('div', { className: 'date-picker' }, [
+                        h('p', 'Select date range:'),
+                        h(DatePicker, { className: 'picker', selected: signupBound[0], onChange: (date) => setSignup([date, signupBound[1]]) }),
+                        h('p', 'to'),
+                        h(DatePicker, { className: 'picker', selected: signupBound[1], onChange: (date) => setSignup([signupBound[0], date]) }),
+                    ]),
+                ]),
+                h("div", { className: 'signups_month' }, [
+                    h("h2", "Signups by month"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_month }, areaArr)
+                ]),
+                h("div", { className: 'users_week' }, [
+                    h("h2", "Active Users by week"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr),
+                    h('div', { className: 'date-picker' }, [
+                        h('p', 'Select date range:'),
+                        h(DatePicker, { className: 'picker', selected: activeBound[0], onChange: (date) => setActive([date, activeBound[1]]) }),
+                        h('p', 'to'),
+                        h(DatePicker, { className: 'picker', selected: activeBound[1], onChange: (date) => setActive([activeBound[0], date]) }),
+                    ]),
+                ]),
+                h("div", { className: 'users_month' }, [
+                    h("h2", "Active Users by month"),
+                    h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_month }, areaArr)
+                ]),
+            ])
         ]),
-        h("div", { className: 'graphs' }, [
-            h("div", { className: 'checkins_week' }, [
-                h("h2", "Checkins by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_week }, areaArr),
-                h('div', { className: 'date-picker' }, [
-                    h('p', 'Select date range:'),
-                    h(DatePicker, { className: 'picker', selected: checkinBound[0], onChange: (date) => setCheckin([date, checkinBound[1]]) }),
-                    h('p', 'to'),
-                    h(DatePicker, { className: 'picker', selected: checkinBound[1], onChange: (date) => setCheckin([checkinBound[0], date]) }),
-                ]),
-            ]),
-            h("div", { className: 'checkins_month' }, [
-                h("h2", "Checkins by month"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: checkins_by_month }, areaArr)
-            ]),
-            h("div", { className: 'signups_week' }, [
-                h("h2", "Signups by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_week }, areaArr),
-                h('div', { className: 'date-picker' }, [
-                    h('p', 'Select date range:'),
-                    h(DatePicker, { className: 'picker', selected: signupBound[0], onChange: (date) => setSignup([date, signupBound[1]]) }),
-                    h('p', 'to'),
-                    h(DatePicker, { className: 'picker', selected: signupBound[1], onChange: (date) => setSignup([signupBound[0], date]) }),
-                ]),
-            ]),
-            h("div", { className: 'signups_month' }, [
-                h("h2", "Signups by month"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: signups_by_month }, areaArr)
-            ]),
-            h("div", { className: 'users_week' }, [
-                h("h2", "Active Users by week"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_week }, areaArr),
-                h('div', { className: 'date-picker' }, [
-                    h('p', 'Select date range:'),
-                    h(DatePicker, { className: 'picker', selected: activeBound[0], onChange: (date) => setActive([date, activeBound[1]]) }),
-                    h('p', 'to'),
-                    h(DatePicker, { className: 'picker', selected: activeBound[1], onChange: (date) => setActive([activeBound[0], date]) }),
-                ]),
-            ]),
-            h("div", { className: 'users_month' }, [
-                h("h2", "Active Users by month"),
-                h(AreaChart, { className: "chart", width: 500, height: 300, data: active_users_by_month }, areaArr)
-            ]),
-        ])
-    ]);
+        h(Footer)
+    ])
 }
