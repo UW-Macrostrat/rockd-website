@@ -4,7 +4,6 @@ import { useMap, useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
-  LocationPanel,
   MapAreaContainer,
   MapMarker,
   MapView,
@@ -12,7 +11,7 @@ import {
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode, useAPIResult } from "@macrostrat/ui-components";
+import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
@@ -124,8 +123,6 @@ function WeaverMap({
     setOpenSelected(true);
   }, []);
 
-  let detailElement = null;
-  let selectedCheckin = null;
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
 
   function FeatureDetails() {
@@ -262,7 +259,9 @@ function WeaverMap({
 
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
+      h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
       h('div.title', [
+        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
         h("h1", "Selected Checkins"),
         h('h3', { className: "coordinates" }, formatCoordinates(inspectPosition?.lat ?? 0, inspectPosition?.lng ?? 0)),
       ]),
@@ -274,7 +273,10 @@ function WeaverMap({
     ]);
   } else {
     overlay = h("div.sidebox", [
-      h('div.title', h("h1", "Featured Checkins")),
+      h('div.title', [
+        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
+        h("h1", "Featured Checkins"),
+      ]),
       h("div.overlay-div", featuredCheckin),
     ]);
   }
@@ -326,12 +328,12 @@ function useMapStyle(type, mapboxToken) {
       }).then((s) => {
         setActualStyle(s);
       });
-  }, []);
+  }, [isEnabled]);
 
   return actualStyle;
 }
 
-export function formatCoordinates(latitude, longitude) {
+function formatCoordinates(latitude, longitude) {
   // Round latitude and longitude to 4 decimal places
   const roundedLatitude = latitude.toFixed(4);
   const roundedLongitude = longitude.toFixed(4);
