@@ -12,7 +12,7 @@ $colors: (
   background-color: #fff,
   panel-background-color: #fff,
   panel-secondary-background-color: #f5f8fa,
-  translucent-panel-background-color: rgba(255, 255, 255, 0.2),
+  translucent-panel-background-color: rgba(255, 255, 255, 0.8),
   panel-rule-color: #ddd,
   accent-secondary-color: #f5f8fa,
   accent-secondary-hover-color: #ebf1f5,
@@ -39,7 +39,7 @@ $dark-colors: (
   panel-secondary-background-color:
     color.scale($dark-background, $lightness: 5%),
   translucent-panel-background-color:
-    color.change($dark-background, $alpha: 0.6),
+    color.change($dark-background, $alpha: 0.8),
   accent-color: $accent,
   // light gray 3,
   accent-secondary-color: $accent,
