@@ -12,6 +12,6 @@ The new website also contains an updated version of [trips viewer](https://githu
    `.env.example`](https://github.com/UW-Macrostrat/rockd-website/blob/main/.env.example) for more information.)
 3. Verify that you have access to recent versions of Node.js and the Yarn package manager ( `node >= 16.0.0` and
    `yarn >= 4.0.0`; run `node -v` and `yarn -v` to check)
-4. Run `make` (or `git submodule update --init --recursive` and `yarn install`) to pull down submodules and update packages
+4. Run `make` (or `yarn install`) to pull down submodules and update packages
 5. Start the live-reloading development server with `yarn run dev`. The server will be available at
    `http://localhost:3000` by default.
