@@ -6,6 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins } from "../index";
 import "../main.styl";
 import "./main.styl";
+import "@macrostrat/style-system";
 
 export function Page() {
     const pageContext = usePageContext();
