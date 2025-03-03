@@ -24,6 +24,14 @@ $colors: (
   text-emphasized-color: #000,
   card-shadow-color: rgba(17, 20, 24, 0.15),
   error-text-color: #cd4246,
+  img-color: invert(0),
+  background: #fff,
+  text: #333,
+  scrollbar-track: rgba(200, 200, 200, 0.3),
+  scrollbar-thumb: rgba(150, 150, 150, 0.6),
+  scrollbar-thumb-hover: rgba(100, 100, 100, 0.8),
+  panel-background: #fff,
+  panel-text: #333,
 );
 
 $dark-background: #141a1e;
@@ -60,4 +68,12 @@ $dark-colors: (
   card-shadow-color: color.adjust($gray1, $alpha: 0.2),
   ui-color-accent-text: rgb(252, 217, 250),
   ui-color-accent: color.adjust(rgb(143, 39, 138), $lightness: -50%),
+  img-color: invert(1),
+  background: #141a1e,
+  text: #fff,
+  scrollbar-track: rgba(60, 60, 60, 0.4),
+  scrollbar-thumb: rgba(100, 100, 100, 0.6),
+  scrollbar-thumb-hover: rgba(180, 180, 180, 0.8),
+  panel-background: #333,
+  panel-text: #fff,
 );

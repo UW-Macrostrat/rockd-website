@@ -76,4 +76,29 @@ body
 .observation-img
   background-color: rgba(var(--text-emphasized-color), 0.5)
 
+.star 
+  filter: var(--img-color)
+
+.checkin-footer
+  img 
+    filter: var(--img-color)
+
+.overlay-div
+  &::-webkit-scrollbar-track
+    background: var(--scrollbar-track)
+
+  &::-webkit-scrollbar-thumb
+    background-color: var(--scrollbar-thumb)
+    border-radius: 4px
+    transition: background-color 0.2s ease
+
+  &::-webkit-scrollbar-thumb:hover
+    background-color: var(--scrollbar-thumb-hover)
+
+.close-btn 
+  background-color: var(--accent-secondary-color)
+  color: var(--text-emphasized-color)
+  
+  &:hover
+    background-color: var(--accent-secondary-hover-color)
 
