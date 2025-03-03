@@ -62,7 +62,7 @@ function hyperStyles(): Plugin {
 export default defineConfig({
   //root: path.resolve("./src"),
   resolve: {
-    conditions: ["typescript"],
+    conditions: ["source"],
     alias: {
       "~": path.resolve("./src"),
       "#": path.resolve("./pages"),
@@ -107,10 +107,7 @@ export default defineConfig({
       "@macrostrat/column-components",
       "@macrostrat/column-views",
       "@macrostrat/data-components",
-      "@macrostrat/svg-map-components",
       "@macrostrat/map-interface",
-      "@macrostrat/feedback-components",
-      "@macrostrat/timescale",
     ],
   },
   css: {
