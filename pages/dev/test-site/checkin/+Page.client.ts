@@ -7,6 +7,8 @@ import { BlankImage, Image, Footer } from "../index";
 import "./main.styl";
 import "../main.styl";
 import { SETTINGS } from "@macrostrat-web/settings";
+import { DarkModeButton } from "@macrostrat/ui-components";
+import "./main.sass";
 
 function imageExists(image_url){
     var http = new XMLHttpRequest();
@@ -199,6 +201,7 @@ export function Page() {
             ]),
             h('div', { className: 'observations' }, observations),
         ]),
-        h(Footer)
+        h(Footer),
+        h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
     ])
 }
