@@ -20,7 +20,7 @@ const aliasedModules = [
   "map-interface",
   "mapbox-utils",
   "mapbox-react",
-  "mapbox-styles",
+  "map-styles",
   "cesium-viewer",
   "map-components",
 ];
