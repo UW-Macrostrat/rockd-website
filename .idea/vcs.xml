@@ -2,8 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/deps/cesium-martini" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/deps/cesium-viewer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/deps/web-components" vcs="Git" />
   </component>
 </project>
