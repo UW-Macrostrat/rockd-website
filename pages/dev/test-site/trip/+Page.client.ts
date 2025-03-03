@@ -9,7 +9,6 @@ import "./main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 
-
 export function Page() {
     const pageContext = usePageContext();
     const [userData, setUserData] = useState(null);
