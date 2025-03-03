@@ -7,6 +7,8 @@ import { BlankImage, createCheckins } from "../index";
 import "../main.styl";
 import "./main.styl";
 import "@macrostrat/style-system";
+import { SETTINGS } from "@macrostrat-web/settings";
+
 
 export function Page() {
     const pageContext = usePageContext();
@@ -68,7 +70,7 @@ export function Page() {
 
         try {
             // Initialize Mapbox map
-            mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_TOKEN;
+            mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
 
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
