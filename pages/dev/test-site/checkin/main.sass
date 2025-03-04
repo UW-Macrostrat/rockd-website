@@ -1,0 +1,142 @@
+@use "sass:color"
+@use "../colors" as *
+@use "@blueprintjs/colors/lib/scss/colors" as *
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro")
+
+*
+  box-sizing: border-box
+
+// Colors taken primarily from blueprintjs v4
+// See https://blueprintjs.com/docs/#core/colors
+:root
+  @each $name, $color in $colors
+    --#{$name}: #{$color}
+
+html, body
+  height: 100vh
+  height: -webkit-fill-available
+
+.bp5-input
+  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15), inset 0 1px 1px rgba(16, 22, 26, 0.2)
+
+.bp5-button
+  color: var(--text-color)
+
+.bp5-control
+  color: var(--text-subtle-color) !important
+
+body
+  color: var(--text-color)
+  margin: 0
+  padding: 0
+  font-family: 'Source Sans Pro', sans-serif
+
+  &.bp5-dark
+    color-scheme: dark
+    color: $dark-text
+    background-color: $dark-background
+    // each item in color map
+    @each $name, $color in $dark-colors
+      --#{$name}: #{$color}
+
+    .bp5-input
+      &::placeholder
+        color: var(--secondary-color)
+        box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
+
+.bp5-card, .bp5-navbar
+  border-radius: 4px
+  background-color: var(--panel-background-color)
+  box-shadow: 0 0 0 1px var(--card-shadow-color)
+  
+.main
+  background-color: var(--background-color)
+  color: var(--text)
+  padding: 0 0 5vh 20%
+  margin: 0
+
+  h4 
+    color: var(--text)
+
+h1, p
+  padding: 0
+  margin: 0
+
+.location-img
+  position: absolute
+  z-index: 1
+  width: 60%
+  height: 25vh
+  object-fit: cover
+
+.stop-header
+  display: grid
+  grid-template-columns: 20% 80%
+  margin: auto
+  position: absolute
+  z-index: 2
+  background-color: var(--translucent-background)  
+  width: 60%
+  height: 25vh
+  align-items: center
+
+.profile-pic
+  height: 100px
+  width: 100px
+  display: grid
+  margin: auto
+  margin-left: 50px
+
+.stop-main-info
+  text-align: left
+  display: grid
+  margin: auto
+  margin-left: 0
+
+.star
+  height: 15px
+  filter: var(--img-color)
+
+.marker
+  height: 15px
+
+.edited
+  color: grey
+
+h4
+  padding: 0
+  margin: 0
+
+.checkin-header
+  padding: 30px
+  padding-left: 0
+
+.loading
+  height: 75vh
+  padding-top: 20vh
+  text-align: center
+  background-color: white
+  color: black
+  font-style: italic
+
+.observations
+  margin-top: 27vh
+  display: flex
+  flex-wrap: wrap
+  width: 75%
+
+  .observation
+    flex: 0 0 calc(33.33% - 10px)
+    margin: 5px
+    text-align: center
+    border-radius: 2%
+    box-shadow: 0 0 0 1px var(--card-shadow-color)
+
+    .observation-img
+      width: 100%
+      border-radius: 2% 2% 0 0
+
+.dark-mode-button
+  position: absolute
+  top: 10px
+  left: 10px

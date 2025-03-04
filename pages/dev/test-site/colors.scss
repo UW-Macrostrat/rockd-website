@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "@blueprintjs/colors/lib/scss/colors" as *;
+
+$colors: (
+  img-color: invert(0),
+  background: #fff,
+  text: #333,
+  scrollbar-track: rgba(200, 200, 200, 0.3),
+  scrollbar-thumb: rgba(150, 150, 150, 0.6),
+  scrollbar-thumb-hover: rgba(100, 100, 100, 0.8),
+  panel-background: #fff,
+  panel-text: #333,
+  semi-translucent-background: rgba(255, 255, 255, 0.8),
+  translucent-background: rgba(255, 255, 255, 0.5),
+);
+
+$dark-background: #141a1e;
+$accent: color.scale($dark-background, $lightness: 10%);
+$dark-text: $gray4;
+
+$dark-colors: (
+  img-color: invert(1),
+  background: #141a1e,
+  text: #fff,
+  scrollbar-track: rgba(60, 60, 60, 0.4),
+  scrollbar-thumb: rgba(100, 100, 100, 0.6),
+  scrollbar-thumb-hover: rgba(180, 180, 180, 0.8),
+  panel-background: #333,
+  panel-text: #fff,
+  semi-translucent-background: rgba(20, 26,30, 0.8),
+  translucent-background: rgba(20, 26,30, 0.5),
+);
