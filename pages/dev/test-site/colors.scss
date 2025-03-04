@@ -10,6 +10,8 @@ $colors: (
   scrollbar-thumb-hover: rgba(100, 100, 100, 0.8),
   panel-background: #fff,
   panel-text: #333,
+  semi-translucent-background: rgba(255, 255, 255, 0.8),
+  translucent-background: rgba(255, 255, 255, 0.5),
 );
 
 $dark-background: #141a1e;
@@ -25,4 +27,6 @@ $dark-colors: (
   scrollbar-thumb-hover: rgba(180, 180, 180, 0.8),
   panel-background: #333,
   panel-text: #fff,
+  semi-translucent-background: rgba(20, 26,30, 0.8),
+  translucent-background: rgba(20, 26,30, 0.5),
 );
