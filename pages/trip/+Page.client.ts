@@ -8,6 +8,8 @@ import "../main.styl";
 import "./main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
+import { DarkModeButton } from "@macrostrat/ui-components";
+import "./main.sass"
 
 export function Page() {
     const pageContext = usePageContext();
@@ -194,7 +196,8 @@ export function Page() {
 
     let stops = createCheckins(arr, mapRef, "marker_red.png");
 
-    return h("div", {className: 'map'}, [
+    return h("div", {className: 'body'}, [
+        h("div", {className: 'map'}, [
             h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '100vh' } }),
             h('div', { className: 'stop-container', style: { width: '100%' } }, [
                 h('div', { className: 'top' }, [
@@ -204,6 +207,7 @@ export function Page() {
                             h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                             h('h4', {className: 'edited'}, "Edited " + data.updated),
                         ]),
+                        h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
                     ]),
                     h('h1', {className: 'park'}, data.name),
                     h('p', {className: 'download-button'}, [
@@ -213,6 +217,7 @@ export function Page() {
                 h('div', { className: 'bottom' }, [
                     h('div', {className: 'stop-list'}, stops),
                 ]),
-            ])
-        ]);
+            ]),
+        ]),
+    ]);
 }
