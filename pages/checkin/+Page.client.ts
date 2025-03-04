@@ -147,42 +147,37 @@ export function Page() {
                 zoom: 10
             };
 
-            // LngLatCoords(LngLatProps);
-
-
             // if photo exists
-            if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo)) {
-                observations.push(
-                    h('div', {className: 'observation'}, [
-                        h(BlankImage, { className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo}),
-                        h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                        h('div', {className: 'observation-details'}, [
-                            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                            h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
-                            h('p', {className: 'observation-detail'}, liths),
-                            h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                            h('p', {className: 'observation-detail'}, "Coords: " + observation.lat + ", " + observation.lng),
-                        ]),
-                    ])
-                );
-            } else {
-                observations.push(
-                    h('div', {className: 'observation'}, [
-                        h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"}),
-                        h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                        h('div', {className: 'observation-details'}, [
-                            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                            h('p', {className: 'observation-detail'}, observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation.age_est.t_age + ")"),
-                            h('p', {className: 'observation-detail'}, liths),
-                            h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                        ]),
-                    ])
-                );
-            }
+            let imageSrc;
+            imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
+
+            console.log("PRINTING" , observation.age_est);
+            observations.push(
+                h('div', {className: 'observation'}, [
+                    h(BlankImage, { className: 'observation-img', src: imageSrc}),
+                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                    h('div', {className: 'observation-details'}, [
+                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                        h('p', {className: 'observation-detail'}, obsAge),
+                        h('p', {className: 'observation-detail'}, liths),
+                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                        LngLatCoords(LngLatProps)
+                    ]),
+                ])
+            );
         }        
     }
+
+    let LngLatProps = {
+        position: {
+            lat: checkin.lat,
+            lng: checkin.lng
+        },
+        precision: 3,
+        zoom: 10
+    };
 
     return h('div', [
         h('div', { className: 'main'}, [
@@ -196,6 +191,7 @@ export function Page() {
                     h('p', {className: 'location'}, [
                         h('p', "Near " + checkin.near),
                     ]),
+                    LngLatCoords(LngLatProps),
                     h('h3', {className: 'rating'}, ratingArr),
                 ]),
             ]),
