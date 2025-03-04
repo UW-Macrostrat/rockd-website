@@ -15,7 +15,6 @@ import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-compon
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
-import "./main.styl";
 import "../main.styl";
 import { createCheckins } from "../index";
 import "./main.sass";
