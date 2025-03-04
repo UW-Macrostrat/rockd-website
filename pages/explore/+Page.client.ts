@@ -152,7 +152,6 @@ function WeaverMap({
     
     if(result != null) {
       // get featured checkins coordinates
-      let features = [];
       let coordinates = [];
   
       result.success.data.forEach((checkin) => {
@@ -164,7 +163,9 @@ function WeaverMap({
         marker.remove();
       });
       
-      if (!selectedResult || !isOpenSelected) {
+      console.log(selectedResult);
+
+      if (!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) {
         let stop = 0;
         coordinates.forEach((coord) => {
           stop++;
