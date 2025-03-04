@@ -13,7 +13,7 @@ function pageDoesntExist() {
       h('h2', "The rock you are looking for doesn't exist. Keep digging."),
       h('div.buttons', [
         h('button', { className: "btn", onClick: () => history.back() }, "Go back"),
-        h('a', { className: "btn", href: "/dev/test-site/" }, "Go home")
+        h('a', { className: "btn", href: "/" }, "Go home")
       ]),
     ])  
   ])
