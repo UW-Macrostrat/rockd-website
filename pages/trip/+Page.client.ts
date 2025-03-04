@@ -5,7 +5,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins } from "../index";
 import "../main.styl";
-import "./main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";

@@ -30,7 +30,331 @@ body
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
 
+html, body, .wrapper, #react, .app, #map
+  color: #333
+  min-height: 100%
+  height: 100vh
+  width: 100%
+  padding: 0
+  margin: 0
+  font-family: 'Roboto', sans-serif
+
+.map-container
+  height: 100vh
+  width: 100%
+
+.hidden
+  display: none
+
+.error
+  height: 100vh
+  width: 100%
+  text-align: center
+  font-size: 2em
+  font-weight: 200
+  background-color: white
+  color: black
+  padding-top: 5vh
+
+.error-img
+  width: 50%
+  text-align: center
+
+.info-container
+  padding-left: 15px
+  padding-right: 15px
+  overflow-y: scroll
+  height: 100%
+
+.trip-title
+  font-weight: 300
+  text-align: center
+
+.profile-pic-header
+  height: 80px
+  border-radius: 50%
+  display: inline-block
+
+.profile-pic-checkin
+  height: 7vh
+  border-radius: 50%
+  display: inline-block
+
+.info-grid
+  box-shadow: -4px 0px 7px #aaa
+  z-index: 9
+
+.trip-meta
+  padding-top: 10px
+  display: flex
+  justify-content: left
+  align-items: center
+
+.trip-meta-text
+  display: inline-block
+  margin-left: 15px
+
+.person-name
+  font-size: 18px
+  font-weight: bold
+
+.stop
+  margin-bottom: 15px
+
+.stop-content
+  padding: 10px
+
+.stop-name
+  font-size: 20px
+  font-weight: 600
+  color: #333
+  margin-bottom: 10px
+
+.stop-description
+  font-size: 14px
+  color: #666
+  margin-top: 10px
+
+  a
+    color: black
+    text-decoration: none
+
+  a:hover
+    color: black
+
+.go-to-stop
+  float: right
+  margin-top: -75px !important
+
+.bedrock-control
+  position: absolute !important
+  z-index: 10
+  bottom: 0
+  background-color: #fff !important
+  margin-left: calc((66.66667% / 2) - 53px) !important
+  bottom: 5px
+  &.active
+    background-color: #2196f3 !important
+    color: #fff !important
+
+.mapInfo-paper
+  width: 50%
+  margin: 0 auto
+  padding: 10px
+  margin-top: 20px
+
+.map-source-attrs
+  padding: 5px 10px 5px 10px
+
+.map-source-attr
+  display: block
+  padding-top: 10px
+  line-height: 24px
+  &:last-child
+    margin-bottom: 25px
+
+.attr
+  font-family: 'Montserrat', sans-serif
+  font-weight: 700
+
+.line-attr
+  font-family: 'Montserrat', sans-serif
+  font-size: 85%
+  display: block
+  margin-left: 15px
+
+.reference
+  font-size: 12px
+  line-height: 15px
+
+.ref-link
+  color: #000
+  font-weight: bold
+  text-decoration: none
+
+.download-kmz
+  margin-bottom: 10px !important
+
+@media screen and (max-width: 600px)
+  .map-container
+    height: 50%
+  .info-grid
+    height: 50%
+  .bedrock-control
+    margin-left: calc(50% - 53px) !important
+    bottom: 51%
+  .mapInfo-paper
+    width: 100%
+
+  p
+    color: white
+
+.trip-search
+  height: 20vh
+  background-color: black
+  color: white
+  display: grid
+  margin: auto  
+
+  .trip-input
+    padding-left: 5px
   
+  .search-btn
+    margin-left: 20px
+
+.trip-q
+  margin-top: 0
+  padding-top: 30px
+  text-align: center
+
+.map  
+  display: grid
+  grid-template-columns: 70% 30%
+
+.stop-container
+  text-align: center
+  box-shadow: -4px 0 7px #aaa
+  z-index: 10
+  height: 100vh
+
+.trip-input-container
+  width: 40%
+  display: grid 
+  grid-template-columns: 80% 20%
+  margin: auto
+  padding-bottom: 30px
+
+.stop-header
+  display: flex
+  height: 15vh
+
+.park
+  height: 5vh
+  margin: 0
+  margin-bottom: 10px
+
+.stop-description
+  color: black
+  text-align: left
+  box-shadow: -4px 0px 7px #aaa
+  width: 95%
+  margin-left: 2.5%
+  padding: 15px
+  border-radius: 2%
+  
+.stop-list
+  overflow: scroll
+  overflow-x: hidden
+  height: 70vh
+  -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%)
+  padding: 20px 10px
+
+.map 
+  height: 100vh
+
+.box-header
+  display: grid
+  grid-template-columns: 20% 60% 20%
+  padding: 10px
+
+  .checkin-details
+    display: grid
+    margin: auto
+    margin-left: 0
+    text-align: left
+    h4
+      padding: 0
+      margin: 0
+      font-weight: 30
+
+.pin
+  background-image: url(https://storage.macrostrat.org/assets/rockd/marker_red.png)
+  width: 60px
+  height: 60px
+  background-size: 50%
+  display: block
+  border: none
+  cursor: pointer
+  background-repeat: no-repeat
+  background-position: center
+
+.marker
+  height: 7vh
+  display: grid
+  margin: auto
+
+.loading
+  height: 75vh
+  padding-top: 20vh
+  text-align: center
+  background-color: white
+  color: black
+  font-style: italic
+
+.stop-link
+  position: relative
+
+  .image-details
+    position: absolute
+    top: -250px
+    left: 0
+    right: 0
+    bottom: 0
+    display: flex
+    justify-content: center
+    align-items: center
+    display: none
+    color: white
+
+  .checkin-card-img
+    margin-top: 10px
+    width: 100%
+    height: 250px
+    object-fit: cover
+    border-radius: 2%
+
+.stop-link:hover 
+  .checkin-card-img 
+    -webkit-filter: brightness(70%)
+  .image-details 
+    display: flex
+
+.details-image
+  width: 40px
+  margin-left: 10px
+  margin-top: 4px
+
+.star
+  height: 15px
+  filter: var(--img-color)
+
+.rock
+  margin: 0
+
+.top 
+  height: 30vh
+
+  .checkin-header
+    padding: 30px
+
+.bottom
+  height: 30vh
+
+.stop-main-info
+  text-align: left
+
+.pin
+  span
+    position: absolute
+    top: 45%
+    left: 49%
+    transform: translate(-50%, -50%)
+    color: white
+    font-size: 12px
+    font-weight: bold
+
+.dark-mode-button
+  height: 10px
 
 .checkin
   background-color: var(--panel-background-color)
@@ -39,9 +363,6 @@ body
 
   h3, h1
     color: var(--text-emphasized-color)
-
-.star
-  filter: var(--img-color)
 
 .checkin-footer
   img 
