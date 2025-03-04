@@ -1,5 +1,6 @@
 import h from "@macrostrat/hyper";
 import { MacrostratIcon } from "~/components";
+import { LngLatCoords } from "@macrostrat/map-interface";
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
@@ -78,6 +79,14 @@ export function createCheckins(result, mapRef, marker) {
 
         // for trips
         let stop_name = checkin?.name ?? null;
+        let LngLatProps = {
+            position: {
+                lat: checkin.lat,
+                lng: checkin.lng
+            },
+            precision: 3,
+            zoom: 10
+        };
 
         let temp = h('div', { className: 'checkin' }, [
             h('h1', {className: 'stop-name'}, stop_name),
@@ -87,6 +96,7 @@ export function createCheckins(result, mapRef, marker) {
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
                     h('h4', {className: 'edited'}, checkin.created),
                     h('p', "Near " + checkin.near),
+                    LngLatCoords(LngLatProps),
                     h('h3', {className: 'rating'}, ratingArr),
                 ]),
                 pin,
