@@ -8,6 +8,7 @@ import "../main.styl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
+import "@macrostrat/style-system";
 
 function imageExists(image_url){
     var http = new XMLHttpRequest();

@@ -18,6 +18,7 @@ import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
 import { createCheckins } from "../index";
 import "./main.sass";
+import "@macrostrat/style-system";
 
 let count = 0;
 
