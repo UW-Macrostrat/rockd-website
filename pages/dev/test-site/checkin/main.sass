@@ -49,20 +49,94 @@ body
   background-color: var(--panel-background-color)
   box-shadow: 0 0 0 1px var(--card-shadow-color)
   
-
-
 .main
   background-color: var(--background-color)
   color: var(--text)
+  padding: 0 0 5vh 20%
+  margin: 0
 
-  h4
+  h4 
     color: var(--text)
-  
-.observation
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
 
-.star
-  filter: var(--img-color)
+h1, p
+  padding: 0
+  margin: 0
+
+.location-img
+  position: absolute
+  z-index: 1
+  width: 60%
+  height: 25vh
+  object-fit: cover
 
 .stop-header
-  background-color: var(--translucent-panel-background-color)
+  display: grid
+  grid-template-columns: 20% 80%
+  margin: auto
+  position: absolute
+  z-index: 2
+  background-color: var(--translucent-panel-background-color)  
+  width: 60%
+  height: 25vh
+  align-items: center
+
+.profile-pic
+  height: 100px
+  width: 100px
+  display: grid
+  margin: auto
+  margin-left: 50px
+
+.stop-main-info
+  text-align: left
+  display: grid
+  margin: auto
+  margin-left: 0
+
+.star
+  height: 15px
+  filter: var(--img-color)
+
+.marker
+  height: 15px
+
+.edited
+  color: grey
+
+h4
+  padding: 0
+  margin: 0
+
+.checkin-header
+  padding: 30px
+  padding-left: 0
+
+.loading
+  height: 75vh
+  padding-top: 20vh
+  text-align: center
+  background-color: white
+  color: black
+  font-style: italic
+
+.observations
+  margin-top: 27vh
+  display: flex
+  flex-wrap: wrap
+  width: 75%
+
+  .observation
+    flex: 0 0 calc(33.33% - 10px)
+    margin: 5px
+    text-align: center
+    border-radius: 2%
+    box-shadow: 0 0 0 1px var(--card-shadow-color)
+
+    .observation-img
+      width: 100%
+      border-radius: 2% 2% 0 0
+
+.dark-mode-button
+  position: absolute
+  top: 0
+  left: 0

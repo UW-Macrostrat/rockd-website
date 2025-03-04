@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image, Footer } from "../index";
-import "./main.styl";
 import "../main.styl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
@@ -189,7 +188,7 @@ export function Page() {
             h('h1', { className: "checkin-header" }, checkin.description),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
             h('div', { className: 'stop-header' }, [
-                h('h3', {className: 'profile-pic'}, profile_pic),
+                profile_pic,
                 h('div', {className: 'stop-main-info'}, [
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
                     h('h4', {className: 'edited'}, checkin.created),
