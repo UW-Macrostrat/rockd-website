@@ -1,0 +1,63 @@
+@use "sass:color"
+@use "../colors" as *
+@use "@blueprintjs/colors/lib/scss/colors" as *
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro")
+
+*
+  box-sizing: border-box
+
+// Colors taken primarily from blueprintjs v4
+// See https://blueprintjs.com/docs/#core/colors
+:root
+  @each $name, $color in $colors
+    --#{$name}: #{$color}
+
+body
+  &.bp5-dark
+    color-scheme: dark
+    color: $dark-text
+    background-color: $dark-background
+    // each item in color map
+    @each $name, $color in $dark-colors
+      --#{$name}: #{$color}
+
+    .bp5-input
+      &::placeholder
+        color: var(--secondary-color)
+        box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
+
+.stop-container
+  background-color: var(--panel-background-color)
+  color: var(--text-emphasized-color)
+
+  
+
+.checkin
+  background-color: var(--panel-background-color)
+  box-shadow: 0 0 0 1px var(--card-shadow-color)
+  color: var(--text-emphasized-color)
+
+  h3, h1
+    color: var(--text-emphasized-color)
+
+.star
+  filter: var(--img-color)
+
+.checkin-footer
+  img 
+    filter: var(--img-color)
+
+.download-button
+  a
+    color: var(--text-emphasized-color)
+  
+  a:hover
+    color: var(--text-emphasized-color)
+    background-color: var(--scrollbar-thumb)
+    text-decoration: none
+
+.kmz
+  border: 2px solid var(--text-emphasized-color)
+  border-radius: 4px
+  padding: 7px
+ 
