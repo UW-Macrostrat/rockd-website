@@ -25,6 +25,9 @@ export function Page() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [checkinNum, setCheckin] = useState(null);
+    const [overlayOpen, setOverlayOpen] = useState(false);
+    const [overlayImage, setOverlayImage] = useState(null);
+    const [overlayBody, setOverlayBody] = useState(null);
 
     let stop;
 
@@ -110,17 +113,19 @@ export function Page() {
 
     // add checkin photo and notes
     console.log("Checkin photo: ", checkin.photo != null);
-    let headerImg;
-    if(imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null) {
-        headerImg = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo})
-    } else {
-        headerImg = h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"})
-    }
+    let headerImgUrl = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    let headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
+
 
     observations.push(
         h('div', {className: 'observation'}, [
-            headerImg,
-            h('h4', {className: 'observation-header'}, checkin.notes),
+            h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
+                setOverlayBody(h('div.observation-body',headerBody));
+                setOverlayImage(headerImgUrl);
+                setOverlayOpen(!overlayOpen);
+                }
+            }),
+            headerBody,
         ])
     );
 
@@ -151,20 +156,26 @@ export function Page() {
             let imageSrc;
             imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
+            let observationBody = h('div', {className: 'observation-body'}, [
+                h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                h('div', {className: 'observation-details'}, [
+                    h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                    h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                    h('p', {className: 'observation-detail'}, obsAge),
+                    h('p', {className: 'observation-detail'}, liths),
+                    h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                    LngLatCoords(LngLatProps)
+                ]),
+            ]);
 
-            console.log("PRINTING" , observation.age_est);
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, { className: 'observation-img', src: imageSrc}),
-                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                    h('div', {className: 'observation-details'}, [
-                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                        h('p', {className: 'observation-detail'}, obsAge),
-                        h('p', {className: 'observation-detail'}, liths),
-                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                        LngLatCoords(LngLatProps)
-                    ]),
+                    h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
+                        setOverlayImage(imageSrc);
+                        setOverlayBody(observationBody);
+                        setOverlayOpen(!overlayOpen);
+                    }}),
+                    observationBody,
                 ])
             );
         }        
@@ -179,7 +190,18 @@ export function Page() {
         zoom: 10
     };
 
-    return h('div', [
+    // overlay
+    let overlay = h('div', {className: 'overlay'}, [
+        h('button', {className: 'close', onClick: () => {
+            setOverlayOpen(!overlayOpen);
+        }}, "Close"),
+        h('div.overlay-body', [
+            h(BlankImage, { className: 'observation-img', src: overlayImage }),
+            overlayBody,
+        ])
+    ]);
+
+    let main = h('div', [
         h('div', { className: 'main'}, [
             h('h1', { className: "checkin-header" }, checkin.description),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
@@ -200,4 +222,6 @@ export function Page() {
         h(Footer),
         h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
     ])
+
+    return overlayOpen ? overlay : main;
 }
