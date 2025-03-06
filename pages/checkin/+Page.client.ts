@@ -198,14 +198,16 @@ export function Page() {
         },
       };
 
-
     let map = h(MapAreaContainer,
             [
               h(MapView, { style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i', mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
                 h(MapMarker, {
-                 position: [center.lng, center.lat],
-                }),
+                    position: center,
+                   }),
               ]),
+              h('div', {className: 'banner', onClick: () => {
+                setShowMap(!showMap);
+              }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
             ]
           );
 
@@ -220,9 +222,10 @@ export function Page() {
 
     // overlay
     let overlay = h('div', {className: 'overlay'}, [
-        h('button', {className: 'close', onClick: () => {
+        h('div', {className: 'banner', onClick: () => {
             setOverlayOpen(!overlayOpen);
-        }}, "Close"),
+        }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
+
         h('div.overlay-body', [
             h(BlankImage, { className: 'observation-img', src: overlayImage }),
             overlayBody,
@@ -230,7 +233,7 @@ export function Page() {
     ]);
 
     let main = h('div', [
-        h('div', { className: 'main'}, [
+        h('div', { className: showMap ? 'hide' : 'main'}, [
             h('h1', { className: "checkin-header" }, checkin.description),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
             h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
@@ -247,9 +250,13 @@ export function Page() {
             ]),
             h('div', { className: 'observations' }, observations),
         ]),
-        h(Footer),
-        h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
+        h('div', { className: showMap ? 'hide' : 'bottom' }, [
+            h(Footer),
+            h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
+        ]),
+        h('div', { className: !showMap ? 'hide' : 'map'}, map)
     ])
 
-    return overlayOpen ? overlay : showMap ? map : main;
+
+    return overlayOpen ? overlay : main;
 }

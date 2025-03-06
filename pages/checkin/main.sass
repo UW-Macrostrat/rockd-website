@@ -153,6 +153,7 @@ h4
     img
       margin: auto
       width: 40%
+      margin-top: 70px
 
     .observation-body
       margin: auto
@@ -164,5 +165,32 @@ h4
       width: 40%
 
 .close
-  margin-top: 10px
-  margin-left: 10px
+  position: absolute
+  top: 10px
+  left: 10px
+  z-index: 100
+
+  background-color: white
+
+  &:hover
+    background-color: grey
+
+.banner
+  position: absolute
+  top: 0
+  left: 0
+  z-index: 100
+  width: 100%
+  background-color: var(--panel-text)
+  height: 50px
+
+.map-container
+  height: 95vh
+
+.hide
+  display: none
+
+.left-arrow
+  height: 50px
+  padding: 10px
+  filter: var(--anti-img-color)
