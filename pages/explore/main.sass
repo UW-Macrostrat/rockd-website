@@ -142,12 +142,12 @@ body
 
 .overlay-div
   position: absolute
-  top: 10%
+  top: 15vh
   left: 0
   z-index: 1000
   border-radius: 0 4px 4px 0
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
-  height: 90vh
+  height: 85vh
   overflow-y: auto
   width: 100%
   padding: 8px
@@ -189,20 +189,19 @@ body
   left: 0
 
   .title
+    display: grid
+    margin: auto
+    width: 100%
+    grid-template-columns: 20% 60% 20%
     color: black
     position: fixed
     width: 35%
     background: rgba(255, 255, 255, 0.85)
-    margin: 0
     height: 10vh
-    display: flex
-    flex-direction: column
-    align-items: center
-    justify-content: center
-
+    
     h1
-      margin-bottom: 0
-      margin-top: 0
+      margin: auto
+
 
   .close-btn
     position: absolute
@@ -307,12 +306,6 @@ body
     .observations-image
       width: 40px
 
-.dark-button
-  position: absolute
-  top: 3vh
-  left: 3%
-  z-index: 100
-
 .checkin
   background-color: var(--panel-background-color)
   box-shadow: 0 0 0 1px var(--card-shadow-color)
@@ -365,4 +358,30 @@ body
   
   &:hover
     background-color: var(--accent-secondary-hover-color)
+
+.sort-dropdown
+  height: 3vh
+  background-color: var(--accent-secondary-color)
+
+.sort-container
+  position: absolute
+  top: 10vh
+  background-color: var(--panel-background-color)
+  width: 100%
+  z-index: 10001
+  height: 5vh
+  display: grid
+  grid-template-columns: 20% 80%
+
+  h3
+    margin: auto
+    margin-right: 5px
+
+  select
+    margin: auto
+    margin-left: 5px
+
+.selected-center
+  margin: auto
+  text-align: center
 
