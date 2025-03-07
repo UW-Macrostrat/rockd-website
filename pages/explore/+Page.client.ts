@@ -261,13 +261,24 @@ function WeaverMap({
     setSort(event.target.value);
   };
 
+  let dropdown = h('select', { className: "sort-dropdown", onChange: handleChange }, [
+    h('option', { value: "likes" }, "Likes"),
+    h('option', { value: "created" }, "Date Created"),
+    h('option', { value: "added" }, "Date Added"),
+  ]);
+
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
-      h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
       h('div.title', [
         h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
-        h("h1", "Selected Checkins"),
-        h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
+        h('div', { className: "selected-center" }, [
+          h("h1", "Selected Checkins"),
+          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
+        ]),
+      ]),
+      h('div.sort-container', [
+        h('h3', "Sort By:"),
+        dropdown,
       ]),
       h("button", {
         className: "close-btn",
@@ -277,14 +288,15 @@ function WeaverMap({
     ]);
   } else {
     overlay = h("div.sidebox", [
-      h('div.title', [
-        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
-        h("h1", "Featured Checkins"),
-        h('select', { className: "sort-dropdown", onChange: handleChange }, [
-          h('option', { value: "likes" }, "Likes"),
-          h('option', { value: "created" }, "Date Created"),
-          h('option', { value: "added" }, "Date Added"),
+      h('div.sidebox-header', [
+        h('div.title', [
+          h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
+          h("h1", "Featured Checkins"),
         ]),
+        h('div.sort-container', [
+          h('h3', "Sort By:"),
+          dropdown,
+        ])
       ]),
       h("div.overlay-div", featuredCheckin),
     ]);
