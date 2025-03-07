@@ -193,7 +193,7 @@ export function Page() {
         arr.push(stop.checkin);
     });
 
-    let stops = createCheckins(arr, mapRef, "marker_red.png");
+    let stops = createCheckins(arr, mapRef, "marker_red.png", "likes");
 
     return h("div", {className: 'body'}, [
         h("div", {className: 'map'}, [

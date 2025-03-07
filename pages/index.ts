@@ -36,7 +36,7 @@ export function Footer() {
     ]);
 }
 
-export function createCheckins(result, mapRef, marker) {
+export function createCheckins(result, mapRef, marker, sort) {
     let checkins = [];
     let map = mapRef?.current;
     let stop = 0;
@@ -44,6 +44,16 @@ export function createCheckins(result, mapRef, marker) {
     let pinClass = "marker-number";
     if (marker.includes("circle")) {
         pinClass = "circle-number";
+    }
+
+    if(sort == "likes") {
+        result.sort((a, b) => b.likes - a.likes);
+    } else if(sort == "created") {
+        result.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+    } else if(sort == "added") {
+        result.sort((a, b) => new Date(b.added).getTime() - new Date(a.added).getTime());
+    } else {
+        result.sort((a, b) => b.rating - a.rating);
     }
       
     result.forEach((checkin) => {
