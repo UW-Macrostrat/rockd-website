@@ -89,17 +89,6 @@ function weaverStyle(type: object) {
   };
 }
 
-
-
-function test({selectedCheckins}) {
-  // return null;
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  
-  console.log("selected checkins", selectedCheckins);
-  return selectedCheckins;
-}
-
 function WeaverMap({
   mapboxToken,
 }: {
@@ -113,6 +102,7 @@ function WeaverMap({
   const [type, setType] = useState(types[0]);
 
   const style = useMapStyle(type, mapboxToken);
+  const [sort, setSort] = useState("likes");
 
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
@@ -128,8 +118,6 @@ function WeaverMap({
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
 
   function FeatureDetails() {
-    let sort = "likes";
-
     // return null;
     const mapRef = useMapRef();
     const map = mapRef.current;
@@ -166,8 +154,6 @@ function WeaverMap({
         marker.remove();
       });
       
-      console.log(selectedResult);
-
       if (!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) {
         let stop = 0;
         coordinates.forEach((coord) => {
@@ -271,6 +257,10 @@ function WeaverMap({
     zoom: 10
   };
 
+  const handleChange = (event) => {
+    setSort(event.target.value);
+  };
+
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
       h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
@@ -290,6 +280,11 @@ function WeaverMap({
       h('div.title', [
         h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
         h("h1", "Featured Checkins"),
+        h('select', { className: "sort-dropdown", onChange: handleChange }, [
+          h('option', { value: "likes" }, "Likes"),
+          h('option', { value: "created" }, "Date Created"),
+          h('option', { value: "added" }, "Date Added"),
+        ]),
       ]),
       h("div.overlay-div", featuredCheckin),
     ]);
