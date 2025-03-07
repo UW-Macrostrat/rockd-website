@@ -128,6 +128,8 @@ function WeaverMap({
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
 
   function FeatureDetails() {
+    let sort = "likes";
+
     // return null;
     const mapRef = useMapRef();
     const map = mapRef.current;
@@ -200,7 +202,7 @@ function WeaverMap({
       });
 
       if(selectedCheckins?.length > 0 && isOpenSelected) {
-        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png");
+        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png", sort);
 
         selectedCheckins.forEach((checkin) => {
           selectedCords.push([checkin.lng, checkin.lat]);
@@ -244,12 +246,12 @@ function WeaverMap({
     if (result == null) return h("div.checkin-container",Spinner);
     result = result.success.data;  
   
-    checkins = createCheckins(result, mapRef, "explore/red-circle.png");
+    checkins = createCheckins(result, mapRef, "explore/red-circle.png", sort);
 
     let selectedCheckins = selectedResult?.success.data;
 
     if (selectedCheckins?.length > 0 && isOpenSelected) {
-      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png"));
+      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png", sort));
     }
     
     return h("div", {className: 'checkin-container'}, [
