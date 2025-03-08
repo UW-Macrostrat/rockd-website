@@ -16,7 +16,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
-import { createCheckins } from "../index";
+import { createCheckins, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -267,19 +267,37 @@ function WeaverMap({
     h('option', { value: "added" }, "Date Added"),
   ]);
 
+  let sortContainer = h('div.sort-container', [
+    h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
+    h('h3', "Sort By:"),
+    dropdown,
+  ]);
+
+  let searchBar = h('div.search-bar', [
+    h('input', { type: "text", placeholder: "Filter Checkins" }),
+    h('div.search-icon', [
+      h(Image, { src: "explore/search-icon.png" }),
+    ]),
+    h('div.x-icon', [
+      h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
+        console.log("clicked");
+        let input = document.querySelector('input');
+        input.value = "";
+        } 
+      }),
+    ]),
+  ]);
+
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
       h('div.title', [
-        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
         h('div', { className: "selected-center" }, [
           h("h1", "Selected Checkins"),
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
         ]),
       ]),
-      h('div.sort-container', [
-        h('h3', "Sort By:"),
-        dropdown,
-      ]),
+      searchBar,
+      sortContainer,
       h("button", {
         className: "close-btn",
         onClick: () => setOpenSelected(false)
@@ -290,13 +308,10 @@ function WeaverMap({
     overlay = h("div.sidebox", [
       h('div.sidebox-header', [
         h('div.title', [
-          h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
           h("h1", "Featured Checkins"),
         ]),
-        h('div.sort-container', [
-          h('h3', "Sort By:"),
-          dropdown,
-        ])
+        searchBar,
+        sortContainer,
       ]),
       h("div.overlay-div", featuredCheckin),
     ]);
