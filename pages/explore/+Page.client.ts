@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 
 import { useMap, useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner } from "@blueprintjs/core";
+import { Divider, Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -103,6 +103,7 @@ function WeaverMap({
 
   const style = useMapStyle(type, mapboxToken);
   const [sort, setSort] = useState("likes");
+  const [searchValue, setSearchValue] = useState('');
 
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
@@ -261,6 +262,10 @@ function WeaverMap({
     setSort(event.target.value);
   };
 
+  const handleInputChange = (event) => {
+    setSearchValue(event.target.value); 
+  };
+
   let dropdown = h('select', { className: "sort-dropdown", onChange: handleChange }, [
     h('option', { value: "likes" }, "Likes"),
     h('option', { value: "created" }, "Date Created"),
@@ -274,7 +279,7 @@ function WeaverMap({
   ]);
 
   let searchBar = h('div.search-bar', [
-    h('input', { type: "text", placeholder: "Filter Checkins" }),
+    h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
     h('div.search-icon', [
       h(Image, { src: "explore/search-icon.png" }),
     ]),
@@ -283,10 +288,13 @@ function WeaverMap({
         console.log("clicked");
         let input = document.querySelector('input');
         input.value = "";
+        // setSearchValue(''); deosnt work
         } 
       }),
     ]),
   ]);
+
+  let autoComplete = AutoComplete(searchValue);
 
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
@@ -311,6 +319,7 @@ function WeaverMap({
           h("h1", "Featured Checkins"),
         ]),
         searchBar,
+        autoComplete,
         sortContainer,
       ]),
       h("div.overlay-div", featuredCheckin),
@@ -369,18 +378,6 @@ function useMapStyle(type, mapboxToken) {
   return actualStyle;
 }
 
-function formatCoordinates(latitude, longitude) {
-  // Round latitude and longitude to 4 decimal places
-  const roundedLatitude = latitude.toFixed(4);
-  const roundedLongitude = longitude.toFixed(4);
-
-  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
-  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
-
-  // Return the formatted string with rounded values
-  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
-}
-
 function getCheckins(lat1, lat2, lng1, lng2) {
   // abitrary bounds around click point
   let minLat = Math.floor(lat1 * 100) / 100;
@@ -393,4 +390,35 @@ function getCheckins(lat1, lat2, lng1, lng2) {
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
+}
+
+function getPersonCheckins(personId) {
+  return useAPIResult("https://rockd.org/api/v2/protected/checkins?person_id=" + personId);
+}
+
+
+function AutoComplete(input) {
+  let result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
+
+  if(result == null) return null;
+  result = result.success.data;
+
+  let taxa = result.taxa.length > 0 ? h('div.taxa', [  
+      h('h2', "Taxa"),
+      h('ul', result.taxa.map((item) => {
+        return h('li', item.name);
+      }))
+    ]) : null;
+
+  let people = result.people.length > 0 ? h('div.people', [  
+    h('h2', "People"),
+    h('ul', result.people.map((item) => {
+      return h('li', item.name);
+    }))
+  ]) : null;
+
+  return h('div.autocomplete', [
+    taxa,
+    people,
+  ]);
 }

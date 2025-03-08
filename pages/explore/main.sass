@@ -143,7 +143,7 @@ body
   position: absolute
   top: 23vh
   left: 0
-  z-index: 1000
+  z-index: 10
   border-radius: 0 4px 4px 0
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
   height: 77vh
@@ -181,7 +181,7 @@ body
 
 .sidebox
   position: absolute
-  z-index: 1000
+  z-index: 10
   height: 100vh
   width: 35%
   top: 0
@@ -366,7 +366,7 @@ body
   top: 15vh
   background-color: var(--panel-background-color)
   width: 100%
-  z-index: 10001
+  z-index: 11
   height: 8vh
   display: grid
   grid-template-columns: 30% 30% 40%
@@ -433,3 +433,40 @@ body
     padding: 0 8%
     height: 5vh
     border: none
+
+
+.autocomplete
+  width: 100%
+  position: absolute
+  top: 15vh
+  z-index: 12
+  background-color: var(--panel-background-color)
+  color: var(--text-emphasized-color)
+  padding: 3% 5%
+  overflow-y: auto
+  height: 85vh
+
+
+  /* Scrollbar Styling */
+  &::-webkit-scrollbar
+    width: 12px
+
+  &::-webkit-scrollbar-track
+    background: rgba(200, 200, 200, 0.3)
+
+  &::-webkit-scrollbar-thumb
+    background-color: rgba(150, 150, 150, 0.6)
+    border-radius: 4px
+    transition: background-color 0.2s ease
+
+    &:hover
+      background-color: rgba(100, 100, 100, 0.8)
+
+._panel-subhead_z8iog_1
+  padding: 10px 20px
+  background-color: #333
+  color: white
+  border: none
+  cursor: pointer
+  border-radius: 4px
+  width: 100%
