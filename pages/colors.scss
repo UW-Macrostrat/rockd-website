@@ -3,6 +3,7 @@
 
 $colors: (
   img-color: invert(0),
+  anti-img-color: invert(1),
   background: #fff,
   text: #333,
   scrollbar-track: rgba(200, 200, 200, 0.3),
@@ -20,6 +21,7 @@ $dark-text: $gray4;
 
 $dark-colors: (
   img-color: invert(1),
+  anti-img-color: invert(0),
   background: #141a1e,
   text: #fff,
   scrollbar-track: rgba(60, 60, 60, 0.4),
