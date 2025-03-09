@@ -449,15 +449,16 @@ function WeaverMap({
   ]);
 
   let autoComplete = h(AutoComplete);
+  let filler = h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps));
 
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
           h("h1", "Selected Checkins"),
-          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
         ]),
       ]),
+      filler,
       sortContainer,
       h("button", {
         className: "close-btn",
