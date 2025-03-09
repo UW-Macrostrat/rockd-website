@@ -16,7 +16,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
-import { createCheckins, Image } from "../index";
+import { createCheckins, createFilteredCheckins, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -383,39 +383,11 @@ function AutoComplete() {
   const [close, setClose] = useState(false);
 
 
-  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0);
+  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
   console.log("person data", person_data);
-  let filteredCheckins = h('div.filtered-checkins', [
-    person_data?.success.data.map((checkin) => {
-      return h('div.filtered-checkin', [
-        h('h3', checkin.checkin_id),
-      ]);
-    })
+  let filteredCheckins = h('div.filtered-checkins-container', [
+    h("div.filtered-checkins", person_data && person_data.length > 0 ? createFilteredCheckins(person_data) : null)
   ]);
-
-  /*
-  const [showFilteredCheckins, setShowFilteredCheckins] = useState(false);
-
-
-  let filteredCheckins = null;
-  if (person_checkins && person_checkins.length > 0) {
-    filteredCheckins = h('div.filtered-checkins', 
-        person_checkins.map((checkin) => {
-        return h('div.filtered-checkin', [
-          h('h3', checkin.checkin_id),
-          h('p', checkin.description),
-        ]);
-      })
-    );
-    setShowFilteredCheckins(true);
-  }
-
-  let filteredCheckinsContainer = h('div.filtered-checkins-container', [
-    h('h2', "Filtered Checkins"),
-    filteredCheckins,
-  ]); 
-  */
-
 
   const handleInputChange = (event) => {
     setAutocompleteOpen(true);
@@ -504,7 +476,6 @@ function AutoComplete() {
   let wrapper = h('div.autocomplete-wrapper', [
     filterContainer,
     results,
-    // showFilteredCheckins ? filteredCheckinsContainer : null,
   ]);
 
 
