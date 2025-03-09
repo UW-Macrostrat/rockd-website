@@ -16,7 +16,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
-import { createCheckins, createFilteredCheckins, Image } from "../index";
+import { createCheckins, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -119,17 +119,71 @@ function WeaverMap({
 
   function AutoComplete() {
     const mapRef = useMapRef();
+    const map = mapRef.current;
     const [filters, setFilters] = useState([]);
     const [autocompleteOpen, setAutocompleteOpen] = useState(true);
     const [input, setInput] = useState('');
     const [close, setClose] = useState(false);  
   
     const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
-    console.log("person data", person_data);
     let filteredCheckins = h('div.filtered-checkins-container', [
       h("div.filtered-checkins", person_data && person_data.length > 0 ? createCheckins(person_data, mapRef, "explore/green-circle.png", sort) : null)
     ]);
 
+    // add markers for filtered checkins
+    let coordinates = [];
+    let lngs = [];
+    let lats = [];
+
+    if(person_data && person_data.length > 0) {
+      person_data.forEach((checkin) => {
+        coordinates.push([checkin.lng, checkin.lat]);
+        lngs.push(checkin.lng);
+        lats.push(checkin.lat);
+      });
+  
+      let previous = document.querySelectorAll('.filtered_pin');
+      previous.forEach((marker) => {
+        marker.remove();
+      });
+
+      let previousFeatured = document.querySelectorAll('.marker_pin');
+      previousFeatured.forEach((marker) => {
+        marker.remove();
+      });
+
+      let stop = 0;
+      coordinates.forEach((coord) => {
+        stop++;
+        // marker
+        const el = document.createElement('div');
+        el.className = 'filtered_pin';
+
+        const number = document.createElement('span');
+        number.innerText = stop;
+
+        // Append the number to the marker
+        el.appendChild(number);
+
+        // Create marker
+        new mapboxgl.Marker(el)
+          .setLngLat(coord)
+          .addTo(map);
+      });
+
+      map.fitBounds([
+          [ Math.max(...lngs), Math.max(...lats) ],
+          [ Math.min(...lngs), Math.min(...lats) ]
+      ], {
+          maxZoom: 12,
+          duration: 0,
+          padding: 75
+      });
+    }
+
+    
+
+    // rest
     const handleInputChange = (event) => {
       setAutocompleteOpen(true);
       setInput(event.target.value); 
@@ -155,6 +209,11 @@ function WeaverMap({
             input.value = "";
             setAutocompleteOpen(false);
             setClose(true);
+
+            let previous = document.querySelectorAll('.filtered_pin');
+            previous.forEach((marker) => {
+              marker.remove();
+            });
           } 
         }),
       ]),
@@ -169,6 +228,11 @@ function WeaverMap({
               setFilters(filters.filter((filter) => filter != item));
               if(filters.length == 1) {
                 setClose(true);
+
+                let previous = document.querySelectorAll('.filtered_pin');
+                previous.forEach((marker) => {
+                  marker.remove();
+                });
               }
             } 
           })
@@ -237,7 +301,7 @@ function WeaverMap({
       result = getCheckins(0, 0, 0, 0);
     } else if (bounds) {
       let distance = Math.abs(bounds.getEast() - bounds.getWest());
-      let newWest = bounds.getWest() + distance * .3;
+      let newWest = bounds.getWest() + distance * .35;
       result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
     } else {
       result = getCheckins(0, 0, 0, 0);
@@ -261,8 +325,11 @@ function WeaverMap({
       previous.forEach((marker) => {
         marker.remove();
       });
+
+      // see if filtered checkins are showing
+      let previousFiltered = document.querySelectorAll('.filtered_pin');
       
-      if (!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) {
+      if ((!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) && previousFiltered?.length == 0) {
         let stop = 0;
         coordinates.forEach((coord) => {
           stop++;
