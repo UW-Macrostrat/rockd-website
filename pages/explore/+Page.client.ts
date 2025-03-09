@@ -113,6 +113,11 @@ function WeaverMap({
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
     setOpenSelected(true);
+
+    let previous = document.querySelectorAll('.filtered_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
   }, []);
 
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
@@ -152,24 +157,26 @@ function WeaverMap({
         marker.remove();
       });
 
-      let stop = 0;
-      coordinates.forEach((coord) => {
-        stop++;
-        // marker
-        const el = document.createElement('div');
-        el.className = 'filtered_pin';
+      if (!close) {
+        let stop = 0;
+        coordinates.forEach((coord) => {
+          stop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'filtered_pin';
 
-        const number = document.createElement('span');
-        number.innerText = stop;
+          const number = document.createElement('span');
+          number.innerText = stop;
 
-        // Append the number to the marker
-        el.appendChild(number);
+          // Append the number to the marker
+          el.appendChild(number);
 
-        // Create marker
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
-      });
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
 
       map.fitBounds([
           [ Math.max(...lngs), Math.max(...lats) ],
@@ -489,6 +496,7 @@ function WeaverMap({
         MapAreaContainer,
         {
           contextPanelOpen: isOpen,
+          className: "map-area-container",
         },
         [
           h(MapView, { style, mapboxToken }, [
