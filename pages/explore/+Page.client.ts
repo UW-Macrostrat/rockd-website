@@ -13,7 +13,7 @@ import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
 import { createCheckins, Image } from "../index";
@@ -380,11 +380,56 @@ function AutoComplete() {
   const [filters, setFilters] = useState([]);
   const [autocompleteOpen, setAutocompleteOpen] = useState(true);
   const [input, setInput] = useState('');
+  const [close, setClose] = useState(false);
+
+
+  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0);
+  console.log("person data", person_data);
+  let filteredCheckins = h('div.filtered-checkins', [
+    person_data?.success.data.map((checkin) => {
+      return h('div.filtered-checkin', [
+        h('h3', checkin.checkin_id),
+      ]);
+    })
+  ]);
+
+  /*
+  const [showFilteredCheckins, setShowFilteredCheckins] = useState(false);
+
+
+  let filteredCheckins = null;
+  if (person_checkins && person_checkins.length > 0) {
+    filteredCheckins = h('div.filtered-checkins', 
+        person_checkins.map((checkin) => {
+        return h('div.filtered-checkin', [
+          h('h3', checkin.checkin_id),
+          h('p', checkin.description),
+        ]);
+      })
+    );
+    setShowFilteredCheckins(true);
+  }
+
+  let filteredCheckinsContainer = h('div.filtered-checkins-container', [
+    h('h2', "Filtered Checkins"),
+    filteredCheckins,
+  ]); 
+  */
+
 
   const handleInputChange = (event) => {
     setAutocompleteOpen(true);
     setInput(event.target.value); 
+    setClose(false);
   };
+
+  let result = null;
+
+  try {
+    result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
+  } catch (e) {
+    return null;
+  }
 
   let searchBar = h('div.search-bar', [
     h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
@@ -395,21 +440,12 @@ function AutoComplete() {
       h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
           let input = document.querySelector('input');
           input.value = "";
+          setAutocompleteOpen(false);
+          setClose(true);
         } 
       }),
     ]),
   ]);
-
-  let result = null;
-
-  try {
-    result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
-  } catch (e) {
-    return null;
-  }
-
-  if(result == null) return h("div.autocomplete", searchBar);
-  result = result.success.data;
 
   let filterContainer = filters.length != 0 ? h("div.filter-container", [
     h('h2', "Filters"),
@@ -418,11 +454,19 @@ function AutoComplete() {
         h('li', item.name),
         h('div.red-bar', { onClick: () => {
             setFilters(filters.filter((filter) => filter != item));
+            if(filters.length == 1) {
+              setClose(true);
+            }
           } 
         })
       ])
-    }))
+    })),
+    filteredCheckins
   ]) : null; 
+
+  
+  if(!result || close) return h("div.autocomplete", searchBar);
+  result = result.success.data;
 
   let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
       h('h2', "Taxa"),
@@ -452,13 +496,21 @@ function AutoComplete() {
     }))
   ]) : null;
 
+  let results = h("div.results", [
+    taxa,
+    people,
+  ]);
+
+  let wrapper = h('div.autocomplete-wrapper', [
+    filterContainer,
+    results,
+    // showFilteredCheckins ? filteredCheckinsContainer : null,
+  ]);
+
+
+
   return h('div.autocomplete', [
     searchBar,
-    h("div.results", [
-      filterContainer,
-      h('p', "Search Results"),
-      taxa,
-      people,
-    ])
+    wrapper
   ]);
 }
