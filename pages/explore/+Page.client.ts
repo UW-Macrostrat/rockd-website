@@ -263,11 +263,6 @@ function WeaverMap({
     setSort(event.target.value);
   };
 
-  const handleInputChange = (event) => {
-    setSearchValue(event.target.value); 
-    setShowAutocomplete(true);
-  };
-
   let dropdown = h('select', { className: "sort-dropdown", onChange: handleChange }, [
     h('option', { value: "likes" }, "Likes"),
     h('option', { value: "created" }, "Date Created"),
@@ -280,23 +275,7 @@ function WeaverMap({
     dropdown,
   ]);
 
-  let searchBar = h('div.search-bar', [
-    h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
-    h('div.search-icon', [
-      h(Image, { src: "explore/search-icon.png" }),
-    ]),
-    h('div.x-icon', [
-      h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
-        console.log("clicked");
-        let input = document.querySelector('input');
-        input.value = "";
-        // setSearchValue(''); deosnt work
-        } 
-      }),
-    ]),
-  ]);
-
-  let autoComplete = AutoComplete(searchValue, showAutocomplete);
+  let autoComplete = AutoComplete();
 
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
@@ -306,7 +285,6 @@ function WeaverMap({
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
         ]),
       ]),
-      searchBar,
       sortContainer,
       h("button", {
         className: "close-btn",
@@ -320,7 +298,6 @@ function WeaverMap({
         h('div.title', [
           h("h1", "Featured Checkins"),
         ]),
-        searchBar,
         autoComplete,
         sortContainer,
       ]),
@@ -399,10 +376,29 @@ function getPersonCheckins(personId) {
 }
 
 
-function AutoComplete(input, showAutocomplete) {
+function AutoComplete() {
   const [filters, setFilters] = useState([]);
   const [autocompleteOpen, setAutocompleteOpen] = useState(true);
-  console.log("input", input, " show", autocompleteOpen);
+  const [input, setInput] = useState('');
+
+  const handleInputChange = (event) => {
+    setAutocompleteOpen(true);
+    setInput(event.target.value); 
+  };
+
+  let searchBar = h('div.search-bar', [
+    h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
+    h('div.search-icon', [
+      h(Image, { src: "explore/search-icon.png" }),
+    ]),
+    h('div.x-icon', [
+      h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
+          let input = document.querySelector('input');
+          input.value = "";
+        } 
+      }),
+    ]),
+  ]);
 
   let result = null;
 
@@ -412,13 +408,19 @@ function AutoComplete(input, showAutocomplete) {
     return null;
   }
 
-  if(result == null) return null;
+  if(result == null) return h("div.autocomplete", searchBar);
   result = result.success.data;
 
   let filterContainer = filters.length != 0 ? h("div.filter-container", [
     h('h2', "Filters"),
     h('ul', filters.map((item) => {
-      return h('li', item.name);
+      return h("div.filter-item", [
+        h('li', item.name),
+        h('div.red-bar', { onClick: () => {
+            setFilters(filters.filter((filter) => filter != item));
+          } 
+        })
+      ])
     }))
   ]) : null; 
 
@@ -451,9 +453,12 @@ function AutoComplete(input, showAutocomplete) {
   ]) : null;
 
   return h('div.autocomplete', [
-    filterContainer,
-    h('p', "Search Results"),
-    taxa,
-    people,
+    searchBar,
+    h("div.results", [
+      filterContainer,
+      h('p', "Search Results"),
+      taxa,
+      people,
+    ])
   ]);
 }
