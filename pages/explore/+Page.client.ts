@@ -104,6 +104,7 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken);
   const [sort, setSort] = useState("likes");
   const [searchValue, setSearchValue] = useState('');
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
 
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
@@ -264,6 +265,7 @@ function WeaverMap({
 
   const handleInputChange = (event) => {
     setSearchValue(event.target.value); 
+    setShowAutocomplete(true);
   };
 
   let dropdown = h('select', { className: "sort-dropdown", onChange: handleChange }, [
@@ -294,7 +296,7 @@ function WeaverMap({
     ]),
   ]);
 
-  let autoComplete = AutoComplete(searchValue);
+  let autoComplete = AutoComplete(searchValue, showAutocomplete);
 
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
@@ -397,27 +399,60 @@ function getPersonCheckins(personId) {
 }
 
 
-function AutoComplete(input) {
-  let result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
+function AutoComplete(input, showAutocomplete) {
+  const [filters, setFilters] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(true);
+  console.log("input", input, " show", autocompleteOpen);
+
+  let result = null;
+
+  try {
+    result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
+  } catch (e) {
+    return null;
+  }
 
   if(result == null) return null;
   result = result.success.data;
 
-  let taxa = result.taxa.length > 0 ? h('div.taxa', [  
+  let filterContainer = filters.length != 0 ? h("div.filter-container", [
+    h('h2', "Filters"),
+    h('ul', filters.map((item) => {
+      return h('li', item.name);
+    }))
+  ]) : null; 
+
+  let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
       h('h2', "Taxa"),
       h('ul', result.taxa.map((item) => {
-        return h('li', item.name);
+        return h('li', { 
+          onClick: () => { 
+            if(!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name);
       }))
     ]) : null;
 
-  let people = result.people.length > 0 ? h('div.people', [  
+  let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
     h('h2', "People"),
     h('ul', result.people.map((item) => {
-      return h('li', item.name);
+      return h('li', { 
+        onClick: () => { 
+          if(!filters.includes(item)) {
+            setAutocompleteOpen(false);
+            setFilters(filters.concat([item]));
+          }
+        }
+      }, item.name);
     }))
   ]) : null;
 
   return h('div.autocomplete', [
+    filterContainer,
+    h('p', "Search Results"),
     taxa,
     people,
   ]);
