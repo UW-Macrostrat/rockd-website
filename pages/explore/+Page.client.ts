@@ -260,6 +260,7 @@ function WeaverMap({
               if(!filters.includes(item)) {
                 setAutocompleteOpen(false);
                 setFilters(filters.concat([item]));
+                console.log(item.id)
               }
             }
           }, item.name);
@@ -308,7 +309,7 @@ function WeaverMap({
       result = getCheckins(0, 0, 0, 0);
     } else if (bounds) {
       let distance = Math.abs(bounds.getEast() - bounds.getWest());
-      let newWest = bounds.getWest() + distance * .35;
+      let newWest = bounds.getWest() + distance * .35 + .05;
       result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
     } else {
       result = getCheckins(0, 0, 0, 0);
@@ -555,4 +556,9 @@ function getCheckins(lat1, lat2, lng1, lng2) {
 
 function getPersonCheckins(personId) {
   return useAPIResult("https://rockd.org/api/v2/protected/checkins?person_id=" + personId);
+}
+
+function getTaxonCheckins(taxonId) {
+  // not sure how to use api yet
+  return useAPIResult("https://rockd.org/api/v1/protected/checkins?taxon_id=" + taxonId);
 }
