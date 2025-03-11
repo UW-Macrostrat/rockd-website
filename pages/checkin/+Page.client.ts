@@ -3,7 +3,7 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer } from "../index";
+import { BlankImage, Image, Footer, apiURL, apiURLOld } from "../index";
 import "../main.styl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
@@ -44,7 +44,7 @@ export function Page() {
             return;
         }
 
-        fetch("https://rockd.org/api/v2/protected/checkins?checkin_id=" + stop)
+        fetch(apiURLOld + "protected/checkins?checkin_id=" + stop)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -97,7 +97,7 @@ export function Page() {
     let checkin = userData;
     console.log(checkin)
 
-    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
     // format rating
     let ratingArr = [];
