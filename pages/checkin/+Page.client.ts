@@ -1,6 +1,6 @@
 import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
@@ -9,6 +9,12 @@ import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
 import "@macrostrat/style-system";
+import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { checkIfClientRouting } from "vike/dist/esm/utils/assertRoutingType";
+import { MapPosition } from "@macrostrat/mapbox-utils";
+import { set } from "react-datepicker/dist/date_utils";
+
 
 function imageExists(image_url){
     var http = new XMLHttpRequest();
@@ -59,8 +65,13 @@ export function Page() {
 
     observations.push(
         h('div', {className: 'observation'}, [
-            headerImg,
-            h('h4', {className: 'observation-header'}, checkin.notes),
+            h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
+                setOverlayBody(h('div.observation-body',headerBody));
+                setOverlayImage(headerImgUrl);
+                setOverlayOpen(!overlayOpen);
+                }
+            }),
+            headerBody,
         ])
     );
 
@@ -107,6 +118,27 @@ export function Page() {
         }        
     }
 
+    const newMapPosition: MapPosition = {
+        camera: {
+          lat: center.lat,  // Latitude
+          lng: center.lng, // Longitude
+          altitude: 300000, // Altitude (height from the Earth's surface)
+        },
+      };
+
+    let map = h(MapAreaContainer,
+            [
+              h(MapView, { style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i', mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
+                h(MapMarker, {
+                    position: center,
+                   }),
+              ]),
+              h('div', {className: 'banner', onClick: () => {
+                setShowMap(!showMap);
+              }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
+            ]
+          );
+
     let LngLatProps = {
         position: {
             lat: checkin.lat,
@@ -116,11 +148,23 @@ export function Page() {
         zoom: 10
     };
 
-    return h('div', [
-        h('div', { className: 'main'}, [
+    // overlay
+    let overlay = h('div', {className: 'overlay'}, [
+        h('div', {className: 'banner', onClick: () => {
+            setOverlayOpen(!overlayOpen);
+        }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
+
+        h('div.overlay-body', [
+            h(BlankImage, { className: 'observation-img', src: overlayImage }),
+            overlayBody,
+        ])
+    ]);
+
+    let main = h('div', [
+        h('div', { className: showMap ? 'hide' : 'main'}, [
             h('h1', { className: "checkin-header" }, checkin.description),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
-            h('div', { className: 'stop-header' }, [
+            h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
                 profile_pic,
                 h('div', {className: 'stop-main-info'}, [
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
@@ -134,7 +178,13 @@ export function Page() {
             ]),
             h('div', { className: 'observations' }, observations),
         ]),
-        h(Footer),
-        h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
+        h('div', { className: showMap ? 'hide' : 'bottom' }, [
+            h(Footer),
+            h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
+        ]),
+        h('div', { className: !showMap ? 'hide' : 'map'}, map)
     ])
+
+
+    return overlayOpen ? overlay : main;
 }
