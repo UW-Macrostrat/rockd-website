@@ -3,7 +3,7 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, apiURLOld } from "../index";
+import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
 import "../main.styl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
@@ -26,76 +26,23 @@ export function Page() {
     const [error, setError] = useState(null);
     const [checkinNum, setCheckin] = useState(null);
 
-    let stop;
 
-    useEffect(() => {
-        if (pageContext.urlParsed) {
-            stop = parseInt(pageContext.urlParsed.search.checkin);
-            setCheckin(stop);
-        } else {
-            setCheckin(0);
-        }
-        console.log(`Fetching data for checkin ID: ` + stop);
+    const checkinID = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.checkin) : null;
+    const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
 
-        // Ensure trip ID is valid
-        if (isNaN(stop)) {
-            setLoading(false);
-            setError('Invalid checkin ID.');
-            return;
-        }
-
-        fetch(apiURLOld + "protected/checkins?checkin_id=" + stop)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched data:', data); // Log fetched data for debugging
-                if (data.success && data.success.data.length > 0) {
-                    setUserData(data.success.data[0]);
-                } else {
-                    setUserData(null);
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []); 
-
-    if (loading) {
-        if(checkinNum == null) {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading checkin..."),
-            ]);
-        } else {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading checkin " + checkinNum + "..."),
-            ]);
-        }
-
+    if (!checkinData) {
+        return h("div", { className: 'loading' }, [
+            h("h1", "Loading checkin..."),
+        ]);       
     }
 
-    if (error) {
+    if (checkinData.success.data.length == 0) {
         return h("div", { className: 'error' }, [
-            h("h1", "Error"),
-            h("p", error)
-        ]);
+            h("h1", "Checkin " + checkinID + " not found"),  
+        ]); 
     }
 
-    if (!userData) {
-        return h("div", { className: 'error' }, [
-            h("h1", "Trip " + checkinNum + " not found"),  
-        ]);
-    }
-
-    let checkin = userData;
-    console.log(checkin)
+    const checkin = checkinData.success.data[0];
 
     let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
@@ -109,7 +56,6 @@ export function Page() {
     let observations = [];
 
     // add checkin photo and notes
-    console.log("Checkin photo: ", checkin.photo != null);
     let headerImg;
     if(imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null) {
         headerImg = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo})
@@ -127,8 +73,6 @@ export function Page() {
     // add observations
     for(var i = 0; i < checkin.observations.length; i++) {
         let observation = checkin.observations[i];
-        console.log("Observation " + i);
-        console.log(observation);
 
         if(Object.keys(observation.rocks).length != 0) {
             // get liths
@@ -152,7 +96,6 @@ export function Page() {
             imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
 
-            console.log("PRINTING" , observation.age_est);
             observations.push(
                 h('div', {className: 'observation'}, [
                     h(BlankImage, { className: 'observation-img', src: imageSrc}),
