@@ -8,7 +8,7 @@ import "../main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
-import "./main.sass"
+import "./main.sass";
 
 export function Page() {
     const pageContext = usePageContext();
