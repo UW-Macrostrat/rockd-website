@@ -64,7 +64,7 @@ export function Page() {
     let observations = [];
 
     // add checkin photo and notes
-    let headerImgUrl = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    let headerImgUrl = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
     let headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
@@ -102,7 +102,7 @@ export function Page() {
 
             // if photo exists
             let imageSrc;
-            imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            imageSrc = imageExists(apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
             let observationBody = h('div', {className: 'observation-body'}, [
                 h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
