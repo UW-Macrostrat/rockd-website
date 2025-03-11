@@ -10,7 +10,7 @@ import {
     Area,
     AreaChart,
   } from "recharts";
-import { apiURL, Footer } from "../index";
+import { apiURL, Footer, useRockdAPI } from "../index";
 import "./main.styl";
 import "../main.styl";
 
@@ -34,39 +34,12 @@ export function Page() {
     lower.setFullYear(currentDate.getFullYear() - 1);
     let upper = new Date();
 
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [checkinBound, setCheckin] = useState([lower, upper]);    
     const [signupBound, setSignup] = useState([lower, upper]);
     const [activeBound, setActive] = useState([lower, upper]);
 
-    useEffect(() => {
-        fetch(apiURL + "/metrics")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched data:', data); // Log fetched data for debugging
-                setUserData(data);
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
-
-    if (loading) {
-        return h("div", { className: 'loading' }, [
-            h("p", null, "Loading...")
-        ]);
-    }
+    const userData = useRockdAPI("metrics");
 
     if (error) {
         return h("div", { className: 'error' }, [
@@ -76,12 +49,12 @@ export function Page() {
     }
 
     if (!userData) {
-        return h("div", { className: 'error' }, [
-            h("h1", "No data found"),  
+        return h("div", { className: 'loading' }, [
+            h("p", null, "Loading...")
         ]);
     }
 
-    let data = userData.success.data;
+    const data = userData.success.data;
 
     // format data
     interface InputData {
