@@ -29,6 +29,10 @@ export function Page() {
     const pageContext = usePageContext();
     const checkinID = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.checkin) : null;
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
+    const [overlayOpen, setOverlayOpen] = useState(false);
+    const [overlayImage, setOverlayImage] = useState(null);
+    const [overlayBody, setOverlayBody] = useState(null);
+    const [showMap, setShowMap] = useState(false);
 
     if (!checkinData) {
         return h("div", { className: 'loading' }, [
@@ -43,6 +47,10 @@ export function Page() {
     }
 
     const checkin = checkinData.success.data[0];
+    const center = {
+        lat: checkin.lat,
+        lng: checkin.lng
+    }
 
     let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
@@ -56,12 +64,8 @@ export function Page() {
     let observations = [];
 
     // add checkin photo and notes
-    let headerImg;
-    if(imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null) {
-        headerImg = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo})
-    } else {
-        headerImg = h(BlankImage, { className: 'observation-img', src: "https://storage.macrostrat.org/assets/rockd/rockd.jpg"})
-    }
+    let headerImgUrl = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    let headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
         h('div', {className: 'observation'}, [
@@ -100,19 +104,26 @@ export function Page() {
             let imageSrc;
             imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
+            let observationBody = h('div', {className: 'observation-body'}, [
+                h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
+                h('div', {className: 'observation-details'}, [
+                    h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+                    h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+                    h('p', {className: 'observation-detail'}, obsAge),
+                    h('p', {className: 'observation-detail'}, liths),
+                    h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
+                    LngLatCoords(LngLatProps)
+                ]),
+            ]);
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, { className: 'observation-img', src: imageSrc}),
-                    h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                    h('div', {className: 'observation-details'}, [
-                        h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                        h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                        h('p', {className: 'observation-detail'}, obsAge),
-                        h('p', {className: 'observation-detail'}, liths),
-                        h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                        LngLatCoords(LngLatProps)
-                    ]),
+                    h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
+                        setOverlayImage(imageSrc);
+                        setOverlayBody(observationBody);
+                        setOverlayOpen(!overlayOpen);
+                    }}),
+                    observationBody,
                 ])
             );
         }        
