@@ -18,10 +18,7 @@ export function Page() {
     const [center, setCenter] = useState();
     const mapRef = useRef(null);
 
-    let trip;
-    if (pageContext.urlParsed) {
-        trip = parseInt(pageContext.urlParsed.search.trip);
-    }
+    const trip = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.trip) : 0;
     const userData = useRockdAPI("trips/" + trip);
 
     useEffect(() => {
