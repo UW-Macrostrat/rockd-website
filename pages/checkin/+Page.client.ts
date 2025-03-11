@@ -21,12 +21,6 @@ function imageExists(image_url){
 
 export function Page() {
     const pageContext = usePageContext();
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [checkinNum, setCheckin] = useState(null);
-
-
     const checkinID = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.checkin) : null;
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
 

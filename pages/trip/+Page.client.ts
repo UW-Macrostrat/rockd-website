@@ -12,10 +12,8 @@ import "./main.sass";
 
 export function Page() {
     const pageContext = usePageContext();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const mapContainerRef = useRef(null);
-    const [center, setCenter] = useState();
+    const center = null;
     const mapRef = useRef(null);
 
     const trip = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.trip) : 0;
