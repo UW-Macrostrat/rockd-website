@@ -79,6 +79,7 @@ h1, p
   width: 60%
   height: 25vh
   align-items: center
+  cursor: pointer
 
 .profile-pic
   height: 100px
@@ -135,8 +136,67 @@ h4
     .observation-img
       width: 100%
       border-radius: 2% 2% 0 0
+      cursor: pointer
 
 .dark-mode-button
   position: absolute
   top: 10px
   left: 10px
+
+.overlay
+  background-color: var(--panel-background-color)
+  height: 100vh
+  width: 100%
+  top: 0
+  left: 0
+
+  .overlay-body
+    display: grid
+    img
+      margin: auto
+      width: 40%
+      margin-top: 20px
+
+    .observation-body
+      margin: auto
+      padding: 3px
+      color: var(--text)
+      text-align: center
+      padding-top: 10px
+      box-shadow: 0 0 0 1px var(--card-shadow-color)
+      width: 40%
+
+.close
+  position: absolute
+  top: 10px
+  left: 10px
+  z-index: 100
+
+  background-color: white
+
+  &:hover
+    background-color: grey
+
+.banner
+  position: absolute
+  top: 0
+  left: 0
+  z-index: 100
+  width: 100%
+  background-color: var(--panel-text)
+  height: 50px
+
+.map-container
+  height: 95vh
+
+.hide
+  display: none
+
+.left-arrow
+  height: 50px
+  padding: 10px
+  filter: var(--anti-img-color)
+
+.overlay
+  .banner
+    position: sticky
