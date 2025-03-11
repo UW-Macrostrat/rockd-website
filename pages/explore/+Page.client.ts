@@ -16,7 +16,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.styl";
-import { createCheckins, Image } from "../index";
+import { createCheckins, Image, useRockdAPI } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -200,7 +200,7 @@ function WeaverMap({
     let result = null;
   
     try {
-      result = useAPIResult("https://rockd.org/api/v2/autocomplete/" + input);
+      result = useRockdAPI("autocomplete/" + input);
     } catch (e) {
       return null;
     }
@@ -548,14 +548,14 @@ function getCheckins(lat1, lat2, lng1, lng2) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+  return useRockdAPI("protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
 }
 
 function getPersonCheckins(personId) {
-  return useAPIResult("https://rockd.org/api/v2/protected/checkins?person_id=" + personId);
+  return useRockdAPI("protected/checkins?person_id=" + personId);
 }
 
 function getTaxonCheckins(taxonId) {

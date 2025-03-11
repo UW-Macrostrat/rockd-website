@@ -3,12 +3,12 @@ import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins } from "../index";
+import { BlankImage, createCheckins, apiURL, apiURLOld } from "../index";
 import "../main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
-import "./main.sass"
+import "./main.sass";
 
 export function Page() {
     const pageContext = usePageContext();
@@ -38,7 +38,7 @@ export function Page() {
             return;
         }
 
-        fetch(`https://rockd.org/api/v2/trips/${trip}`)
+        fetch(apiURL + `trips/${trip}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -181,7 +181,7 @@ export function Page() {
     data.updated = date.toLocaleDateString('en-US', options);
 
     // profile pic
-    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + data.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + data.person_id, className: "profile-pic"});
 
     // create stops
 
@@ -210,7 +210,7 @@ export function Page() {
                     ]),
                     h('h1', {className: 'park'}, data.name),
                     h('p', {className: 'download-button'}, [
-                        h('a', {className: 'kmz', href: "https://rockd.org/api/v2/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                        h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                     ]),
                 ]),
                 h('div', { className: 'bottom' }, [
