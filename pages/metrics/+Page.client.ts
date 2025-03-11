@@ -10,7 +10,7 @@ import {
     Area,
     AreaChart,
   } from "recharts";
-import { Footer } from "../index";
+import { apiURL, Footer } from "../index";
 import "./main.styl";
 import "../main.styl";
 
@@ -42,7 +42,7 @@ export function Page() {
     const [activeBound, setActive] = useState([lower, upper]);
 
     useEffect(() => {
-        fetch("https://rockd.org/api/v2/metrics")
+        fetch(apiURL + "/metrics")
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
