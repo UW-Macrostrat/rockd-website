@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, apiURL, apiURLOld } from "../index";
+import { BlankImage, createCheckins, apiURL, apiURLOld, useRockdAPI } from "../index";
 import "../main.styl";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -12,8 +12,6 @@ import "./main.sass";
 
 export function Page() {
     const pageContext = usePageContext();
-    const [userData, setUserData] = useState(null);
-    const [tripNum, setTrip] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const mapContainerRef = useRef(null);
@@ -21,48 +19,10 @@ export function Page() {
     const mapRef = useRef(null);
 
     let trip;
-
-    useEffect(() => {
-        if (pageContext.urlParsed) {
-            trip = parseInt(pageContext.urlParsed.search.trip);
-            setTrip(trip);
-        } else {
-            setTrip(0);
-        }
-        console.log(`Fetching data for trip ID: ` + trip);
-
-        // Ensure trip ID is valid
-        if (isNaN(trip)) {
-            setLoading(false);
-            setError('Invalid trip ID.');
-            return;
-        }
-
-        fetch(apiURL + `trips/${trip}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched data:', data); // Log fetched data for debugging
-                if (data.success && data.success.data.length > 0) {
-                    setUserData(data.success.data[0]);
-
-                    return data.success.data[0];
-                } else {
-                    setUserData(null);
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []); 
+    if (pageContext.urlParsed) {
+        trip = parseInt(pageContext.urlParsed.search.trip);
+    }
+    const userData = useRockdAPI("trips/" + trip);
 
     useEffect(() => {
         // Check if the map instance already exists
@@ -89,7 +49,7 @@ export function Page() {
         let lats = [];
         let lngs = [];
         const map = mapRef.current;
-        userData.stops.forEach((stop, index) => {
+        userData.success.data[0].stops.forEach((stop, index) => {
             const count = index + 1;
             const el = document.createElement('div');
             el.className = 'pin';
@@ -141,41 +101,23 @@ export function Page() {
         }
     }, [center]);
 
-    if (loading) {
-        if(tripNum == null) {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading trip..."),
-            ]);
-        } else {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading trip " + tripNum + "..."),
-            ]);
-        }
-
-    }
-
-    if (error) {
-        return h("div", { className: 'error-main' }, [
-            h("div", { className: 'error' }, [
-                h("h1", "Error"),
-                h("p", error)
-            ]),
+    if (!userData) {
+        return h("div", { className: 'loading' }, [
+            h("h1", "Loading trip..."),
         ]);
     }
 
-    if (!userData) {
+    if (userData.success.data.length == 0) {
         return h("div", { className: 'error' }, [
             h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
-            h("h1", "Trip " + tripNum + " not found!"),  
+            h("h1", "Trip " + trip + " not found!"),  
         ]);
     }
 
     
 
-    // Data found correctly
-    let data = userData;
-
     // format date
+    const data = userData.success.data[0];
     let date = new Date(data.updated);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     data.updated = date.toLocaleDateString('en-US', options);
@@ -185,7 +127,7 @@ export function Page() {
 
     // create stops
 
-    let final = data.stops;
+    const final = data.stops;
     let arr = [];
     final.forEach((stop) => { 
         let temp = stop.checkin;
