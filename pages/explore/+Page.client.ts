@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 
-import { useMap, useMapRef } from "@macrostrat/mapbox-react";
-import { Divider, Spinner } from "@blueprintjs/core";
+import { useMapRef } from "@macrostrat/mapbox-react";
+import { Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -38,13 +38,12 @@ const _macrostratStyle = buildMacrostratStyle({
   strokeOpacity: 0.1,
 }) as mapboxgl.Style;
 
-const types = [
+const type = 
   {
     id: "Sample",
     name: "Sample",
     color: "purple",
-  },
-];
+  };
 
 function weaverStyle(type: object) {
   const color = type?.color ?? "dodgerblue";
@@ -97,10 +96,6 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const [isOpen, setOpen] = useState(false);
-
-  const [type, setType] = useState(types[0]);
-
   const style = useMapStyle(type, mapboxToken);
   const [sort, setSort] = useState("likes");
 
@@ -496,7 +491,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanelOpen: isOpen,
+          contextPanelOpen: false,
           className: "map-area-container",
         },
         [
@@ -528,7 +523,7 @@ function useMapStyle(type, mapboxToken) {
 
   // Auto select sample type
   useEffect(() => {
-    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
+    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
       buildInspectorStyle(baseStyle, overlayStyle, {
         mapboxToken,
         inDarkMode: isEnabled,
