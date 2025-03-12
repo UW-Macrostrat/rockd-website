@@ -4,7 +4,7 @@ import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins, apiURL, apiURLOld, useRockdAPI } from "../index";
-import "../main.styl";
+import "../main.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";

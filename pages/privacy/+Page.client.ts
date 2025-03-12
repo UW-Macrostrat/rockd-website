@@ -1,7 +1,7 @@
 import { PageHeader } from "~/components";
 import { Image, Footer } from "../index";
 import "./main.styl";
-import "../main.styl";
+import "../main.sass";
 import { MacrostratIcon } from "~/components";
 import "@macrostrat/style-system";
 import h from "@macrostrat/hyper";

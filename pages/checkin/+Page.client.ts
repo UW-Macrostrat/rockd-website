@@ -4,16 +4,14 @@ import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
-import "../main.styl";
+import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { checkIfClientRouting } from "vike/dist/esm/utils/assertRoutingType";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { set } from "react-datepicker/dist/date_utils";
 
 
 function imageExists(image_url){
