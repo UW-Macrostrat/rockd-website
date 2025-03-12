@@ -12,7 +12,7 @@ import {
   } from "recharts";
 import { apiURL, Footer, useRockdAPI } from "../index";
 import "./main.styl";
-import "../main.styl";
+import "../main.sass";
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
