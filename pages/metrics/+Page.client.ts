@@ -10,9 +10,10 @@ import {
     Area,
     AreaChart,
   } from "recharts";
-import { apiURL, Footer, useRockdAPI } from "../index";
+import { apiURLOld, Footer, useRockdAPI } from "../index";
 import "./main.styl";
 import "../main.sass";
+import { useAPIResult } from "@macrostrat/ui-components";
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -34,19 +35,12 @@ export function Page() {
     lower.setFullYear(currentDate.getFullYear() - 1);
     let upper = new Date();
 
-    const [error, setError] = useState(null);
     const [checkinBound, setCheckin] = useState([lower, upper]);    
     const [signupBound, setSignup] = useState([lower, upper]);
     const [activeBound, setActive] = useState([lower, upper]);
 
-    const userData = useRockdAPI("metrics");
-
-    if (error) {
-        return h("div", { className: 'error' }, [
-            h("h1", "Error"),
-            h("p", error)
-        ]);
-    }
+    // new API doesn't return all data
+    const userData = useAPIResult(apiURLOld + "metrics");
 
     if (!userData) {
         return h("div", { className: 'loading' }, [
@@ -101,8 +95,8 @@ export function Page() {
             name: `${item.month}/${String(item.year).slice(-2)}`, 
             Total: parseInt(item.count)
         });
-    }      
-    checkins_by_month.pop();
+    }
+    checkins_by_month.pop();      
     currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
     currentName = checkins_by_month[checkins_by_month.length - 1].name;
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
