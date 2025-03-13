@@ -95,11 +95,17 @@ async function startServer() {
     process.env.VITE_MACROSTRAT_INSTANCE
   );
 
-  // Redirect from /test/:id to /test with query parameter
+  // Redirect from /trip/:trip to /trip with query parameter
   app.get("/trip/:trip", (req, res) => {
     const { trip } = req.params;
-    // Redirect to /test with query parameter `id`
     res.redirect(`/trip?trip=${trip}`);
+  });
+
+  // Redirect from /checkin/:checkin to /checkin with query parameter
+  app.get("/checkin/:checkin", (req, res) => {
+    const { checkin } = req.params;
+    // Redirect to /test with query parameter `id`
+    res.redirect(`/checkin?checkin=${checkin}`);
   });
 
   /**

@@ -1,5 +1,5 @@
 import { Image, Footer } from "./index";
-import "./main.styl";
+import "./main.sass";
 import "./main-page.styl";
 import "@macrostrat/style-system";
 import h from "@macrostrat/hyper";

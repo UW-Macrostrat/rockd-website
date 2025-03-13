@@ -31,7 +31,7 @@ export function Footer() {
             h("li", h("a", {href: "/explore"}, "Explore")),
             h("li", h("a", {href: "/privacy"}, "Privacy Policy")),
             h("li", h("a", {href: "/terms"}, "Terms and Conditions")),
-            h("li", h("a", {href: "/trip?trip=1"}, "Trips")),
+            h("li", h("a", {href: "/trip/1"}, "Trips")),
             h("li", h("a", {href: "/metrics"}, "Metrics")),
         ])
     ]);
@@ -113,7 +113,7 @@ export function createCheckins(result, mapRef, marker, sort) {
                 pin,
                 ]),
                 h('p', {className: 'description'}, checkin.notes),
-                h('a', {className: 'checkin-link', href: "/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
+                h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
                 image,
                 h('div', {className: "image-details"}, [
                     h('h1', "Details"),
