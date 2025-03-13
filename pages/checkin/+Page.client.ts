@@ -171,7 +171,7 @@ export function Page() {
 }
 
 function observationFooter(observation) {
-    let LngLatProps = {
+    const LngLatProps = {
         position: {
             lat: observation.lat,
             lng: observation.lng
@@ -179,29 +179,30 @@ function observationFooter(observation) {
         precision: 3,
         zoom: 10
     };
-    console.log(LngLatProps);
+
+    const rocks = observation.rocks;
 
     // get liths
     let liths = [];
-    for(var j = 0; j < observation.rocks.liths.length; j++) {                
-        liths.push(h('p', observation.rocks.liths[j].name));
+    for(var j = 0; j < rocks.liths.length; j++) {                
+        liths.push(h('p', { className: "observation-detail liths"}, rocks.liths[j].name));
     }
 
     // observation body
     let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
     return h('div', {className: 'observation-body'}, [
         h('h4', {className: 'observation-header'}, [
-            observation.rocks.strat_name?.strat_name_long,
+            rocks.strat_name?.strat_name_long,
             observation.lat ? LngLatCoords(LngLatProps) : null,
         ]),
         h('div', {className: 'observation-details'}, [
-            observation.rocks.strat_name?.strat_name_long ? h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long) : null,
-            observation.rocks.map_unit?.unit_name ? h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name) : null,
+            rocks.strat_name?.strat_name_long ? h('p', {className: 'observation-detail'}, rocks.strat_name?.strat_name_long) : null,
+            rocks.map_unit?.unit_name ? h('p', {className: 'observation-detail'}, rocks.map_unit?.unit_name) : null,
             obsAge ? h('p', {className: 'observation-detail'}, obsAge) : null,
-            h('p', {className: 'observation-detail interval'}, observation.rocks.interval.name),
-            h('p', {className: 'observation-detail liths'}, liths),
+            rocks.interval.name ? h('p', {className: 'observation-detail interval'}, rocks.interval.name) : null,
+            liths,
             observation.orientation.feature?.name ? h('p', {className: 'observation-detail'}, observation.orientation.feature?.name) : null,
-            h('p', {className: "notes"}, observation.rocks.notes),
+            h('p', {className: "notes"}, rocks.notes),
         ]),
     ]);
 }
