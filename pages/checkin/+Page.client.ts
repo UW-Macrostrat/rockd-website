@@ -76,43 +76,17 @@ export function Page() {
             headerBody,
         ])
     );
+    console.log("checkin", checkin);
 
     // add observations
     for(var i = 0; i < checkin.observations.length; i++) {
         let observation = checkin.observations[i];
 
         if(Object.keys(observation.rocks).length != 0) {
-            // get liths
-            let liths = [];
-            for(var j = 0; j < observation.rocks.liths.length; j++) {                
-                liths.push(h('p', observation.rocks.liths[j].name));
-            }
-            
-
-            let LngLatProps = {
-                position: {
-                    lat: observation.lat,
-                    lng: observation.lng
-                },
-                precision: 3,
-                zoom: 10
-            };
-
             // if photo exists
             let imageSrc;
             imageSrc = imageExists(apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
-            let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
-            let observationBody = h('div', {className: 'observation-body'}, [
-                h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),
-                h('div', {className: 'observation-details'}, [
-                    h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-                    h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
-                    h('p', {className: 'observation-detail'}, obsAge),
-                    h('p', {className: 'observation-detail'}, liths),
-                    h('p', {className: 'observation-detail'}, observation.orientation.feature?.name),
-                    LngLatCoords(LngLatProps)
-                ]),
-            ]);
+            let observationBody = observationFooter(observation);
 
             observations.push(
                 h('div', {className: 'observation'}, [
@@ -171,7 +145,7 @@ export function Page() {
 
     let main = h('div', [
         h('div', { className: showMap ? 'hide' : 'main'}, [
-            h('h1', { className: "checkin-header" }, checkin.description),
+            h('h1', { className: "checkin-header" }, checkin.notes),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
             h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
                 profile_pic,
@@ -196,4 +170,38 @@ export function Page() {
 
 
     return overlayOpen ? overlay : main;
+}
+
+function observationFooter(observation) {
+    let LngLatProps = {
+        position: {
+            lat: observation.lat,
+            lng: observation.lng
+        },
+        precision: 3,
+        zoom: 10
+    };
+
+    // get liths
+    let liths = [];
+    for(var j = 0; j < observation.rocks.liths.length; j++) {                
+        liths.push(h('p', observation.rocks.liths[j].name));
+    }
+
+    // observation body
+    let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
+    return h('div', {className: 'observation-body'}, [
+        h('h4', {className: 'observation-header'}, [
+            observation.rocks.strat_name?.strat_name_long,
+            LngLatCoords(LngLatProps)
+        ]),
+        h('div', {className: 'observation-details'}, [
+            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
+            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+            obsAge ? h('p', {className: 'observation-detail'}, obsAge) : null,
+            h('p', {className: 'observation-detail interval'}, observation.rocks.interval.name),
+            h('p', {className: 'observation-detail liths'}, liths),
+            observation.orientation.feature?.name ? h('p', {className: 'observation-detail'}, observation.orientation.feature?.name) : null,
+        ]),
+    ]);
 }
