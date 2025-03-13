@@ -81,7 +81,7 @@ html, body, .wrapper, #react, .app, #map
   display: inline-block
 
 .info-grid
-  box-shadow: -4px 0px 7px #aaa
+  box-shadow: -4px 0px 7px var(--panel-background-color)
   z-index: 9
 
 .trip-meta
@@ -213,7 +213,6 @@ html, body, .wrapper, #react, .app, #map
 
 .stop-container
   text-align: center
-  box-shadow: -4px 0 7px #aaa
   z-index: 10
   height: 100vh
 
@@ -245,7 +244,7 @@ html, body, .wrapper, #react, .app, #map
 .stop-list
   overflow: scroll
   overflow-x: hidden
-  height: 70vh
+  height: 68vh
   -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%)
   padding: 20px 10px
 
@@ -332,7 +331,7 @@ html, body, .wrapper, #react, .app, #map
   margin: 0
 
 .top 
-  height: 30vh
+  height: 32vh
 
   .checkin-header
     padding: 30px
@@ -381,4 +380,6 @@ html, body, .wrapper, #react, .app, #map
   border: 2px solid var(--text-emphasized-color)
   border-radius: 4px
   padding: 7px
- 
+
+.checkin-info
+  text-align: left

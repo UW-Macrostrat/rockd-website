@@ -10,9 +10,10 @@ import {
     Area,
     AreaChart,
   } from "recharts";
-import { Footer } from "../index";
+import { apiURLOld, Footer, useRockdAPI } from "../index";
 import "./main.styl";
-import "../main.styl";
+import "../main.sass";
+import { useAPIResult } from "@macrostrat/ui-components";
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -34,54 +35,20 @@ export function Page() {
     lower.setFullYear(currentDate.getFullYear() - 1);
     let upper = new Date();
 
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [checkinBound, setCheckin] = useState([lower, upper]);    
     const [signupBound, setSignup] = useState([lower, upper]);
     const [activeBound, setActive] = useState([lower, upper]);
 
-    useEffect(() => {
-        fetch("https://rockd.org/api/v2/metrics")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched data:', data); // Log fetched data for debugging
-                setUserData(data);
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+    // new API doesn't return all data
+    const userData = useAPIResult(apiURLOld + "metrics");
 
-    if (loading) {
+    if (!userData) {
         return h("div", { className: 'loading' }, [
             h("p", null, "Loading...")
         ]);
     }
 
-    if (error) {
-        return h("div", { className: 'error' }, [
-            h("h1", "Error"),
-            h("p", error)
-        ]);
-    }
-
-    if (!userData) {
-        return h("div", { className: 'error' }, [
-            h("h1", "No data found"),  
-        ]);
-    }
-
-    let data = userData.success.data;
+    const data = userData.success.data;
 
     // format data
     interface InputData {
@@ -128,8 +95,8 @@ export function Page() {
             name: `${item.month}/${String(item.year).slice(-2)}`, 
             Total: parseInt(item.count)
         });
-    }      
-    checkins_by_month.pop();
+    }
+    checkins_by_month.pop();      
     currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
     currentName = checkins_by_month[checkins_by_month.length - 1].name;
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
