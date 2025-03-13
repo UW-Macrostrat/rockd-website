@@ -1,6 +1,6 @@
 import h from "@macrostrat/hyper";
 
-import { useMap, useMapRef } from "@macrostrat/mapbox-react";
+import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
@@ -13,10 +13,10 @@ import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
-import "../main.styl";
-import { createCheckins } from "../index";
+import "../main.sass";
+import { createCheckins, Image, useRockdAPI } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -38,13 +38,12 @@ const _macrostratStyle = buildMacrostratStyle({
   strokeOpacity: 0.1,
 }) as mapboxgl.Style;
 
-const types = [
+const type = 
   {
     id: "Sample",
     name: "Sample",
     color: "purple",
-  },
-];
+  };
 
 function weaverStyle(type: object) {
   const color = type?.color ?? "dodgerblue";
@@ -89,17 +88,6 @@ function weaverStyle(type: object) {
   };
 }
 
-
-
-function test({selectedCheckins}) {
-  // return null;
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  
-  console.log("selected checkins", selectedCheckins);
-  return selectedCheckins;
-}
-
 function WeaverMap({
   mapboxToken,
 }: {
@@ -108,11 +96,8 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const [isOpen, setOpen] = useState(false);
-
-  const [type, setType] = useState(types[0]);
-
   const style = useMapStyle(type, mapboxToken);
+  const [sort, setSort] = useState("likes");
 
   // overlay
   const [isOpenSelected, setOpenSelected] = useState(true);
@@ -123,9 +108,189 @@ function WeaverMap({
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
     setOpenSelected(true);
+
+    let previous = document.querySelectorAll('.filtered_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
   }, []);
 
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
+
+  function AutoComplete() {
+    const mapRef = useMapRef();
+    const map = mapRef.current;
+    const [filters, setFilters] = useState([]);
+    const [autocompleteOpen, setAutocompleteOpen] = useState(true);
+    const [input, setInput] = useState('');
+    const [close, setClose] = useState(false);  
+  
+    const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
+    let filteredCheckins = h('div.filtered-checkins-container', [
+      h("div.filtered-checkins", person_data && person_data.length > 0 ? createCheckins(person_data, mapRef, "explore/green-circle.png", sort) : null)
+    ]);
+
+    // add markers for filtered checkins
+    let coordinates = [];
+    let lngs = [];
+    let lats = [];
+
+    if(person_data && person_data.length > 0) {
+      person_data.forEach((checkin) => {
+        coordinates.push([checkin.lng, checkin.lat]);
+        lngs.push(checkin.lng);
+        lats.push(checkin.lat);
+      });
+  
+      let previous = document.querySelectorAll('.filtered_pin');
+      previous.forEach((marker) => {
+        marker.remove();
+      });
+
+      let previousFeatured = document.querySelectorAll('.marker_pin');
+      previousFeatured.forEach((marker) => {
+        marker.remove();
+      });
+
+      if (!close) {
+        let stop = 0;
+        coordinates.forEach((coord) => {
+          stop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'filtered_pin';
+
+          const number = document.createElement('span');
+          number.innerText = stop;
+
+          // Append the number to the marker
+          el.appendChild(number);
+
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
+
+      map.fitBounds([
+          [ Math.max(...lngs), Math.max(...lats) ],
+          [ Math.min(...lngs), Math.min(...lats) ]
+      ], {
+          maxZoom: 12,
+          duration: 0,
+          padding: 75
+      });
+    }
+
+    
+
+    // rest
+    const handleInputChange = (event) => {
+      setAutocompleteOpen(true);
+      setInput(event.target.value); 
+      setClose(false);
+    };
+  
+    let result = null;
+  
+    try {
+      result = useRockdAPI("autocomplete/" + input);
+    } catch (e) {
+      return null;
+    }
+  
+    let searchBar = h('div.search-bar', [
+      h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
+      h('div.search-icon', [
+        h(Image, { src: "explore/search-icon.png" }),
+      ]),
+      h('div.x-icon', [
+        h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
+            let input = document.querySelector('input');
+            input.value = "";
+            setAutocompleteOpen(false);
+            setClose(true);
+
+            let previous = document.querySelectorAll('.filtered_pin');
+            previous.forEach((marker) => {
+              marker.remove();
+            });
+          } 
+        }),
+      ]),
+    ]);
+  
+    let filterContainer = filters.length != 0 ? h("div.filter-container", [
+      h('h2', "Filters"),
+      h('ul', filters.map((item) => {
+        return h("div.filter-item", [
+          h('li', item.name),
+          h('div.red-bar', { onClick: () => {
+              setFilters(filters.filter((filter) => filter != item));
+              if(filters.length == 1) {
+                setClose(true);
+
+                let previous = document.querySelectorAll('.filtered_pin');
+                previous.forEach((marker) => {
+                  marker.remove();
+                });
+              }
+            } 
+          })
+        ])
+      })),
+      filteredCheckins
+    ]) : null; 
+  
+    
+    if(!result || close) return h("div.autocomplete", searchBar);
+    result = result.success.data;
+  
+    let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
+        h('h2', "Taxa"),
+        h('ul', result.taxa.map((item) => {
+          return h('li', { 
+            onClick: () => { 
+              if(!filters.includes(item)) {
+                setAutocompleteOpen(false);
+                setFilters(filters.concat([item]));
+                console.log(item.id)
+              }
+            }
+          }, item.name);
+        }))
+      ]) : null;
+  
+    let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
+      h('h2', "People"),
+      h('ul', result.people.map((item) => {
+        return h('li', { 
+          onClick: () => { 
+            if(!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name);
+      }))
+    ]) : null;
+  
+    let results = h("div.results", [
+      taxa,
+      people,
+    ]);
+  
+    let wrapper = h('div.autocomplete-wrapper', [
+      filterContainer,
+      results,
+    ]);
+  
+    return h('div.autocomplete', [
+      searchBar,
+      wrapper
+    ]);
+  }
 
   function FeatureDetails() {
     // return null;
@@ -139,7 +304,7 @@ function WeaverMap({
       result = getCheckins(0, 0, 0, 0);
     } else if (bounds) {
       let distance = Math.abs(bounds.getEast() - bounds.getWest());
-      let newWest = bounds.getWest() + distance * .3;
+      let newWest = bounds.getWest() + distance * .35 + .05;
       result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
     } else {
       result = getCheckins(0, 0, 0, 0);
@@ -163,10 +328,11 @@ function WeaverMap({
       previous.forEach((marker) => {
         marker.remove();
       });
-      
-      console.log(selectedResult);
 
-      if (!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) {
+      // see if filtered checkins are showing
+      let previousFiltered = document.querySelectorAll('.filtered_pin');
+      
+      if ((!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) && previousFiltered?.length == 0) {
         let stop = 0;
         coordinates.forEach((coord) => {
           stop++;
@@ -200,7 +366,7 @@ function WeaverMap({
       });
 
       if(selectedCheckins?.length > 0 && isOpenSelected) {
-        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png");
+        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png", sort);
 
         selectedCheckins.forEach((checkin) => {
           selectedCords.push([checkin.lng, checkin.lat]);
@@ -244,12 +410,12 @@ function WeaverMap({
     if (result == null) return h("div.checkin-container",Spinner);
     result = result.success.data;  
   
-    checkins = createCheckins(result, mapRef, "explore/red-circle.png");
+    checkins = createCheckins(result, mapRef, "explore/red-circle.png", sort);
 
     let selectedCheckins = selectedResult?.success.data;
 
     if (selectedCheckins?.length > 0 && isOpenSelected) {
-      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png"));
+      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png", sort));
     }
     
     return h("div", {className: 'checkin-container'}, [
@@ -269,14 +435,34 @@ function WeaverMap({
     zoom: 10
   };
 
+  const handleChange = (event) => {
+    setSort(event.target.value);
+  };
+
+  let dropdown = h('select', { className: "sort-dropdown", onChange: handleChange }, [
+    h('option', { value: "likes" }, "Likes"),
+    h('option', { value: "created" }, "Date Created"),
+    h('option', { value: "added" }, "Date Added"),
+  ]);
+
+  let sortContainer = h('div.sort-container', [
+    h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
+    h('h3', "Sort By:"),
+    dropdown,
+  ]);
+
+  let autoComplete = h(AutoComplete);
+  let filler = h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps));
+
   if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
     overlay = h("div.sidebox", [
-      h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
       h('div.title', [
-        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
-        h("h1", "Selected Checkins"),
-        h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps)),
+        h('div', { className: "selected-center" }, [
+          h("h1", "Selected Checkins"),
+        ]),
       ]),
+      filler,
+      sortContainer,
       h("button", {
         className: "close-btn",
         onClick: () => setOpenSelected(false)
@@ -285,9 +471,12 @@ function WeaverMap({
     ]);
   } else {
     overlay = h("div.sidebox", [
-      h('div.title', [
-        h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
-        h("h1", "Featured Checkins"),
+      h('div.sidebox-header', [
+        h('div.title', [
+          h("h1", "Featured Checkins"),
+        ]),
+        autoComplete,
+        sortContainer,
       ]),
       h("div.overlay-div", featuredCheckin),
     ]);
@@ -302,7 +491,8 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanelOpen: isOpen,
+          contextPanelOpen: false,
+          className: "map-area-container",
         },
         [
           h(MapView, { style, mapboxToken }, [
@@ -333,7 +523,7 @@ function useMapStyle(type, mapboxToken) {
 
   // Auto select sample type
   useEffect(() => {
-    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(types[0]));
+    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
       buildInspectorStyle(baseStyle, overlayStyle, {
         mapboxToken,
         inDarkMode: isEnabled,
@@ -345,18 +535,6 @@ function useMapStyle(type, mapboxToken) {
   return actualStyle;
 }
 
-function formatCoordinates(latitude, longitude) {
-  // Round latitude and longitude to 4 decimal places
-  const roundedLatitude = latitude.toFixed(4);
-  const roundedLongitude = longitude.toFixed(4);
-
-  const latitudeDirection = latitude >= 0 ? 'N' : 'S';
-  const longitudeDirection = longitude >= 0 ? 'E' : 'W';
-
-  // Return the formatted string with rounded values
-  return `${Math.abs(roundedLatitude)}° ${latitudeDirection}, ${Math.abs(roundedLongitude)}° ${longitudeDirection}`;
-}
-
 function getCheckins(lat1, lat2, lng1, lng2) {
   // abitrary bounds around click point
   let minLat = Math.floor(lat1 * 100) / 100;
@@ -365,8 +543,17 @@ function getCheckins(lat1, lat2, lng1, lng2) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useAPIResult("https://rockd.org/api/v2/protected/checkins?minlat=" + minLat + 
+  return useRockdAPI("protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
+}
+
+function getPersonCheckins(personId) {
+  return useRockdAPI("protected/checkins?person_id=" + personId);
+}
+
+function getTaxonCheckins(taxonId) {
+  // not sure how to use api yet
+  return useAPIResult("https://rockd.org/api/v1/protected/checkins?taxon_id=" + taxonId);
 }

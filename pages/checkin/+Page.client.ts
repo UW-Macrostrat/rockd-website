@@ -3,17 +3,15 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer } from "../index";
-import "../main.styl";
+import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
+import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { checkIfClientRouting } from "vike/dist/esm/utils/assertRoutingType";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { set } from "react-datepicker/dist/date_utils";
 
 
 function imageExists(image_url){
@@ -27,93 +25,32 @@ function imageExists(image_url){
 
 export function Page() {
     const pageContext = usePageContext();
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [checkinNum, setCheckin] = useState(null);
+    const checkinID = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.checkin) : null;
+    const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [overlayImage, setOverlayImage] = useState(null);
     const [overlayBody, setOverlayBody] = useState(null);
     const [showMap, setShowMap] = useState(false);
-    const [center, setCenter] = useState({
-        lat: 0,
-        lng: 0
-    });
 
-    let stop;
-
-    useEffect(() => {
-        if (pageContext.urlParsed) {
-            stop = parseInt(pageContext.urlParsed.search.checkin);
-            setCheckin(stop);
-        } else {
-            setCheckin(0);
-        }
-
-        // Ensure trip ID is valid
-        if (isNaN(stop)) {
-            setLoading(false);
-            setError('Invalid checkin ID.');
-            return;
-        }
-
-        fetch("https://rockd.org/api/v2/protected/checkins?checkin_id=" + stop)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success && data.success.data.length > 0) {
-                    setUserData(data.success.data[0]);
-                    setCenter({
-                        lat: data.success.data[0].lat,
-                        lng: data.success.data[0].lng
-                    });
-                    console.log("Center: ", center);
-                } else {
-                    setUserData(null);
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []); 
-
-    if (loading) {
-        if(checkinNum == null) {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading checkin..."),
-            ]);
-        } else {
-            return h("div", { className: 'loading' }, [
-                h("h1", "Loading checkin " + checkinNum + "..."),
-            ]);
-        }
-
+    if (!checkinData) {
+        return h("div", { className: 'loading' }, [
+            h("h1", "Loading checkin..."),
+        ]);       
     }
 
-    if (error) {
+    if (checkinData.success.data.length == 0) {
         return h("div", { className: 'error' }, [
-            h("h1", "Error"),
-            h("p", error)
-        ]);
+            h("h1", "Checkin " + checkinID + " not found"),  
+        ]); 
     }
 
-    if (!userData) {
-        return h("div", { className: 'error' }, [
-            h("h1", "Trip " + checkinNum + " not found"),  
-        ]);
+    const checkin = checkinData.success.data[0];
+    const center = {
+        lat: checkin.lat,
+        lng: checkin.lng
     }
 
-    let checkin = userData;
-
-    let profile_pic = h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
     // format rating
     let ratingArr = [];
@@ -125,7 +62,7 @@ export function Page() {
     let observations = [];
 
     // add checkin photo and notes
-    let headerImgUrl = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    let headerImgUrl = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
     let headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
@@ -163,7 +100,7 @@ export function Page() {
 
             // if photo exists
             let imageSrc;
-            imageSrc = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            imageSrc = imageExists(apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
             let observationBody = h('div', {className: 'observation-body'}, [
                 h('h4', {className: 'observation-header'}, observation.rocks.strat_name?.strat_name_long),

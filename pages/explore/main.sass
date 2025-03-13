@@ -34,7 +34,6 @@ body
   &.bp5-dark
     color-scheme: dark
     color: $dark-text
-    background-color: $dark-background
     // each item in color map
     @each $name, $color in $dark-colors
       --#{$name}: #{$color}
@@ -49,106 +48,17 @@ body
   background-color: var(--panel-background-color)
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
-.checkin
-  background-color: var(--panel-background-color)
-  color: black
-  text-align: left
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
-  padding: 15px
-  padding-bottom: 6px
-  border-radius: 2%
-  font-size: 14px
-  color: var(--text-emphasized-color)
-  margin-top: 10px
-
-  h3
-    color: var(--text-emphasized-color)
-
-  a
-    color: black
-    text-decoration: none
-
-    &:hover
-      color: black
-
-  .star
-    height: 15px
-
-  .checkin-header
-    display: flex
-
-  .checkin-name
-    font-size: 20px
-    font-weight: 500
-    color: #333
-    margin-bottom: 0
-
-  .profile-pic
-    height: 80px
-    width: 80px
-    border-radius: 50%
-    display: inline-block
-    margin-right: 10px
-
-  .box-header
-    display: flex
-
-  .name
-    margin: 0
-
-  .checkin-info
-    display: grid
-    margin: auto
-    margin-left: 0
-
-  h3, h4, p
-    margin: 0
-
-  .checkin-link
-    position: relative
-
-    .image-details
-      position: absolute
-      top: -250px
-      left: 0
-      right: 0
-      bottom: 0
-      display: flex
-      justify-content: center
-      align-items: center
-      display: none
-      color: white
-
-    .observation-img
-      margin-top: 10px
-      width: 100%
-      height: 250px
-      object-fit: cover
-      border-radius: 2%
-
-    &:hover
-      .observation-img
-        -webkit-filter: brightness(70%)
-      .image-details
-        display: flex
-
-  .description
-    margin-top: 10px
-
-.navbar
-  background-color: white
-
 .map-container
   position: relative
 
 .overlay-div
   position: absolute
-  top: 10%
+  top: 23vh
   left: 0
-  z-index: 1000
+  z-index: 10
   border-radius: 0 4px 4px 0
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
-  height: 90vh
+  height: 77vh
   overflow-y: auto
   width: 100%
   padding: 8px
@@ -183,27 +93,25 @@ body
 
 .sidebox
   position: absolute
-  z-index: 1000
+  z-index: 10
   height: 100vh
   width: 35%
   top: 0
   left: 0
 
   .title
+    display: grid
+    margin: auto
+    width: 100%
     color: black
     position: fixed
     width: 35%
     background: rgba(255, 255, 255, 0.85)
-    margin: 0
     height: 10vh
-    display: flex
-    flex-direction: column
-    align-items: center
-    justify-content: center
-
+    
     h1
-      margin-bottom: 0
-      margin-top: 0
+      margin: auto
+
 
   .close-btn
     position: absolute
@@ -233,7 +141,7 @@ body
   margin: auto
   margin-right: 0
 
-.marker_pin
+.marker_pin, .filtered_pin
   background-image: url(https://storage.macrostrat.org/assets/rockd/explore/red-circle.png)
   width: 60px
   height: 60px
@@ -275,44 +183,6 @@ body
   width: 40px
   margin-left: 10px
   margin-top: 4px
-
-.checkin-footer
-  display: flex
-  justify-content: center
-
-  .likes-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    justify-content: end
-    place-items: center
-
-    .likes-image
-      width: 40px
-
-  .comments-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    place-items: center
-
-    .comments-image
-      width: 40px
-
-  .observations-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    place-items: center
-
-    .observations-image
-      width: 40px
-
-.dark-button
-  position: absolute
-  top: 3vh
-  left: 3%
-  z-index: 100
 
 .sidebox
   background-color: var(--semi-translucent-background)
@@ -358,3 +228,196 @@ body
   
   &:hover
     background-color: var(--accent-secondary-hover-color)
+
+.sort-dropdown
+  height: 3vh
+  background-color: var(--accent-secondary-color)
+
+.sort-container
+  position: absolute
+  top: 15vh
+  background-color: var(--panel-background-color)
+  width: 100%
+  z-index: 11
+  height: 8vh
+  display: grid
+  grid-template-columns: 30% 30% 40%
+
+  h3
+    margin: auto
+    margin-right: 5px
+
+  select
+    margin: auto
+    margin-left: 5px
+    border: none
+
+.selected-center
+  margin: auto
+  text-align: center
+
+.dark-button 
+  margin: 6px 15px
+  background-color: green
+
+.search-bar
+  height: 5vh
+  width: 100%
+  background-color: var(--panel-background-color)
+  
+  .search-icon
+    position: absolute
+    top: 0
+    margin-left: 10%
+    width: 8%
+    height: 5vh
+    
+    img 
+      height: 5vh
+      display: grid
+      margin: auto
+      filter: var(--img-color)
+      padding: 1vh 0
+
+  .x-icon
+    position: absolute
+    top: 0
+    right: 0
+    margin-right: 10%
+    width: 7%
+    height: 5vh
+
+    img
+      height: 5vh
+      display: grid
+      margin: auto
+      width: 100%
+      filter: var(--img-color)
+      cursor: pointer
+
+  input
+    width: 80%
+    margin: 0 10%
+    background-color: var(--accent-secondary-color)
+    color: var(--text-emphasized-color)
+    padding: 0 8%
+    height: 5vh
+    border: none
+
+
+.autocomplete
+  width: 100%
+  position: absolute
+  top: 10vh
+  z-index: 12
+  background-color: var(--panel-background-color)
+  color: var(--text-emphasized-color)
+  height: 5vh
+
+  h2
+    background-color: var(--accent-secondary-color)
+    padding: 10px
+    margin-bottom: 0
+  
+  li
+    list-style-type: none
+    background-color: var(--panel-background-color)
+    padding: 3px 10px
+
+    &:hover
+      background-color: var(--accent-secondary-hover-color)
+
+  p
+    padding-left: 10px
+  
+  ul
+    margin-top: 0
+    padding-left: 0
+
+  /* Scrollbar Styling */
+  &::-webkit-scrollbar
+    width: 12px
+
+  &::-webkit-scrollbar-track
+    background: rgba(200, 200, 200, 0.3)
+
+  &::-webkit-scrollbar-thumb
+    background-color: rgba(150, 150, 150, 0.6)
+    border-radius: 4px
+    transition: background-color 0.2s ease
+
+    &:hover
+      background-color: rgba(100, 100, 100, 0.8)
+
+._panel-subhead_z8iog_1
+  padding: 10px 20px
+  background-color: #333
+  color: white
+  border: none
+  cursor: pointer
+  border-radius: 4px
+  width: 100%
+
+
+.results
+  padding-top: 10px
+  overflow-y: auto
+  height: 85vh
+  background-color: var(--panel-background-color)
+  /* Scrollbar Styling */
+  &::-webkit-scrollbar
+    width: 12px
+
+  &::-webkit-scrollbar-track
+    background: rgba(200, 200, 200, 0.3)
+
+  &::-webkit-scrollbar-thumb
+    background-color: rgba(150, 150, 150, 0.6)
+    border-radius: 4px
+    transition: background-color 0.2s ease
+
+    &:hover
+      background-color: rgba(100, 100, 100, 0.8)
+
+
+.filter-item
+  display: grid
+  grid-template-columns: 50% 50%
+
+  li 
+    &:hover
+      background-color: var(--panel-background-color)
+
+  .red-bar
+    width: 15%
+    height: 7px
+    border-radius: 15px
+    margin: auto
+    background-color: red
+    margin-right: 10px
+    cursor: pointer
+
+
+.autocomplete-wrapper
+  background-color: var(--panel-background-color)
+
+.filtered-checkins-container
+  background-color: var(--panel-background-color)
+
+.filtered-checkins
+  padding: 8px
+  height: 75vh
+  overflow-y: auto
+
+.filtered_pin
+  background-image: url(https://storage.macrostrat.org/assets/rockd/explore/green-circle.png)
+
+.coordinates
+  position: absolute
+  top: 10vh
+  height: 5vh
+  background-color: var(--panel-background-color)
+  width: 100%
+  color: var(--text-emphasized-color)
+  display: flex
+  justify-content: center

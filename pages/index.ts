@@ -1,6 +1,7 @@
 import h from "@macrostrat/hyper";
 import { MacrostratIcon } from "~/components";
 import { LngLatCoords } from "@macrostrat/map-interface";
+import { useAPIResult } from "@macrostrat/ui-components";
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
@@ -30,13 +31,13 @@ export function Footer() {
             h("li", h("a", {href: "/explore"}, "Explore")),
             h("li", h("a", {href: "/privacy"}, "Privacy Policy")),
             h("li", h("a", {href: "/terms"}, "Terms and Conditions")),
-            h("li", h("a", {href: "/trip?trip=1"}, "Trips")),
+            h("li", h("a", {href: "/trip/1"}, "Trips")),
             h("li", h("a", {href: "/metrics"}, "Metrics")),
         ])
     ]);
 }
 
-export function createCheckins(result, mapRef, marker) {
+export function createCheckins(result, mapRef, marker, sort) {
     let checkins = [];
     let map = mapRef?.current;
     let stop = 0;
@@ -44,6 +45,16 @@ export function createCheckins(result, mapRef, marker) {
     let pinClass = "marker-number";
     if (marker.includes("circle")) {
         pinClass = "circle-number";
+    }
+
+    if(sort == "likes") {
+        result.sort((a, b) => b.likes - a.likes);
+    } else if(sort == "created") {
+        result.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+    } else if(sort == "added") {
+        result.sort((a, b) => new Date(b.added).getTime() - new Date(a.added).getTime());
+    } else {
+        result.sort((a, b) => b.rating - a.rating);
     }
       
     result.forEach((checkin) => {
@@ -91,7 +102,7 @@ export function createCheckins(result, mapRef, marker) {
         let temp = h('div', { className: 'checkin' }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
-                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: "https://rockd.org/api/v2/protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
                 h('div', {className: 'checkin-info'}, [
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
                     h('h4', {className: 'edited'}, checkin.created),
@@ -102,7 +113,7 @@ export function createCheckins(result, mapRef, marker) {
                 pin,
                 ]),
                 h('p', {className: 'description'}, checkin.notes),
-                h('a', {className: 'checkin-link', href: "/checkin?checkin=" + checkin.checkin_id, target: "_blank"}, [
+                h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
                 image,
                 h('div', {className: "image-details"}, [
                     h('h1', "Details"),
@@ -138,4 +149,11 @@ export function imageExists(image_url){
     http.send();
   
     return http.status != 404;
+}
+
+export const apiURLOld = "https://rockd.org/api/v2/"; // old route
+export const apiURL = "https://rockd.dev.svc.macrostrat.org/api/v2/"; // new route
+
+export function useRockdAPI(src) {
+    return useAPIResult(apiURL + src);
 }

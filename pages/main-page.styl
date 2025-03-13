@@ -130,11 +130,10 @@ img
 .record-img-caption
   margin-top 10px
   font-size 90%
-  & > span
-    padding 10px
-    background-color rgba(100, 100, 100, 0.5)
-    border-radius 4px
-
+  background-color rgba(100, 100, 100, 0.5)
+  padding 10px
+  border-radius 4px
+    
 .full-width
   width 100%
 
@@ -177,6 +176,10 @@ img
 .img-container
   position absolute
   z-index 2
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+  padding: 30px
 
 .main-content
   position absolute
@@ -218,3 +221,22 @@ img
 
 .main-img 
   width 70%
+
+.image-grid
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+
+  .col-sm-6
+    padding: 30px
+
+.download-buttons
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+
+  a 
+    display: grid
+    margin: auto
+
+  
