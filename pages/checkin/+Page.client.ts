@@ -76,12 +76,10 @@ export function Page() {
             headerBody,
         ])
     );
-    console.log("checkin", checkin);
 
     // add observations
-    for(var i = 0; i < checkin.observations.length; i++) {
-        let observation = checkin.observations[i];
-
+    checkin.observations.forEach(observation => {
+        console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
             let imageSrc;
@@ -99,7 +97,7 @@ export function Page() {
                 ])
             );
         }        
-    }
+    });
 
     const newMapPosition: MapPosition = {
         camera: {
@@ -181,6 +179,7 @@ function observationFooter(observation) {
         precision: 3,
         zoom: 10
     };
+    console.log(LngLatProps);
 
     // get liths
     let liths = [];
@@ -193,15 +192,16 @@ function observationFooter(observation) {
     return h('div', {className: 'observation-body'}, [
         h('h4', {className: 'observation-header'}, [
             observation.rocks.strat_name?.strat_name_long,
-            LngLatCoords(LngLatProps)
+            observation.lat ? LngLatCoords(LngLatProps) : null,
         ]),
         h('div', {className: 'observation-details'}, [
-            h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long),
-            h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name),
+            observation.rocks.strat_name?.strat_name_long ? h('p', {className: 'observation-detail'}, observation.rocks.strat_name?.strat_name_long) : null,
+            observation.rocks.map_unit?.unit_name ? h('p', {className: 'observation-detail'}, observation.rocks.map_unit?.unit_name) : null,
             obsAge ? h('p', {className: 'observation-detail'}, obsAge) : null,
             h('p', {className: 'observation-detail interval'}, observation.rocks.interval.name),
             h('p', {className: 'observation-detail liths'}, liths),
             observation.orientation.feature?.name ? h('p', {className: 'observation-detail'}, observation.orientation.feature?.name) : null,
+            h('p', {className: "notes"}, observation.rocks.notes),
         ]),
     ]);
 }
