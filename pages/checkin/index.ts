@@ -23,9 +23,7 @@ function imageExists(image_url){
     return http.status != 404;
 }
 
-export function Page() {
-    const pageContext = usePageContext();
-    const checkinID = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.checkin) : null;
+export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [overlayImage, setOverlayImage] = useState(null);
