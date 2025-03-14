@@ -1,6 +1,5 @@
 import h from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
-import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins, apiURL, apiURLOld, useRockdAPI } from "../index";
@@ -9,9 +8,9 @@ import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
+import { Icon } from "~/components";
 
 export function Trips({trip}) {
-    const pageContext = usePageContext();
     const mapContainerRef = useRef(null);
     const center = null;
     const mapRef = useRef(null);
@@ -43,6 +42,7 @@ export function Trips({trip}) {
         let lats = [];
         let lngs = [];
         const map = mapRef.current;
+
         userData.success.data[0].stops.forEach((stop, index) => {
             const count = index + 1;
             const el = document.createElement('div');
