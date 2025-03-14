@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner } from "@blueprintjs/core";
+import { Spinner, Icon } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -203,10 +203,10 @@ function WeaverMap({
     let searchBar = h('div.search-bar', [
       h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
       h('div.search-icon', [
-        h(Image, { src: "explore/search-icon.png" }),
+        h(Icon, { icon: "search"}),
       ]),
       h('div.x-icon', [
-        h(Image, { className: 'x-icon', src: "explore/x-button.png", onClick: () => {
+        h(Icon, { className: 'x-icon', icon: "cross", onClick: () => {
             let input = document.querySelector('input');
             input.value = "";
             setAutocompleteOpen(false);

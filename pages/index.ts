@@ -2,6 +2,7 @@ import h from "@macrostrat/hyper";
 import { MacrostratIcon } from "~/components";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useAPIResult } from "@macrostrat/ui-components";
+import { Icon } from "@blueprintjs/core";
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
@@ -74,11 +75,11 @@ export function createCheckins(result, mapRef, marker, sort) {
         // format rating
         let ratingArr = [];
         for(var i = 0; i < checkin.rating; i++) {
-            ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+            ratingArr.push(h(Icon, {className: "star", icon: "star", style: {color: 'white'}}));
         }
     
         for(var i = 0; i < 5 - checkin.rating; i++) {
-        ratingArr.push(h(Image, {className: "star", src: "emptystar.png"}));
+            ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
         }
         let image;
     
