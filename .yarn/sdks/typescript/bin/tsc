@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/.env node
 
 const {existsSync} = require(`fs`);
 const {createRequire} = require(`module`);
