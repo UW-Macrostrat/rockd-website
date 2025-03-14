@@ -141,7 +141,10 @@ export function Checkins({checkinID}) {
 
     let main = h('div', [
         h('div', { className: showMap ? 'hide' : 'main'}, [
-            h('h1', { className: "checkin-header" }, checkin.notes),
+            h('div', { className: "checkin-header" }, [
+                h('h1', checkin.notes),
+                h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
+            ]),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
             h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
                 profile_pic,
@@ -159,7 +162,6 @@ export function Checkins({checkinID}) {
         ]),
         h('div', { className: showMap ? 'hide' : 'bottom' }, [
             h(Footer),
-            h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
         ]),
         h('div', { className: !showMap ? 'hide' : 'map'}, map)
     ])

@@ -15,11 +15,11 @@ export function BlankImage({ src, className, width, height, onClick }) {
 export function Footer() {
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
-            h("h3", {className: "footer-text"}, [
+            h("h3", {className: "footer-text top"}, [
                 "Produced by the ",
                 h("a", {href: "https://macrostrat.org"} , "UW Macrostrat Lab")
             ]),
-            h("h3", {className: "footer-text"}, [
+            h("h3", {className: "footer-text bottom"}, [
                 "Funded by ",
                 h("a", {href: "https://nsf.gov"}, "NSF"),
                 " and ",
