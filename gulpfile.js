@@ -82,7 +82,7 @@ function bundleApp(isProduction) {
 		process.env.NODE_ENV = 'production'
 		appBundler
 			// transform ES6 and JSX to ES5 with babelify
-	  	.transform('babelify', {presets: ['@babel/preset-env', '@babel/preset-react']})
+	  	.transform('babelify', {presets: ['@babel/preset-.env', '@babel/preset-react']})
 	    .bundle()
 	    .on('error',gutil.log)
 	    .pipe(source('bundle.js'))
@@ -103,7 +103,7 @@ function bundleApp(isProduction) {
 	} else {
 		appBundler
 			// transform ES6 and JSX to ES5 with babelify
-	  	.transform('babelify', {presets: ['@babel/preset-env', '@babel/preset-react']})
+	  	.transform('babelify', {presets: ['@babel/preset-.env', '@babel/preset-react']})
 	    .bundle()
 	    .on('error',gutil.log)
 	    .pipe(source('bundle.js'))
