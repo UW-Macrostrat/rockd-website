@@ -1,9 +1,9 @@
 import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
-import { usePageContext } from 'vike-react/usePageContext';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
@@ -53,7 +53,10 @@ export function Checkins({checkinID}) {
     // format rating
     let ratingArr = [];
     for(var i = 0; i < checkin.rating; i++) {
-        ratingArr.push(h(Image, {className: "star", src: "blackstar.png"}));
+        ratingArr.push(h(Icon, {className: "star", icon: "star", style: {color: 'white'}}));
+    }
+    for(var i = 0; i < 5 - checkin.rating; i++) {
+        ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
     }
 
     // get observations
