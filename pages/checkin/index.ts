@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, useRockdAPI } from "../index";
+import { BlankImage, Image, Footer, apiURL, useRockdAPI, imageExists } from "../index";
 import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -12,16 +12,6 @@ import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
-
-
-function imageExists(image_url){
-    var http = new XMLHttpRequest();
-  
-    http.open('HEAD', image_url, false);
-    http.send();
-  
-    return http.status != 404;
-}
 
 export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
@@ -63,7 +53,7 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const showImage = imageExists(apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null;
+    const showImage = checkin.photo;
     const headerImgUrl = showImage ? apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
@@ -84,7 +74,7 @@ export function Checkins({checkinID}) {
         console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            const showImage = imageExists(apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo);
+            const showImage = observation.photo;
             const imageSrc = showImage ? apiURL + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let observationBody = observationFooter(observation);
 

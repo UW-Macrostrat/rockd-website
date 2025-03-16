@@ -1,8 +1,8 @@
 import h from "@macrostrat/hyper";
-import { MacrostratIcon } from "~/components";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
+import mapboxgl from "mapbox-gl";
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
@@ -40,7 +40,7 @@ export function Footer() {
 
 export function createCheckins(result, mapRef, marker, sort) {
     let checkins = [];
-    let map = mapRef?.current;
+    const map = mapRef?.current;
     let stop = 0;
 
     let pinClass = "marker-number";
@@ -58,20 +58,7 @@ export function createCheckins(result, mapRef, marker, sort) {
         result.sort((a, b) => b.rating - a.rating);
     }
       
-    result.forEach((checkin) => {
-        stop++;
-        let pin = h('div', 
-        { src: "marker_container.png", 
-            className: "marker_container", 
-            onClick: () => { 
-            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-            } 
-        }, [
-            h(Image, { src: marker, className: "marker" }),
-            h('span', { className: pinClass }, stop)
-        ])
-    
-    
+    result.forEach((checkin) => {    
         // format rating
         let ratingArr = [];
         for(var i = 0; i < checkin.rating; i++) {
@@ -105,9 +92,28 @@ export function createCheckins(result, mapRef, marker, sort) {
             zoom: 10
         };
 
-        let temp = h('div', { className: 'checkin' , onClick: () => { 
-            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-            } }, [
+        let temp = h('div', { 
+                className: 'checkin', 
+                onClick: () => { 
+                    map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+                }, 
+                onMouseEnter: () => {
+                    // marker
+                    const el = document.createElement('div');
+                    el.className = 'marker_pin';
+        
+                    // Create marker
+                    new mapboxgl.Marker(el)
+                    .setLngLat([checkin.lng, checkin.lat])
+                    .addTo(map);
+                },
+                onMouseLeave: () => {
+                    let previous = document.querySelectorAll('.marker_pin');
+                    previous.forEach((marker) => {
+                        marker.remove();
+                    });
+                } 
+            }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
                 h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
