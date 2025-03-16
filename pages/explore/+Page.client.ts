@@ -117,6 +117,7 @@ function WeaverMap({
     const mapRef = useMapRef();
     const map = mapRef.current;
     const [bounds, setBounds] = useState(map?.getBounds());
+    const [loading, setLoading] = useState(true);
     let checkins = [];
     let result;
   
@@ -229,7 +230,7 @@ function WeaverMap({
       }
     }, [bounds]);
   
-    if (result == null) return h("div.checkin-container",Spinner);
+    if (result == null) return h(Spinner);
     result = result.success.data;  
   
     checkins = createCheckins(result, mapRef, "explore/red-circle.png", sort);
@@ -246,6 +247,7 @@ function WeaverMap({
   }
 
   let featuredCheckin = h(FeatureDetails);
+  console.log("featured checkin", featuredCheckin);
   let overlay;
 
   let LngLatProps = {
