@@ -149,22 +149,26 @@ h4
   width: 100%
   top: 0
   left: 0
+  overflow: auto
+
 
   .overlay-body
-    display: grid
+    margin: 0 30%
+    width: 40%
+    border-radius: 2%
+    box-shadow: 0 0 0 1px var(--card-shadow-color)
+    margin-bottom: 5vh
+
     img
-      margin: auto
-      width: 40%
-      margin-top: 20px
+      width: 100%
+      border-radius: 2% 2% 0 0
 
     .observation-body
-      margin: auto
       padding: 3px
       color: var(--text)
       text-align: center
       padding-top: 10px
-      box-shadow: 0 0 0 1px var(--card-shadow-color)
-      width: 40%
+      width: 100%
 
 .close
   position: absolute
@@ -184,7 +188,7 @@ h4
   z-index: 100
   width: 100%
   background-color: var(--panel-text)
-  height: 50px
+  height: 7vh
 
 .map-container
   height: 95vh
@@ -193,9 +197,8 @@ h4
   display: none
 
 .left-arrow
-  height: 50px
-  padding: 10px
   filter: var(--anti-img-color)
+  cursor: pointer
 
 .overlay
   .banner
@@ -224,3 +227,18 @@ h4
 
 .observation-header
   padding: 10px
+
+.back-arrow
+  filter: var(--img-color)
+  position: fixed
+  svg
+    height: 10vh
+
+.banner-arrow
+  margin-left: 10px
+  svg
+    height: 7vh
+
+.overlay-header
+  height: 10vh
+  margin-left: 20%
