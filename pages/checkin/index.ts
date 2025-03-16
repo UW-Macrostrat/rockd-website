@@ -146,7 +146,7 @@ export function Checkins({checkinID}) {
         ])
     ]);
 
-    let main = h('div', [
+    let main = h('div', { className: "container" }, [
         h('div', { className: showMap ? 'hide' : 'main'}, [
             h('div', { className: "checkin-header" }, [
                 h('h1', checkin.notes),

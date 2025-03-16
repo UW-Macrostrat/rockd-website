@@ -445,7 +445,7 @@ function WeaverMap({
     h('option', { value: "added" }, "Date Added"),
   ]);
 
-  let sortContainer = h('div.sort-container', [
+  const sortContainer = h('div.sort-container', [
     h(DarkModeButton, { className: "dark-button", showText: true, minimal: true }),
     h('h3', "Sort By:"),
     dropdown,
