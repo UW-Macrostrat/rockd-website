@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { BlankImage, Image, Footer, apiURL, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -48,7 +48,7 @@ export function Checkins({checkinID}) {
         lng: checkin.lng
     }
 
-    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
     
     // format rating
     let ratingArr = [];
@@ -63,8 +63,8 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const showImage = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null;
-    const headerImgUrl = showImage ? apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    const showImage = imageExists(apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null;
+    const headerImgUrl = showImage ? apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
@@ -84,8 +84,8 @@ export function Checkins({checkinID}) {
         console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            const showImage = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo);
-            const imageSrc = showImage ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            const showImage = imageExists(apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo);
+            const imageSrc = showImage ? apiURL + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let observationBody = observationFooter(observation);
 
             observations.push(
