@@ -117,7 +117,7 @@ export function Checkins({checkinID}) {
               ]),
               h('div', {className: 'banner', onClick: () => {
                 setShowMap(!showMap);
-              }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
+              }}, h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}})),
             ]
           );
 
@@ -132,10 +132,13 @@ export function Checkins({checkinID}) {
 
     // overlay
     let overlay = h('div', {className: 'overlay'}, [
-        h('div', {className: 'banner', onClick: () => {
-            setOverlayOpen(!overlayOpen);
-        }}, h(Image, { className: 'left-arrow', src: "checkins/left-arrow.png"})),
-
+        h('div.overlay-header', [
+            h(Icon, {className: "left-arrow back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
+                onClick: () => {
+                    setOverlayOpen(!overlayOpen);
+                }
+            }),
+        ]),
         h('div.overlay-body', [
             h(BlankImage, { className: 'observation-img', src: overlayImage }),
             overlayBody,
