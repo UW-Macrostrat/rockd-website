@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { BlankImage, createCheckins, apiURL, useRockdAPI } from "../index";
 import "../main.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -117,7 +117,7 @@ export function Trips({trip}) {
     data.updated = date.toLocaleDateString('en-US', options);
 
     // profile pic
-    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + data.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic"});
 
     // create stops
 

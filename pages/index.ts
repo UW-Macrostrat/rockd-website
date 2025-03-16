@@ -108,7 +108,7 @@ export function createCheckins(result, mapRef, marker, sort) {
         let temp = h('div', { className: 'checkin' }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
-                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURLOld + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
                 h('div', {className: 'checkin-info'}, [
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
                     h('h4', {className: 'edited'}, checkin.created),
