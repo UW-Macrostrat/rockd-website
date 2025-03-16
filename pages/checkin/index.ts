@@ -63,17 +63,18 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    let headerImgUrl = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null ? apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
-    let headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
+    const showImage = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo) && checkin.photo != null;
+    const headerImgUrl = showImage ? apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
         h('div', {className: 'observation'}, [
-            h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
+            showImage ? h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
                 setOverlayBody(h('div.observation-body',headerBody));
                 setOverlayImage(headerImgUrl);
                 setOverlayOpen(!overlayOpen);
                 }
-            }),
+            }) : null,
             headerBody,
         ])
     );
@@ -83,17 +84,17 @@ export function Checkins({checkinID}) {
         console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            let imageSrc;
-            imageSrc = imageExists(apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo) ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            const showImage = imageExists(apiURLOld + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo);
+            const imageSrc = showImage ? apiURLOld + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
             let observationBody = observationFooter(observation);
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
+                    showImage ? h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
                         setOverlayImage(imageSrc);
                         setOverlayBody(observationBody);
                         setOverlayOpen(!overlayOpen);
-                    }}),
+                    }}) : null,
                     observationBody,
                 ])
             );
@@ -197,10 +198,10 @@ function observationFooter(observation) {
     // observation body
     let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
     return h('div', {className: 'observation-body'}, [
-        h('h4', {className: 'observation-header'}, [
+        observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
             rocks.strat_name?.strat_name_long,
             observation.lat ? LngLatCoords(LngLatProps) : null,
-        ]),
+        ]) : null,
         h('div', {className: 'observation-details'}, [
             rocks.strat_name?.strat_name_long ? h('p', {className: 'observation-detail'}, rocks.strat_name?.strat_name_long) : null,
             rocks.map_unit?.unit_name ? h('p', {className: 'observation-detail'}, rocks.map_unit?.unit_name) : null,
