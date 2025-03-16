@@ -108,11 +108,6 @@ function WeaverMap({
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
     setOpenSelected(true);
-
-    let previous = document.querySelectorAll('.filtered_pin');
-    previous.forEach((marker) => {
-      marker.remove();
-    });
   }, []);
 
   let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
@@ -316,6 +311,7 @@ function WeaverMap({
   
     count++;
     
+    /*
     if(result != null) {
       // get featured checkins coordinates
       let coordinates = [];
@@ -353,6 +349,7 @@ function WeaverMap({
         });
       }
     }
+    */
 
     // add selected checkin markers
     useEffect(() => {
@@ -497,7 +494,6 @@ function WeaverMap({
         [
           h(MapView, { style, mapboxToken }, [
             h(MapMarker, {
-              position: inspectPosition,
               setPosition: onSelectPosition,
             }),
           ]),
