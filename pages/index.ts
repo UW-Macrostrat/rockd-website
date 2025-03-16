@@ -105,7 +105,9 @@ export function createCheckins(result, mapRef, marker, sort) {
             zoom: 10
         };
 
-        let temp = h('div', { className: 'checkin' }, [
+        let temp = h('div', { className: 'checkin' , onClick: () => { 
+            map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+            } }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
                 h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
@@ -116,7 +118,7 @@ export function createCheckins(result, mapRef, marker, sort) {
                     LngLatCoords(LngLatProps),
                     h('h3', {className: 'rating'}, ratingArr),
                 ]),
-                pin,
+                // pin,
                 ]),
                 h('p', {className: 'description'}, checkin.notes),
                 h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
