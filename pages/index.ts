@@ -81,12 +81,17 @@ export function createCheckins(result, mapRef, marker, sort) {
         for(var i = 0; i < 5 - checkin.rating; i++) {
             ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
         }
+        
         let image;
+        let showImage = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo);
     
-        if (imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo)) {
+        if (showImage) {
             image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
         } else {
-            image = h(Image, { className: 'observation-img', src: "rockd.jpg"});
+            image = h("div", { className: 'no-image' }, [
+                h('h1', "Details"),
+                h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
+            ]);
         }
 
         // for trips
@@ -116,22 +121,22 @@ export function createCheckins(result, mapRef, marker, sort) {
                 h('p', {className: 'description'}, checkin.notes),
                 h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
                 image,
-                h('div', {className: "image-details"}, [
+                showImage ? h('div', {className: "image-details"}, [
                     h('h1', "Details"),
-                    h(Image, {className: 'details-image', src: "explore/white-arrow.png"})
-                ])
+                    h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
+                ]) : null
                 ]),
                 h('div', {className: 'checkin-footer'}, [
                 h('div', {className: 'likes-container'}, [
-                    h(Image, {className: 'likes-image', src: "explore/thumbs-up.png"}),
+                    h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
                     h('h3', {className: 'likes'}, checkin.likes),
                 ]),
                 h('div', {className: 'observations-container'}, [
-                    h(Image, {className: 'observations-image', src: "explore/observations.png"}),
-                    h('h3', {className: 'comments'}, checkin.observations.length),
+                    h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
+                    h('h3', {className: 'likes'}, checkin.observations.length),
                 ]),
                 h('div', {className: 'comments-container'}, [
-                    h(Image, {className: 'comments-image', src: "explore/comment.png"}),
+                    h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
                     h('h3', {className: 'comments'}, checkin.comments),
                 ])
             ]),
