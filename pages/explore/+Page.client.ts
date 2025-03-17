@@ -123,9 +123,7 @@ function WeaverMap({
     if(!map) {
       result = getCheckins(0, 0, 0, 0);
     } else if (bounds) {
-      let distance = Math.abs(bounds.getEast() - bounds.getWest());
-      let newWest = bounds.getWest() + distance * .35 + .05;
-      result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
+      result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
     } else {
       result = getCheckins(0, 0, 0, 0);
     }
@@ -361,6 +359,7 @@ function WeaverMap({
         {
           contextPanelOpen: false,
           className: "map-area-container",
+          style: { width: "70%", left: "30%" },
         },
         [
           h(MapView, { style, mapboxToken }, [
