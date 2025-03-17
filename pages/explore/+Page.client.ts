@@ -127,6 +127,7 @@ function WeaverMap({
           h("h1", "Selected Checkins"),
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
         ]),
+        h(DarkModeButton, { className: "dark-btn", showText: true } )
       ]),
       h("button", {
         className: "close-btn",
