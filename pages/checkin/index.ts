@@ -99,18 +99,20 @@ export function Checkins({checkinID}) {
         },
       };
 
-    let map = h(MapAreaContainer,
+    let map = h("div.map", [
+        h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
             [
               h(MapView, { style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i', mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
                 h(MapMarker, {
                     position: center,
                    }),
               ]),
-              h('div', {className: 'banner', onClick: () => {
-                setShowMap(!showMap);
-              }}, h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}})),
             ]
-          );
+          ),
+        h('div', {className: 'banner', onClick: () => {
+            setShowMap(!showMap);
+          }}, h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}})),
+    ])
 
     let LngLatProps = {
         position: {
