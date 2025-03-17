@@ -70,7 +70,7 @@ export function createCheckins(result, mapRef, marker, sort) {
         }
         
         let image;
-        let showImage = imageExists("https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo);
+        const showImage = checkin.photo;
     
         if (showImage) {
             image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
@@ -154,15 +154,6 @@ export function createCheckins(result, mapRef, marker, sort) {
     });
     
     return checkins;
-}
-
-export function imageExists(image_url){
-    var http = new XMLHttpRequest();
-  
-    http.open('HEAD', image_url, false);
-    http.send();
-  
-    return http.status != 404;
 }
 
 export const apiURLOld = "https://rockd.org/api/v2/"; // old route

@@ -65,7 +65,7 @@ export function Checkins({checkinID}) {
                 setOverlayOpen(!overlayOpen);
                 }
             }) : null,
-            headerBody,
+            h("div.observation-body", headerBody),
         ])
     );
 
