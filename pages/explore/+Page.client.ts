@@ -16,7 +16,7 @@ import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.sass";
-import { createCheckins, Image, useRockdAPI } from "../index";
+import { BlankImage, apiURL, useRockdAPI } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -117,7 +117,6 @@ function WeaverMap({
     const mapRef = useMapRef();
     const map = mapRef.current;
     const [bounds, setBounds] = useState(map?.getBounds());
-    const [loading, setLoading] = useState(true);
     let checkins = [];
     let result;
   
@@ -137,46 +136,6 @@ function WeaverMap({
   
     count++;
     
-    /*
-    if(result != null) {
-      // get featured checkins coordinates
-      let coordinates = [];
-  
-      result.success.data.forEach((checkin) => {
-        coordinates.push([checkin.lng, checkin.lat]);
-      });
-  
-      let previous = document.querySelectorAll('.marker_pin');
-      previous.forEach((marker) => {
-        marker.remove();
-      });
-
-      // see if filtered checkins are showing
-      let previousFiltered = document.querySelectorAll('.filtered_pin');
-      
-      if ((!selectedResult || selectedResult?.success.data.length == 0 || !isOpenSelected) && previousFiltered?.length == 0) {
-        let stop = 0;
-        coordinates.forEach((coord) => {
-          stop++;
-          // marker
-          const el = document.createElement('div');
-          el.className = 'marker_pin';
-    
-          const number = document.createElement('span');
-          number.innerText = stop;
-    
-          // Append the number to the marker
-          el.appendChild(number);
-    
-          // Create marker
-          new mapboxgl.Marker(el)
-            .setLngLat(coord)
-            .addTo(map);
-        });
-      }
-    }
-    */
-
     // add selected checkin markers
     useEffect(() => {
       let selectedCheckins = selectedResult?.success.data;
@@ -188,7 +147,7 @@ function WeaverMap({
         marker.remove();
       });
 
-      if(selectedCheckins?.length > 0 && isOpenSelected) {
+      if(selectedCheckins?.length > 0 && inspectPosition) {
         finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png", sort);
 
         selectedCheckins.forEach((checkin) => {
@@ -201,12 +160,6 @@ function WeaverMap({
           // marker
           const el = document.createElement('div');
           el.className = 'selected_pin';
-
-          const number = document.createElement('span');
-          number.innerText = selectedStop;
-
-          // Append the number to the marker
-          el.appendChild(number);
 
           // Create marker
           new mapboxgl.Marker(el)
@@ -236,13 +189,124 @@ function WeaverMap({
 
     let selectedCheckins = selectedResult?.success.data;
 
-    if (selectedCheckins?.length > 0 && isOpenSelected) {
+    if (selectedCheckins?.length > 0 && inspectPosition) {
+      console.log("returning selected")
       return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png", sort));
     }
     
     return h("div", {className: 'checkin-container'}, [
         h('div', checkins)
       ]);
+
+    function createCheckins(result, mapRef, marker, sort) {
+        let checkins = [];
+        const map = mapRef?.current;
+        let stop = 0;
+    
+        let pinClass = "marker-number";
+        if (marker.includes("circle")) {
+            pinClass = "circle-number";
+        }
+          
+        result.forEach((checkin) => {    
+            // format rating
+            let ratingArr = [];
+            for(var i = 0; i < checkin.rating; i++) {
+                ratingArr.push(h(Icon, {className: "star", icon: "star", style: {color: 'white'}}));
+            }
+        
+            for(var i = 0; i < 5 - checkin.rating; i++) {
+                ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
+            }
+            
+            let image;
+            const showImage = checkin.photo;
+        
+            if (showImage) {
+                image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+            } else {
+                image = h("div", { className: 'no-image' }, [
+                    h('h1', "Details"),
+                    h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
+                ]);
+            }
+    
+            // for trips
+            let stop_name = checkin?.name ?? null;
+            let LngLatProps = {
+                position: {
+                    lat: checkin.lat,
+                    lng: checkin.lng
+                },
+                precision: 3,
+                zoom: 10
+            };
+    
+            let temp = h('div', { 
+                    className: 'checkin', 
+                    onClick: () => { 
+                        map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+                        setInspectPosition({lat: checkin.lat, lng: checkin.lng});
+                        console.log("inspect position set")
+                    }, 
+                    onMouseEnter: () => {
+                        // marker
+                        const el = document.createElement('div');
+                        el.className = 'marker_pin';
+            
+                        // Create marker
+                        new mapboxgl.Marker(el)
+                        .setLngLat([checkin.lng, checkin.lat])
+                        .addTo(map);
+                    },
+                    onMouseLeave: () => {
+                        let previous = document.querySelectorAll('.marker_pin');
+                        previous.forEach((marker) => {
+                            marker.remove();
+                        });
+                    } 
+                }, [
+                h('h1', {className: 'stop-name'}, stop_name),
+                h('div', {className: 'checkin-header'}, [
+                    h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+                    h('div', {className: 'checkin-info'}, [
+                        h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                        h('h4', {className: 'edited'}, checkin.created),
+                        h('p', "Near " + checkin.near),
+                        LngLatCoords(LngLatProps),
+                        h('h3', {className: 'rating'}, ratingArr),
+                    ]),
+                    // pin,
+                    ]),
+                    h('p', {className: 'description'}, checkin.notes),
+                    h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
+                    image,
+                    showImage ? h('div', {className: "image-details"}, [
+                        h('h1', "Details"),
+                        h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
+                    ]) : null
+                    ]),
+                    h('div', {className: 'checkin-footer'}, [
+                    h('div', {className: 'likes-container'}, [
+                        h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
+                        h('h3', {className: 'likes'}, checkin.likes),
+                    ]),
+                    h('div', {className: 'observations-container'}, [
+                        h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
+                        h('h3', {className: 'likes'}, checkin.observations.length),
+                    ]),
+                    h('div', {className: 'comments-container'}, [
+                        h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
+                        h('h3', {className: 'comments'}, checkin.comments),
+                    ])
+                ]),
+            ]);
+            
+            checkins.push(temp);
+        });
+        
+        return checkins;
+    }
   }
 
   let featuredCheckin = h(FeatureDetails);
@@ -257,19 +321,20 @@ function WeaverMap({
     zoom: 10
   };
 
-  let filler = h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps));
-
-  if (selectedResult?.success.data?.length > 0 && isOpenSelected) {
+  if (inspectPosition) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
           h("h1", "Selected Checkins"),
+          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
         ]),
       ]),
-      filler,
       h("button", {
         className: "close-btn",
-        onClick: () => setOpenSelected(false)
+        onClick: () => {
+          setOpenSelected(false)
+          setInspectPosition(null);
+        }
       }, "X"),
       h("div.overlay-div", featuredCheckin),
     ]);
