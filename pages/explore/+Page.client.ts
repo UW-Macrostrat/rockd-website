@@ -321,7 +321,7 @@ function WeaverMap({
     zoom: 10
   };
 
-  if (inspectPosition) {
+  if (inspectPosition && selectedResult?.success.data.length > 0) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
