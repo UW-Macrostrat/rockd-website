@@ -13,8 +13,10 @@
     --#{$name}: #{$color}
 
 html, body
+  width: 100%
   height: 100vh
   height: -webkit-fill-available
+  overflow-y: auto
 
 .bp5-input
   box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15), inset 0 1px 1px rgba(16, 22, 26, 0.2)
@@ -52,7 +54,7 @@ body
 .main
   background-color: var(--background-color)
   color: var(--text)
-  padding: 0 0 5vh 20%
+  padding: 0 20% 5vh 20%
   margin: 0
 
   h4 
@@ -96,7 +98,7 @@ h1, p
 
 .star
   height: 15px
-  filter: var(--img-color)
+  filter: var(--anti-img-color)
 
 .marker
   height: 15px
@@ -109,22 +111,27 @@ h4
   margin: 0
 
 .checkin-header
-  padding: 30px
-  padding-left: 0
+  padding: 30px 0
+  width: 100%
+  display: grid
+  grid-template-columns: 80% 20%
+
+  h1
+    padding-right: 15px
 
 .loading
   height: 75vh
   padding-top: 20vh
   text-align: center
-  background-color: white
-  color: black
+  background-color: var(--panel-background-color)
+  color: var(--panel-text)
   font-style: italic
 
 .observations
   margin-top: 27vh
   display: flex
   flex-wrap: wrap
-  width: 75%
+  width: 100%
 
   .observation
     flex: 0 0 calc(33.33% - 10px)
@@ -138,33 +145,32 @@ h4
       border-radius: 2% 2% 0 0
       cursor: pointer
 
-.dark-mode-button
-  position: absolute
-  top: 10px
-  left: 10px
-
 .overlay
   background-color: var(--panel-background-color)
   height: 100vh
   width: 100%
   top: 0
   left: 0
+  overflow: auto
+
 
   .overlay-body
-    display: grid
+    margin: 0 30%
+    width: 40%
+    border-radius: 2%
+    box-shadow: 0 0 0 1px var(--card-shadow-color)
+    margin: 5vh 30%
+
     img
-      margin: auto
-      width: 40%
-      margin-top: 20px
+      width: 100%
+      border-radius: 2% 2% 0 0
 
     .observation-body
-      margin: auto
       padding: 3px
       color: var(--text)
       text-align: center
       padding-top: 10px
-      box-shadow: 0 0 0 1px var(--card-shadow-color)
-      width: 40%
+      width: 100%
 
 .close
   position: absolute
@@ -184,7 +190,7 @@ h4
   z-index: 100
   width: 100%
   background-color: var(--panel-text)
-  height: 50px
+  height: 7vh
 
 .map-container
   height: 95vh
@@ -193,10 +199,55 @@ h4
   display: none
 
 .left-arrow
-  height: 50px
-  padding: 10px
   filter: var(--anti-img-color)
+  cursor: pointer
 
 .overlay
   .banner
     position: sticky
+
+.observation-details
+  text-align: left
+  margin: 10px
+  
+  .observation-detail
+    padding: 4px
+    border: 1px solid var(--panel-text)
+    margin: 4px
+    border-radius: 4px
+    display: inline-block
+
+  .interval
+    background-color: var(--interval-background)
+
+  .liths
+    background-color: var(--liths-background)
+
+  .notes
+    padding-top: 5px
+    padding-left: 5px
+
+.observation-header
+  padding: 10px
+
+.back-arrow
+  filter: var(--img-color)
+  position: fixed
+  svg
+    height: 10vh
+
+.banner-arrow
+  margin-left: 10px
+  svg
+    height: 7vh
+
+.overlay-header
+  position: absolute
+  height: 10vh
+  margin-left: 20%
+
+.container
+  position: relative
+
+.dark-mode-button
+  height: 5vh

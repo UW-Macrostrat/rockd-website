@@ -13,6 +13,8 @@ $colors: (
   panel-text: #333,
   semi-translucent-background: rgba(255, 255, 255, 0.8),
   translucent-background: rgba(255, 255, 255, 0.5),
+  interval-background: rgba(176, 81, 165, .5),
+  liths-background: rgba(255, 213, 0, 0.5),
 );
 
 $dark-background: #141a1e;
@@ -31,4 +33,6 @@ $dark-colors: (
   panel-text: #fff,
   semi-translucent-background: rgba(20, 26,30, 0.8),
   translucent-background: rgba(20, 26,30, 0.5),
+  interval-background: rgba(79, 174, 90, .5),
+  liths-background: rgba(0, 42, 255, 0.5),
 );
