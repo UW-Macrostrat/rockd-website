@@ -1,22 +1,20 @@
 import h from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
-import { usePageContext } from 'vike-react/usePageContext';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { BlankImage, createCheckins, apiURL, useRockdAPI } from "../index";
 import "../main.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
+import { Icon } from "~/components";
 
-export function Page() {
-    const pageContext = usePageContext();
+export function Trips({trip}) {
     const mapContainerRef = useRef(null);
     const center = null;
     const mapRef = useRef(null);
 
-    const trip = pageContext.urlParsed ? parseInt(pageContext.urlParsed.search.trip) : 0;
     const userData = useRockdAPI("trips/" + trip);
 
     useEffect(() => {
@@ -44,6 +42,7 @@ export function Page() {
         let lats = [];
         let lngs = [];
         const map = mapRef.current;
+
         userData.success.data[0].stops.forEach((stop, index) => {
             const count = index + 1;
             const el = document.createElement('div');
@@ -118,7 +117,7 @@ export function Page() {
     data.updated = date.toLocaleDateString('en-US', options);
 
     // profile pic
-    let profile_pic = h(BlankImage, {src: apiURLOld + "protected/gravatar/" + data.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic"});
 
     // create stops
 

@@ -95,6 +95,7 @@ async function startServer() {
     process.env.VITE_MACROSTRAT_INSTANCE
   );
 
+  /*
   // Redirect from /trip/:trip to /trip with query parameter
   app.get("/trip/:trip", (req, res) => {
     const { trip } = req.params;
@@ -107,6 +108,7 @@ async function startServer() {
     // Redirect to /test with query parameter `id`
     res.redirect(`/checkin?checkin=${checkin}`);
   });
+  */
 
   /**
    * Vike route

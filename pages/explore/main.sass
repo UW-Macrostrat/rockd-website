@@ -53,12 +53,11 @@ body
 
 .overlay-div
   position: absolute
-  top: 23vh
+  top: 10vh
   left: 0
   z-index: 10
   border-radius: 0 4px 4px 0
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
-  height: 77vh
+  height: 90vh
   overflow-y: auto
   width: 100%
   padding: 8px
@@ -95,9 +94,10 @@ body
   position: absolute
   z-index: 10
   height: 100vh
-  width: 35%
+  width: 30%
   top: 0
-  left: 0
+  left: -30%
+  background: var(--panel-background-color)
 
   .title
     display: grid
@@ -105,7 +105,7 @@ body
     width: 100%
     color: black
     position: fixed
-    width: 35%
+    width: 30%
     background: rgba(255, 255, 255, 0.85)
     height: 10vh
     
@@ -185,8 +185,6 @@ body
   margin-top: 4px
 
 .sidebox
-  background-color: var(--semi-translucent-background)
-
   .title
     background-color: var(--panel-background-color)
     color: var(--text-emphasized-color)
@@ -204,7 +202,7 @@ body
   background-color: rgba(var(--text-emphasized-color), 0.5)
 
 .star 
-  filter: var(--img-color)
+  filter: var(--anti-img-color)
 
 .checkin-footer
   img 
@@ -272,7 +270,7 @@ body
     width: 8%
     height: 5vh
     
-    img 
+    Icon 
       height: 5vh
       display: grid
       margin: auto
@@ -413,11 +411,10 @@ body
   background-image: url(https://storage.macrostrat.org/assets/rockd/explore/green-circle.png)
 
 .coordinates
+  margin: 0
+
+.dark-btn
+  height: 3vh
   position: absolute
-  top: 10vh
-  height: 5vh
-  background-color: var(--panel-background-color)
-  width: 100%
-  color: var(--text-emphasized-color)
-  display: flex
-  justify-content: center
+  top: 3.5vh
+  left: 10px
