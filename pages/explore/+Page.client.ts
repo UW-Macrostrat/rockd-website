@@ -11,16 +11,15 @@ import {
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-components";
+import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.sass";
-import { BlankImage, apiURL, useRockdAPI } from "../index";
+import { createCheckins, useRockdAPI } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { set } from "react-datepicker/dist/date_utils";
 
 let count = 0;
 
@@ -233,110 +232,6 @@ function getSelectedCheckins(lat1, lat2, lng1, lng2) {
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng + "&all=10");
-}
-
-function createCheckins(result, mapRef, setInspectPosition) {
-    let checkins = [];
-    const map = mapRef?.current;
-      
-    result.forEach((checkin) => {    
-        // format rating
-        let ratingArr = [];
-        for(var i = 0; i < checkin.rating; i++) {
-            ratingArr.push(h(Icon, {className: "star", icon: "star", style: {color: 'white'}}));
-        }
-    
-        for(var i = 0; i < 5 - checkin.rating; i++) {
-            ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
-        }
-        
-        let image;
-        const showImage = checkin.photo;
-    
-        if (showImage) {
-            image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-        } else {
-            image = h("div", { className: 'no-image' }, [
-                h('h1', "Details"),
-                h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
-            ]);
-        }
-
-        // for trips
-        let stop_name = checkin?.name ?? null;
-        let LngLatProps = {
-            position: {
-                lat: checkin.lat,
-                lng: checkin.lng
-            },
-            precision: 3,
-            zoom: 10
-        };
-
-        let temp = h('div', { 
-                className: 'checkin', 
-                onClick: () => { 
-                    map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-                    setInspectPosition({lat: checkin.lat, lng: checkin.lng});
-                    console.log("inspect position set")
-                }, 
-                onMouseEnter: () => {
-                    // marker
-                    const el = document.createElement('div');
-                    el.className = 'marker_pin';
-        
-                    // Create marker
-                    new mapboxgl.Marker(el)
-                    .setLngLat([checkin.lng, checkin.lat])
-                    .addTo(map);
-                },
-                onMouseLeave: () => {
-                    let previous = document.querySelectorAll('.marker_pin');
-                    previous.forEach((marker) => {
-                        marker.remove();
-                    });
-                } 
-            }, [
-            h('h1', {className: 'stop-name'}, stop_name),
-            h('div', {className: 'checkin-header'}, [
-                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-                h('div', {className: 'checkin-info'}, [
-                    h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                    h('h4', {className: 'edited'}, checkin.created),
-                    h('p', "Near " + checkin.near),
-                    LngLatCoords(LngLatProps),
-                    h('h3', {className: 'rating'}, ratingArr),
-                ]),
-                // pin,
-                ]),
-                h('p', {className: 'description'}, checkin.notes),
-                h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
-                image,
-                showImage ? h('div', {className: "image-details"}, [
-                    h('h1', "Details"),
-                    h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
-                ]) : null
-                ]),
-                h('div', {className: 'checkin-footer'}, [
-                h('div', {className: 'likes-container'}, [
-                    h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
-                    h('h3', {className: 'likes'}, checkin.likes),
-                ]),
-                h('div', {className: 'observations-container'}, [
-                    h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
-                    h('h3', {className: 'likes'}, checkin.observations.length),
-                ]),
-                h('div', {className: 'comments-container'}, [
-                    h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
-                    h('h3', {className: 'comments'}, checkin.comments),
-                ])
-            ]),
-        ]);
-        
-        checkins.push(temp);
-    });
-    
-    return checkins;
 }
 
 function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition}) {
