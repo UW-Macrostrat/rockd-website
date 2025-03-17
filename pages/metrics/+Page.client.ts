@@ -171,27 +171,27 @@ export function Page() {
             h("div", { className: 'summary' }, [
                 h("div", { className: 'stat' }, [
                     h("h2", "Total Users"),
-                    h("p", data.summary.people)
+                    h("p", numberWithCommas(data.summary.people))
                 ]),
                 h("div", { className: 'stat' }, [
                     h("h2", "Active Users"),
-                    h("p", data.summary.active_people)
+                    h("p", numberWithCommas(data.summary.active_people))
                 ]),
                 h("div", { className: 'stat' }, [
                     h("h2", "Avid Users (>5)"),
-                    h("p", data.summary.avid_people)
+                    h("p", numberWithCommas(data.summary.avid_people))
                 ]),
                 h("div", { className: 'stat' }, [
                     h("h2", "Checkins"),
-                    h("p", data.summary.checkins)
+                    h("p", numberWithCommas(data.summary.checkins))
                 ]),
                 h("div", { className: 'stat' }, [
                     h("h2", "Observations"),
-                    h("p", data.summary.observations)
+                    h("p", numberWithCommas(data.summary.observations))
                 ]),
                 h("div", { className: 'stat' }, [
                     h("h2", "Photos"),
-                    h("p", data.summary.photos)
+                    h("p",numberWithCommas( data.summary.photos))
                 ]),
             ]),
             h("div", { className: 'graphs' }, [
@@ -253,4 +253,9 @@ export function Page() {
         ]),
         h(Footer)
     ])
+}
+
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
