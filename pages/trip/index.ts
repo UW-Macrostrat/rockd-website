@@ -8,7 +8,6 @@ import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
-import { Icon } from "~/components";
 
 export function Trips({trip}) {
     const mapContainerRef = useRef(null);
@@ -129,7 +128,7 @@ export function Trips({trip}) {
         arr.push(stop.checkin);
     });
 
-    let stops = createCheckins(arr, mapRef, "marker_red.png", "likes");
+    let stops = createCheckins(arr, mapRef, null);
 
     return h("div", {className: 'body'}, [
         h("div", {className: 'map'}, [
