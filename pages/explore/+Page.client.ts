@@ -197,7 +197,6 @@ function WeaverMap({
 
         let selectedStop = 0;
         selectedCords.forEach((coord) => {
-          console.log("selected cords", coord);
           selectedStop++;
           // marker
           const el = document.createElement('div');
@@ -247,7 +246,6 @@ function WeaverMap({
   }
 
   let featuredCheckin = h(FeatureDetails);
-  console.log("featured checkin", featuredCheckin);
   let overlay;
 
   let LngLatProps = {
@@ -269,7 +267,6 @@ function WeaverMap({
         ]),
       ]),
       filler,
-      sortContainer,
       h("button", {
         className: "close-btn",
         onClick: () => setOpenSelected(false)
