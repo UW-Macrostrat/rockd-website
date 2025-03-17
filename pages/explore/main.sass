@@ -108,17 +108,21 @@ body
     width: 30%
     background: rgba(255, 255, 255, 0.85)
     height: 10vh
+    background-color: var(--panel-background-color)
+    color: var(--text-emphasized-color)
+    padding: 0
     
     h1
       margin: auto
+      font-size: 24px
 
 
   .close-btn
     position: absolute
     top: 10px
     right: 10px
-    background-color: #333
-    color: white
+    background-color: var(--panel-background)
+    color: var(--panel-text)
     border: none
     border-radius: 50%
     width: 30px
@@ -132,7 +136,7 @@ body
     transition: background-color 0.3s, box-shadow 0.3s
 
     &:hover
-      background-color: #555
+      background-color: var(--panel-hover)
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3)
 
 .marker
@@ -182,12 +186,7 @@ body
 .details-image
   width: 40px
   margin-left: 10px
-  margin-top: 4px
-
-.sidebox
-  .title
-    background-color: var(--panel-background-color)
-    color: var(--text-emphasized-color)
+  margin-top: 4px    
 
 .checkin-info
   color: var(--text-emphasized-color)

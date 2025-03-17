@@ -11,12 +11,12 @@ import {
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode, useAPIResult, DarkModeButton } from "@macrostrat/ui-components";
+import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { tileserverDomain } from "@macrostrat-web/settings";
 import "../main.sass";
-import { BlankImage, apiURL, useRockdAPI } from "../index";
+import { createCheckins, useRockdAPI } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -97,220 +97,21 @@ function WeaverMap({
   mapboxToken?: string;
 }) {
   const style = useMapStyle(type, mapboxToken);
-  const [sort, setSort] = useState("likes");
 
   // overlay
-  const [isOpenSelected, setOpenSelected] = useState(true);
-
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
-    setOpenSelected(true);
   }, []);
 
-  let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
-
-  function FeatureDetails() {
-    // return null;
-    const mapRef = useMapRef();
-    const map = mapRef.current;
-    const [bounds, setBounds] = useState(map?.getBounds());
-    let checkins = [];
-    let result;
-  
-    if(!map) {
-      result = getCheckins(0, 0, 0, 0);
-    } else if (bounds) {
-      result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
-    } else {
-      result = getCheckins(0, 0, 0, 0);
-    }
-  
-    if (!bounds && map) {
-      setBounds(map.getBounds());
-    }
-  
-    count++;
-    
-    // add selected checkin markers
-    useEffect(() => {
-      let selectedCheckins = selectedResult?.success.data;
-      let selectedCords = [];
-      let finalCheckins = null;
-
-      let previousSelected = document.querySelectorAll('.selected_pin');
-      previousSelected.forEach((marker) => {
-        marker.remove();
-      });
-
-      if(selectedCheckins?.length > 0 && inspectPosition) {
-        finalCheckins = createCheckins(selectedCheckins, mapRef, "explore/blue-marker.png", sort);
-
-        selectedCheckins.forEach((checkin) => {
-          selectedCords.push([checkin.lng, checkin.lat]);
-        });
-
-        let selectedStop = 0;
-        selectedCords.forEach((coord) => {
-          selectedStop++;
-          // marker
-          const el = document.createElement('div');
-          el.className = 'selected_pin';
-
-          // Create marker
-          new mapboxgl.Marker(el)
-            .setLngLat(coord)
-            .addTo(map);
-        });
-      }
-    }, [selectedResult]);
-  
-    // Update bounds on move
-    useEffect(() => {
-      if(map) {
-        const listener = () => {
-          setBounds(map.getBounds());
-        };
-        map.on("moveend", listener);
-        return () => {
-          map.off("moveend", listener);
-        };
-      }
-    }, [bounds]);
-  
-    if (result == null) return h(Spinner);
-    result = result.success.data;  
-  
-    checkins = createCheckins(result, mapRef, "explore/red-circle.png", sort);
-
-    let selectedCheckins = selectedResult?.success.data;
-
-    if (selectedCheckins?.length > 0 && inspectPosition) {
-      console.log("returning selected")
-      return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, "explore/blue-circle.png", sort));
-    }
-    
-    return h("div", {className: 'checkin-container'}, [
-        h('div', checkins)
-      ]);
-
-    function createCheckins(result, mapRef, marker, sort) {
-        let checkins = [];
-        const map = mapRef?.current;
-        let stop = 0;
-    
-        let pinClass = "marker-number";
-        if (marker.includes("circle")) {
-            pinClass = "circle-number";
-        }
-          
-        result.forEach((checkin) => {    
-            // format rating
-            let ratingArr = [];
-            for(var i = 0; i < checkin.rating; i++) {
-                ratingArr.push(h(Icon, {className: "star", icon: "star", style: {color: 'white'}}));
-            }
-        
-            for(var i = 0; i < 5 - checkin.rating; i++) {
-                ratingArr.push(h(Icon, {className: "star", icon: "star-empty", style: {color: 'white'}}));
-            }
-            
-            let image;
-            const showImage = checkin.photo;
-        
-            if (showImage) {
-                image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
-            } else {
-                image = h("div", { className: 'no-image' }, [
-                    h('h1', "Details"),
-                    h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
-                ]);
-            }
-    
-            // for trips
-            let stop_name = checkin?.name ?? null;
-            let LngLatProps = {
-                position: {
-                    lat: checkin.lat,
-                    lng: checkin.lng
-                },
-                precision: 3,
-                zoom: 10
-            };
-    
-            let temp = h('div', { 
-                    className: 'checkin', 
-                    onClick: () => { 
-                        map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-                        setInspectPosition({lat: checkin.lat, lng: checkin.lng});
-                        console.log("inspect position set")
-                    }, 
-                    onMouseEnter: () => {
-                        // marker
-                        const el = document.createElement('div');
-                        el.className = 'marker_pin';
-            
-                        // Create marker
-                        new mapboxgl.Marker(el)
-                        .setLngLat([checkin.lng, checkin.lat])
-                        .addTo(map);
-                    },
-                    onMouseLeave: () => {
-                        let previous = document.querySelectorAll('.marker_pin');
-                        previous.forEach((marker) => {
-                            marker.remove();
-                        });
-                    } 
-                }, [
-                h('h1', {className: 'stop-name'}, stop_name),
-                h('div', {className: 'checkin-header'}, [
-                    h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
-                    h('div', {className: 'checkin-info'}, [
-                        h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
-                        h('h4', {className: 'edited'}, checkin.created),
-                        h('p', "Near " + checkin.near),
-                        LngLatCoords(LngLatProps),
-                        h('h3', {className: 'rating'}, ratingArr),
-                    ]),
-                    // pin,
-                    ]),
-                    h('p', {className: 'description'}, checkin.notes),
-                    h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
-                    image,
-                    showImage ? h('div', {className: "image-details"}, [
-                        h('h1', "Details"),
-                        h(Icon, {className: 'details-image', icon: "arrow-right", style: {color: 'white'}})
-                    ]) : null
-                    ]),
-                    h('div', {className: 'checkin-footer'}, [
-                    h('div', {className: 'likes-container'}, [
-                        h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
-                        h('h3', {className: 'likes'}, checkin.likes),
-                    ]),
-                    h('div', {className: 'observations-container'}, [
-                        h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
-                        h('h3', {className: 'likes'}, checkin.observations.length),
-                    ]),
-                    h('div', {className: 'comments-container'}, [
-                        h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
-                        h('h3', {className: 'comments'}, checkin.comments),
-                    ])
-                ]),
-            ]);
-            
-            checkins.push(temp);
-        });
-        
-        return checkins;
-    }
-  }
-
-  let featuredCheckin = h(FeatureDetails);
+  const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
+  const featuredCheckin = h(FeatureDetails, {setInspectPosition});
+  const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
   let overlay;
 
-  let LngLatProps = {
+  const LngLatProps = {
     position: {
         lat: inspectPosition?.lat ?? 0,
         lng: inspectPosition?.lng ?? 0
@@ -319,22 +120,27 @@ function WeaverMap({
     zoom: 10
   };
 
-  if (inspectPosition && selectedResult?.success.data.length > 0) {
+  if (inspectPosition && selectedResult.length > 0) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
           h("h1", "Selected Checkins"),
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
         ]),
+        h(DarkModeButton, { className: "dark-btn", showText: true } )
       ]),
       h("button", {
         className: "close-btn",
         onClick: () => {
-          setOpenSelected(false)
           setInspectPosition(null);
+
+          let previousSelected = document.querySelectorAll('.selected_pin');
+          previousSelected.forEach((marker) => {
+            marker.remove();
+          });
         }
       }, "X"),
-      h("div.overlay-div", featuredCheckin),
+      h("div.overlay-div", selectedCheckin),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -415,11 +221,100 @@ function getCheckins(lat1, lat2, lng1, lng2) {
     "&maxlng=" + maxLng);
 }
 
-function getPersonCheckins(personId) {
-  return useRockdAPI("protected/checkins?person_id=" + personId);
+function getSelectedCheckins(lat1, lat2, lng1, lng2) {
+  // abitrary bounds around click point
+  let minLat = Math.floor(lat1 * 100) / 100;
+  let maxLat = Math.floor(lat2 * 100) / 100;
+  let minLng = Math.floor(lng1 * 100) / 100;
+  let maxLng = Math.floor(lng2 * 100) / 100;
+
+  // return 10 pages of results
+  return useRockdAPI("protected/checkins?minlat=" + minLat + 
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng + "&all=10");
 }
 
-function getTaxonCheckins(taxonId) {
-  // not sure how to use api yet
-  return useAPIResult("https://rockd.org/api/v1/protected/checkins?taxon_id=" + taxonId);
+function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition}) {
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+
+  // add selected checkin markers
+  useEffect(() => {
+    let selectedCords = [];
+
+    let previousSelected = document.querySelectorAll('.selected_pin');
+    previousSelected.forEach((marker) => {
+      marker.remove();
+    });
+
+    // if selected checkins
+    if(selectedResult?.length > 0 && inspectPosition) {
+      selectedResult.forEach((checkin) => {
+        selectedCords.push([checkin.lng, checkin.lat]);
+      });
+
+      let selectedStop = 0;
+      selectedCords.forEach((coord) => {
+        selectedStop++;
+        // marker
+        const el = document.createElement('div');
+        el.className = 'selected_pin';
+
+        // Create marker
+        new mapboxgl.Marker(el)
+          .setLngLat(coord)
+          .addTo(map);
+      });
+    }
+  }, [selectedResult]);
+
+  return h("div", {className: 'checkin-container'}, createCheckins(selectedResult, mapRef, setInspectPosition));
+}
+
+function FeatureDetails({setInspectPosition}) {
+  // return null;
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [bounds, setBounds] = useState(map?.getBounds());
+  let checkins = [];
+  let result;
+
+  if(!map) {
+    result = getCheckins(0, 0, 0, 0);
+  } else if (bounds) {
+    const distance = Math.abs(bounds.getEast() - bounds.getWest());
+    const newEast = bounds.getEast() - distance * .2;
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), newEast);
+  } else {
+    result = getCheckins(0, 0, 0, 0);
+  }
+
+  if (!bounds && map) {
+    setBounds(map.getBounds());
+  }
+
+  count++;
+
+  // Update bounds on move
+  useEffect(() => {
+    if(map) {
+      const listener = () => {
+        setBounds(map.getBounds());
+      };
+      map.on("moveend", listener);
+      return () => {
+        map.off("moveend", listener);
+      };
+    }
+  }, [bounds]);
+
+  if (result == null) return h(Spinner);
+  result = result.success.data;  
+
+  checkins = createCheckins(result, mapRef, setInspectPosition);
+  
+  return h("div", {className: 'checkin-container'}, [
+      h('div', checkins)
+    ]);
 }

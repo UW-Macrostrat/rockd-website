@@ -38,15 +38,9 @@ export function Footer() {
     ]);
 }
 
-export function createCheckins(result, mapRef, marker, sort) {
+export function createCheckins(result, mapRef, setInspectPosition) {
     let checkins = [];
     const map = mapRef?.current;
-    let stop = 0;
-
-    let pinClass = "marker-number";
-    if (marker.includes("circle")) {
-        pinClass = "circle-number";
-    }
       
     result.forEach((checkin) => {    
         // format rating
@@ -86,6 +80,7 @@ export function createCheckins(result, mapRef, marker, sort) {
                 className: 'checkin', 
                 onClick: () => { 
                     map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
+                    setInspectPosition({lat: checkin.lat, lng: checkin.lng});
                 }, 
                 onMouseEnter: () => {
                     // marker
@@ -145,7 +140,6 @@ export function createCheckins(result, mapRef, marker, sort) {
     
     return checkins;
 }
-
 export const apiURLOld = "https://rockd.org/api/v2/"; // old route
 export const apiURL = "https://rockd.dev.svc.macrostrat.org/api/v2/"; // new route
 
