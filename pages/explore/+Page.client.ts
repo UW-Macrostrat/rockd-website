@@ -110,7 +110,7 @@ function WeaverMap({
     setOpenSelected(true);
   }, []);
 
-  let selectedResult = getCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
+  let selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
 
   function FeatureDetails() {
     // return null;
@@ -123,7 +123,9 @@ function WeaverMap({
     if(!map) {
       result = getCheckins(0, 0, 0, 0);
     } else if (bounds) {
-      result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+      const distance = Math.abs(bounds.getEast() - bounds.getWest());
+      const newEast = bounds.getEast() - distance * .2;
+      result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), newEast);
     } else {
       result = getCheckins(0, 0, 0, 0);
     }
@@ -413,6 +415,20 @@ function getCheckins(lat1, lat2, lng1, lng2) {
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
+}
+
+function getSelectedCheckins(lat1, lat2, lng1, lng2) {
+  // abitrary bounds around click point
+  let minLat = Math.floor(lat1 * 100) / 100;
+  let maxLat = Math.floor(lat2 * 100) / 100;
+  let minLng = Math.floor(lng1 * 100) / 100;
+  let maxLng = Math.floor(lng2 * 100) / 100;
+
+  // change use map coords
+  return useRockdAPI("protected/checkins?minlat=" + minLat + 
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng + "&all=10");
 }
 
 function getPersonCheckins(personId) {
