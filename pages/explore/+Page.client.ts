@@ -100,23 +100,19 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken);
 
   // overlay
-  const [isOpenSelected, setOpenSelected] = useState(true);
-
   const [inspectPosition, setInspectPosition] =
     useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
-    setOpenSelected(true);
   }, []);
 
-  let selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05);
-
+  const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
   let overlay;
 
-  let LngLatProps = {
+  const LngLatProps = {
     position: {
         lat: inspectPosition?.lat ?? 0,
         lng: inspectPosition?.lng ?? 0
@@ -125,7 +121,7 @@ function WeaverMap({
     zoom: 10
   };
 
-  if (inspectPosition && selectedResult?.success.data.length > 0) {
+  if (inspectPosition && selectedResult.length > 0) {
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
@@ -136,7 +132,6 @@ function WeaverMap({
       h("button", {
         className: "close-btn",
         onClick: () => {
-          setOpenSelected(false)
           setInspectPosition(null);
 
           let previousSelected = document.querySelectorAll('.selected_pin');
@@ -347,13 +342,10 @@ function createCheckins(result, mapRef, setInspectPosition) {
 function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
-  const selectedCheckins = selectedResult?.success.data;
 
   // add selected checkin markers
   useEffect(() => {
-    let selectedCheckins = selectedResult?.success.data;
     let selectedCords = [];
-    let finalCheckins = null;
 
     let previousSelected = document.querySelectorAll('.selected_pin');
     previousSelected.forEach((marker) => {
@@ -361,10 +353,8 @@ function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition})
     });
 
     // if selected checkins
-    if(selectedCheckins?.length > 0 && inspectPosition) {
-      finalCheckins = createCheckins(selectedCheckins, mapRef, null);
-
-      selectedCheckins.forEach((checkin) => {
+    if(selectedResult?.length > 0 && inspectPosition) {
+      selectedResult.forEach((checkin) => {
         selectedCords.push([checkin.lng, checkin.lat]);
       });
 
@@ -383,7 +373,7 @@ function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition})
     }
   }, [selectedResult]);
 
-  return h("div", {className: 'checkin-container'}, createCheckins(selectedCheckins, mapRef, setInspectPosition));
+  return h("div", {className: 'checkin-container'}, createCheckins(selectedResult, mapRef, setInspectPosition));
 }
 
 function FeatureDetails({setInspectPosition}) {
