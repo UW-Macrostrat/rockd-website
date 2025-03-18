@@ -227,11 +227,6 @@ html, body, .wrapper, #react, .app, #map
   display: flex
   height: 15vh
 
-.park
-  height: 5vh
-  margin: 0
-  margin-bottom: 10px
-
 .stop-description
   color: black
   text-align: left
@@ -242,11 +237,8 @@ html, body, .wrapper, #react, .app, #map
   border-radius: 2%
   
 .stop-list
-  overflow: scroll
-  overflow-x: hidden
-  height: 68vh
-  -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%)
   padding: 20px 10px
+  padding-top: 0
 
 .map 
   height: 100vh
@@ -331,13 +323,27 @@ html, body, .wrapper, #react, .app, #map
   margin: 0
 
 .top 
-  height: 32vh
+  height: 20vh
 
   .checkin-header
     padding: 30px
 
 .bottom
-  height: 30vh
+  height: 80vh
+  overflow: scroll
+  overflow-x: hidden
+  text-align: left
+
+  .details
+    margin: 0
+    padding: 15px
+
+    .park
+      margin: 0
+
+    .description
+      margin: 0
+      padding-bottom: 25px
 
 .stop-main-info
   text-align: left
@@ -381,5 +387,11 @@ html, body, .wrapper, #react, .app, #map
   border-radius: 4px
   padding: 7px
 
-.checkin-info
+.stop-info
   text-align: left
+  h3, h4
+    margin: 0
+    
+  display: grid
+  margin: auto
+
