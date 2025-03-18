@@ -137,18 +137,21 @@ export function Trips({trip}) {
                 h('div', { className: 'top' }, [
                     h('div', { className: 'checkin-header' }, [
                         h('h3', {className: 'profile-pic'}, profile_pic),
-                        h('div', {className: 'checkin-info'}, [
+                        h('div', {className: 'stop-info'}, [
                             h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                             h('h4', {className: 'edited'}, "Edited " + data.updated),
                         ]),
                         h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
                     ]),
-                    h('h1', {className: 'park'}, data.name),
-                    h('p', {className: 'download-button'}, [
-                        h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
-                    ]),
                 ]),
                 h('div', { className: 'bottom' }, [
+                    h("div.details", [
+                        h('h1', {className: 'park'}, data.name),
+                        h('p', {className: 'description'}, data.description),
+                        h('p', {className: 'download-button'}, [
+                            h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                        ]),
+                    ]),
                     h('div', {className: 'stop-list'}, stops),
                 ]),
             ]),
