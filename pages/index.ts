@@ -80,7 +80,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                 className: 'checkin', 
                 onClick: () => { 
                     map.flyTo({center: [checkin.lng, checkin.lat], zoom: 12});
-                    setInspectPosition({lat: checkin.lat, lng: checkin.lng});
+                    if(setInspectPosition) setInspectPosition({lat: checkin.lat, lng: checkin.lng});
                 }, 
                 onMouseEnter: () => {
                     // marker

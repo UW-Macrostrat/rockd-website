@@ -51,7 +51,7 @@ function weaverStyle(type: object) {
     sources: {
       weaver: {
         type: "vector",
-        tiles: [ tileserverDomain + "/checkins/tiles/{z}/{x}/{y}"],
+        tiles: [ "https://rockd.dev.svc.macrostrat.org/api/v2/checkin-tile/{z}/{x}/{y}"],
       }
     },
     layers: [
