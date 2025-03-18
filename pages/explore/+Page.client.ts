@@ -104,6 +104,10 @@ function WeaverMap({
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
+    let previousSelected = document.querySelectorAll('.selected_pin');
+    previousSelected.forEach((marker) => {
+      marker.remove();
+    });
   }, []);
 
   const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
