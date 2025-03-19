@@ -1,7 +1,6 @@
 @use "sass:color"
 @use "../colors" as *
 @use "@blueprintjs/colors/lib/scss/colors" as *
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro")
 
 *
   box-sizing: border-box
@@ -50,6 +49,7 @@ body
 
 .map-container
   position: relative
+  padding: 0
 
 .overlay-div
   position: absolute
@@ -100,8 +100,7 @@ body
   background: var(--panel-background-color)
 
   .title
-    display: grid
-    margin: auto
+    display: flex
     width: 100%
     color: black
     position: fixed
@@ -412,8 +411,28 @@ body
 .coordinates
   margin: 0
 
-.dark-btn
-  height: 3vh
+.toolbar
   position: absolute
-  top: 3.5vh
-  left: 10px
+  display: flex
+  align-items: center
+  gap: 5px
+  width: 65px
+
+  a 
+    display: flex
+    align-items: center
+    flex-basis: 50%
+
+  .settings-icon
+    cursor: pointer
+    flex-basis: 50%
+
+
+.home-icon  
+  height: 20px
+
+.hide
+  display: none
+
+.settings-content
+  flex-basis: 100%

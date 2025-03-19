@@ -12,6 +12,10 @@
   @each $name, $color in $colors
     --#{$name}: #{$color}
 
+*
+  padding: 0
+  margin: 0
+
 body
   &.bp5-dark
     color-scheme: dark
@@ -29,6 +33,9 @@ body
 .stop-container
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
+
+p
+  padding: 0
 
 html, body, .wrapper, #react, .app, #map
   color: #333
