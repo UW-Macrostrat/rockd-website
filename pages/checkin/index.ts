@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, useRockdAPI } from "../index";
+import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -218,7 +218,3 @@ function observationFooter(observation) {
         ]),
     ]);
 }
-
-function imageExists(url) {
-    return true
-  }

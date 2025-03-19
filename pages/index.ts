@@ -9,8 +9,8 @@ export function Image({ src, className, width, height, onClick }) {
     return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
 }
 
-export function BlankImage({ src, className, width, height, onClick, onError }) {
-    return h("img", {src: src, className, width, height, onClick, onError})
+export function BlankImage({ src, className, width, height, onClick, onError, alt }) {
+    return h("img", {src: src, className, width, height, onClick, onError, alt})
 }
 
 export function Footer() {
@@ -145,4 +145,15 @@ export const apiURL = "https://rockd.dev.svc.macrostrat.org/api/v2/"; // new rou
 
 export function useRockdAPI(src) {
     return useAPIResult(apiURL + src);
+}
+
+export function imageExists(url) {
+    var http = new XMLHttpRequest();
+    try {
+        http.open('HEAD', url, false);
+        http.send();
+    } catch (e) {
+        return true;
+    }
+    return false
 }
