@@ -1,22 +1,22 @@
 import h from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon } from "@blueprintjs/core";
+import { Spinner, Divider, Icon } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
   MapMarker,
   MapView,
+  PanelCard,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { tileserverDomain } from "@macrostrat-web/settings";
+import { useCallback, useEffect, useState } from "react";
 import "../main.sass";
-import { createCheckins, useRockdAPI } from "../index";
+import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -113,6 +113,7 @@ function WeaverMap({
   const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
+  const [showSettings, setSettings] = useState(false);
   let overlay;
 
   const LngLatProps = {
@@ -123,6 +124,18 @@ function WeaverMap({
     precision: 3,
     zoom: 10
   };
+  const toolbar = h(PanelCard, { className: "toolbar" }, [
+        h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
+            setSettings(!showSettings);
+          }
+        }),
+        h("a", { href: "/" }, 
+          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+        ),
+        h("div", { className: showSettings ? "settings-content" : "hide" },[
+          h(DarkModeButton, { className: "dark-btn", showText: true } )
+        ])
+      ]);
 
   if (inspectPosition && selectedResult.length > 0) {
     overlay = h("div.sidebox", [
@@ -131,7 +144,7 @@ function WeaverMap({
           h("h1", "Selected Checkins"),
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
         ]),
-        h(DarkModeButton, { className: "dark-btn", showText: true } )
+        // h(DarkModeButton, { className: "dark-btn", showText: true } )
       ]),
       h("button", {
         className: "close-btn",
@@ -151,7 +164,7 @@ function WeaverMap({
       h('div.sidebox-header', [
         h('div.title', [
           h("h1", "Featured Checkins"),
-          h(DarkModeButton, { className: "dark-btn", showText: true } )
+          // h(DarkModeButton, { className: "dark-btn", showText: true } )
         ]),
       ]),
       h("div.overlay-div", featuredCheckin),
@@ -167,7 +180,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanelOpen: false,
+          // contextPanel: toolbar,
           className: "map-area-container",
           style: { width: "70%", left: "30%" },
         },

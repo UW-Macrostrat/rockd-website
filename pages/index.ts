@@ -13,6 +13,11 @@ export function BlankImage({ src, className, width, height, onClick, onError, al
     return h("img", {src: src, className, width, height, onClick, onError, alt})
 }
 
+const handleClick = (e) => {
+    e.preventDefault();
+    // Custom logic to navigate or do something without style transfer
+};
+
 export function Footer() {
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
@@ -28,12 +33,12 @@ export function Footer() {
             ])
         ]),
         h("ul", {className: "footer-links"},[
-            h("li", h("a", {href: "/"}, "Home")),
-            h("li", h("a", {href: "/explore"}, "Explore")),
-            h("li", h("a", {href: "/privacy"}, "Privacy Policy")),
-            h("li", h("a", {href: "/terms"}, "Terms and Conditions")),
-            h("li", h("a", {href: "/trip/1"}, "Trips")),
-            h("li", h("a", {href: "/metrics"}, "Metrics")),
+            h("li", h("a", {href: "/", onClick: handleClick}, "Home")),
+            h("li", h("a", {href: "/explore", onClick: handleClick}, "Explore")),
+            h("li", h("a", {href: "/privacy", onClick: handleClick}, "Privacy Policy")),
+            h("li", h("a", {href: "/terms", onClick: handleClick}, "Terms and Conditions")),
+            h("li", h("a", {href: "/trip/1", onClick: handleClick}, "Trips")),
+            h("li", h("a", {href: "/metrics", onClick: handleClick}, "Metrics")),
         ])
     ]);
 }
