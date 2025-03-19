@@ -54,7 +54,8 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         }
         
         let image;
-        const showImage = checkin.photo;
+        const imgSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+        const showImage = checkin.photo && imageExists(imgSrc);
     
         if (showImage) {
             image = h(BlankImage, {className: 'observation-img', src: apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
