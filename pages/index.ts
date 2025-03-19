@@ -9,8 +9,8 @@ export function Image({ src, className, width, height, onClick }) {
     return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
 }
 
-export function BlankImage({ src, className, width, height, onClick }) {
-    return h("img", {src: src, className, width, height, onClick})
+export function BlankImage({ src, className, width, height, onClick, onError }) {
+    return h("img", {src: src, className, width, height, onClick, onError})
 }
 
 export function Footer() {
