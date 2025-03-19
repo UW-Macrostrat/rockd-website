@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, useRockdAPI, imageExists } from "../index";
+import { BlankImage, Image, Footer, apiURL, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -19,6 +19,8 @@ export function Checkins({checkinID}) {
     const [overlayImage, setOverlayImage] = useState(null);
     const [overlayBody, setOverlayBody] = useState(null);
     const [showMap, setShowMap] = useState(false);
+    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
+    const [styleText, setStyleText] = useState("Show Satelite");
 
     if (!checkinData) {
         return h("div", { className: 'loading' }, [
@@ -53,13 +55,13 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const showImage = checkin.photo;
-    const headerImgUrl = showImage ? apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+    const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
         h('div', {className: 'observation'}, [
-            showImage ? h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
+            headerImgUrl ? h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
                 setOverlayBody(h('div.observation-body',headerBody));
                 setOverlayImage(headerImgUrl);
                 setOverlayOpen(!overlayOpen);
@@ -99,19 +101,30 @@ export function Checkins({checkinID}) {
         },
       };
 
+    const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
+    const whiteStyle = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
+    const whiteText = "Show White";
+    const sateliteText = "Show Satelite";
+
     let map = h("div.map", [
         h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
             [
-              h(MapView, { style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i', mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
+              h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
                 h(MapMarker, {
                     position: center,
                    }),
               ]),
             ]
           ),
-        h('div', {className: 'banner', onClick: () => {
-            setShowMap(!showMap);
-          }}, h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}})),
+        h('div', {className: 'banner'}, [
+            h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
+                setShowMap(!showMap);
+              }}),
+            h("button", {className: "banner-button", onClick: () => {
+                setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                setStyleText(styleText == whiteText ? sateliteText : whiteText);
+            }}, styleText),
+        ]),
     ])
 
     let LngLatProps = {
@@ -205,3 +218,7 @@ function observationFooter(observation) {
         ]),
     ]);
 }
+
+function imageExists(url) {
+    return true
+  }
