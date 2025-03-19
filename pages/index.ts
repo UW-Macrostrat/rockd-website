@@ -57,7 +57,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         const showImage = checkin.photo;
     
         if (showImage) {
-            image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+            image = h(BlankImage, {className: 'observation-img', src: apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
         } else {
             image = h("div", { className: 'no-image' }, [
                 h('h1', "Details"),
