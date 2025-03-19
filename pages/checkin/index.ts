@@ -76,13 +76,13 @@ export function Checkins({checkinID}) {
         console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            const showImage = observation.photo;
-            const imageSrc = showImage ? apiURL + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
+            const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
             let observationBody = observationFooter(observation);
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    showImage ? h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
+                    observationURL ? h(BlankImage, { className: 'observation-img', src: observationURL, onClick: () => {
                         setOverlayImage(imageSrc);
                         setOverlayBody(observationBody);
                         setOverlayOpen(!overlayOpen);
