@@ -20,6 +20,7 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
+import { set } from "react-datepicker/dist/date_utils";
 
 let count = 0;
 
@@ -51,7 +52,7 @@ function weaverStyle(type: object) {
     sources: {
       weaver: {
         type: "vector",
-        tiles: [ "https://rockd.dev.svc.macrostrat.org/api/v2/checkin-tile/{z}/{x}/{y}"],
+        tiles: [ "https://dev.rockd.org/api/v2/checkin-tile/{z}/{x}/{y}?cluster=true"],
       }
     },
     layers: [
@@ -96,7 +97,8 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const style = useMapStyle(type, mapboxToken);
+  const [showSatelite, setSatelite] = useState(false);
+  const style = useMapStyle(type, mapboxToken, showSatelite);
 
   // overlay
   const [inspectPosition, setInspectPosition] =
@@ -125,16 +127,24 @@ function WeaverMap({
     zoom: 10
   };
   const toolbar = h(PanelCard, { className: "toolbar" }, [
-        h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
+        h("div.toolbar-header", [
+          h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
             setSettings(!showSettings);
           }
-        }),
-        h("a", { href: "/" }, 
-          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
-        ),
-        h("div", { className: showSettings ? "settings-content" : "hide" },[
-          h(DarkModeButton, { className: "dark-btn", showText: true } )
-        ])
+          }),
+          h("a", { href: "/" }, 
+            h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+          ),
+        ]),
+        h("div.toolbar-content", [
+          h("div", { className: showSettings ? "settings-content" : "hide" },[
+            h(DarkModeButton, { className: "dark-btn", showText: true } ),
+          ]),
+          h("div", { className: showSettings ? "satelite": "hide", onClick: () => {
+            console.log("clicked");
+            setSatelite(!showSatelite);
+          } }, "Show Satelite")
+        ]),
       ]);
 
   if (inspectPosition && selectedResult.length > 0) {
@@ -180,7 +190,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          // contextPanel: toolbar,
+          contextPanel: toolbar,
           className: "map-area-container",
           style: { width: "70%", left: "30%" },
         },
@@ -200,20 +210,22 @@ function WeaverMap({
   
 }
 
-function useMapStyle(type, mapboxToken) {
+function useMapStyle(type, mapboxToken, showSatelite) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
   const baseStyle = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
+  const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
+  const finalStyle = showSatelite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
 
   // Auto select sample type
   useEffect(() => {
     const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
-      buildInspectorStyle(baseStyle, overlayStyle, {
+      buildInspectorStyle(finalStyle, overlayStyle, {
         mapboxToken,
         inDarkMode: isEnabled,
       }).then((s) => {
