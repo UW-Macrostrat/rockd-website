@@ -91,6 +91,8 @@ img
   height 50%
 
 .map-container
+  display: flex
+  gap: 20px
   height 100vh
   padding 10%
   & > .row
@@ -203,9 +205,8 @@ img
 
 .map-imgs
   display grid
-  grid-template-columns 30vh 30vh
+  grid-template-columns 50% 50%
   grid-template-rows 25vh 25vh
-
 .curious
   h1
     color #363434
@@ -240,3 +241,9 @@ img
   
 .main-page
   position: relative
+
+.left
+  margin-right: 5%
+
+.right
+  margin-left: 5%
