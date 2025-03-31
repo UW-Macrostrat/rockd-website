@@ -30,7 +30,8 @@ export function Checkins({checkinID}) {
 
     if (checkinData.success.data.length == 0) {
         return h("div", { className: 'error' }, [
-            h("h1", "Checkin " + checkinID + " not found"),  
+            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
+            h("h1", "Checkin " + checkinID + " not found!"),  
         ]); 
     }
 
