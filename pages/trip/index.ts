@@ -2,17 +2,23 @@ import h from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, apiURL, useRockdAPI } from "../index";
+import { BlankImage, createCheckins, apiURL, useRockdAPI, Image } from "../index";
 import "../main.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
+import { PanelCard } from "@macrostrat/map-interface";
+import { Divider, Icon } from "@blueprintjs/core";
 
 export function Trips({trip}) {
     const mapContainerRef = useRef(null);
     const center = null;
     const mapRef = useRef(null);
+    const [showSettings, setSettings] = useState(false);
+    const [showSatelite, setSatelite] = useState(false);
+    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
+    const [styleText, setStyleText] = useState("Show Satelite");
 
     const userData = useRockdAPI("trips/" + trip);
 
@@ -24,15 +30,17 @@ export function Trips({trip}) {
             // Initialize Mapbox map
             mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
 
+            console.log("stye: ", style);
+
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i',
+                style: style,
                 center: [10, 10],
                 zoom: 12,
             });
 
             // Add navigation controls
-            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-left');
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         } catch (error) {
             console.error("Error initializing the map:", error);
@@ -128,11 +136,19 @@ export function Trips({trip}) {
         arr.push(stop.checkin);
     });
 
-    let stops = createCheckins(arr, mapRef, null);
+    const stops = createCheckins(arr, mapRef, null);
+
+    const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
+    const whiteStyle = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
+    const whiteText = "Show White";
+    const sateliteText = "Show Satelite";
+
+    const toolbar = h(Toolbar);
 
     return h("div", {className: 'body'}, [
         h("div", {className: 'map'}, [
             h("div", { ref: mapContainerRef, className: 'map-container', style: { width: '100%', height: '100vh' } }),
+            toolbar,
             h('div', { className: 'stop-container', style: { width: '100%' } }, [
                 h('div', { className: 'top' }, [
                     h('div', { className: 'checkin-header' }, [
@@ -141,7 +157,6 @@ export function Trips({trip}) {
                             h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                             h('h4', {className: 'edited'}, "Edited " + data.updated),
                         ]),
-                        h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
                     ]),
                 ]),
                 h('div', { className: 'bottom' }, [
@@ -157,4 +172,35 @@ export function Trips({trip}) {
             ]),
         ]),
     ]);
+}
+
+function Toolbar() {
+    const [showSettings, setSettings] = useState(false);
+    const [showSatelite, setSatelite] = useState(false);
+    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
+    const [styleText, setStyleText] = useState("Show Satelite");
+
+    return h(PanelCard, { className: "toolbar" }, [
+        h("div.toolbar-header", [
+          h("a", { href: "/" }, 
+            h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+          ),
+          h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
+            setSettings(!showSettings);
+          }
+          }),
+        ]),
+        h("div", { className: showSettings ? "settings-content" : "hide" }, [
+            h(Divider, { className: "divider" }),
+            h("div", { className: "settings" }, [
+                h(DarkModeButton, { className: "dark-btn", showText: true } ),
+                h(PanelCard, {className: "map-style", onClick: () => {
+                        setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                    }}, [
+                        h(Icon, { className: "satellite-icon", icon: "satellite"}),
+                        h("p", "Satellite"),
+                    ]),
+                ]),
+            ])
+      ]);
 }
