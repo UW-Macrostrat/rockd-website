@@ -413,20 +413,44 @@ body
 
 .toolbar
   position: absolute
+  padding: 0
+
+  .home-icon
+    height: 16px
 
   .toolbar-header
     display: flex
     align-items: center
     justify-conter: center
     gap: 10px
+    padding: 10px
 
     a
       display: flex
       align-items: center
 
+  .settings-content
+    width: 125px
 
-.home-icon  
-  height: 20px
+    .divider
+      margin: 0
+
+    .settings
+      padding: 10px
+
+  .dark-btn
+    margin-bottom: 10px
+
+  .map-style
+    display: flex
+    gap: 5px
+    cursor: pointer
+
+  .clicked
+    background-color: red
+
+  .unclicked
+    background-color: green
 
 .hide
   display: none

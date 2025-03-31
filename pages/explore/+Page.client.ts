@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon } from "@blueprintjs/core";
+import { Spinner, Icon, Divider } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -125,26 +125,6 @@ function WeaverMap({
     precision: 3,
     zoom: 10
   };
-  const toolbar = h(PanelCard, { className: "toolbar" }, [
-        h("div.toolbar-header", [
-          h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
-            setSettings(!showSettings);
-          }
-          }),
-          h("a", { href: "/" }, 
-            h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
-          ),
-        ]),
-        h("div.toolbar-content", [
-          h("div", { className: showSettings ? "settings-content" : "hide" },[
-            h(DarkModeButton, { className: "dark-btn", showText: true } ),
-          ]),
-          h("div", { className: showSettings ? "satelite": "hide", onClick: () => {
-            console.log("clicked");
-            setSatelite(!showSatelite);
-          } }, "Show Satelite")
-        ]),
-      ]);
 
   if (inspectPosition && selectedResult.length > 0) {
     overlay = h("div.sidebox", [
@@ -189,7 +169,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: toolbar,
+          contextPanel: h(Toolbar),
           className: "map-area-container",
           style: { width: "70%", left: "30%" },
         },
@@ -344,5 +324,35 @@ function FeatureDetails({setInspectPosition}) {
   
   return h("div", {className: 'checkin-container'}, [
       h('div', checkins)
+    ]);
+}
+
+function Toolbar() {
+  const [showSettings, setSettings] = useState(false);
+  const [showSatelite, setSatelite] = useState(false);
+  const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
+
+  return h(PanelCard, { className: "toolbar" }, [
+      h("div.toolbar-header", [
+        h("a", { href: "/" }, 
+          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+        ),
+        h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
+          setSettings(!showSettings);
+        }
+        }),
+      ]),
+      h("div", { className: showSettings ? "settings-content" : "hide" }, [
+          h(Divider, { className: "divider" }),
+          h("div", { className: "settings" }, [
+              h(DarkModeButton, { className: "dark-btn", showText: true } ),
+              h(PanelCard, {className: "map-style", onClick: () => {
+                      setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                  }}, [
+                      h(Icon, { className: "satellite-icon", icon: "satellite"}),
+                      h("p", "Satellite"),
+                  ]),
+              ]),
+          ])
     ]);
 }
