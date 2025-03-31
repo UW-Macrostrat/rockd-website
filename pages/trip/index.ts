@@ -15,22 +15,20 @@ export function Trips({trip}) {
     const mapContainerRef = useRef(null);
     const center = null;
     const mapRef = useRef(null);
-    const [showSettings, setSettings] = useState(false);
     const [showSatelite, setSatelite] = useState(false);
-    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
-    const [styleText, setStyleText] = useState("Show Satelite");
 
     const userData = useRockdAPI("trips/" + trip);
 
+    const style = useMapStyle({showSatelite});
+    console.log("Map style:", style);
+
     useEffect(() => {
         // Check if the map instance already exists
-        if (mapRef.current || !mapContainerRef.current) return;
+        if (!mapContainerRef.current) return;
 
         try {
             // Initialize Mapbox map
             mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
-
-            console.log("stye: ", style);
 
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
@@ -88,7 +86,7 @@ export function Trips({trip}) {
             duration: 0,
             padding: 75
         });
-    }, [userData]);
+    }, [userData, style]);
 
     // when outside marker is clicked
     useEffect(() => {
@@ -138,7 +136,7 @@ export function Trips({trip}) {
 
     const stops = createCheckins(arr, mapRef, null);
 
-    const toolbar = h(Toolbar);
+    const toolbar = h(Toolbar, {showSatelite, setSatelite});
 
     return h("div", {className: 'body'}, [
         h("div", {className: 'map'}, [
@@ -169,10 +167,8 @@ export function Trips({trip}) {
     ]);
 }
 
-function Toolbar() {
+function Toolbar({showSatelite, setSatelite}) {
     const [showSettings, setSettings] = useState(false);
-    const [showSatelite, setSatelite] = useState(false);
-    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
 
     return h(PanelCard, { className: "toolbar" }, [
         h("div.toolbar-header", [
@@ -189,7 +185,7 @@ function Toolbar() {
             h("div", { className: "settings" }, [
                 h(DarkModeButton, { className: "dark-btn", showText: true } ),
                 h(PanelCard, {className: "map-style", onClick: () => {
-                        setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                        setSatelite(!showSatelite);
                     }}, [
                         h(Icon, { className: "satellite-icon", icon: "satellite"}),
                         h("p", "Satellite"),
@@ -197,4 +193,11 @@ function Toolbar() {
                 ]),
             ])
       ]);
+}
+
+function useMapStyle({showSatelite}) {
+    const white = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
+    const satellite = 'mapbox://styles/mapbox/satellite-v9';
+
+    return showSatelite ? satellite : white;
 }
