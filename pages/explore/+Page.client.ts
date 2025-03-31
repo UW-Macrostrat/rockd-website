@@ -114,7 +114,6 @@ function WeaverMap({
   const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
-  const [showSettings, setSettings] = useState(false);
   let overlay;
 
   const LngLatProps = {
@@ -169,7 +168,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: h(Toolbar),
+          contextPanel: h(Toolbar, {showSatelite, setSatelite}),
           className: "map-area-container",
           style: { width: "70%", left: "30%" },
         },
@@ -210,7 +209,7 @@ function useMapStyle(type, mapboxToken, showSatelite) {
       }).then((s) => {
         setActualStyle(s);
       });
-  }, [isEnabled]);
+  }, [isEnabled, showSatelite]);
 
   return actualStyle;
 }
@@ -327,9 +326,8 @@ function FeatureDetails({setInspectPosition}) {
     ]);
 }
 
-function Toolbar() {
+function Toolbar({showSatelite, setSatelite}) {
   const [showSettings, setSettings] = useState(false);
-  const [showSatelite, setSatelite] = useState(false);
   const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
 
   return h(PanelCard, { className: "toolbar" }, [
@@ -347,7 +345,7 @@ function Toolbar() {
           h("div", { className: "settings" }, [
               h(DarkModeButton, { className: "dark-btn", showText: true } ),
               h(PanelCard, {className: "map-style", onClick: () => {
-                      setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                    setSatelite(!showSatelite);
                   }}, [
                       h(Icon, { className: "satellite-icon", icon: "satellite"}),
                       h("p", "Satellite"),
