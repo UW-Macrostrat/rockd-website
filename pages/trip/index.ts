@@ -138,11 +138,6 @@ export function Trips({trip}) {
 
     const stops = createCheckins(arr, mapRef, null);
 
-    const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
-    const whiteStyle = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
-    const whiteText = "Show White";
-    const sateliteText = "Show Satelite";
-
     const toolbar = h(Toolbar);
 
     return h("div", {className: 'body'}, [
