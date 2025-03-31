@@ -12,6 +12,7 @@ import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { PanelCard } from "@macrostrat/map-interface";
 
 export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
@@ -121,7 +122,8 @@ export function Checkins({checkinID}) {
             h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
                 setShowMap(!showMap);
               }}),
-            h("button", {className: "banner-button", onClick: () => {
+            h(PanelCard, {className: "banner-button", onClick: () => {
+                console.log("clicked");
                 setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
                 setStyleText(styleText == whiteText ? sateliteText : whiteText);
             }}, styleText),

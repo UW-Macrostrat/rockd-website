@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Divider, Icon } from "@blueprintjs/core";
+import { Spinner, Icon } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -20,7 +20,6 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { set } from "react-datepicker/dist/date_utils";
 
 let count = 0;
 
