@@ -178,7 +178,6 @@ function Toolbar() {
     const [showSettings, setSettings] = useState(false);
     const [showSatelite, setSatelite] = useState(false);
     const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
-    const [styleText, setStyleText] = useState("Show Satelite");
 
     return h(PanelCard, { className: "toolbar" }, [
         h("div.toolbar-header", [
