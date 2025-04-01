@@ -328,9 +328,8 @@ function FeatureDetails({setInspectPosition}) {
 
 function Toolbar({showSatelite, setSatelite}) {
   const [showSettings, setSettings] = useState(false);
-  const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
 
-  return h(PanelCard, { className: "toolbar" }, [
+  return h(PanelCard, { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
