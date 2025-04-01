@@ -9,9 +9,14 @@ export function Image({ src, className, width, height, onClick }) {
     return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
 }
 
-export function BlankImage({ src, className, width, height, onClick }) {
-    return h("img", {src: src, className, width, height, onClick})
+export function BlankImage({ src, className, width, height, onClick, onError, alt }) {
+    return h("img", {src: src, className, width, height, onClick, onError, alt})
 }
+
+const handleClick = (e) => {
+    e.preventDefault();
+    // Custom logic to navigate or do something without style transfer
+};
 
 export function Footer() {
     return h("div", {className: "footer"}, [
@@ -28,12 +33,12 @@ export function Footer() {
             ])
         ]),
         h("ul", {className: "footer-links"},[
-            h("li", h("a", {href: "/"}, "Home")),
-            h("li", h("a", {href: "/explore"}, "Explore")),
-            h("li", h("a", {href: "/privacy"}, "Privacy Policy")),
-            h("li", h("a", {href: "/terms"}, "Terms and Conditions")),
-            h("li", h("a", {href: "/trip/1"}, "Trips")),
-            h("li", h("a", {href: "/metrics"}, "Metrics")),
+            h("li", h("a", {href: "/", onClick: handleClick}, "Home")),
+            h("li", h("a", {href: "/explore", onClick: handleClick}, "Explore")),
+            h("li", h("a", {href: "/privacy", onClick: handleClick}, "Privacy Policy")),
+            h("li", h("a", {href: "/terms", onClick: handleClick}, "Terms and Conditions")),
+            h("li", h("a", {href: "/trip/1", onClick: handleClick}, "Trips")),
+            h("li", h("a", {href: "/metrics", onClick: handleClick}, "Metrics")),
         ])
     ]);
 }
@@ -54,10 +59,11 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         }
         
         let image;
-        const showImage = checkin.photo;
+        const imgSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+        const showImage = checkin.photo && imageExists(imgSrc);
     
         if (showImage) {
-            image = h(BlankImage, {className: 'observation-img', src: "https://rockd.org/api/v1/protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+            image = h(BlankImage, {className: 'observation-img', src: apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
         } else {
             image = h("div", { className: 'no-image' }, [
                 h('h1', "Details"),
@@ -145,4 +151,15 @@ export const apiURL = "https://rockd.dev.svc.macrostrat.org/api/v2/"; // new rou
 
 export function useRockdAPI(src) {
     return useAPIResult(apiURL + src);
+}
+
+export function imageExists(url) {
+    var http = new XMLHttpRequest();
+    try {
+        http.open('HEAD', url, false);
+        http.send();
+    } catch (e) {
+        return true;
+    }
+    return false
 }
