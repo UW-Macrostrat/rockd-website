@@ -168,9 +168,8 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: h(Toolbar, {showSatelite, setSatelite}),
           className: "map-area-container",
-          style: { width: "70%", left: "30%" },
+          style: { width: "70%", right: "30%" },
         },
         [
           h(MapView, { style, mapboxToken }, [
@@ -181,6 +180,7 @@ function WeaverMap({
 
           // The Overlay Div
           overlay,
+          h(Toolbar, {showSatelite, setSatelite})
         ]
       ),
     ]
@@ -290,8 +290,8 @@ function FeatureDetails({setInspectPosition}) {
     result = getCheckins(0, 0, 0, 0);
   } else if (bounds) {
     const distance = Math.abs(bounds.getEast() - bounds.getWest());
-    const newEast = bounds.getEast() - distance * .2;
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), newEast);
+    const newWest = bounds.getWest() - distance * .2;
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), newWest, bounds.getEast());
   } else {
     result = getCheckins(0, 0, 0, 0);
   }
