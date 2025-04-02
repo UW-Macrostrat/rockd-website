@@ -29,11 +29,6 @@ body
       &::placeholder
         color: var(--secondary-color)
         box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
-
-.stop-container
-  background-color: var(--panel-background-color)
-  color: var(--text-emphasized-color)
-
 p
   padding: 0
 
@@ -219,7 +214,13 @@ html, body, .wrapper, #react, .app, #map
   grid-template-columns: 70% 30%
 
 .stop-container
+  position: absolute
+  background-color: var(--panel-background-color)
+  color: var(--text-emphasized-color)
+  width: 30%
   text-align: center
+  top:0 
+  right: -30%
   z-index: 10
   height: 100vh
 
@@ -448,3 +449,6 @@ html, body, .wrapper, #react, .app, #map
   
 .hide
   display: none
+
+.map-view
+  height: 100vh
