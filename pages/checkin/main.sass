@@ -56,6 +56,7 @@ body
   color: var(--text)
   padding: 0 20% 5vh 20%
   margin: 0
+  min-height: 74vh
 
   h4 
     color: var(--text)
@@ -191,6 +192,22 @@ h4
   width: 100%
   background-color: var(--panel-text)
   height: 7vh
+  display: flex
+
+  
+  .banner-arrow
+    margin-left: 10px
+    svg
+      height: 7vh
+  
+  .banner-button
+    width: 100px
+    cursor: pointer
+    text-align: center
+    margin: 10px 0
+    background-color: var(--panel-background)
+    position: absolute
+    right: 15px
 
 .map-container
   height: 95vh
@@ -236,11 +253,6 @@ h4
   svg
     height: 10vh
 
-.banner-arrow
-  margin-left: 10px
-  svg
-    height: 7vh
-
 .overlay-header
   position: absolute
   height: 10vh
@@ -251,3 +263,17 @@ h4
 
 .dark-mode-button
   height: 5vh
+
+.error
+  height: 100vh
+  width: 100%
+  text-align: center
+  font-size: 2em
+  font-weight: 200
+  background-color: var(--panel-background-color)
+  color: var(--panel-text)
+  padding-top: 5vh
+
+.error-img
+  width: 50%
+  text-align: center

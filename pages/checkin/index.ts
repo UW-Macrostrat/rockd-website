@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Image, Footer, apiURL, useRockdAPI, imageExists } from "../index";
+import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import "../main.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -12,6 +12,7 @@ import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { PanelCard } from "@macrostrat/map-interface";
 
 export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
@@ -28,7 +29,8 @@ export function Checkins({checkinID}) {
 
     if (checkinData.success.data.length == 0) {
         return h("div", { className: 'error' }, [
-            h("h1", "Checkin " + checkinID + " not found"),  
+            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
+            h("h1", "Checkin " + checkinID + " not found!"),  
         ]); 
     }
 
@@ -53,13 +55,13 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const showImage = checkin.photo;
-    const headerImgUrl = showImage ? apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+    const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+    const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
         h('div', {className: 'observation'}, [
-            showImage ? h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
+            headerImgUrl ? h(BlankImage, { className: 'observation-img', src: headerImgUrl, onClick: () => {
                 setOverlayBody(h('div.observation-body',headerBody));
                 setOverlayImage(headerImgUrl);
                 setOverlayOpen(!overlayOpen);
@@ -74,13 +76,13 @@ export function Checkins({checkinID}) {
         console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            const showImage = observation.photo;
-            const imageSrc = showImage ? apiURL + "/protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo : "https://storage.macrostrat.org/assets/rockd/rockd.jpg";
+            const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
+            const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
             let observationBody = observationFooter(observation);
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    showImage ? h(BlankImage, { className: 'observation-img', src: imageSrc, onClick: () => {
+                    observationURL ? h(BlankImage, { className: 'observation-img', src: observationURL, onClick: () => {
                         setOverlayImage(imageSrc);
                         setOverlayBody(observationBody);
                         setOverlayOpen(!overlayOpen);
@@ -90,29 +92,6 @@ export function Checkins({checkinID}) {
             );
         }        
     });
-
-    const newMapPosition: MapPosition = {
-        camera: {
-          lat: center.lat,  // Latitude
-          lng: center.lng, // Longitude
-          altitude: 300000, // Altitude (height from the Earth's surface)
-        },
-      };
-
-    let map = h("div.map", [
-        h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
-            [
-              h(MapView, { style: 'mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i', mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
-                h(MapMarker, {
-                    position: center,
-                   }),
-              ]),
-            ]
-          ),
-        h('div', {className: 'banner', onClick: () => {
-            setShowMap(!showMap);
-          }}, h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}})),
-    ])
 
     let LngLatProps = {
         position: {
@@ -137,6 +116,8 @@ export function Checkins({checkinID}) {
             overlayBody,
         ])
     ]);
+
+    const map = h(Map, {center, showMap, setShowMap});
 
     let main = h('div', { className: "container" }, [
         h('div', { className: showMap ? 'hide' : 'main'}, [
@@ -204,4 +185,46 @@ function observationFooter(observation) {
             h('p', {className: "notes"}, rocks.notes),
         ]),
     ]);
+}
+
+function Map({center, showMap, setShowMap}) {
+    const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
+    const [styleText, setStyleText] = useState("Show Satelite");
+
+    const newMapPosition: MapPosition = {
+        camera: {
+          lat: center.lat,  // Latitude
+          lng: center.lng, // Longitude
+          altitude: 300000, // Altitude (height from the Earth's surface)
+        },
+      };
+
+    const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
+    const whiteStyle = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
+    const whiteText = "Show White";
+    const sateliteText = "Show Satelite";
+
+    let map = h("div.map", [
+        h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
+            [
+              h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
+                h(MapMarker, {
+                    position: center,
+                   }),
+              ]),
+            ]
+          ),
+        h('div', {className: 'banner'}, [
+            h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
+                setShowMap(!showMap);
+              }}),
+            h(PanelCard, {className: "banner-button", onClick: () => {
+                console.log("clicked");
+                setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
+                setStyleText(styleText == whiteText ? sateliteText : whiteText);
+            }}, styleText),
+        ]),
+    ])
+
+    return map;
 }

@@ -1,22 +1,22 @@
 import h from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon } from "@blueprintjs/core";
+import { Spinner, Icon, Divider } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
   MapMarker,
   MapView,
+  PanelCard,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { tileserverDomain } from "@macrostrat-web/settings";
+import { useCallback, useEffect, useState } from "react";
 import "../main.sass";
-import { createCheckins, useRockdAPI } from "../index";
+import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
@@ -51,7 +51,7 @@ function weaverStyle(type: object) {
     sources: {
       weaver: {
         type: "vector",
-        tiles: [ "https://rockd.dev.svc.macrostrat.org/api/v2/checkin-tile/{z}/{x}/{y}"],
+        tiles: [ "https://dev.rockd.org/api/v2/checkin-tile/{z}/{x}/{y}?cluster=true"],
       }
     },
     layers: [
@@ -96,7 +96,8 @@ function WeaverMap({
   children?: React.ReactNode;
   mapboxToken?: string;
 }) {
-  const style = useMapStyle(type, mapboxToken);
+  const [showSatelite, setSatelite] = useState(false);
+  const style = useMapStyle(type, mapboxToken, showSatelite);
 
   // overlay
   const [inspectPosition, setInspectPosition] =
@@ -131,7 +132,7 @@ function WeaverMap({
           h("h1", "Selected Checkins"),
           h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
         ]),
-        h(DarkModeButton, { className: "dark-btn", showText: true } )
+        // h(DarkModeButton, { className: "dark-btn", showText: true } )
       ]),
       h("button", {
         className: "close-btn",
@@ -151,7 +152,7 @@ function WeaverMap({
       h('div.sidebox-header', [
         h('div.title', [
           h("h1", "Featured Checkins"),
-          h(DarkModeButton, { className: "dark-btn", showText: true } )
+          // h(DarkModeButton, { className: "dark-btn", showText: true } )
         ]),
       ]),
       h("div.overlay-div", featuredCheckin),
@@ -167,7 +168,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanelOpen: false,
+          contextPanel: h(Toolbar, {showSatelite, setSatelite}),
           className: "map-area-container",
           style: { width: "70%", left: "30%" },
         },
@@ -187,26 +188,28 @@ function WeaverMap({
   
 }
 
-function useMapStyle(type, mapboxToken) {
+function useMapStyle(type, mapboxToken, showSatelite) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
   const baseStyle = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
+  const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
+  const finalStyle = showSatelite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
 
   // Auto select sample type
   useEffect(() => {
     const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
-      buildInspectorStyle(baseStyle, overlayStyle, {
+      buildInspectorStyle(finalStyle, overlayStyle, {
         mapboxToken,
         inDarkMode: isEnabled,
       }).then((s) => {
         setActualStyle(s);
       });
-  }, [isEnabled]);
+  }, [isEnabled, showSatelite]);
 
   return actualStyle;
 }
@@ -320,5 +323,33 @@ function FeatureDetails({setInspectPosition}) {
   
   return h("div", {className: 'checkin-container'}, [
       h('div', checkins)
+    ]);
+}
+
+function Toolbar({showSatelite, setSatelite}) {
+  const [showSettings, setSettings] = useState(false);
+
+  return h(PanelCard, { className: "toolbar", style: {padding: "0"} }, [
+      h("div.toolbar-header", [
+        h("a", { href: "/" }, 
+          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+        ),
+        h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
+          setSettings(!showSettings);
+        }
+        }),
+      ]),
+      h("div", { className: showSettings ? "settings-content" : "hide" }, [
+          h(Divider, { className: "divider" }),
+          h("div", { className: "settings" }, [
+              h(DarkModeButton, { className: "dark-btn", showText: true } ),
+              h(PanelCard, {className: "map-style", onClick: () => {
+                    setSatelite(!showSatelite);
+                  }}, [
+                      h(Icon, { className: "satellite-icon", icon: "satellite"}),
+                      h("p", "Satellite"),
+                  ]),
+              ]),
+          ])
     ]);
 }
