@@ -72,11 +72,11 @@ function weaverStyle(type: object) {
           "circle-radius": [
             "step",
             ["get", "n"],
-            20,
+            15,
             100,
-            30,
+            20,
             750,
-            40
+            30
           ],
           'circle-color': [
               'step',
