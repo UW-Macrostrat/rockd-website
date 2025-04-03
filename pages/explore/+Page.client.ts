@@ -52,7 +52,7 @@ function weaverStyle(type: object) {
     c: "#f28cb1",
   };
 
-  const clusterThreshold = 2;
+  const clusterThreshold = 1;
 
   return {
     sources: {
@@ -184,7 +184,6 @@ function WeaverMap({
       h('div.sidebox-header', [
         h('div.title', [
           h("h1", "Featured Checkins"),
-          // h(DarkModeButton, { className: "dark-btn", showText: true } )
         ]),
       ]),
       h("div.overlay-div", featuredCheckin),
@@ -213,6 +212,7 @@ function WeaverMap({
 
           // The Overlay Div
           overlay,
+          h(hanndleClick),
         ]
       ),
     ]
@@ -383,4 +383,31 @@ function Toolbar({showSatelite, setSatelite}) {
               ]),
           ])
     ]);
+}
+
+function hanndleClick() {
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  
+  // handle unclustered point click
+  map?.on('click', 'unclustered-point', (e) => {
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: ['unclustered-point']
+    });
+    const checkinId = features[0].properties.id;
+    console.log("checkinId", checkinId);
+    const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinId);
+    console.log("checkinData", checkinData);
+  });
+
+  // handle cluster click
+  map?.on('click', 'clusters', (e) => {
+    console.log("cluster click", e);
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: ['clusters']
+    });
+    console.log("features", features[0]);
+  });
+
+  return null;
 }
