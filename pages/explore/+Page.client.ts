@@ -46,7 +46,14 @@ const type =
   };
 
 function weaverStyle(type: object) {
-  const color = type?.color ?? "dodgerblue";
+  const colors = {
+    a: "#51bbd6",
+    b: "#f1f075",
+    c: "#f28cb1",
+  };
+
+  const clusterThreshold = 2;
+
   return {
     sources: {
       weaver: {
@@ -56,41 +63,58 @@ function weaverStyle(type: object) {
     },
     layers: [
       {
-        id: "weaver",
+        id: "clusters",
         type: "circle",
         source: "weaver",
         "source-layer": "default",
+        filter: ['>', ['get', 'n'], clusterThreshold],
         paint: {
           "circle-radius": [
             "step",
             ["get", "n"],
-            2,
-            1,
-            2,
-            5,
-            4,
-            10,
-            8,
-            50,
-            12,
-            100,
-            16,
-            200,
             20,
+            100,
+            30,
+            750,
+            40
           ],
           'circle-color': [
-                    'step',
-                    ['get', 'n'],
-                    '#51bbd6',
-                    100,
-                    '#f1f075',
-                    750,
-                    '#f28cb1'
-                ],
+              'step',
+              ['get', 'n'],
+              colors.a,
+              100,
+              colors.b,
+              750,
+              colors.c
+          ],
           "circle-opacity": .8,
           "circle-stroke-width": 0.5,
-          "circle-stroke-color": color,
+          "circle-stroke-color": "#000",
         },
+      },
+      {
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'weaver',
+        "source-layer": "default",
+        filter: ['has', 'n'],
+        layout: {
+            'text-field': ['get', 'n'],
+            'text-size': 12
+        }
+      },
+      {
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'weaver',
+        "source-layer": "default",
+        filter: ['<=', ['get', 'n'], clusterThreshold],
+        paint: {
+            'circle-color': colors.a,
+            'circle-radius': 4,
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#fff'
+        }
       },
     ],
   };
