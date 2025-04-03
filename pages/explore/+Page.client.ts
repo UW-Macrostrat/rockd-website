@@ -20,6 +20,7 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
+import { s } from "vite/dist/node/types.d-aGj9QkWt";
 
 let count = 0;
 
@@ -130,10 +131,10 @@ function WeaverMap({
 }) {
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
+  const [checkinSelected, setCheckinSelected] = useState(false);
 
   // overlay
-  const [inspectPosition, setInspectPosition] =
-    useState<mapboxgl.LngLat | null>(null);
+  const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
@@ -145,7 +146,8 @@ function WeaverMap({
 
   const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
-  const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
+  // const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
+  const selectedCheckin = null;
   let overlay;
 
   const LngLatProps = {
@@ -157,6 +159,7 @@ function WeaverMap({
     zoom: 10
   };
 
+  /*
   if (inspectPosition && selectedResult.length > 0) {
     overlay = h("div.sidebox", [
       h('div.title', [
@@ -178,6 +181,43 @@ function WeaverMap({
         }
       }, "X"),
       h("div.overlay-div", selectedCheckin),
+    ]);
+  } else {
+    overlay = h("div.sidebox", [
+      h('div.sidebox-header', [
+        h('div.title', [
+          h("h1", "Featured Checkins"),
+        ]),
+      ]),
+      h("div.overlay-div", featuredCheckin),
+    ]);
+  }
+  */
+
+  const selectedCheckins = h(handleUnclusteredClick, {setCheckinSelected});
+  console.log("selected checkin: ", checkinSelected);
+
+
+  if(true) {
+    overlay = h("div.sidebox", [
+      h('div.title', [
+        h('div', { className: "selected-center" }, [
+          h("h1", "Selected Checkins"),
+          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
+        ]),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => {
+          setInspectPosition(null);
+
+          let previousSelected = document.querySelectorAll('.selected_pin');
+          previousSelected.forEach((marker) => {
+            marker.remove();
+          });
+        }
+      }, "X"),
+      h("div.overlay-div", selectedCheckins),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -212,7 +252,6 @@ function WeaverMap({
 
           // The Overlay Div
           overlay,
-          h(hanndleClick),
         ]
       ),
     ]
@@ -385,29 +424,40 @@ function Toolbar({showSatelite, setSatelite}) {
     ]);
 }
 
-function hanndleClick() {
+function handleClusterClick() {
   const mapRef = useMapRef();
   const map = mapRef.current;
-  
+  // handle cluster click
+  map?.on('click', 'clusters', (e) => {
+    console.log("cluster click");
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: ['clusters']
+    });
+
+    console.log("features", features[0].properties.expansion_zoom);
+  });
+
+  return null;
+}
+
+function handleUnclusteredClick({setCheckinSelected}) {
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [selectedCheckin, setSelectedCheckin] = useState(null);
+  const data = useRockdAPI("protected/checkins?checkin_id=" + selectedCheckin)?.success.data[0];
+
   // handle unclustered point click
   map?.on('click', 'unclustered-point', (e) => {
     const features = map.queryRenderedFeatures(e.point, {
       layers: ['unclustered-point']
     });
-    const checkinId = features[0].properties.id;
-    console.log("checkinId", checkinId);
-    const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinId);
-    console.log("checkinData", checkinData);
+    setSelectedCheckin(features[0].properties.id);
+    setCheckinSelected(true);
+    return createCheckins(data, mapRef, null)
   });
 
-  // handle cluster click
-  map?.on('click', 'clusters', (e) => {
-    console.log("cluster click", e);
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['clusters']
-    });
-    console.log("features", features[0]);
-  });
+  console.log("checkinId", selectedCheckin);
+
 
   return null;
 }
