@@ -78,7 +78,15 @@ function weaverStyle(type: object) {
             200,
             20,
           ],
-          "circle-color": color,
+          'circle-color': [
+                    'step',
+                    ['get', 'n'],
+                    '#51bbd6',
+                    100,
+                    '#f1f075',
+                    750,
+                    '#f28cb1'
+                ],
           "circle-opacity": .8,
           "circle-stroke-width": 0.5,
           "circle-stroke-color": color,
