@@ -29,7 +29,7 @@ function LoginForm() {
 
   const submitForm = async () => {
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch("http://Localhost:5500/v2/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(state),
@@ -37,7 +37,7 @@ function LoginForm() {
 
       if (!res.ok) {
         if (res.status === 502) {
-          setError("The Sparrow server is not available");
+          setError("The server is not available");
         } else {
           setError("Invalid credentials");
         }
