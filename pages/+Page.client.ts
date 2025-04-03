@@ -36,7 +36,6 @@ export function Page()  {
             ])
           ]),
           h("div", { className: "new_container map-container" }, [
-            h("div", { className: "side" }, [
               h("div", { className: "map-imgs" }, [
                 h(Image, { src: "main-page/grand_canyon.jpg", className: "map-shot grand_canyon" }),
                 h(Image, { src: "main-page/new_zealand.jpg", className: "map-shot new_zealand" }),
@@ -57,7 +56,6 @@ export function Page()  {
                   " (where available)"
                 ])
               ])
-            ])
           ]),
           
             h("div", { className: "new_container white-container" }, [
@@ -113,7 +111,7 @@ export function Page()  {
                   h("div", { className: "image-grid" }, [
                     h("div", { className: "col-sm-6" }, [
                         h("div", { className: "headline-alligner" }, [
-                          h("div", { className: "center" }, [
+                          h("div", { className: "center left" }, [
                             h(Image, { src: "main-page/checkin.png", className: "record-block-img" }),
                             h("p", { className: "record-img-caption" }, h("span", {}, "Take pictures of and rate features"))
                           ])
@@ -122,7 +120,7 @@ export function Page()  {
                 
                       h("div", { className: "col-sm-6" }, [
                         h("div", { className: "headline-alligner" }, [
-                          h("div", { className: "center" }, [
+                          h("div", { className: "center right" }, [
                             h(Image, { src: "main-page/strat-names.png", className: "record-block-img" }),
                             h("p", { className: "record-img-caption" }, h("span", {}, "Tag stratigraphic names, even offline"))
                           ])
@@ -131,7 +129,7 @@ export function Page()  {
                 
                       h("div", { className: "col-sm-6" }, [
                         h("div", { className: "headline-alligner" }, [
-                          h("div", { className: "center" }, [
+                          h("div", { className: "center left" }, [
                             h(Image, { src: "main-page/strike-dip.png", className: "record-block-img" }),
                             h("p", { className: "record-img-caption" }, h("span", {}, "Use your phone's compass to record strike and dip"))
                           ])
@@ -140,7 +138,7 @@ export function Page()  {
                 
                       h("div", { className: "col-sm-6" }, [
                         h("div", { className: "headline-alligner" }, [
-                          h("div", { className: "center" }, [
+                          h("div", { className: "center right" }, [
                             h(Image, { src: "main-page/taxa.png", className: "record-block-img" }),
                             h("p", { className: "record-img-caption" }, [
                               h("span", {}, "Search for and tag "),
