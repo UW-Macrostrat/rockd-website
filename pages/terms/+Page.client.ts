@@ -1,6 +1,6 @@
 import { Image, Footer } from "../index";
-import styles from "./main.module.styl";
-import "../main.sass";
+import "./main.styl";
+import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import hyper from "@macrostrat/hyper";
 

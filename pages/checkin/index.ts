@@ -1,10 +1,10 @@
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
-import "../main.sass";
+import styles from "../main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
@@ -13,6 +13,8 @@ import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface"
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
+
+const h = hyper.styled(styles);
 
 export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);

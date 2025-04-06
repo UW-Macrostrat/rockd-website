@@ -1,9 +1,9 @@
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins, apiURL, useRockdAPI, Image } from "../index";
-import "../main.sass";
+import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton } from "@macrostrat/ui-components";
@@ -16,6 +16,8 @@ import {
   PanelCard,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
+
+const h = hyper.styled(styles);
 
 export function Trips({trip}) {
     const center = null;
