@@ -21,6 +21,7 @@ import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { s } from "vite/dist/node/types.d-aGj9QkWt";
+import { set } from "react-datepicker/dist/date_utils";
 
 let count = 0;
 
