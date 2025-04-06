@@ -131,7 +131,7 @@ function WeaverMap({
 }) {
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
-  const [checkinSelected, setCheckinSelected] = useState(false);
+  const [selectedCheckin, setSelectedCheckin] = useState(null);  
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -144,10 +144,7 @@ function WeaverMap({
     });
   }, []);
 
-  const selectedResult = getSelectedCheckins(inspectPosition?.lat - .05, inspectPosition?.lat + .05, inspectPosition?.lng - .05, inspectPosition?.lng + .05)?.success.data;
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
-  // const selectedCheckin = h(SelectedCheckins, {selectedResult, inspectPosition, setInspectPosition});
-  const selectedCheckin = null;
   let overlay;
 
   const LngLatProps = {
@@ -159,44 +156,12 @@ function WeaverMap({
     zoom: 10
   };
 
-  /*
-  if (inspectPosition && selectedResult.length > 0) {
-    overlay = h("div.sidebox", [
-      h('div.title', [
-        h('div', { className: "selected-center" }, [
-          h("h1", "Selected Checkins"),
-          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
-        ]),
-        // h(DarkModeButton, { className: "dark-btn", showText: true } )
-      ]),
-      h("button", {
-        className: "close-btn",
-        onClick: () => {
-          setInspectPosition(null);
-
-          let previousSelected = document.querySelectorAll('.selected_pin');
-          previousSelected.forEach((marker) => {
-            marker.remove();
-          });
-        }
-      }, "X"),
-      h("div.overlay-div", selectedCheckin),
-    ]);
-  } else {
-    overlay = h("div.sidebox", [
-      h('div.sidebox-header', [
-        h('div.title', [
-          h("h1", "Featured Checkins"),
-        ]),
-      ]),
-      h("div.overlay-div", featuredCheckin),
-    ]);
-  }
-  */
-
-  const selectedCheckins = h(handleUnclusteredClick, {setCheckinSelected});
-  console.log("selected checkin: ", checkinSelected);
-
+  // handle selected checkins
+  const checkinData = useRockdAPI(
+    selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
+  );
+  const clickedCheckins = h(ClickedCheckins, {checkinData, selectedCheckin, setSelectedCheckin});
+  console.log("selected checki ", selectedCheckin);
 
   if(true) {
     overlay = h("div.sidebox", [
@@ -209,7 +174,7 @@ function WeaverMap({
       h("button", {
         className: "close-btn",
         onClick: () => {
-          setInspectPosition(null);
+          setSelectedCheckin(null);
 
           let previousSelected = document.querySelectorAll('.selected_pin');
           previousSelected.forEach((marker) => {
@@ -217,7 +182,7 @@ function WeaverMap({
           });
         }
       }, "X"),
-      h("div.overlay-div", selectedCheckins),
+      h("div.overlay-div", clickedCheckins),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -440,24 +405,38 @@ function handleClusterClick() {
   return null;
 }
 
-function handleUnclusteredClick({setCheckinSelected}) {
+function ClickedCheckins({checkinData, selectedCheckin, setSelectedCheckin}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
-  const [selectedCheckin, setSelectedCheckin] = useState(null);
-  const data = useRockdAPI("protected/checkins?checkin_id=" + selectedCheckin)?.success.data[0];
 
-  // handle unclustered point click
-  map?.on('click', 'unclustered-point', (e) => {
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['unclustered-point']
-    });
-    setSelectedCheckin(features[0].properties.id);
-    setCheckinSelected(true);
-    return createCheckins(data, mapRef, null)
-  });
+  useEffect(() => {
+    if (!map) return;
 
-  console.log("checkinId", selectedCheckin);
+    const handleClick = (e) => {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ['unclustered-point']
+      });
 
+      if (features.length > 0) {
+        const checkinId = features[0].properties.id;
+        setSelectedCheckin(checkinId);
+      } else {
+        setSelectedCheckin(null); 
+      }
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map]);
+
+  if (!selectedCheckin) return null;
+
+  if (checkinData?.success?.data) {
+    return createCheckins(checkinData.success.data, mapRef, null);
+  }
 
   return null;
 }
