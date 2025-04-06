@@ -1,8 +1,10 @@
 import { Footer } from "../index";
 import "./main.styl";
-import "../main.sass";
+import styles from "../main.module.sass";
 import "@macrostrat/style-system";
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
+
+const h = hyper.styled(styles);
 
 export function Page() {
     return h("div", { className: "main-page" }, [
