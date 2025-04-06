@@ -18,7 +18,6 @@ import {
 import { useMapRef } from "@macrostrat/mapbox-react";
 
 export function Trips({trip}) {
-    const mapContainerRef = useRef(null);
     const center = null;
     const mapRef = useRef(null);
     const [showSatelite, setSatelite] = useState(false);
@@ -137,7 +136,7 @@ function SideBar({data}) {
     const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic"});
     const stops = data.stops;
 
-    if(!map) return h(Spinner);
+    if(!map) return h("div.stop-container", h(Spinner, {style: {"margin-top": "10vh"}}));
 
 
     let arr = [];
