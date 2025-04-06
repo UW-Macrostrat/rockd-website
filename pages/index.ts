@@ -1,8 +1,12 @@
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
+import styles from "./main.module.sass";
+
+const h = hyper.styled(styles);
+
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
