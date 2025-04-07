@@ -1,8 +1,10 @@
 import { Footer } from "../index";
 import "./main.styl";
-import "../main.sass";
+import styles from "../main.module.sass";
 import "@macrostrat/style-system";
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
+
+const h = hyper.styled(styles);
 
 export function Page() {
     return h("div", { className: "main-page" }, [
@@ -106,7 +108,7 @@ export function Page() {
             ]),
           
             // Privacy Statement Changes Section
-            h("div", {className: "section bottom"}, [
+            h("div", {className: "section bottoms"}, [
               h("h3", {className: "header"}, "Privacy statement changes"),
               h("p", {}, "If our information practices change in a significant way, we will post the policy changes here and in the Rockd App Privacy information page. This Privacy Statement was last updated on June 15, 2016."),
             ]),

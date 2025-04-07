@@ -1,9 +1,10 @@
-import { PageHeader } from "~/components";
 import { Image, Footer } from "../index";
 import "./main.styl";
-import "../main.sass";
+import styles from "../main.module.sass";
 import "@macrostrat/style-system";
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
+
+const h = hyper.styled(styles);
 
 export function Page() {
     return h("div", { className: "main-page" }, [
@@ -58,7 +59,7 @@ export function Page() {
               ])
             ]),
         
-            h("div", { className: "section bottom" }, [
+            h("div", { className: "section bottoms" }, [
               h("h3", {}, "Warranties and Disclaimers"),
               h("span", { className: "highlight-answer" }, [
                 "We provide our Application and Data using a reasonable level of skill and care and we hope that you will enjoy using them. But there are certain things that we don’t promise about our Services, for example, that services will exist ad infinitum and will have 100% uptime. Service disruptions can and do occur, both as a result of our mistakes and acts far beyond our control."
@@ -67,7 +68,7 @@ export function Page() {
                 "Other than as expressly set out in these terms or additional terms, neither Rockd nor partners and collaborators make any specific promises about the services. For example, we don't make any commitments about the content with the services, the specific functions of the services, or their reliability, availability, or ability to meet your needs. ",
                 h("b", {}, "We provide the services 'as is'.")
               ]),
-              h("span", { className: "highlight-answer bottom" }, [
+              h("span", { className: "highlight-answer bottoms" }, [
                 "Some jurisdictions provide for certain warranties, like the implied warranty of merchantability, fitness for a particular purpose and non-infringement. To the extent permitted by law, we exclude all warranties."
               ])
             ])

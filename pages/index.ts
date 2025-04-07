@@ -1,8 +1,12 @@
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
+import styles from "./main.module.sass";
+
+const h = hyper.styled(styles);
+
 
 export function Image({ src, className, width, height, onClick }) {
     const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
@@ -21,11 +25,11 @@ const handleClick = (e) => {
 export function Footer() {
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
-            h("h3", {className: "footer-text top"}, [
+            h("h3", {className: "footer-text a"}, [
                 "Produced by the ",
                 h("a", {href: "https://macrostrat.org"} , "UW Macrostrat Lab")
             ]),
-            h("h3", {className: "footer-text bottom"}, [
+            h("h3", {className: "footer-text b"}, [
                 "Funded by ",
                 h("a", {href: "https://nsf.gov"}, "NSF"),
                 " and ",
@@ -46,6 +50,8 @@ export function Footer() {
 export function createCheckins(result, mapRef, setInspectPosition) {
     let checkins = [];
     const map = mapRef?.current;
+
+    const len = result.length;
       
     result.forEach((checkin) => {    
         // format rating
@@ -89,14 +95,16 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                     if(setInspectPosition) setInspectPosition({lat: checkin.lat, lng: checkin.lng});
                 }, 
                 onMouseEnter: () => {
-                    // marker
-                    const el = document.createElement('div');
-                    el.className = 'marker_pin';
-        
-                    // Create marker
-                    new mapboxgl.Marker(el)
-                    .setLngLat([checkin.lng, checkin.lat])
-                    .addTo(map);
+                    if (len > 1) {
+                        // marker
+                        const el = document.createElement('div');
+                        el.className = 'marker_pin';
+
+                        // Create marker
+                        new mapboxgl.Marker(el)
+                        .setLngLat([checkin.lng, checkin.lat])
+                        .addTo(map);
+                    }
                 },
                 onMouseLeave: () => {
                     let previous = document.querySelectorAll('.marker_pin');
