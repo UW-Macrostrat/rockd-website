@@ -37,7 +37,7 @@ function LoginForm() {
 
   const submitForm = async () => {
     try {
-      const login = await fetch("http://localhost:5500/v2/login", {
+      const login = await fetch("https://dev.rockd.org/api/v2/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -58,7 +58,7 @@ function LoginForm() {
             strabo_jwt: jParam,
           };
           const linkStrabo = await fetch(
-            "http://localhost:5500/v2/link-strabospot",
+            "https://dev.rockd.org/api/v2/link-strabospot",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
