@@ -42,7 +42,7 @@ export function Checkins({checkinID}) {
         lng: checkin.lng
     }
 
-    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"});
+    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-picture"});
     
     // format rating
     let ratingArr = [];
@@ -123,7 +123,7 @@ export function Checkins({checkinID}) {
 
     let main = h('div', { className: "container" }, [
         h('div', { className: showMap ? 'hide' : 'main'}, [
-            h('div', { className: "checkin-header" }, [
+            h('div', { className: "checkin-head" }, [
                 h('h1', checkin.notes),
                 h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
             ]),
