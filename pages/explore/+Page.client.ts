@@ -134,6 +134,7 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
+  const [selectedCheckinPoint, setSelectedCheckinPoint] = useState(null);  
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -165,6 +166,7 @@ function WeaverMap({
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = createCheckins(checkinData?.success.data, mapboxToken, null);
+
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
@@ -299,9 +301,7 @@ function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition})
         selectedCords.push([checkin.lng, checkin.lat]);
       });
 
-      let selectedStop = 0;
       selectedCords.forEach((coord) => {
-        selectedStop++;
         // marker
         const el = document.createElement('div');
         el.className = 'selected_pin';
@@ -421,6 +421,19 @@ function ClickedCheckins({setSelectedCheckin}) {
 
       if (features.length > 0) {
         const checkinId = features[0].properties.id;
+
+        // add marker
+        const coord = features[0].geometry.coordinates.slice();
+        console.log("coordinates", coord);
+
+        const el = document.createElement('div');
+        el.className = 'selected_pin';
+
+        new mapboxgl.Marker(el)
+          .setLngLat(coord)
+          .addTo(map);
+
+        console.log("data", features[0]);
         setSelectedCheckin(checkinId);
       } else {
         setSelectedCheckin(null); 
