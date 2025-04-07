@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Callout, Intent, Classes } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./main.sass";
@@ -23,30 +23,55 @@ function LoginForm() {
     username: "",
     password: "",
   });
-
   const [error, setError] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [linkStraboResponse, setLinkStraboResponse] = useState<any>(null);
+  const [jParam, setJParam] = useState<string | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const j = params.get("j");
+    if (j) {
+      setJParam(j);
+    }
+  }, []);
 
   const submitForm = async () => {
     try {
-      const res = await fetch("http://Localhost:5500/v2/login", {
+      const login = await fetch("http://localhost:5500/v2/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(state),
+        body: JSON.stringify({
+          email: state.username,
+          password: state.password,
+        }),
       });
-
-      if (!res.ok) {
-        if (res.status === 502) {
-          setError("The server is not available");
-        } else {
-          setError("Invalid credentials");
-        }
+      const loginBody = await login.json();
+      console.log(loginBody);
+      if (login.status === 502) {
+        setError("The server is not available");
         return;
       }
-
-      // success
-      setLoggedIn(true);
-      setError(null);
+      if (login.ok) {
+        if (jParam) {
+          const mergedBody = {
+            ...loginBody,
+            strabo_jwt: jParam,
+          };
+          const linkStrabo = await fetch(
+            "http://localhost:5500/v2/link-strabospot",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(mergedBody),
+            }
+          );
+          const linkStraboBody = await linkStrabo.json();
+          setLinkStraboResponse(linkStraboBody);
+        }
+        setLoggedIn(true);
+        setError(null);
+        return;
+      }
     } catch (err) {
       setError("Something went wrong");
     }
@@ -61,7 +86,18 @@ function LoginForm() {
 
   if (loggedIn) {
     return h("div", { className: "login-page" }, [
-      h("h3", "You're already logged in."),
+      h(Callout, {
+        title: "Login Successful",
+        intent: Intent.SUCCESS,
+        className: "login-info",
+        children: linkStraboResponse
+          ? h(
+              "pre",
+              { className: "login-json" },
+              JSON.stringify(linkStraboResponse, null, 2)
+            )
+          : {},
+      }),
       h(
         Button,
         { intent: Intent.DANGER, onClick: () => setLoggedIn(false) },
@@ -79,37 +115,43 @@ function LoginForm() {
         intent: Intent.DANGER,
         children: error,
       }),
-    h("form.login-form", [
-      h("input", {
-        type: "text",
-        name: "username",
-        value: state.username,
-        onChange,
-        className,
-        placeholder: "Username",
-      }),
-      h("input", {
-        type: "password",
-        name: "password",
-        value: state.password,
-        onChange,
-        className,
-        placeholder: "Password",
-        onKeyUp(e) {
-          if (e.key === "Enter") submitForm();
+    h(
+      "form.login-form",
+      {
+        onSubmit: (e) => {
+          e.preventDefault(); // Prevent form reload
+          submitForm();
         },
-      }),
-      h(
-        Button,
-        {
-          intent: Intent.PRIMARY,
-          large: true,
-          onClick: submitForm,
-          disabled: !isValid(state),
-        },
-        "Login"
-      ),
-    ]),
+      },
+      [
+        h("input", {
+          type: "text",
+          name: "username",
+          value: state.username,
+          onChange,
+          className,
+          placeholder: "Username",
+        }),
+        h("input", {
+          type: "password",
+          name: "password",
+          value: state.password,
+          onChange,
+          className,
+          placeholder: "Password",
+        }),
+        h(
+          Button,
+          {
+            intent: Intent.PRIMARY,
+            large: true,
+            type: "submit", // Important: treat this as a submit button
+            disabled: !isValid(state),
+          },
+          "Login"
+        ),
+      ]
+    ),
   ]);
 }
 function InnerPage() {
