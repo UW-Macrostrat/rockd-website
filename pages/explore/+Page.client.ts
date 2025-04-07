@@ -20,6 +20,7 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
+import { set } from "react-datepicker/dist/date_utils";
 
 const h = hyper.styled(styles);
 
@@ -133,6 +134,7 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
+  const [show, setShow] = useState(false);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -161,10 +163,10 @@ function WeaverMap({
   const checkinData = useRockdAPI(
     selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
   );
-  const clickedCheckins = h(ClickedCheckins, {checkinData, selectedCheckin, setSelectedCheckin});
   console.log("selected checki ", selectedCheckin);
 
-  if(true) {
+  if(selectedCheckin && checkinData) {
+    const clickedCheckins = createCheckins(checkinData?.success.data, mapboxToken, null);
     overlay = h("div.sidebox", [
       h('div.title', [
         h('div', { className: "selected-center" }, [
@@ -218,6 +220,7 @@ function WeaverMap({
 
           // The Overlay Div
           overlay,
+          h(ClickedCheckins, {setSelectedCheckin}),
         ]
       ),
     ]
@@ -406,7 +409,7 @@ function handleClusterClick() {
   return null;
 }
 
-function ClickedCheckins({checkinData, selectedCheckin, setSelectedCheckin}) {
+function ClickedCheckins({setSelectedCheckin}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
 
@@ -432,12 +435,6 @@ function ClickedCheckins({checkinData, selectedCheckin, setSelectedCheckin}) {
       map.off('click', handleClick);
     };
   }, [map]);
-
-  if (!selectedCheckin) return null;
-
-  if (checkinData?.success?.data) {
-    return createCheckins(checkinData.success.data, mapRef, null);
-  }
 
   return null;
 }
