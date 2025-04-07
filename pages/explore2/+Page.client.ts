@@ -1,4 +1,4 @@
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner, Icon, Divider } from "@blueprintjs/core";
@@ -15,11 +15,13 @@ import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
-import "../main.sass";
+import styles from "../main.module.sass";
 import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
+
+const h = hyper.styled(styles);
 
 let count = 0;
 
