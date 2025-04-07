@@ -1,9 +1,11 @@
 import { Image, Footer } from "./index";
-import "./main.sass";
+import styles from "./main.module.sass";
 import "./main-page.styl";
 import "@macrostrat/style-system";
-import h from "@macrostrat/hyper";
+import hyper from "@macrostrat/hyper";
 import "@macrostrat/style-system";
+
+const h = hyper.styled(styles);
 
 
 export function Page()  {
