@@ -134,7 +134,6 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
-  const [show, setShow] = useState(false);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -163,7 +162,6 @@ function WeaverMap({
   const checkinData = useRockdAPI(
     selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
   );
-  console.log("selected checki ", selectedCheckin);
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = createCheckins(checkinData?.success.data, mapboxToken, null);
