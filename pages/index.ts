@@ -50,6 +50,8 @@ export function Footer() {
 export function createCheckins(result, mapRef, setInspectPosition) {
     let checkins = [];
     const map = mapRef?.current;
+
+    const len = result.length;
       
     result.forEach((checkin) => {    
         // format rating
@@ -93,14 +95,16 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                     if(setInspectPosition) setInspectPosition({lat: checkin.lat, lng: checkin.lng});
                 }, 
                 onMouseEnter: () => {
-                    // marker
-                    const el = document.createElement('div');
-                    el.className = 'marker_pin';
-        
-                    // Create marker
-                    new mapboxgl.Marker(el)
-                    .setLngLat([checkin.lng, checkin.lat])
-                    .addTo(map);
+                    if (len > 1) {
+                        // marker
+                        const el = document.createElement('div');
+                        el.className = 'marker_pin';
+
+                        // Create marker
+                        new mapboxgl.Marker(el)
+                        .setLngLat([checkin.lng, checkin.lat])
+                        .addTo(map);
+                    }
                 },
                 onMouseLeave: () => {
                     let previous = document.querySelectorAll('.marker_pin');

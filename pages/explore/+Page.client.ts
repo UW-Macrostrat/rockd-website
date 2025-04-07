@@ -21,6 +21,7 @@ import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { set } from "react-datepicker/dist/date_utils";
+import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 
 const h = hyper.styled(styles);
 
@@ -165,7 +166,7 @@ function WeaverMap({
   );
 
   if(selectedCheckin && checkinData) {
-    const clickedCheckins = createCheckins(checkinData?.success.data, mapboxToken, null);
+    const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
 
     overlay = h("div.sidebox", [
       h('div.title', [
@@ -448,4 +449,12 @@ function ClickedCheckins({setSelectedCheckin}) {
   }, [map]);
 
   return null;
+}
+
+function createSelectedCheckins(result, setInspectPosition) {
+  const mapRef = useMapRef();
+
+  console.log("data", result);
+
+  return createCheckins(result.data, mapRef, setInspectPosition);
 }
