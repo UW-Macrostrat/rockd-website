@@ -70,10 +70,8 @@ export function Trips({trip}) {
               altitude: 300000,
             },
           };
-    
 
     return h("div", {className: 'body'}, [
-        h("div", {className: 'map'}, [
             h(
                 "div.map-container",
                 [
@@ -82,7 +80,7 @@ export function Trips({trip}) {
                     MapAreaContainer,
                     {
                       className: "map-area-container",
-                      style: { width: "70%", right: "30%", height: "100vh" },
+                      style: { width: "70%", right: "30%"},
                     },
                     [
                         h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
@@ -93,7 +91,6 @@ export function Trips({trip}) {
                 ]
               ),
             toolbar,
-        ]),
     ]);
 }
 
@@ -195,7 +192,7 @@ function SideBar({data}) {
                 ]),
             ]),
         ]),
-        h('div', { className: 'bottom' }, [
+        h('div', { className: 'bottoms' }, [
             h("div.details", [
                 h('h1', {className: 'park'}, data.name),
                 h('p', {className: 'description'}, data.description),
