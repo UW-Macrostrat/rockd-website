@@ -41,10 +41,6 @@ html, body, .wrapper, #react, .app, #map
   margin: 0
   font-family: 'Roboto', sans-serif
 
-.map-container
-  height: 100vh
-  width: 100%
-
 .hidden
   display: none
 
@@ -74,6 +70,7 @@ html, body, .wrapper, #react, .app, #map
 
 .profile-pic-header
   height: 70px
+  width: 70px
   border-radius: 50%
   display: inline-block
   margin: auto
@@ -124,73 +121,6 @@ html, body, .wrapper, #react, .app, #map
 
   a:hover
     color: black
-
-.go-to-stop
-  float: right
-  margin-top: -75px !important
-
-.bedrock-control
-  position: absolute !important
-  z-index: 10
-  bottom: 0
-  background-color: #fff !important
-  margin-left: calc((66.66667% / 2) - 53px) !important
-  bottom: 5px
-  &.active
-    background-color: #2196f3 !important
-    color: #fff !important
-
-.mapInfo-paper
-  width: 50%
-  margin: 0 auto
-  padding: 10px
-  margin-top: 20px
-
-.map-source-attrs
-  padding: 5px 10px 5px 10px
-
-.map-source-attr
-  display: block
-  padding-top: 10px
-  line-height: 24px
-  &:last-child
-    margin-bottom: 25px
-
-.attr
-  font-family: 'Montserrat', sans-serif
-  font-weight: 700
-
-.line-attr
-  font-family: 'Montserrat', sans-serif
-  font-size: 85%
-  display: block
-  margin-left: 15px
-
-.reference
-  font-size: 12px
-  line-height: 15px
-
-.ref-link
-  color: #000
-  font-weight: bold
-  text-decoration: none
-
-.download-kmz
-  margin-bottom: 10px !important
-
-@media screen and (max-width: 600px)
-  .map-container
-    height: 50%
-  .info-grid
-    height: 50%
-  .bedrock-control
-    margin-left: calc(50% - 53px) !important
-    bottom: 51%
-  .mapInfo-paper
-    width: 100%
-
-  p
-    color: white
 
 .trip-search
   height: 20vh
@@ -336,7 +266,7 @@ html, body, .wrapper, #react, .app, #map
   gap: 0px
   padding: 30px
 
-.bottom
+.bottoms
   height: 80vh
   overflow: scroll
   overflow-x: hidden
@@ -449,6 +379,3 @@ html, body, .wrapper, #react, .app, #map
   
 .hide
   display: none
-
-.map-view
-  height: 100vh
