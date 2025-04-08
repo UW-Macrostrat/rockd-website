@@ -25,11 +25,11 @@ const handleClick = (e) => {
 export function Footer() {
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
-            h("h3", {className: "footer-text a"}, [
+            h("h3", {className: "footer-text upper"}, [
                 "Produced by the ",
                 h("a", {href: "https://macrostrat.org"} , "UW Macrostrat Lab")
             ]),
-            h("h3", {className: "footer-text b"}, [
+            h("h3", {className: "footer-text lower"}, [
                 "Funded by ",
                 h("a", {href: "https://nsf.gov"}, "NSF"),
                 " and ",

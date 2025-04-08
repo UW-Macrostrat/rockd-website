@@ -1,15 +1,19 @@
 import { Footer } from "../index";
-import "./main.styl";
+import "./main.sass";
 import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import hyper from "@macrostrat/hyper";
+import { DarkModeButton } from "@macrostrat/ui-components";
 
 const h = hyper.styled(styles);
 
 export function Page() {
     return h("div", { className: "main-page" }, [
         h("div", {className: "content"}, [
-            h("h1", {className: "title"}, "Rockd Privacy Policy"),
+            h("div", { className: 'header' }, [
+                h("h1", "Privacy Policy"),
+                h(DarkModeButton, { className: 'dark-mode-btn', showText: true }),
+            ]),
           
             // Scope Section
             h("div", {className: "section"}, [
