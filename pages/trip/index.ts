@@ -135,7 +135,7 @@ function useMapStyle({showSatelite}) {
 function SideBar({data}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
-    const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic"});
+    const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic-header"});
     const stops = data.stops;
 
     if(!map) return h("div.stop-container", h(Spinner, {style: {"margin-top": "10vh"}}));
@@ -187,8 +187,8 @@ function SideBar({data}) {
 
     return h('div', { className: 'stop-container'}, [
         h('div', { className: 'top' }, [
-            h('div', { className: 'checkin-header' }, [
-                h('h3', {className: 'profile-pic'}, profile_pic),
+            h('div', { className: 'trip-header' }, [
+                profile_pic,
                 h('div', {className: 'stop-info'}, [
                     h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
