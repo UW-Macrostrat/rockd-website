@@ -50,8 +50,7 @@ body
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
 .footer
-  display: grid
-  grid-template-columns: 50% 50%
+  display: flex
   background-color: var(--panel-background-color)
   text-align: center
   color: var(--panel-text)
@@ -83,11 +82,29 @@ body
         color: var(--panel-text)
 
   .titles
-    text-align: left
+    display: flex
+    justify-content: center
+    gap: 5vh
     height: 25vh
-    display: grid
-    margin: auto
-    margin-left: 0
+    flex-direction: column
+    width: 100%
+
+    h3
+      margin: 0
+  
+  .footer-links
+    display: flex
+    flex-direction: column
+    width: 100%
+    color: var(--text-emphasized-color)
+    margin: 0
+    justify-content: center
+
+    a 
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
 
 .row
   width: 100%
@@ -192,18 +209,6 @@ body
 
     .details-image
       filter: var(--anti-img-color)
-
-  .footer-links
-    display: grid
-    margin: auto
-    margin-right: 0
-    color: var(--text-emphasized-color)
-
-    a 
-      color: var(--panel-text)
-
-      &:hover
-        color: var(--panel-text)
 
 .checkin-footer
   display: flex

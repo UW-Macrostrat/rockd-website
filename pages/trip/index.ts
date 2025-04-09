@@ -192,7 +192,7 @@ function SideBar({data}) {
                 ]),
             ]),
         ]),
-        h('div', { className: 'bottoms' }, [
+        h('div', { className: 'stop-bottom' }, [
             h("div.details", [
                 h('h1', {className: 'park'}, data.name),
                 h('p', {className: 'description'}, data.description),
