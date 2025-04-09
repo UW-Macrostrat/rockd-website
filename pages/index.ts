@@ -4,6 +4,7 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import styles from "./main.module.sass";
+import { useNavigate } from 'react-router-dom';
 
 const h = hyper.styled(styles);
 
@@ -18,7 +19,6 @@ export function BlankImage({ src, className, width, height, onClick, onError, al
 }
 
 const handleClick = (e) => {
-    e.preventDefault();
     // Custom logic to navigate or do something without style transfer
 };
 

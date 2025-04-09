@@ -7,7 +7,7 @@ import { DarkModeButton } from "@macrostrat/ui-components";
 
 const h = hyper.styled(styles);
 
-export function Page() {
+export function Page() {    
     return h("div", { className: "main-page" }, [
         h("div", { className: "content" }, [
             h("div", { className: 'header' }, [
