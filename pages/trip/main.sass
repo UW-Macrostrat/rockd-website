@@ -41,10 +41,6 @@ html, body, .wrapper, #react, .app, #map
   margin: 0
   font-family: 'Roboto', sans-serif
 
-.map-container
-  height: 100vh
-  width: 100%
-
 .hidden
   display: none
 
@@ -73,9 +69,11 @@ html, body, .wrapper, #react, .app, #map
   text-align: center
 
 .profile-pic-header
-  height: 80px
+  height: 70px
+  width: 70px
   border-radius: 50%
   display: inline-block
+  margin: auto
 
 .profile-pic-checkin
   height: 7vh
@@ -109,8 +107,9 @@ html, body, .wrapper, #react, .app, #map
 .stop-name
   font-size: 20px
   font-weight: 600
-  color: #333
-  margin-bottom: 10px
+  color: var(--text-emphasized-color)
+  padding: 10px 0 
+  text-align: left
 
 .stop-description
   font-size: 14px
@@ -123,73 +122,6 @@ html, body, .wrapper, #react, .app, #map
 
   a:hover
     color: black
-
-.go-to-stop
-  float: right
-  margin-top: -75px !important
-
-.bedrock-control
-  position: absolute !important
-  z-index: 10
-  bottom: 0
-  background-color: #fff !important
-  margin-left: calc((66.66667% / 2) - 53px) !important
-  bottom: 5px
-  &.active
-    background-color: #2196f3 !important
-    color: #fff !important
-
-.mapInfo-paper
-  width: 50%
-  margin: 0 auto
-  padding: 10px
-  margin-top: 20px
-
-.map-source-attrs
-  padding: 5px 10px 5px 10px
-
-.map-source-attr
-  display: block
-  padding-top: 10px
-  line-height: 24px
-  &:last-child
-    margin-bottom: 25px
-
-.attr
-  font-family: 'Montserrat', sans-serif
-  font-weight: 700
-
-.line-attr
-  font-family: 'Montserrat', sans-serif
-  font-size: 85%
-  display: block
-  margin-left: 15px
-
-.reference
-  font-size: 12px
-  line-height: 15px
-
-.ref-link
-  color: #000
-  font-weight: bold
-  text-decoration: none
-
-.download-kmz
-  margin-bottom: 10px !important
-
-@media screen and (max-width: 600px)
-  .map-container
-    height: 50%
-  .info-grid
-    height: 50%
-  .bedrock-control
-    margin-left: calc(50% - 53px) !important
-    bottom: 51%
-  .mapInfo-paper
-    width: 100%
-
-  p
-    color: white
 
 .trip-search
   height: 20vh
@@ -330,13 +262,12 @@ html, body, .wrapper, #react, .app, #map
 .rock
   margin: 0
 
-.top 
-  height: 20vh
+.trip-header
+  display: flex
+  gap: 0px
+  padding: 30px
 
-  .checkin-header
-    padding: 30px
-
-.bottom
+.stop-bottom
   height: 80vh
   overflow: scroll
   overflow-x: hidden
@@ -449,6 +380,3 @@ html, body, .wrapper, #react, .app, #map
   
 .hide
   display: none
-
-.map-view
-  height: 100vh

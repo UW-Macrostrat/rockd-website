@@ -22,6 +22,7 @@ import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { set } from "react-datepicker/dist/date_utils";
 import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
+import chroma from "chroma-js";
 
 const h = hyper.styled(styles);
 
@@ -58,6 +59,33 @@ function weaverStyle(type: object) {
 
   const clusterThreshold = 1;
 
+  const baseColor = "#868aa2";
+  const endColor = "#212435";
+  const scale = chroma.scale([baseColor, endColor]).mode("hsl");
+
+  const _circleColor = (step) => {
+    return scale(step / _steps.length);
+  };
+
+  const circleColor = (step) => _circleColor(step).hex();
+  const _steps = [1, 20, 100, 200, 500];
+
+  function steps(fn: (step: number) => any) {
+  let res: any[] = ["step", ["coalesce", ["get", "point_count"], 0]];
+
+  let ix = 0;
+  for (const step of _steps) {
+      res.push(fn(ix), step);
+      ix++;
+    }
+    res.push(fn(ix));
+    return res;
+  }
+
+  const textColor = (step) => {
+    return chroma(baseColor).brighten(2).hex();
+  };
+
   return {
     sources: {
       weaver: {
@@ -73,27 +101,14 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['>', ['get', 'n'], clusterThreshold],
         paint: {
-          "circle-radius": [
-            "step",
-            ["get", "n"],
-            15,
-            100,
-            20,
-            750,
-            30
-          ],
-          'circle-color': [
-              'step',
-              ['get', 'n'],
-              colors.a,
-              100,
-              colors.b,
-              750,
-              colors.c
-          ],
-          "circle-opacity": .8,
-          "circle-stroke-width": 0.5,
-          "circle-stroke-color": "#000",
+          "circle-radius": steps((step) => 8 + step * 2),
+          "circle-color": steps(circleColor),
+          "circle-stroke-width": 3,
+          "circle-stroke-color": steps((step) => {
+            const c = _circleColor(step);
+            return c.brighten(0.5).hex();
+          }),
+          "circle-stroke-opacity": 1,
         },
       },
       {
@@ -104,8 +119,11 @@ function weaverStyle(type: object) {
         filter: ['has', 'n'],
         layout: {
             'text-field': ['get', 'n'],
-            'text-size': 12
-        }
+            'text-size': 10
+        },
+        paint: {
+          "text-color": "#000"
+        },
       },
       {
         id: 'unclustered-point',
@@ -114,7 +132,7 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['<=', ['get', 'n'], clusterThreshold],
         paint: {
-            'circle-color': colors.a,
+            'circle-color': baseColor,
             'circle-radius': 4,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'

@@ -50,8 +50,7 @@ body
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
 .footer
-  display: grid
-  grid-template-columns: 50% 50%
+  display: flex
   background-color: var(--panel-background-color)
   text-align: center
   color: var(--panel-text)
@@ -64,17 +63,48 @@ body
     list-style-type: none
 
   a
-    color: black
+    color: var(--panel-text)
     font-weight: bold
   a:hover
-    color: black
+    color: var(--panel-text)
 
-.titles
-  text-align: left
-  height: 25vh
-  display: grid
-  margin: auto
-  margin-left: 0
+  .footer-text
+    font-size: 24px
+    font-weight: 500
+
+    .upper
+      margin-bottom: 0
+
+    a 
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
+
+  .titles
+    display: flex
+    justify-content: center
+    gap: 5vh
+    height: 25vh
+    flex-direction: column
+    width: 100%
+
+    h3
+      margin: 0
+  
+  .footer-links
+    display: flex
+    flex-direction: column
+    width: 100%
+    color: var(--text-emphasized-color)
+    margin: 0
+    justify-content: center
+
+    a 
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
 
 .row
   width: 100%
@@ -169,6 +199,17 @@ body
   .description
     margin-top: 10px
 
+  .no-image
+    color: var(--panel-text)
+    display: flex
+    justify-content: center
+    align-items: center
+    gap: 10px
+    marigin: 0
+
+    .details-image
+      filter: var(--anti-img-color)
+
 .checkin-footer
   display: flex
   justify-content: center
@@ -201,7 +242,6 @@ body
     .observations-image
       width: 40px
 
-
 .marker
   height: 7vh
   display: grid
@@ -220,13 +260,6 @@ body
 
 .checkin-header
   display: flex
-
-.profile-pic
-  height: 80px
-  width: 80px
-  border-radius: 50%
-  display: inline-block
-  margin-right: 10px
 
 .description
   margin-top: 10px
@@ -253,35 +286,3 @@ body
     top: 50%
     left: 50%
     color: white
-
-.footer-links
-  display: grid
-  margin: auto
-  margin-right: 0
-
-  a 
-    color: var(--panel-text)
-
-    &:hover
-      color: var(--panel-text)
-
-.footer-text
-  font-size: 24px
-  font-weight: 500
-
-  a 
-    color: var(--panel-text)
-
-    &:hover
-      color: var(--panel-text)
-
-.no-image
-  color: var(--panel-text)
-  display: flex
-  justify-content: center
-  align-items: center
-  gap: 10px
-  marigin: 0
-
-  .details-image
-    filter: var(--anti-img-color)

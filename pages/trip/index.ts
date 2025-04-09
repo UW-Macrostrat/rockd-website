@@ -70,10 +70,8 @@ export function Trips({trip}) {
               altitude: 300000,
             },
           };
-    
 
     return h("div", {className: 'body'}, [
-        h("div", {className: 'map'}, [
             h(
                 "div.map-container",
                 [
@@ -82,7 +80,7 @@ export function Trips({trip}) {
                     MapAreaContainer,
                     {
                       className: "map-area-container",
-                      style: { width: "70%", right: "30%", height: "100vh" },
+                      style: { width: "70%", right: "30%"},
                     },
                     [
                         h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
@@ -93,7 +91,6 @@ export function Trips({trip}) {
                 ]
               ),
             toolbar,
-        ]),
     ]);
 }
 
@@ -135,7 +132,7 @@ function useMapStyle({showSatelite}) {
 function SideBar({data}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
-    const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic"});
+    const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic-header"});
     const stops = data.stops;
 
     if(!map) return h("div.stop-container", h(Spinner, {style: {"margin-top": "10vh"}}));
@@ -187,15 +184,15 @@ function SideBar({data}) {
 
     return h('div', { className: 'stop-container'}, [
         h('div', { className: 'top' }, [
-            h('div', { className: 'checkin-header' }, [
-                h('h3', {className: 'profile-pic'}, profile_pic),
+            h('div', { className: 'trip-header' }, [
+                profile_pic,
                 h('div', {className: 'stop-info'}, [
                     h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
                 ]),
             ]),
         ]),
-        h('div', { className: 'bottom' }, [
+        h('div', { className: 'stop-bottom' }, [
             h("div.details", [
                 h('h1', {className: 'park'}, data.name),
                 h('p', {className: 'description'}, data.description),
