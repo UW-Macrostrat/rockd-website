@@ -69,12 +69,25 @@ body
   a:hover
     color: black
 
-.titles
-  text-align: left
-  height: 25vh
-  display: grid
-  margin: auto
-  margin-left: 0
+  .footer-text
+    font-size: 24px
+    font-weight: 500
+
+    .upper
+      margin-bottom: 0
+
+    a 
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
+
+  .titles
+    text-align: left
+    height: 25vh
+    display: grid
+    margin: auto
+    margin-left: 0
 
 .row
   width: 100%
@@ -169,6 +182,28 @@ body
   .description
     margin-top: 10px
 
+  .no-image
+    color: var(--panel-text)
+    display: flex
+    justify-content: center
+    align-items: center
+    gap: 10px
+    marigin: 0
+
+    .details-image
+      filter: var(--anti-img-color)
+
+  .footer-links
+    display: grid
+    margin: auto
+    margin-right: 0
+
+    a 
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
+
 .checkin-footer
   display: flex
   justify-content: center
@@ -200,7 +235,6 @@ body
 
     .observations-image
       width: 40px
-
 
 .marker
   height: 7vh
@@ -246,38 +280,3 @@ body
     top: 50%
     left: 50%
     color: white
-
-.footer-links
-  display: grid
-  margin: auto
-  margin-right: 0
-
-  a 
-    color: var(--panel-text)
-
-    &:hover
-      color: var(--panel-text)
-
-.footer-text
-  font-size: 24px
-  font-weight: 500
-
-  .upper
-    margin-bottom: 0
-
-  a 
-    color: var(--panel-text)
-
-    &:hover
-      color: var(--panel-text)
-
-.no-image
-  color: var(--panel-text)
-  display: flex
-  justify-content: center
-  align-items: center
-  gap: 10px
-  marigin: 0
-
-  .details-image
-    filter: var(--anti-img-color)
