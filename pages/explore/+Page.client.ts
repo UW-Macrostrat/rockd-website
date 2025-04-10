@@ -61,30 +61,6 @@ function weaverStyle(type: object) {
 
   const baseColor = "#868aa2";
   const endColor = "#212435";
-  const scale = chroma.scale([baseColor, endColor]).mode("hsl");
-
-  const _circleColor = (step) => {
-    return scale(step / _steps.length);
-  };
-
-  const circleColor = (step) => _circleColor(step).hex();
-  const _steps = [1, 20, 100, 200, 500];
-
-  function steps(fn: (step: number) => any) {
-  let res: any[] = ["step", ["coalesce", ["get", "point_count"], 0]];
-
-  let ix = 0;
-  for (const step of _steps) {
-      res.push(fn(ix), step);
-      ix++;
-    }
-    res.push(fn(ix));
-    return res;
-  }
-
-  const textColor = (step) => {
-    return chroma(baseColor).brighten(2).hex();
-  };
 
   return {
     sources: {
@@ -101,13 +77,28 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['>', ['get', 'n'], clusterThreshold],
         paint: {
-          "circle-radius": steps((step) => 8 + step * 2),
-          "circle-color": steps(circleColor),
+          "circle-radius": [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            5, 8,
+            15, 28 // 8 + 10 * 2
+          ],
+          "circle-color": [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            5, endColor,
+            10, baseColor
+          ],
+          "circle-stroke-color": [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            5, '#3a3f55', 
+            10, '#a6aac2', 
+          ],
           "circle-stroke-width": 3,
-          "circle-stroke-color": steps((step) => {
-            const c = _circleColor(step);
-            return c.brighten(0.5).hex();
-          }),
           "circle-stroke-opacity": 1,
         },
       },
@@ -122,7 +113,7 @@ function weaverStyle(type: object) {
             'text-size': 10
         },
         paint: {
-          "text-color": "#000"
+          "text-color": "#fff"
         },
       },
       {
