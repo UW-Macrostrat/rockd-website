@@ -144,7 +144,6 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const style = useMapStyle(type, mapboxToken, showSatelite);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
-  const [selectedCheckinPoint, setSelectedCheckinPoint] = useState(null);  
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -276,55 +275,6 @@ function getCheckins(lat1, lat2, lng1, lng2) {
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
-}
-
-function getSelectedCheckins(lat1, lat2, lng1, lng2) {
-  // abitrary bounds around click point
-  let minLat = Math.floor(lat1 * 100) / 100;
-  let maxLat = Math.floor(lat2 * 100) / 100;
-  let minLng = Math.floor(lng1 * 100) / 100;
-  let maxLng = Math.floor(lng2 * 100) / 100;
-
-  // return 10 pages of results
-  return useRockdAPI("protected/checkins?minlat=" + minLat + 
-    "&maxlat=" + maxLat +
-    "&minlng=" + minLng +
-    "&maxlng=" + maxLng + "&all=10");
-}
-
-function SelectedCheckins({selectedResult, inspectPosition, setInspectPosition}) {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-
-  // add selected checkin markers
-  useEffect(() => {
-    let selectedCords = [];
-
-    let previousSelected = document.querySelectorAll('.selected_pin');
-    previousSelected.forEach((marker) => {
-      marker.remove();
-    });
-
-    // if selected checkins
-    if(selectedResult?.length > 0 && inspectPosition) {
-      selectedResult.forEach((checkin) => {
-        selectedCords.push([checkin.lng, checkin.lat]);
-      });
-
-      selectedCords.forEach((coord) => {
-        // marker
-        const el = document.createElement('div');
-        el.className = 'selected_pin';
-
-        // Create marker
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
-      });
-    }
-  }, [selectedResult]);
-
-  return h("div", {className: 'checkin-container'}, createCheckins(selectedResult, mapRef, setInspectPosition));
 }
 
 function FeatureDetails({setInspectPosition}) {
