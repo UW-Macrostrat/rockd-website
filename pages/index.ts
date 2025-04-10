@@ -66,7 +66,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         
         let image;
         const imgSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
-        const showImage = checkin.photo && imageExists(imgSrc);
+        const showImage = checkin.photo && imageExists(imgSrc); // causing lag
     
         if (showImage) {
             image = h(BlankImage, {className: 'observation-img', src: apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
