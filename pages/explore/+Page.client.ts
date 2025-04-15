@@ -218,7 +218,7 @@ function WeaverMap({
         {
           contextPanel: h(Toolbar, {showSatelite, setSatelite}),
           className: "map-area-container",
-          style: { width: "70%", left: "30%" },
+          style: { "padding-left": "calc(30% + 14px)",},
         },
         [
           h(MapView, { style, mapboxToken }, [
