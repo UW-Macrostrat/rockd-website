@@ -287,9 +287,7 @@ function FeatureDetails({setInspectPosition}) {
   if(!map) {
     result = getCheckins(0, 0, 0, 0);
   } else if (bounds) {
-    const distance = Math.abs(bounds.getEast() - bounds.getWest());
-    const newEast = bounds.getEast() - distance * .2;
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), newEast);
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
   } else {
     result = getCheckins(0, 0, 0, 0);
   }
