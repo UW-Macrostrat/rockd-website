@@ -81,6 +81,10 @@ body
   left: 0
   background: var(--panel-background-color)
 
+  .title-header, .coordinates
+    display: flex
+    justify-content: center
+
   .title
     display: flex
     width: 100%
@@ -148,9 +152,10 @@ body
     transform: translate(-50%, -50%)
     color: white
     font-size: 12px
-    font-weight: bold
+    font-weight: bold    
 
-    
+.selcted-center
+  display: flex
 
 .selected_pin
   background-color: blue
@@ -221,10 +226,6 @@ body
     margin: auto
     margin-left: 5px
     border: none
-
-.selected-center
-  margin: auto
-  text-align: center
 
 .dark-button 
   margin: 6px 15px
@@ -383,7 +384,9 @@ body
   background-image: url(https://storage.macrostrat.org/assets/rockd/explore/green-circle.png)
 
 .coordinates
-  margin: 0
+  display: flex
+  justify-content: center
+  height: 5vh
 
 .toolbar
   padding: 0
