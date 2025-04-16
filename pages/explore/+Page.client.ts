@@ -144,6 +144,7 @@ function WeaverMap({
   const [showOverlay, setOverlay] = useState(true);
   const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
+  const [showSettings, setSettings] = useState(false);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -173,6 +174,9 @@ function WeaverMap({
     selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
   );
 
+  const toolbar = h(Toolbar, {showSettings, setSettings});
+  const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
+
   if(selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
 
@@ -200,6 +204,7 @@ function WeaverMap({
     overlay = h("div.sidebox", [
       h('div.sidebox-header', [
         h('div.title', [
+          toolbar,
           h("h1", "Featured Checkins"),
         ]),
       ]),
@@ -216,7 +221,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: h(Toolbar, {showSatelite, setSatelite, showOverlay, setOverlay}),
+          contextPanel: contextPanel,
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
@@ -322,10 +327,8 @@ function FeatureDetails({setInspectPosition}) {
     ]);
 }
 
-function Toolbar({showSatelite, setSatelite, showOverlay, setOverlay}) {
-  const [showSettings, setSettings] = useState(false);
-
-  return h(PanelCard, { className: "toolbar", style: {padding: "0"} }, [
+function Toolbar({showSettings, setSettings}) {
+  return h("div", { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
@@ -335,26 +338,28 @@ function Toolbar({showSatelite, setSatelite, showOverlay, setOverlay}) {
         }
         }),
       ]),
-      h("div", { className: showSettings ? "settings-content" : "hide" }, [
-          h(Divider, { className: "divider" }),
-          h("div", { className: "settings" }, [
-              h(DarkModeButton, { className: "dark-btn", showText: true } ),
-              h(PanelCard, {className: "satellite-style", onClick: () => {
-                    setSatelite(!showSatelite);
-                  }}, [
-                      h(Icon, { className: "satellite-icon", icon: "satellite"}),
-                      h("p", "Satellite"),
-                  ]),
-              h(PanelCard, {className: "map-style", onClick: () => {
-                    setOverlay(!showOverlay);
-                  }}, [
-                      h(Icon, { className: "overlay-icon", icon: "map"}),
-                      h("p", "Overlay"),
-                  ]),
-            ]),
-              
-          ])
     ]);
+}
+
+function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
+  return h(PanelCard, { className: showSettings ? "settings-content" : "hide" }, [
+  h("div", { className: "settings" }, [
+      h(DarkModeButton, { className: "dark-btn", showText: true } ),
+      h(PanelCard, {className: "satellite-style", onClick: () => {
+            setSatelite(!showSatelite);
+          }}, [
+              h(Icon, { className: "satellite-icon", icon: "satellite"}),
+              h("p", "Satellite"),
+          ]),
+      h(PanelCard, {className: "map-style", onClick: () => {
+            setOverlay(!showOverlay);
+          }}, [
+              h(Icon, { className: "overlay-icon", icon: "map"}),
+              h("p", "Overlay"),
+          ]),
+    ]),
+      
+  ])
 }
 
 function handleClusterClick() {
