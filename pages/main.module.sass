@@ -61,10 +61,18 @@ body
 
   ul
     list-style-type: none
+    display: flex
+    gap: 10px
+    flex-direction: column
+
+    li
+      p
+        margin-bottom: 0
 
   a
     color: var(--panel-text)
     font-weight: bold
+
   a:hover
     color: var(--panel-text)
 
@@ -84,7 +92,7 @@ body
   .titles
     display: flex
     justify-content: center
-    gap: 5vh
+    gap: 30px
     height: 25vh
     flex-direction: column
     width: 100%
@@ -94,15 +102,20 @@ body
   
   .footer-links
     display: flex
-    flex-direction: column
     width: 100%
     color: var(--text-emphasized-color)
     margin: 0
     justify-content: center
+    align-items: center
     padding-inline-start: 0px
+
+    .footer-icon
+      filter: var(--anti-img-color)
 
     a 
       color: var(--panel-text)
+      display: flex
+      gap: 5px
 
       &:hover
         color: var(--panel-text)
@@ -290,3 +303,7 @@ body
     top: 50%
     left: 50%
     color: white
+
+.dark-mode
+  display: flex
+  align-items: center

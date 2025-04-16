@@ -168,7 +168,6 @@ export function Page() {
         h("div", { className: 'metrics' }, [
             h("div", { className: 'header' }, [
                 h("h1", "Metrics"),
-                h(DarkModeButton, { className: 'dark-mode-btn', showText: true }),
             ]),
             h("div", { className: 'summary' }, [
                 h("div", { className: 'stat' }, [
