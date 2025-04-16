@@ -182,10 +182,8 @@ function WeaverMap({
 
     overlay = h("div.sidebox", [
       h('div.title', [
-        h('div', { className: "selected-center" }, [
-          h("h1", "Selected Checkins"),
-          h('h3', { className: "coordinates" }, LngLatCoords(LngLatProps))
-        ]),
+        toolbar,
+        h("h1", "Selected Checkins"),
       ]),
       h("button", {
         className: "close-btn",
