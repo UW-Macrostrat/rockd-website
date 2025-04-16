@@ -80,7 +80,7 @@ export function Trips({trip}) {
                     MapAreaContainer,
                     {
                       className: "map-area-container",
-                      style: { width: "70%", right: "30%"},
+                      style: { 'padding-right': "calc(30% + 14px)"},
                     },
                     [
                         h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
