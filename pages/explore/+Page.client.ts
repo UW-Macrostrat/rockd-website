@@ -251,7 +251,6 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   const finalStyle = showSatelite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
-  console.log("showOverlay", showOverlay);
   const overlayStyle = showOverlay ? mergeStyles(_macrostratStyle, weaverStyle(type)) : weaverStyle(type);
 
   // Auto select sample type
@@ -384,6 +383,23 @@ function ClickedCheckins({setSelectedCheckin}) {
     if (!map) return;
 
     const handleClick = (e) => {
+      const cluster = map.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
+      });
+
+      if(cluster.length > 0) {
+        const zoom = cluster[0].properties.expansion_zoom;
+        console.log("cluster", cluster[0]);
+
+        console.log("zoom", zoom);
+
+        map.flyTo({
+          center: cluster[0].geometry.coordinates,
+          zoom: zoom,
+          speed: 0.5,
+        });
+      }
+
       const features = map.queryRenderedFeatures(e.point, {
         layers: ['unclustered-point']
       });
@@ -421,8 +437,6 @@ function ClickedCheckins({setSelectedCheckin}) {
 
 function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
-
-  console.log("data", result);
 
   return createCheckins(result.data, mapRef, setInspectPosition);
 }
