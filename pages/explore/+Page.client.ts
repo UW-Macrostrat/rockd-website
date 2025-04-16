@@ -51,12 +51,6 @@ const type =
   };
 
 function weaverStyle(type: object) {
-  const colors = {
-    a: "#51bbd6",
-    b: "#f1f075",
-    c: "#f28cb1",
-  };
-
   const clusterThreshold = 1;
 
   const baseColor = "#868aa2";
@@ -80,27 +74,27 @@ function weaverStyle(type: object) {
           "circle-radius": [
             'step',
             ['get', 'n'],
-            7, 5,
-            9, 20,
-            11, 50,
-            13, 100,
+            7, 50,
+            9, 100,
+            11, 150,
+            13, 200,
             15, 
           ],
           "circle-color": [
             'step',
             ['get', 'n'],
-            "#7b7fa0", 5,
-            '#636b8d', 20,
-            '#4a546e', 50,
-            '#353b49', 100,
+            "#7b7fa0", 50,
+            '#636b8d', 100,
+            '#4a546e', 150,
+            '#353b49', 200,
             endColor
           ],
           "circle-stroke-color": [
             'step',
             ['get', 'n'],
-            "#8b8eab", 5,
-            '#7a7e96', 20,
-            '#5d5f7c', 50,
+            "#8b8eab", 50,
+            '#7a7e96', 100,
+            '#5d5f7c', 150,
             '#484b63', 
           ],
           "circle-stroke-width": 3,
@@ -147,7 +141,8 @@ function WeaverMap({
   mapboxToken?: string;
 }) {
   const [showSatelite, setSatelite] = useState(false);
-  const style = useMapStyle(type, mapboxToken, showSatelite);
+  const [showOverlay, setOverlay] = useState(true);
+  const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
 
   // overlay
@@ -221,7 +216,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: h(Toolbar, {showSatelite, setSatelite}),
+          contextPanel: h(Toolbar, {showSatelite, setSatelite, showOverlay, setOverlay}),
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
@@ -242,7 +237,7 @@ function WeaverMap({
   
 }
 
-function useMapStyle(type, mapboxToken, showSatelite) {
+function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
@@ -253,17 +248,18 @@ function useMapStyle(type, mapboxToken, showSatelite) {
   const finalStyle = showSatelite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
+  console.log("showOverlay", showOverlay);
+  const overlayStyle = showOverlay ? mergeStyles(_macrostratStyle, weaverStyle(type)) : weaverStyle(type);
 
   // Auto select sample type
   useEffect(() => {
-    const overlayStyle = mergeStyles(_macrostratStyle, weaverStyle(type));
       buildInspectorStyle(finalStyle, overlayStyle, {
         mapboxToken,
         inDarkMode: isEnabled,
       }).then((s) => {
         setActualStyle(s);
       });
-  }, [isEnabled, showSatelite]);
+  }, [isEnabled, showSatelite, showOverlay]);
 
   return actualStyle;
 }
@@ -326,7 +322,7 @@ function FeatureDetails({setInspectPosition}) {
     ]);
 }
 
-function Toolbar({showSatelite, setSatelite}) {
+function Toolbar({showSatelite, setSatelite, showOverlay, setOverlay}) {
   const [showSettings, setSettings] = useState(false);
 
   return h(PanelCard, { className: "toolbar", style: {padding: "0"} }, [
@@ -343,13 +339,20 @@ function Toolbar({showSatelite, setSatelite}) {
           h(Divider, { className: "divider" }),
           h("div", { className: "settings" }, [
               h(DarkModeButton, { className: "dark-btn", showText: true } ),
-              h(PanelCard, {className: "map-style", onClick: () => {
+              h(PanelCard, {className: "satellite-style", onClick: () => {
                     setSatelite(!showSatelite);
                   }}, [
                       h(Icon, { className: "satellite-icon", icon: "satellite"}),
                       h("p", "Satellite"),
                   ]),
-              ]),
+              h(PanelCard, {className: "map-style", onClick: () => {
+                    setOverlay(!showOverlay);
+                  }}, [
+                      h(Icon, { className: "overlay-icon", icon: "map"}),
+                      h("p", "Overlay"),
+                  ]),
+            ]),
+              
           ])
     ]);
 }
