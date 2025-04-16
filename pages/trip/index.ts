@@ -62,6 +62,12 @@ export function Trips({trip}) {
     const toolbar = h(Toolbar, {showSatelite, setSatelite});
     const sidebar = h(SideBar, {data});
 
+    if (!sidebar) {
+        return h("div", { className: 'loading' }, [
+            h("h1", "Loading trip..."),
+        ]);
+    }
+
     let start = [data.stops[0].checkin.lng, data.stops[0].checkin.lat];
     const newMapPosition ={
             camera: {
