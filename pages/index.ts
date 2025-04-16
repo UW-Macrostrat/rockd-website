@@ -1,10 +1,9 @@
 import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useAPIResult } from "@macrostrat/ui-components";
+import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import styles from "./main.module.sass";
-import { useNavigate } from 'react-router-dom';
 
 const h = hyper.styled(styles);
 
@@ -24,6 +23,9 @@ const handleClick = (e) => {
 
 export function Footer() {
     return h("div", {className: "footer"}, [
+        h("div.dark-mode", [
+            h(DarkModeButton, {className: "dark-mode-button", showText: true}),
+        ]),
         h("div", {className: "titles"}, [
             h("h3", {className: "footer-text upper"}, [
                 "Produced by the ",
@@ -36,14 +38,36 @@ export function Footer() {
                 h("a", {href: "http://geoscience.wisc.edu/geoscience/"}, "UW Geoscience")
             ])
         ]),
-        h("ul", {className: "footer-links"},[
-            h("li", h("a", {href: "/", onClick: handleClick}, "Home")),
-            h("li", h("a", {href: "/explore", onClick: handleClick}, "Explore")),
-            h("li", h("a", {href: "/privacy", onClick: handleClick}, "Privacy Policy")),
-            h("li", h("a", {href: "/terms", onClick: handleClick}, "Terms and Conditions")),
-            h("li", h("a", {href: "/trip/1", onClick: handleClick}, "Trips")),
-            h("li", h("a", {href: "/metrics", onClick: handleClick}, "Metrics")),
-        ])
+        h("div", {className: "footer-links"},[
+            h("ul", [
+                h("li", h("a", {href: "/", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "home", style: {color: 'white'}}),
+                    h('p', "Home")
+                ])),
+                h("li", h("a", {href: "/explore", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "geosearch", style: {color: 'white'}}),
+                    h('p', "Explore")
+                ])),
+                h("li", h("a", {href: "/privacy", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "lock", style: {color: 'white'}}),
+                    h('p', "Privacy")
+                ])),
+            ]),
+            h("ul", [
+                h("li", h("a", {href: "/terms", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "manual", style: {color: 'white'}}),
+                    h('p', "Terms and Conditions")
+                ])),
+                h("li", h("a", {href: "/trip/1", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "route", style: {color: 'white'}}),
+                    h('p', "Trip")
+                ])),
+                h("li", h("a", {href: "/metrics", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "chart", style: {color: 'white'}}),
+                    h('p', "Metrics")
+                ])),
+            ]),
+        ]),
     ]);
 }
 

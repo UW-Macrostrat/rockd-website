@@ -12,7 +12,6 @@ export function Page() {
         h("div", {className: "content"}, [
             h("div", { className: 'header' }, [
                 h("h1", "Privacy Policy"),
-                h(DarkModeButton, { className: 'dark-mode-btn', showText: true }),
             ]),
           
             // Scope Section
