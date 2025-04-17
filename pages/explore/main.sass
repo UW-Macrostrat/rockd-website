@@ -232,53 +232,40 @@ body
   background-color: green
 
 .search-bar
-  height: 5vh
-  width: 100%
-  background-color: var(--panel-background-color)
+  position: relative
+  width: 300px
   
   .search-icon
+    top: 10px
     position: absolute
-    top: 0
-    margin-left: 10%
-    width: 8%
-    height: 5vh
-    
-    Icon 
-      height: 5vh
-      display: grid
-      margin: auto
-      filter: var(--img-color)
-      padding: 1vh 0
+    width: 20px
+    height: 20px
+    left: 22px
 
   .x-icon
+    top: 10px
     position: absolute
-    top: 0
-    right: 0
-    margin-right: 10%
-    width: 7%
-    height: 5vh
-
-    img
-      height: 5vh
-      display: grid
-      margin: auto
-      width: 100%
-      filter: var(--img-color)
-      cursor: pointer
+    width: 20px
+    height: 20px
+    right: 40px
 
   input
-    width: 80%
-    margin: 0 10%
+    width: 250px
+    margin: 0 5%
     background-color: var(--accent-secondary-color)
     color: var(--text-emphasized-color)
-    padding: 0 8%
-    height: 5vh
+    padding: 0 30px
+    height: 40px
     border: none
 
 
 .autocomplete
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
+  width: 300px
+  h1 
+    margin-top: 0
+    text-align: center
 
   h2
     background-color: var(--accent-secondary-color)
@@ -299,31 +286,6 @@ body
   ul
     margin-top: 0
     padding-left: 0
-
-  /* Scrollbar Styling */
-  &::-webkit-scrollbar
-    width: 12px
-
-  &::-webkit-scrollbar-track
-    background: rgba(200, 200, 200, 0.3)
-
-  &::-webkit-scrollbar-thumb
-    background-color: rgba(150, 150, 150, 0.6)
-    border-radius: 4px
-    transition: background-color 0.2s ease
-
-    &:hover
-      background-color: rgba(100, 100, 100, 0.8)
-
-._panel-subhead_z8iog_1
-  padding: 10px 20px
-  background-color: #333
-  color: white
-  border: none
-  cursor: pointer
-  border-radius: 4px
-  width: 100%
-
 
 .results
   padding-top: 10px
