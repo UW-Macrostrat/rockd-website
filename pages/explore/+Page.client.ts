@@ -147,6 +147,7 @@ function WeaverMap({
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
+  const [filteredCheckins, setFilteredCheckins] = useState(null);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -178,7 +179,7 @@ function WeaverMap({
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {showFilter});
+  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins});
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
@@ -437,7 +438,7 @@ function createSelectedCheckins(result, setInspectPosition) {
   return createCheckins(result.data, mapRef, setInspectPosition);
 }
 
-function AutoComplete({showFilter}) {
+function AutoComplete({showFilter, setFilteredCheckins}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [filters, setFilters] = useState([]);
@@ -445,10 +446,8 @@ function AutoComplete({showFilter}) {
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
 
-  return h(PanelCard, { className: showFilter ? "autocomplete" : "hide" },)
-
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
-  let filteredCheckins = h('div.filtered-checkins-container', [
+  const filteredCheckins = h('div.filtered-checkins-container', [
     h("div.filtered-checkins", person_data && person_data.length > 0 ? createCheckins(person_data, mapRef, null) : null)
   ]);
 
@@ -528,7 +527,7 @@ function AutoComplete({showFilter}) {
       h(Icon, { icon: "search" }),
     ]),
     h('div.x-icon', [
-      h(Icon, { className: 'x-icon', icon: "cross", onClick: () => {
+      h(Icon, { icon: "cross", onClick: () => {
           let input = document.querySelector('input');
           input.value = "";
           setAutocompleteOpen(false);
@@ -562,11 +561,14 @@ function AutoComplete({showFilter}) {
         })
       ])
     })),
-    filteredCheckins
+    // filteredCheckins
   ]) : null; 
 
   
-  if(!result || close) return h("div.autocomplete", searchBar);
+  if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
+    h("h1", "Filter Checkins"),
+    searchBar
+  ]);
   result = result.success.data;
 
   let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
@@ -598,17 +600,18 @@ function AutoComplete({showFilter}) {
     }))
   ]) : null;
 
-  let results = h("div.results", [
+  const results = h("div.results", [
     taxa,
     people,
   ]);
 
-  let wrapper = h('div.autocomplete-wrapper', [
+  const wrapper = h('div.autocomplete-wrapper', [
     filterContainer,
     results,
   ]);
 
   return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
+    h("h1", "Filter Checkins"),
     searchBar,
     wrapper
   ]);
