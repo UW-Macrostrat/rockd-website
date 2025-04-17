@@ -216,8 +216,8 @@ function WeaverMap({
   if(style == null) return null;
 
   const sidePanel = h("div.side-panel", [
-    contextPanel,
     autoComplete,
+    contextPanel,
   ])
 
   return h(
@@ -338,14 +338,14 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
+        h(Icon, { className: "settings-icon", icon: "search", onClick: () => {
+            setFilter(!showFilter);
+          }
+        }),
         h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
             setSettings(!showSettings);
           }
         }),
-        h(Icon, { className: "settings-icon", icon: "search", onClick: () => {
-          setFilter(!showFilter);
-        }
-      }),
       ]),
     ]);
 }
@@ -444,6 +444,8 @@ function AutoComplete({showFilter}) {
   const [autocompleteOpen, setAutocompleteOpen] = useState(true);
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
+
+  return h(PanelCard, { className: showFilter ? "autocomplete" : "hide" },)
 
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
   let filteredCheckins = h('div.filtered-checkins-container', [
