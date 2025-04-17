@@ -37,6 +37,9 @@ body
     @each $name, $color in $dark-colors
       --#{$name}: #{$color}
 
+    .selected
+      background-color: var(--panel-hover)
+
     .bp5-input
       &::placeholder
         color: var(--secondary-color)
@@ -251,7 +254,7 @@ body
 
   input
     width: 250px
-    margin: 0 5%
+    margin: 0 15px
     background-color: var(--accent-secondary-color)
     color: var(--text-emphasized-color)
     padding: 0 30px 0 10px
@@ -295,8 +298,9 @@ body
 
 
 .filter-item
-  display: grid
-  grid-template-columns: 50% 50%
+  display: flex
+  align-items: center
+  justify-content: space-between
 
   li 
     &:hover
@@ -372,7 +376,6 @@ body
 .settings-content
   color: var(--text-emphasized-color)
 
-
   h1
     margin: 0
     color: var(--text-emphasized-color)
@@ -410,3 +413,14 @@ body
   display: flex
   gap: 10px
   align-items: center
+  padding: 0 15px
+
+.settings
+  padding: 0 15px
+
+.satellite-style, .map-style
+  justify-content: center
+  width: 100px
+
+.selected
+  background-color: green
