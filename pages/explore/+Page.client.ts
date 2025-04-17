@@ -365,6 +365,11 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 
 function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h(PanelCard, { className: showSettings ? "settings-content" : "hide" }, [
+    h("div", { className: "settings-header" }, [
+      h(Icon, { className: "settings-icon", icon: "settings"}),
+      h("h1", "Settings"),
+    ]),
+    h(Divider, {className: "settings-divider"}),
   h("div", { className: "settings" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
       h(PanelCard, {className: "satellite-style", onClick: () => {
@@ -537,9 +542,6 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
 
   let searchBar = h('div.search-bar', [
     h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
-    h('div.search-icon', [
-      h(Icon, { icon: "search" }),
-    ]),
     h('div.x-icon', [
       h(Icon, { icon: "cross", onClick: () => {
           let input = document.querySelector('input');
@@ -561,7 +563,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     h('ul', filters.map((item) => {
       return h("div.filter-item", [
         h('li', item.name),
-        h('div.red-bar', { onClick: () => {
+        h(Icon, { icon: "cross", style: {color: "red"}, onClick: () => {
             setFilters(filters.filter((filter) => filter != item));
             if(filters.length == 1) {
               setClose(true);
@@ -579,7 +581,11 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
 
   
   if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("h1", "Filter Checkins"),
+    h("div", { className: "search-header" }, [
+      h(Icon, { className: "search-icon", icon: "search"}),
+      h("h1", "Filter Checkins"),
+    ]),
+    h(Divider, {className: "filter-divider"}),
     searchBar
   ]);
   result = result.success.data;

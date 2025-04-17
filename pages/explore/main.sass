@@ -254,7 +254,7 @@ body
     margin: 0 5%
     background-color: var(--accent-secondary-color)
     color: var(--text-emphasized-color)
-    padding: 0 30px
+    padding: 0 30px 0 10px
     height: 40px
     border: none
 
@@ -263,8 +263,9 @@ body
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
   width: 300px
+
   h1 
-    margin-top: 0
+    margin:0
     text-align: center
 
   h2
@@ -365,8 +366,17 @@ body
 .setting-icon
   cursor: pointer
 
+.filter-divider, .settings-divider
+  margin-bottom: 10px
+
 .settings-content
-  width: 125px
+  color: var(--text-emphasized-color)
+
+
+  h1
+    margin: 0
+    color: var(--text-emphasized-color)
+    text-align: center
 
   .divider
     margin: 0
@@ -395,3 +405,8 @@ body
   display: flex
   flex-direction: column
   gap: 10px
+
+.search-header, .settings-header
+  display: flex
+  gap: 10px
+  align-items: center
