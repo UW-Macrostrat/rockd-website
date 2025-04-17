@@ -351,7 +351,7 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
-        h(Icon, { className: "settings-icon", icon: "search", onClick: () => {
+        h(Icon, { className: "settings-icon", icon: "filter", onClick: () => {
             setFilter(!showFilter);
           }
         }),
@@ -372,13 +372,13 @@ function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, set
     h(Divider, {className: "settings-divider"}),
   h("div", { className: "settings" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(PanelCard, {className: "satellite-style", onClick: () => {
+      h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
           }}, [
               h(Icon, { className: "satellite-icon", icon: "satellite"}),
               h("p", "Satellite"),
           ]),
-      h(PanelCard, {className: "map-style", onClick: () => {
+      h(PanelCard, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
             setOverlay(!showOverlay);
           }}, [
               h(Icon, { className: "overlay-icon", icon: "map"}),
@@ -541,13 +541,14 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   }
 
   let searchBar = h('div.search-bar', [
-    h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
+    h('input', { type: "text", placeholder: "Search name", onChange: handleInputChange }),
     h('div.x-icon', [
       h(Icon, { icon: "cross", onClick: () => {
           let input = document.querySelector('input');
           input.value = "";
           setAutocompleteOpen(false);
           setClose(true);
+          setFilters([]);
 
           let previous = document.querySelectorAll('.filtered_pin');
           previous.forEach((marker) => {
@@ -578,11 +579,10 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
       ])
     })),
   ]) : null; 
-
   
   if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
     h("div", { className: "search-header" }, [
-      h(Icon, { className: "search-icon", icon: "search"}),
+      h(Icon, { className: "search-icon", icon: "filter"}),
       h("h1", "Filter Checkins"),
     ]),
     h(Divider, {className: "filter-divider"}),
@@ -630,7 +630,11 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   ]);
 
   return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("h1", "Filter Checkins"),
+    h("div", { className: "search-header" }, [
+      h(Icon, { className: "search-icon", icon: "filter"}),
+      h("h1", "Filter Checkins"),
+    ]),
+    h(Divider, {className: "filter-divider"}),
     searchBar,
     wrapper
   ]);
