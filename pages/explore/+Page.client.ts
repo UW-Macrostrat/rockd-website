@@ -20,10 +20,6 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { set } from "react-datepicker/dist/date_utils";
-import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
-import chroma from "chroma-js";
-import { a } from "vitest/dist/suite-IbNSsUWN";
 
 const h = hyper.styled(styles);
 
@@ -147,7 +143,8 @@ function WeaverMap({
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
-  const [filteredCheckins, setFilteredCheckins] = useState(null);
+  const [filteredCheckins, setFilteredCheckins] = useState(false);
+  const [filteredData, setFilteredData] = useState(null);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -202,6 +199,16 @@ function WeaverMap({
       }, "X"),
       h("div.overlay-div", clickedCheckins),
     ]);
+  } else if (filteredCheckins) {
+    overlay = h("div.sidebox", [
+      h('div.sidebox-header', [
+        h('div.title', [
+          toolbar,
+          h("h1", "Filtered Checkins"),
+        ]),
+      ]),
+      h("div.overlay-div", filteredData),
+    ]);
   } else {
     overlay = h("div.sidebox", [
       h('div.sidebox-header', [
@@ -220,6 +227,8 @@ function WeaverMap({
     autoComplete,
     contextPanel,
   ])
+
+  console.log("filtered checkins", filteredData)
 
   return h(
     "div.map-container",
@@ -447,9 +456,12 @@ function AutoComplete({showFilter, setFilteredCheckins}) {
   const [close, setClose] = useState(false);  
 
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
-  const filteredCheckins = h('div.filtered-checkins-container', [
-    h("div.filtered-checkins", person_data && person_data.length > 0 ? createCheckins(person_data, mapRef, null) : null)
-  ]);
+
+  if(person_data && person_data.length > 0) {
+    setFilteredCheckins(true);
+  } else {
+    setFilteredCheckins(false);
+  }
 
   // add markers for filtered checkins
   let coordinates = [];
@@ -503,8 +515,6 @@ function AutoComplete({showFilter, setFilteredCheckins}) {
         padding: 75
     });
   }
-
-  
 
   // rest
   const handleInputChange = (event) => {
@@ -561,7 +571,6 @@ function AutoComplete({showFilter, setFilteredCheckins}) {
         })
       ])
     })),
-    // filteredCheckins
   ]) : null; 
 
   
