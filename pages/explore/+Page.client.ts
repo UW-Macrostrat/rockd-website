@@ -19,10 +19,7 @@ import styles from "../main.module.sass";
 import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
-import { LngLatCoords } from "@macrostrat/map-interface";
-import { set } from "react-datepicker/dist/date_utils";
-import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
-import chroma from "chroma-js";
+import { MapPosition } from "@macrostrat/mapbox-utils";
 
 const h = hyper.styled(styles);
 
@@ -145,6 +142,9 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
+  const [showFilter, setFilter] = useState(false);
+  const [filteredCheckins, setFilteredCheckins] = useState(false);
+  const [filteredData, setFilteredData] = useState(null);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -174,8 +174,11 @@ function WeaverMap({
     selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
   );
 
-  const toolbar = h(Toolbar, {showSettings, setSettings});
+  const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
+  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData});
+
+  const test = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
@@ -198,6 +201,16 @@ function WeaverMap({
       }, "X"),
       h("div.overlay-div", clickedCheckins),
     ]);
+  } else if (filteredCheckins) {
+    overlay = h("div.sidebox", [
+      h('div.sidebox-header', [
+        h('div.title', [
+          toolbar,
+          h("h1", "Filtered Checkins"),
+        ]),
+      ]),
+      h("div.overlay-div", test),
+    ]);
   } else {
     overlay = h("div.sidebox", [
       h('div.sidebox-header', [
@@ -212,6 +225,20 @@ function WeaverMap({
 
   if(style == null) return null;
 
+  const sidePanel = h("div.side-panel", [
+    autoComplete,
+    contextPanel,
+  ])
+
+
+  const mapPosition: MapPosition = {
+          camera: {
+            lat: 0, 
+            lng: 0, 
+            altitude: 30000000,
+          },
+        };
+
   return h(
     "div.map-container",
     [
@@ -219,7 +246,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: contextPanel,
+          contextPanel: sidePanel,
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
@@ -324,15 +351,19 @@ function FeatureDetails({setInspectPosition}) {
     ]);
 }
 
-function Toolbar({showSettings, setSettings}) {
+function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
   return h("div", { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
+        h(Icon, { className: "settings-icon", icon: "filter", onClick: () => {
+            setFilter(!showFilter);
+          }
+        }),
         h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
-          setSettings(!showSettings);
-        }
+            setSettings(!showSettings);
+          }
         }),
       ]),
     ]);
@@ -340,15 +371,20 @@ function Toolbar({showSettings, setSettings}) {
 
 function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h(PanelCard, { className: showSettings ? "settings-content" : "hide" }, [
+    h("div", { className: "settings-header" }, [
+      h(Icon, { className: "settings-icon", icon: "settings"}),
+      h("h1", "Settings"),
+    ]),
+    h(Divider, {className: "settings-divider"}),
   h("div", { className: "settings" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(PanelCard, {className: "satellite-style", onClick: () => {
+      h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
           }}, [
               h(Icon, { className: "satellite-icon", icon: "satellite"}),
               h("p", "Satellite"),
           ]),
-      h(PanelCard, {className: "map-style", onClick: () => {
+      h(PanelCard, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
             setOverlay(!showOverlay);
           }}, [
               h(Icon, { className: "overlay-icon", icon: "map"}),
@@ -357,22 +393,6 @@ function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, set
     ]),
       
   ])
-}
-
-function handleClusterClick() {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  // handle cluster click
-  map?.on('click', 'clusters', (e) => {
-    console.log("cluster click");
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['clusters']
-    });
-
-    console.log("features", features[0].properties.expansion_zoom);
-  });
-
-  return null;
 }
 
 function ClickedCheckins({setSelectedCheckin}) {
@@ -439,4 +459,193 @@ function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
 
   return createCheckins(result.data, mapRef, setInspectPosition);
+}
+
+function createFilteredCheckins(filteredData, setInspectPosition) {
+  const mapRef = useMapRef();
+  
+  return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
+}
+
+function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [filters, setFilters] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(true);
+  const [input, setInput] = useState('');
+  const [close, setClose] = useState(false);  
+
+  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
+
+  if(person_data && person_data.length > 0) {
+    setFilteredCheckins(true);
+    setFilteredData(person_data);
+  } else {
+    setFilteredCheckins(false);
+  }
+
+  // add markers for filtered checkins
+  let coordinates = [];
+  let lngs = [];
+  let lats = [];
+
+  if(person_data && person_data.length > 0) {
+    person_data.forEach((checkin) => {
+      coordinates.push([checkin.lng, checkin.lat]);
+      lngs.push(checkin.lng);
+      lats.push(checkin.lat);
+    });
+
+    let previous = document.querySelectorAll('.filtered_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
+    let previousFeatured = document.querySelectorAll('.marker_pin');
+    previousFeatured.forEach((marker) => {
+      marker.remove();
+    });
+
+    if (!close) {
+      let stop = 0;
+      coordinates.forEach((coord) => {
+        stop++;
+        // marker
+        const el = document.createElement('div');
+        el.className = 'filtered_pin';
+
+        // Create marker
+        new mapboxgl.Marker(el)
+          .setLngLat(coord)
+          .addTo(map);
+      });
+    }
+
+    map.fitBounds([
+        [ Math.max(...lngs), Math.max(...lats) ],
+        [ Math.min(...lngs), Math.min(...lats) ]
+    ], {
+        maxZoom: 12,
+        duration: 0,
+        padding: 75
+    });
+  }
+
+  // rest
+  const handleInputChange = (event) => {
+    setAutocompleteOpen(true);
+    setInput(event.target.value); 
+    setClose(false);
+  };
+
+  let result = null;
+
+  try {
+    result = useRockdAPI("autocomplete/" + input);
+  } catch (e) {
+    return null;
+  }
+
+  let searchBar = h('div.search-bar', [
+    h('input', { type: "text", placeholder: "Search name", onChange: handleInputChange }),
+    h('div.x-icon', [
+      h(Icon, { icon: "cross", onClick: () => {
+          let input = document.querySelector('input');
+          input.value = "";
+          setAutocompleteOpen(false);
+          setClose(true);
+          setFilters([]);
+
+          let previous = document.querySelectorAll('.filtered_pin');
+          previous.forEach((marker) => {
+            marker.remove();
+          });
+        } 
+      }),
+    ]),
+  ]);
+
+  let filterContainer = filters.length != 0 ? h("div.filter-container", [
+    h('h2', "Filters"),
+    h('ul', filters.map((item) => {
+      return h("div.filter-item", [
+        h('li', item.name),
+        h(Icon, { icon: "cross", style: {color: "red"}, onClick: () => {
+            setFilters(filters.filter((filter) => filter != item));
+            if(filters.length == 1) {
+              setClose(true);
+
+              let previous = document.querySelectorAll('.filtered_pin');
+              previous.forEach((marker) => {
+                marker.remove();
+              });
+            }
+          } 
+        })
+      ])
+    })),
+  ]) : null; 
+  
+  if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
+    h("div", { className: "search-header" }, [
+      h(Icon, { className: "search-icon", icon: "filter"}),
+      h("h1", "Filter Checkins"),
+    ]),
+    h(Divider, {className: "filter-divider"}),
+    searchBar
+  ]);
+  result = result.success.data;
+
+  let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
+      h('h2', "Taxa"),
+      h('ul', result.taxa.map((item) => {
+        return h('li', { 
+          onClick: () => { 
+            if(!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+              console.log(item.id)
+            }
+          }
+        }, item.name);
+      }))
+    ]) : null;
+
+  let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
+    h('h2', "People"),
+    h('ul', result.people.map((item) => {
+      return h('li', { 
+        onClick: () => { 
+          if(!filters.includes(item)) {
+            setAutocompleteOpen(false);
+            setFilters(filters.concat([item]));
+          }
+        }
+      }, item.name);
+    }))
+  ]) : null;
+
+  const results = h("div.results", [
+    taxa,
+    people,
+  ]);
+
+  const wrapper = h('div.autocomplete-wrapper', [
+    filterContainer,
+    results,
+  ]);
+
+  return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
+    h("div", { className: "search-header" }, [
+      h(Icon, { className: "search-icon", icon: "filter"}),
+      h("h1", "Filter Checkins"),
+    ]),
+    h(Divider, {className: "filter-divider"}),
+    searchBar,
+    wrapper
+  ]);
+}
+
+function getPersonCheckins(personId) {
+  return useRockdAPI("protected/checkins?person_id=" + personId);
 }

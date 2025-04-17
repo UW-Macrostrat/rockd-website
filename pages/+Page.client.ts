@@ -37,7 +37,7 @@ export function Page()  {
               ])
             ])
           ]),
-          h("div", { className: "new_container map-container" }, [
+          h("div", { className: "new_container maps-container" }, [
               h("div", { className: "map-imgs" }, [
                 h(Image, { src: "main-page/grand_canyon.jpg", className: "map-shot grand_canyon" }),
                 h(Image, { src: "main-page/new_zealand.jpg", className: "map-shot new_zealand" }),

@@ -12,7 +12,6 @@ export function Page() {
         h("div", { className: "content" }, [
             h("div", { className: 'header' }, [
                 h("h1", "Rockd Terms and Conditions"),
-                h(DarkModeButton, { className: 'dark-mode-btn', showText: true }),
             ]),        
             h("div", { className: "section" }, [
               h("h3", { className: "header" }, "Overview"),
