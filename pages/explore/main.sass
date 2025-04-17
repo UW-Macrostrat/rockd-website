@@ -288,24 +288,9 @@ body
     padding-left: 0
 
 .results
-  padding-top: 10px
   overflow-y: auto
-  height: 85vh
+  max-height: 85vh
   background-color: var(--panel-background-color)
-  /* Scrollbar Styling */
-  &::-webkit-scrollbar
-    width: 12px
-
-  &::-webkit-scrollbar-track
-    background: rgba(200, 200, 200, 0.3)
-
-  &::-webkit-scrollbar-thumb
-    background-color: rgba(150, 150, 150, 0.6)
-    border-radius: 4px
-    transition: background-color 0.2s ease
-
-    &:hover
-      background-color: rgba(100, 100, 100, 0.8)
 
 
 .filter-item
@@ -338,7 +323,20 @@ body
   overflow-y: auto
 
 .filtered_pin
-  background-image: url(https://storage.macrostrat.org/assets/rockd/explore/green-circle.png)
+  background-color: green
+  border-radius: 50%
+  border: solid white 2px
+  width: 15px
+  height: 15px
+
+  span
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    color: white
+    font-size: 12px
+    font-weight: bold
 
 .coordinates
   display: flex

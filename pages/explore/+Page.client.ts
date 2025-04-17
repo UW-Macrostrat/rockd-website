@@ -20,6 +20,7 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { LngLatCoords } from "@macrostrat/map-interface";
+import { set } from "react-datepicker/dist/date_utils";
 
 const h = hyper.styled(styles);
 
@@ -176,7 +177,9 @@ function WeaverMap({
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins});
+  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData});
+
+  const test = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
@@ -207,7 +210,7 @@ function WeaverMap({
           h("h1", "Filtered Checkins"),
         ]),
       ]),
-      h("div.overlay-div", filteredData),
+      h("div.overlay-div", test),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -447,7 +450,13 @@ function createSelectedCheckins(result, setInspectPosition) {
   return createCheckins(result.data, mapRef, setInspectPosition);
 }
 
-function AutoComplete({showFilter, setFilteredCheckins}) {
+function createFilteredCheckins(filteredData, setInspectPosition) {
+  const mapRef = useMapRef();
+  
+  return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
+}
+
+function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [filters, setFilters] = useState([]);
@@ -459,6 +468,7 @@ function AutoComplete({showFilter, setFilteredCheckins}) {
 
   if(person_data && person_data.length > 0) {
     setFilteredCheckins(true);
+    setFilteredData(person_data);
   } else {
     setFilteredCheckins(false);
   }
@@ -492,12 +502,6 @@ function AutoComplete({showFilter, setFilteredCheckins}) {
         // marker
         const el = document.createElement('div');
         el.className = 'filtered_pin';
-
-        const number = document.createElement('span');
-        number.innerText = stop;
-
-        // Append the number to the marker
-        el.appendChild(number);
 
         // Create marker
         new mapboxgl.Marker(el)
