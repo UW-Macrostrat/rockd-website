@@ -48,23 +48,23 @@ export function Footer() {
                     h(Icon, {className: "footer-icon", icon: "geosearch", style: {color: 'white'}}),
                     h('p', "Explore")
                 ])),
-                h("li", h("a", {href: "/privacy", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "lock", style: {color: 'white'}}),
-                    h('p', "Privacy")
-                ])),
-            ]),
-            h("ul", [
-                h("li", h("a", {href: "/terms", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "manual", style: {color: 'white'}}),
-                    h('p', "Terms and Conditions")
-                ])),
                 h("li", h("a", {href: "/trip/1", onClick: handleClick}, [
                     h(Icon, {className: "footer-icon", icon: "route", style: {color: 'white'}}),
                     h('p', "Trip")
                 ])),
+            ]),
+            h("ul", [
                 h("li", h("a", {href: "/metrics", onClick: handleClick}, [
                     h(Icon, {className: "footer-icon", icon: "chart", style: {color: 'white'}}),
                     h('p', "Metrics")
+                ])),
+                h("li", h("a", {href: "/terms", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "manual", style: {color: 'white'}}),
+                    h('p', "Terms and Conditions")
+                ])),
+                h("li", h("a", {href: "/privacy", onClick: handleClick}, [
+                    h(Icon, {className: "footer-icon", icon: "lock", style: {color: 'white'}}),
+                    h('p', "Privacy")
                 ])),
             ]),
         ]),
