@@ -19,8 +19,7 @@ import styles from "../main.module.sass";
 import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
-import { LngLatCoords } from "@macrostrat/map-interface";
-import { set } from "react-datepicker/dist/date_utils";
+import { MapPosition } from "@macrostrat/mapbox-utils";
 
 const h = hyper.styled(styles);
 
@@ -231,7 +230,14 @@ function WeaverMap({
     contextPanel,
   ])
 
-  console.log("filtered checkins", filteredData)
+
+  const mapPosition: MapPosition = {
+          camera: {
+            lat: 0, 
+            lng: 0, 
+            altitude: 30000000,
+          },
+        };
 
   return h(
     "div.map-container",
