@@ -23,6 +23,7 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { set } from "react-datepicker/dist/date_utils";
 import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 import chroma from "chroma-js";
+import { a } from "vitest/dist/suite-IbNSsUWN";
 
 const h = hyper.styled(styles);
 
@@ -145,6 +146,7 @@ function WeaverMap({
   const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
+  const [showFilter, setFilter] = useState(false);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -174,8 +176,9 @@ function WeaverMap({
     selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
   );
 
-  const toolbar = h(Toolbar, {showSettings, setSettings});
+  const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
+  const autoComplete = h(AutoComplete, {showFilter});
 
   if(selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
@@ -212,6 +215,11 @@ function WeaverMap({
 
   if(style == null) return null;
 
+  const sidePanel = h("div.side-panel", [
+    contextPanel,
+    autoComplete,
+  ])
+
   return h(
     "div.map-container",
     [
@@ -219,7 +227,7 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: contextPanel,
+          contextPanel: sidePanel,
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
@@ -324,16 +332,20 @@ function FeatureDetails({setInspectPosition}) {
     ]);
 }
 
-function Toolbar({showSettings, setSettings}) {
+function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
   return h("div", { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
         h("a", { href: "/" }, 
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
         h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
-          setSettings(!showSettings);
-        }
+            setSettings(!showSettings);
+          }
         }),
+        h(Icon, { className: "settings-icon", icon: "search", onClick: () => {
+          setFilter(!showFilter);
+        }
+      }),
       ]),
     ]);
 }
@@ -357,22 +369,6 @@ function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, set
     ]),
       
   ])
-}
-
-function handleClusterClick() {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  // handle cluster click
-  map?.on('click', 'clusters', (e) => {
-    console.log("cluster click");
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['clusters']
-    });
-
-    console.log("features", features[0].properties.expansion_zoom);
-  });
-
-  return null;
 }
 
 function ClickedCheckins({setSelectedCheckin}) {
@@ -439,4 +435,183 @@ function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
 
   return createCheckins(result.data, mapRef, setInspectPosition);
+}
+
+function AutoComplete({showFilter}) {
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [filters, setFilters] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(true);
+  const [input, setInput] = useState('');
+  const [close, setClose] = useState(false);  
+
+  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
+  let filteredCheckins = h('div.filtered-checkins-container', [
+    h("div.filtered-checkins", person_data && person_data.length > 0 ? createCheckins(person_data, mapRef, null) : null)
+  ]);
+
+  // add markers for filtered checkins
+  let coordinates = [];
+  let lngs = [];
+  let lats = [];
+
+  if(person_data && person_data.length > 0) {
+    person_data.forEach((checkin) => {
+      coordinates.push([checkin.lng, checkin.lat]);
+      lngs.push(checkin.lng);
+      lats.push(checkin.lat);
+    });
+
+    let previous = document.querySelectorAll('.filtered_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
+    let previousFeatured = document.querySelectorAll('.marker_pin');
+    previousFeatured.forEach((marker) => {
+      marker.remove();
+    });
+
+    if (!close) {
+      let stop = 0;
+      coordinates.forEach((coord) => {
+        stop++;
+        // marker
+        const el = document.createElement('div');
+        el.className = 'filtered_pin';
+
+        const number = document.createElement('span');
+        number.innerText = stop;
+
+        // Append the number to the marker
+        el.appendChild(number);
+
+        // Create marker
+        new mapboxgl.Marker(el)
+          .setLngLat(coord)
+          .addTo(map);
+      });
+    }
+
+    map.fitBounds([
+        [ Math.max(...lngs), Math.max(...lats) ],
+        [ Math.min(...lngs), Math.min(...lats) ]
+    ], {
+        maxZoom: 12,
+        duration: 0,
+        padding: 75
+    });
+  }
+
+  
+
+  // rest
+  const handleInputChange = (event) => {
+    setAutocompleteOpen(true);
+    setInput(event.target.value); 
+    setClose(false);
+  };
+
+  let result = null;
+
+  try {
+    result = useRockdAPI("autocomplete/" + input);
+  } catch (e) {
+    return null;
+  }
+
+  let searchBar = h('div.search-bar', [
+    h('input', { type: "text", placeholder: "Filter Checkins", onChange: handleInputChange }),
+    h('div.search-icon', [
+      h(Icon, { icon: "search" }),
+    ]),
+    h('div.x-icon', [
+      h(Icon, { className: 'x-icon', icon: "cross", onClick: () => {
+          let input = document.querySelector('input');
+          input.value = "";
+          setAutocompleteOpen(false);
+          setClose(true);
+
+          let previous = document.querySelectorAll('.filtered_pin');
+          previous.forEach((marker) => {
+            marker.remove();
+          });
+        } 
+      }),
+    ]),
+  ]);
+
+  let filterContainer = filters.length != 0 ? h("div.filter-container", [
+    h('h2', "Filters"),
+    h('ul', filters.map((item) => {
+      return h("div.filter-item", [
+        h('li', item.name),
+        h('div.red-bar', { onClick: () => {
+            setFilters(filters.filter((filter) => filter != item));
+            if(filters.length == 1) {
+              setClose(true);
+
+              let previous = document.querySelectorAll('.filtered_pin');
+              previous.forEach((marker) => {
+                marker.remove();
+              });
+            }
+          } 
+        })
+      ])
+    })),
+    filteredCheckins
+  ]) : null; 
+
+  
+  if(!result || close) return h("div.autocomplete", searchBar);
+  result = result.success.data;
+
+  let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
+      h('h2', "Taxa"),
+      h('ul', result.taxa.map((item) => {
+        return h('li', { 
+          onClick: () => { 
+            if(!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+              console.log(item.id)
+            }
+          }
+        }, item.name);
+      }))
+    ]) : null;
+
+  let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
+    h('h2', "People"),
+    h('ul', result.people.map((item) => {
+      return h('li', { 
+        onClick: () => { 
+          if(!filters.includes(item)) {
+            setAutocompleteOpen(false);
+            setFilters(filters.concat([item]));
+          }
+        }
+      }, item.name);
+    }))
+  ]) : null;
+
+  let results = h("div.results", [
+    taxa,
+    people,
+  ]);
+
+  let wrapper = h('div.autocomplete-wrapper', [
+    filterContainer,
+    results,
+  ]);
+
+  return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
+    searchBar,
+    wrapper
+  ]);
+}
+
+function getPersonCheckins(personId) {
+  return useRockdAPI("protected/checkins?person_id=" + personId);
 }
