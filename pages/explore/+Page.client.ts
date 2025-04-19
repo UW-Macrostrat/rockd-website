@@ -233,9 +233,9 @@ function WeaverMap({
 
   const mapPosition: MapPosition = {
           camera: {
-            lat: 0, 
-            lng: 0, 
-            altitude: 30000000,
+            lat: 39, 
+            lng: -98, 
+            altitude: 6000000,
           },
         };
 
@@ -316,13 +316,13 @@ function FeatureDetails({setInspectPosition}) {
 
   if(!map) {
     console.log("map not ready");
-    result = getCheckins(0, 10, 0, 10);
+    result = getCheckins(40, 45, -60, -70);
   } else if (bounds) {
     console.log("bounds", bounds);
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
   } else {
     console.log("no bounds");
-    result = getCheckins(0, 10, 0, 10);
+    result = getCheckins(40, 45, -60, -70);
   }
 
   if (!bounds && map) {
