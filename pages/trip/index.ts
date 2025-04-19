@@ -143,7 +143,6 @@ function SideBar({data}) {
 
     if(!map) return h("div.stop-container", h(Spinner, {style: {"margin-top": "10vh"}}));
 
-
     let arr = [];
     let lats = [];
     let lngs = [];
@@ -184,8 +183,15 @@ function SideBar({data}) {
         [ Math.min(...lngs), Math.min(...lats) ]
     ];
 
-    map.fitBounds(bounds);    
-
+    map.fitBounds(bounds, {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 200,
+          right: 20
+        },
+        animate: false
+      });
     const stopCheckins = createCheckins(arr, mapRef, null);
 
     return h('div', { className: 'stop-container'}, [
