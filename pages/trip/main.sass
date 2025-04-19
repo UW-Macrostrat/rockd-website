@@ -147,6 +147,8 @@ html, body, .wrapper, #react, .app, #map
 
 .stop-container
   position: absolute
+  display: flex
+  flex-direction: column
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
   width: 30%
@@ -265,24 +267,25 @@ html, body, .wrapper, #react, .app, #map
 .trip-header
   display: flex
   gap: 0px
-  padding: 30px
+  padding: 10px
 
 .stop-bottom
-  height: 80vh
-  overflow: scroll
-  overflow-x: hidden
+  flex: 1
+  overflow: auto
   text-align: left
+  min-height: 0
 
-  .details
+.details
+  margin: 0
+  padding: 15px
+  padding-top: 0
+
+  .park
     margin: 0
-    padding: 15px
 
-    .park
-      margin: 0
-
-    .description
-      margin: 0
-      padding-bottom: 25px
+  .description
+    margin: 0
+    padding-bottom: 25px
 
 .stop-main-info
   text-align: left
@@ -313,6 +316,9 @@ html, body, .wrapper, #react, .app, #map
     filter: var(--img-color)
 
 .download-button
+  display: flex
+  justify-content: center
+  align-items: center
   a
     color: var(--text-emphasized-color)
   
