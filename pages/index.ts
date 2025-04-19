@@ -23,9 +23,6 @@ const handleClick = (e) => {
 
 export function Footer() {
     return h("div", {className: "footer"}, [
-        h("div.dark-mode", [
-            h(DarkModeButton, {className: "dark-mode-button", showText: true}),
-        ]),
         h("div", {className: "titles"}, [
             h("h3", {className: "footer-text upper"}, [
                 "Produced by the ",
@@ -67,6 +64,9 @@ export function Footer() {
                     h('p', "Privacy")
                 ])),
             ]),
+        ]),
+        h("div.dark-mode", [
+            h(DarkModeButton, {className: "dark-mode-button", showText: true}),
         ]),
     ]);
 }
