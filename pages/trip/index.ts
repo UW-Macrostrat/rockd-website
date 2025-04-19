@@ -196,16 +196,16 @@ function SideBar({data}) {
                     h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
                 ]),
-            ]),
-        ]),
-        h('div', { className: 'stop-bottom' }, [
-            h("div.details", [
-                h('h1', {className: 'park'}, data.name),
-                h('p', {className: 'description'}, data.description),
-                h('p', {className: 'download-button'}, [
+                h('div', {className: 'download-button'}, [
                     h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                 ]),
             ]),
+            h("div.details", [
+                h('h1', {className: 'park'}, data.name),
+                h('p', {className: 'description'}, data.description),
+            ]),
+        ]),
+        h('div', { className: 'stop-bottom' }, [
             h('div', {className: 'stop-list'}, stopCheckins),
         ]),
     ]);
