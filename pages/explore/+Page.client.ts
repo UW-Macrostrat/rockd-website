@@ -251,7 +251,7 @@ function WeaverMap({
           style: { "padding-left": "calc(30% + 14px)",},
         },
         [
-          h(MapView, { style, mapboxToken }, [
+          h(MapView, { style, mapboxToken, mapPosition }, [
             h(MapMarker, {
               setPosition: onSelectPosition,
             }),
@@ -315,11 +315,14 @@ function FeatureDetails({setInspectPosition}) {
   let result;
 
   if(!map) {
-    result = getCheckins(0, 0, 0, 0);
+    console.log("map not ready");
+    result = getCheckins(0, 10, 0, 10);
   } else if (bounds) {
+    console.log("bounds", bounds);
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
   } else {
-    result = getCheckins(0, 0, 0, 0);
+    console.log("no bounds");
+    result = getCheckins(0, 10, 0, 10);
   }
 
   if (!bounds && map) {
