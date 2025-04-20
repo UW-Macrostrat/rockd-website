@@ -315,13 +315,10 @@ function FeatureDetails({setInspectPosition}) {
   let result;
 
   if(!map) {
-    console.log("map not ready");
     result = getCheckins(40, 45, -60, -70);
   } else if (bounds) {
-    console.log("bounds", bounds);
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
   } else {
-    console.log("no bounds");
     result = getCheckins(40, 45, -60, -70);
   }
 
@@ -479,7 +476,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   const [close, setClose] = useState(false);  
 
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
-
+  
   if(person_data && person_data.length > 0) {
     setFilteredCheckins(true);
     setFilteredData(person_data);
@@ -650,5 +647,5 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
 }
 
 function getPersonCheckins(personId) {
-  return useRockdAPI("protected/checkins?person_id=" + personId);
+  return useRockdAPI("protected/checkins?person_id=" + personId + "&all=100");
 }

@@ -90,10 +90,10 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         
         let image;
         const imgSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
-        const showImage = checkin.photo //&& imageExists(imgSrc); // causing lag
-    
+        const showImage = checkin.photo
+
         if (showImage) {
-            image = h(BlankImage, {className: 'observation-img', src: apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo});
+            image = h(BlankImage, {className: 'observation-img', src: imgSrc});
         } else {
             image = h("div", { className: 'no-image' }, [
                 h('h1', "Details"),
@@ -102,8 +102,8 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         }
 
         // for trips
-        let stop_name = checkin?.name ?? null;
-        let LngLatProps = {
+        const stop_name = checkin?.name ?? null;
+        const LngLatProps = {
             position: {
                 lat: checkin.lat,
                 lng: checkin.lng
@@ -139,9 +139,9 @@ export function createCheckins(result, mapRef, setInspectPosition) {
             }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
-                h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})),
+                !stop_name ? h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})) : null,
                 h('div', {className: 'checkin-info'}, [
-                    h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
+                    !stop_name ? h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name) : null,
                     h('h4', {className: 'edited'}, checkin.created),
                     h('p', "Near " + checkin.near),
                     LngLatCoords(LngLatProps),

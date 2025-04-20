@@ -24,22 +24,5 @@ const h = hyper.styled(styles);
 let count = 0;
 
 export function Page() {
-    return h(
-        "div.map",
-        [
-          // The Map Area Container
-          h(
-            MapAreaContainer,
-            {
-              className: "map-container",
-              style: { "padding-right": "calc(30% + 14px)"}
-            },
-            [
-              h(MapView, { style: 'mapbox://styles/mapbox/satellite-v9', mapboxToken: SETTINGS.mapboxAccessToken }, [
-              ]),
-              h("div.test")
-            ]
-          ),
-        ]
-      );
+    return h(DarkModeButton);
 }
