@@ -216,13 +216,17 @@ html, body, .wrapper, #react, .app, #map
   display: grid
   margin: auto
 
-.loading
-  height: 75vh
+.loading, .loading2
+  height: 100vh
   padding-top: 20vh
   text-align: center
   background-color: var(--panel-background-color)
   color: var(--text-emphasized-color)
   font-style: italic
+  z-index: 10
+
+.loading2
+  padding-top: 20px
 
 .stop-link
   position: relative
