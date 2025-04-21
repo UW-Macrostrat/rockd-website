@@ -13,6 +13,7 @@ import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface"
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
+import { LithologyList } from "@macrostrat/data-components";
 
 const h = hyper.styled(styles);
 
@@ -75,7 +76,6 @@ export function Checkins({checkinID}) {
 
     // add observations
     checkin.observations.forEach(observation => {
-        console.log("obs", observation.photo, observation);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
             const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
@@ -125,7 +125,6 @@ export function Checkins({checkinID}) {
         h('div', { className: showMap ? 'hide' : 'main'}, [
             h('div', { className: "checkin-head" }, [
                 h('h1', checkin.notes),
-                h(DarkModeButton, { className: 'dark-mode-button', showText: true }),
             ]),
             h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
             h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
@@ -168,22 +167,75 @@ function observationFooter(observation) {
     let liths = [];
     for(var j = 0; j < rocks.liths.length; j++) {                
         liths.push(h('p', { className: "observation-detail liths"}, rocks.liths[j].name));
+    }    
+
+    function rgbaStringToHex(rgba: string): string {
+        // Split the input string by commas and trim whitespace
+        const values = rgba.split(',').map(value => value.trim());
+    
+        // Extract r, g, b values and ignore alpha
+        const r = parseInt(values[0], 10);
+        const g = parseInt(values[1], 10);
+        const b = parseInt(values[2], 10);
+    
+        // Convert r, g, b to two-digit hex values
+        const red = r.toString(16).padStart(2, '0');
+        const green = g.toString(16).padStart(2, '0');
+        const blue = b.toString(16).padStart(2, '0');
+    
+        // Return the HEX string without alpha
+        return `#${red}${green}${blue}`;
+    }
+
+    let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
+
+    let lithologies = [];
+    rocks.liths.forEach(lith => {
+        if(!lith.color.includes("#")) {
+            lithologies.push({
+                name: lith.name,
+                color: rgbaStringToHex(lith.color)});
+        } else {
+            lithologies.push(lith);
+        }
+    });
+
+    if (rocks.strat_name?.strat_name_long) {
+        lithologies.push({
+            name: rocks.strat_name?.strat_name_long,
+        })
+    }
+
+    if(rocks.map_unit?.unit_name) {
+        lithologies.push({
+            name: rocks.map_unit?.unit_name
+        })
+    }
+    
+    if(obsAge) {
+        lithologies.push({
+            name: obsAge
+        })
+    }
+    if(rocks.interval.name) {
+        lithologies.push({
+            name: rocks.interval.name
+        })
+    }
+    if(observation.orientation.feature?.name) {
+        lithologies.push({
+            name: observation.orientation.feature?.name
+        })
     }
 
     // observation body
-    let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
     return h('div', {className: 'observation-body'}, [
         observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
             rocks.strat_name?.strat_name_long,
             observation.lat ? LngLatCoords(LngLatProps) : null,
         ]) : null,
         h('div', {className: 'observation-details'}, [
-            rocks.strat_name?.strat_name_long ? h('p', {className: 'observation-detail'}, rocks.strat_name?.strat_name_long) : null,
-            rocks.map_unit?.unit_name ? h('p', {className: 'observation-detail'}, rocks.map_unit?.unit_name) : null,
-            obsAge ? h('p', {className: 'observation-detail'}, obsAge) : null,
-            rocks.interval.name ? h('p', {className: 'observation-detail interval'}, rocks.interval.name) : null,
-            liths,
-            observation.orientation.feature?.name ? h('p', {className: 'observation-detail'}, observation.orientation.feature?.name) : null,
+            h(LithologyList, { lithologies }),
             h('p', {className: "notes"}, rocks.notes),
         ]),
     ]);
@@ -221,7 +273,6 @@ function Map({center, showMap, setShowMap}) {
                 setShowMap(!showMap);
               }}),
             h(PanelCard, {className: "banner-button", onClick: () => {
-                console.log("clicked");
                 setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);
                 setStyleText(styleText == whiteText ? sateliteText : whiteText);
             }}, styleText),
