@@ -12,9 +12,7 @@ import { LithologyList } from "@macrostrat/data-components";
 
 const h = hyper.styled(styles);
 
-export function Photos({photoID}) {
-    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
-
+export function Photos({photoID, checkinData}) {
     if (!checkinData) {
         return h("div", { className: 'loading' }, [
             h("h1", "Loading checkin..."),
@@ -77,11 +75,39 @@ export function Photos({photoID}) {
     });
 
     console.log("arr",photoIDArr)
+    const photoIndex = photoIDArr.indexOf(photoID);
+    const observation = observations[photoIndex];
+    const leftArrow = h(Icon, {className: "left-arrow", icon: "arrow-left", style: { color: 'white'}});
+    const rightArrow = h(Icon, {className: "right-arrow", icon: "arrow-right", style: {color: 'white'}});
 
-    const observation = photoIDArr.indexOf(photoID) ? observations[photoIDArr.indexOf(photoID)] : observations[0];
+    let footer = [];
+    photoIDArr.forEach(photo => {
+        if(photo == photoID) {
+            footer.push(
+                h(Icon, {icon: "symbol-circle", style: {color: "grey"}})
+            )
+        } else {
+            footer.push(
+                h("a", {href: "/photo/" + photo}, 
+                    h(Icon, {icon: "symbol-circle", style: {color: "white"}}),
+                )
+            )
+        }
+    });
 
     return h('div', { className: "container" }, [
-        observation,
+        h('div.photo-banner', [
+            h("a", {href: "/checkin/" + checkin.checkin_id}, [
+                h(Icon, {icon: "arrow-left", style: {color: "white"}}),
+                h('h3', "CHECKIN")
+            ])
+        ]),
+        h("div", {className: "photos"}, [
+            photoIndex != 0 ? h("a", {href: "/photo/" + (photoIDArr[photoIndex -1])}, leftArrow) : null,
+            observation,
+            photoIndex != photoIDArr.length - 1 ? h("a", {href: "/photo/" + photoIDArr[photoIndex + 1]}, rightArrow) : null,
+        ]),
+        h('div.circles',footer),
     ])
 }
 
