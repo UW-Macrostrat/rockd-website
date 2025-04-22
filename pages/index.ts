@@ -182,6 +182,7 @@ export const apiURLOld = "https://rockd.org/api/v2/"; // old route
 export const apiURL = "https://rockd.dev.svc.macrostrat.org/api/v2/"; // new route
 
 export function useRockdAPI(src) {
+    console.log("API CALLED")
     return useAPIResult(apiURL + src);
 }
 
