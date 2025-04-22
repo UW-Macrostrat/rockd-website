@@ -13,13 +13,26 @@ import { DarkModeButton } from "@macrostrat/ui-components";
 
 const h = hyper.styled(styles);
 
-export function Photos({photoID, checkinData}) {
+export function Photos({photoID}) {
     const [showBody, setBody] = useState(true);
+    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
+
+
+    if (!checkinData) {
+        return h("div", { className: 'loading' }, [
+            h("h1", "Loading photo " + photoID  + "..."),
+        ]);       
+    }
+
+    if (checkinData.success.data.length == 0) {
+        return h("div", { className: 'error' }, [
+            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
+            h("h1", "Photo " + photoID + " not found!"),  
+        ]); 
+    }
+
     const checkin = checkinData.success.data[0];
     let photoIDArr = [checkin.photo];
-
-    console.log(checkin);
-
     
     // format rating
     let ratingArr = [];
@@ -92,11 +105,11 @@ export function Photos({photoID, checkinData}) {
     return h('div', { className: "container" }, [
         h('div.photo-banner', [
             h("a", {href: "/checkin/" + checkin.checkin_id}, [
-                h(Icon, {icon: "arrow-left", style: {color: "white"}}),
+                h(Icon, {icon: "arrow-left", className: "back-arrow", style: {color: "white"}}),
                 h('h3', "CHECKIN")
             ]),
             h('div.right-side', [
-                h(DarkModeButton, {className: "dark-mode-btn"}),
+                h(DarkModeButton, {className: "dark-mode-btn", showText: true}),
                 h("a", { href: "/" }, 
                     h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
                 ),

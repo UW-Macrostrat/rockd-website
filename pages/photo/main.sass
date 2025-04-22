@@ -127,14 +127,12 @@ h4
   width: 40%
   margin: calc(20px + 7vh) 30% 0 30%
   text-align: center
-  border-radius: 2%
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
   .observation-image
     height: 80vh
     width: 100%
     object-fit: cover
-    border-radius: 2%
 
 .overlay
   background-color: var(--panel-background-color)
@@ -201,7 +199,6 @@ h4
   height: 7vh
   display: flex
   gap: 10px
-  box-shadow: 0 4px 6px rgba(256, 256, 256, 0.2)
   padding-left: 20px
   background-color: var(--panel-rule-color)
   justify-content: space-between
@@ -212,21 +209,22 @@ h4
     gap: 10px
     height:100%
     padding-right: 30px
-  
-  svg
-    height: 30px
-    width: 30px
 
   a
     display: flex
     align-items: center
     gap: 10px  
 
+    h3
+      color: var(--text-emphasized-color)
+
+    &:hover
+      text-decoration: none
 
 .hide
   display: none
 
-.left-arrow
+.left-arrow, .right-arrow, .back-arrow
   filter: var(--anti-img-color)
   cursor: pointer
 
@@ -258,11 +256,6 @@ h4
 .observation-header
   padding: 10px
 
-.back-arrow
-  filter: var(--img-color)
-  position: fixed
-  svg
-    height: 10vh
 
 .overlay-header
   position: absolute
@@ -308,6 +301,7 @@ h4
   display: flex
   justify-content: center
   padding: 30px 0
+  filter: var(--anti-img-color)
 
 .info-btn
   position: absolute
