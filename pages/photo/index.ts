@@ -49,12 +49,20 @@ export function Photos({photoID}) {
     // add checkin photo and notes
     const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
     const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
-    const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
+    const headerBody = h('div', {className: 'observation-body-container'}, [
+        h(Icon, {className: "close-body", icon: "ban-circle", onClick: () => {
+            setBody(false)
+        }}),
+        checkin.notes
+    ]);
 
     observations.push(
-        h('div', {className: 'observation'}, [
+        h('div', {className: 'observation-item'}, [
             headerImgUrl ? h(BlankImage, { className: 'observation-image', src: headerImgUrl}) : null,
-            h("div.observation-body", headerBody),
+            showBody ? headerBody : null,
+            !showBody ? h(Icon, {className: "info-btn", icon: "info-sign", onClick: () => {
+                setBody(true)
+            }}) : null,
         ])
     );
 
@@ -68,7 +76,7 @@ export function Photos({photoID}) {
             let observationBody = h('div.observation-body-container', observationFooter(observation, setBody));
 
             observations.push(
-                h('div', {className: 'observation'}, [
+                h('div', {className: 'observation-item'}, [
                     observationURL ? h(BlankImage, { className: 'observation-image', src: observationURL}) : null,
                     showBody ? observationBody : null,
                     !showBody ? h(Icon, {className: "info-btn", icon: "info-sign", onClick: () => {

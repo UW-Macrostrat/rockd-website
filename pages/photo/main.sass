@@ -122,7 +122,7 @@ h4
   font-style: italic
 
 
-.observation
+.observation-item
   height: 80vh
   width: 40%
   margin: calc(20px + 7vh) 30% 0 30%
@@ -164,19 +164,21 @@ h4
   text-align: center
   width: calc(40% + 2px)
   margin-left: calc(30% - 1px)
+  min-height: 50px
+  display: flex
+  align-items: center
+  justify-content: center
+
+  .close-body
+    position: absolute
+    top: 5px
+    left: 5px
+    cursor: pointer
 
   .observation-body
     position: relative
-
-    .close-body
-      position: absolute
-      top: -5px
-      left: 5px
-      cursor: pointer
-
-      svg
-        height: 20px
-        width: 20px
+    min-hegiht: 50px
+    width: 100%
     
 
 .close
@@ -234,7 +236,7 @@ h4
 
 .observation-details
   text-align: left
-  margin: 10px
+  padding: 0 5px
   
   .observation-detail
     padding: 4px
