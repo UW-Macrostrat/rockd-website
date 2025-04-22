@@ -131,10 +131,10 @@ h4
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
   .observation-image
-    height: 60vh
+    height: 80vh
     width: 100%
     object-fit: cover
-    border-radius: 2% 2% 0 0
+    border-radius: 2%
 
 .overlay
   background-color: var(--panel-background-color)
@@ -156,12 +156,29 @@ h4
       width: 100%
       border-radius: 2% 2% 0 0
 
-    .observation-body
-      padding: 3px
-      color: var(--text)
-      text-align: center
-      padding-top: 10px
-      width: 100%
+.observation-body-container
+  position: absolute
+  bottom: 10vh
+  left: 0
+  padding: 3px
+  color: var(--text)
+  background-color: var(--panel-background)
+  text-align: center
+  width: calc(40% + 2px)
+  margin-left: calc(30% - 1px)
+
+  .observation-body
+    position: relative
+
+    .close-body
+      position: absolute
+      top: 0
+      right: 0
+
+      svg
+        height: 20px
+        width: 20px
+    
 
 .close
   position: absolute
@@ -281,3 +298,11 @@ h4
   display: flex
   justify-content: center
   padding: 30px 0
+
+.info-btn
+  position: absolute
+  bottom: 10vh
+  right: 20%
+  svg
+    height: 20px
+    width: 20px
