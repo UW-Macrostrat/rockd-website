@@ -2,7 +2,7 @@ import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { BlankImage, imageExists, Image, apiURL, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import styles from "../main.module.sass";
 import "./main.sass";
@@ -12,7 +12,9 @@ import { LithologyList } from "@macrostrat/data-components";
 
 const h = hyper.styled(styles);
 
-export function Photos({photoID, checkinData}) {
+export function Photos({photoID}) {
+    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
+
     if (!checkinData) {
         return h("div", { className: 'loading' }, [
             h("h1", "Loading checkin..."),
@@ -84,7 +86,9 @@ export function Photos({photoID, checkinData}) {
     photoIDArr.forEach(photo => {
         if(photo == photoID) {
             footer.push(
-                h(Icon, {icon: "symbol-circle", style: {color: "grey"}})
+                h('div', 
+                    h(Icon, {icon: "symbol-circle", style: {color: "grey"}}),
+                )
             )
         } else {
             footer.push(
@@ -97,10 +101,13 @@ export function Photos({photoID, checkinData}) {
 
     return h('div', { className: "container" }, [
         h('div.photo-banner', [
+            h("a", { href: "/" }, 
+                h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+            ),
             h("a", {href: "/checkin/" + checkin.checkin_id}, [
                 h(Icon, {icon: "arrow-left", style: {color: "white"}}),
                 h('h3', "CHECKIN")
-            ])
+            ]),
         ]),
         h("div", {className: "photos"}, [
             photoIndex != 0 ? h("a", {href: "/photo/" + (photoIDArr[photoIndex -1])}, leftArrow) : null,

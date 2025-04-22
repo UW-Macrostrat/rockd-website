@@ -7,7 +7,6 @@ import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from 
 export function Page() {
     const pageContext = usePageContext();
     const photoID = parseInt(pageContext.urlParsed.pathname.split("/")[2]);
-    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
 
-    return h(Photos, { photoID, checkinData });
+    return h(Photos, { photoID });
 }
