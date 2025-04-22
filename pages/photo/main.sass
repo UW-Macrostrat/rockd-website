@@ -172,8 +172,9 @@ h4
 
     .close-body
       position: absolute
-      top: 0
-      right: 0
+      top: -5px
+      left: 5px
+      cursor: pointer
 
       svg
         height: 20px
@@ -202,6 +203,15 @@ h4
   gap: 10px
   box-shadow: 0 4px 6px rgba(256, 256, 256, 0.2)
   padding-left: 20px
+  background-color: var(--panel-rule-color)
+  justify-content: space-between
+
+  .right-side
+    display: flex
+    align-items: center
+    gap: 10px
+    height:100%
+    padding-right: 30px
   
   svg
     height: 30px

@@ -9,6 +9,7 @@ import "./main.sass";
 import "@macrostrat/style-system";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { LithologyList } from "@macrostrat/data-components";
+import { DarkModeButton } from "@macrostrat/ui-components";
 
 const h = hyper.styled(styles);
 
@@ -90,12 +91,15 @@ export function Photos({photoID, checkinData}) {
 
     return h('div', { className: "container" }, [
         h('div.photo-banner', [
-            h("a", { href: "/" }, 
-                h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
-            ),
             h("a", {href: "/checkin/" + checkin.checkin_id}, [
                 h(Icon, {icon: "arrow-left", style: {color: "white"}}),
                 h('h3', "CHECKIN")
+            ]),
+            h('div.right-side', [
+                h(DarkModeButton, {className: "dark-mode-btn"}),
+                h("a", { href: "/" }, 
+                    h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+                ),
             ]),
         ]),
         h("div", {className: "photos"}, [
