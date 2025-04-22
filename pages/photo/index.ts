@@ -13,6 +13,7 @@ import { LithologyList } from "@macrostrat/data-components";
 const h = hyper.styled(styles);
 
 export function Photos({photoID, checkinData}) {
+    const [showBody, setBody] = useState(true);
     const checkin = checkinData.success.data[0];
     let photoIDArr = [checkin.photo];
 
@@ -50,12 +51,15 @@ export function Photos({photoID, checkinData}) {
             // if photo exists
             const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
             const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
-            let observationBody = observationFooter(observation);
+            let observationBody = h('div.observation-body-container', observationFooter(observation, setBody));
 
             observations.push(
                 h('div', {className: 'observation'}, [
                     observationURL ? h(BlankImage, { className: 'observation-image', src: observationURL}) : null,
-                    observationBody,
+                    showBody ? observationBody : null,
+                    !showBody ? h(Icon, {className: "info-btn", icon: "info-sign", onClick: () => {
+                        setBody(true)
+                    }}) : null,
                 ])
             );
         }        
@@ -103,7 +107,7 @@ export function Photos({photoID, checkinData}) {
     ])
 }
 
-function observationFooter(observation) {
+function observationFooter(observation, setBody) {
     const LngLatProps = {
         position: {
             lat: observation.lat,
@@ -190,5 +194,8 @@ function observationFooter(observation) {
             h(LithologyList, { lithologies }),
             h('p', {className: "notes"}, rocks.notes),
         ]),
+        h(Icon, {className: "close-body", icon: "ban-circle", onClick: () => {
+            setBody(false)
+        }})
     ]);
 }
