@@ -1,6 +1,6 @@
 import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, imageExists, Image, apiURL, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
@@ -12,22 +12,7 @@ import { LithologyList } from "@macrostrat/data-components";
 
 const h = hyper.styled(styles);
 
-export function Photos({photoID}) {
-    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
-
-    if (!checkinData) {
-        return h("div", { className: 'loading' }, [
-            h("h1", "Loading checkin..."),
-        ]);       
-    }
-
-    if (checkinData.success.data.length == 0) {
-        return h("div", { className: 'error' }, [
-            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
-            h("h1", "Photo " + photoID + " not found!"),  
-        ]); 
-    }
-
+export function Photos({photoID, checkinData}) {
     const checkin = checkinData.success.data[0];
     let photoIDArr = [checkin.photo];
 
