@@ -123,15 +123,15 @@ h4
 
 
 .observation
-  height: 90vh
+  height: 85vh
   width: 40%
-  margin: 30px 30%
+  margin: calc(20px + 7vh) 30%
   text-align: center
   border-radius: 2%
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
   .observation-image
-    height: 80vh
+    height: 70vh
     width: 100%
     object-fit: cover
     border-radius: 2% 2% 0 0
@@ -174,30 +174,27 @@ h4
   &:hover
     background-color: grey
 
-.banner
+.photo-banner
   position: absolute
   top: 0
   left: 0
   z-index: 100
   width: 100%
-  background-color: var(--panel-text)
   height: 7vh
   display: flex
+  box-shadow: 0 4px 6px rgba(256, 256, 256, 0.2)
+  padding-left: 20px
+  
+  svg
+    height: 30px
+    width: 30px
 
+  a
+    display: flex
+    align-items: center
+    gap: 10px
   
-  .banner-arrow
-    margin-left: 10px
-    svg
-      height: 7vh
-  
-  .banner-button
-    width: 100px
-    cursor: pointer
-    text-align: center
-    margin: 10px 0
-    background-color: var(--panel-background)
-    position: absolute
-    right: 15px
+
 
 .hide
   display: none
@@ -245,9 +242,6 @@ h4
   height: 10vh
   margin-left: 20%
 
-.container
-  position: relative
-
 .dark-mode-button
   height: 5vh
 
@@ -265,8 +259,25 @@ h4
   width: 50%
   text-align: center
 
-.carousel-item
-  display: none
+.left-arrow
+  position: absolute
+  top: 30%
+  left: 100px
 
-.active
+  svg
+    height: 50px
+    width: 50px
+
+.right-arrow
+  position: absolute
+  top: 30%
+  right: 100px
+
+  svg
+    height: 50px
+    width: 50px
+
+.circles
   display: flex
+  justify-content: center
+  padding-bottom: 30px
