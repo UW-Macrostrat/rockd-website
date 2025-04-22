@@ -64,12 +64,9 @@ export function Checkins({checkinID}) {
 
     observations.push(
         h('div', {className: 'observation'}, [
-            headerImgUrl ? h(BlankImage, { className: 'observation-image', src: headerImgUrl, onClick: () => {
-                setOverlayBody(h('div.observation-body',headerBody));
-                setOverlayImage(headerImgUrl);
-                setOverlayOpen(!overlayOpen);
-                }
-            }) : null,
+            headerImgUrl ? h('a', {href: "/photo/" + checkin.photo}, 
+                h(BlankImage, { className: 'observation-image', src: headerImgUrl})
+            ) : null,
             h("div.observation-body", headerBody),
         ])
     );
@@ -84,11 +81,9 @@ export function Checkins({checkinID}) {
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    observationURL ? h(BlankImage, { className: 'observation-image', src: observationURL, onClick: () => {
-                        setOverlayImage(imageSrc);
-                        setOverlayBody(observationBody);
-                        setOverlayOpen(!overlayOpen);
-                    }}) : null,
+                    observationURL ? h('a', {href: "/photo/" + observation.photo}, 
+                        h(BlankImage, { className: 'observation-image', src: observationURL})
+                    ) : null,
                     observationBody,
                 ])
             );
