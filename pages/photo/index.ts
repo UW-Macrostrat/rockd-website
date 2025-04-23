@@ -73,12 +73,12 @@ export function Photos({photoID}) {
             // if photo exists
             const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
             const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
-            let observationBody = h('div.observation-body-container', observationFooter(observation, setBody));
+            let observationBody = h(observationFooter, {observation, setBody});
 
             observations.push(
                 h('div', {className: 'observation-item'}, [
                     observationURL ? h(BlankImage, { className: 'observation-image', src: observationURL}) : null,
-                    showBody ? observationBody : null,
+                    showBody ? h('div.observation-body-container', observationBody) : null,
                     !showBody ? h(Icon, {className: "info-btn", icon: "info-sign", onClick: () => {
                         setBody(true)
                     }}) : null,
@@ -132,7 +132,7 @@ export function Photos({photoID}) {
     ])
 }
 
-function observationFooter(observation, setBody) {
+function observationFooter({observation, setBody}) {
     const LngLatProps = {
         position: {
             lat: observation.lat,
@@ -223,4 +223,8 @@ function observationFooter(observation, setBody) {
             setBody(false)
         }})
     ]);
+}
+
+function observationDiv({photoIndex}){
+    return h('h1', "Photo " + photoIndex);
 }
