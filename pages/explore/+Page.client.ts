@@ -180,7 +180,21 @@ function WeaverMap({
 
   const test = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
-  if(selectedCheckin && checkinData) {
+  if(showSettings) {
+    overlay = h('div.sidebox', [
+      h('div.title', [
+        toolbar,
+        h("h1", "Settings"),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => {
+          setSettings(false);
+        }
+      }, "X"),
+      h("div.overlay-div", contextPanel),
+    ])
+  } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
 
     overlay = h("div.sidebox", [
@@ -246,7 +260,6 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: sidePanel,
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
@@ -370,13 +383,7 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 }
 
 function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
-  return h(PanelCard, { className: showSettings ? "settings-content" : "hide" }, [
-    h("div", { className: "settings-header" }, [
-      h(Icon, { className: "settings-icon", icon: "settings"}),
-      h("h1", "Settings"),
-    ]),
-    h(Divider, {className: "settings-divider"}),
-  h("div", { className: "settings" }, [
+  return h("div", { className: "settings-content" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
       h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
@@ -390,9 +397,7 @@ function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, set
               h(Icon, { className: "overlay-icon", icon: "map"}),
               h("p", "Overlay"),
           ]),
-    ]),
-      
-  ])
+    ]);
 }
 
 function ClickedCheckins({setSelectedCheckin}) {
