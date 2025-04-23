@@ -415,7 +415,7 @@ function ClickedCheckins({setSelectedCheckin}) {
 
         map.flyTo({
           center: cluster[0].geometry.coordinates,
-          zoom: zoom,
+          zoom: zoom + 2,
           speed: 0.5,
         });
       }
