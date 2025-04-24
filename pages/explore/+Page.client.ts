@@ -178,9 +178,29 @@ function WeaverMap({
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
   const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData});
 
-  const test = h(createFilteredCheckins, {filteredData, setInspectPosition});
+  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
-  if(showSettings) {
+  if(showFilter) {
+    overlay = h('div.sidebox', [
+      h('div.title', [
+        toolbar,
+        h("h1", "Filter Checkins"),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => {
+          setFilter(false);
+          setSettings(false);
+        }
+      }, "X"),
+      h("div.overlay-div", [
+        h('div.autocomplete-container', [
+          autoComplete,
+          filteredData ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
+        ])
+      ]),
+    ])
+  } else if(showSettings) {
     overlay = h('div.sidebox', [
       h('div.title', [
         toolbar,
@@ -190,6 +210,7 @@ function WeaverMap({
         className: "close-btn",
         onClick: () => {
           setSettings(false);
+          setFilter(false);
         }
       }, "X"),
       h("div.overlay-div", contextPanel),
@@ -213,7 +234,9 @@ function WeaverMap({
           });
         }
       }, "X"),
-      h("div.overlay-div", clickedCheckins),
+      h("div.overlay-div", 
+        h('div.checkin-container',clickedCheckins)
+      ),
     ]);
   } else if (filteredCheckins) {
     overlay = h("div.sidebox", [
@@ -481,8 +504,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   const [close, setClose] = useState(false);  
 
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
-  
-  if(person_data && person_data.length > 0) {
+  const foundData = person_data && person_data.length > 0;
+
+  if(foundData) {
     setFilteredCheckins(true);
     setFilteredData(person_data);
   } else {
@@ -559,6 +583,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
           input.value = "";
           setAutocompleteOpen(false);
           setClose(true);
+          setFilteredData(null);
           setFilters([]);
 
           let previous = document.querySelectorAll('.filtered_pin');
@@ -579,6 +604,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
             setFilters(filters.filter((filter) => filter != item));
             if(filters.length == 1) {
               setClose(true);
+              setFilteredData(null);
 
               let previous = document.querySelectorAll('.filtered_pin');
               previous.forEach((marker) => {
@@ -591,12 +617,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     })),
   ]) : null; 
   
-  if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("div", { className: "search-header" }, [
-      h(Icon, { className: "search-icon", icon: "filter"}),
-      h("h1", "Filter Checkins"),
-    ]),
-    h(Divider, {className: "filter-divider"}),
+  if(!result || close) return h('div', {className: "autocomplete"}, [
     searchBar
   ]);
   result = result.success.data;
@@ -640,14 +661,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     results,
   ]);
 
-  return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("div", { className: "search-header" }, [
-      h(Icon, { className: "search-icon", icon: "filter"}),
-      h("h1", "Filter Checkins"),
-    ]),
-    h(Divider, {className: "filter-divider"}),
+  return h('div.autocomplete', [
     searchBar,
-    wrapper
+    wrapper,
   ]);
 }
 
