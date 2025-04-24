@@ -54,6 +54,7 @@
     "@macrostrat-web/utility-functions": "workspace:*",
     "@macrostrat/color-utils": "^1.0.0",
     "@macrostrat/corelle": "^2.0.1",
+    "@macrostrat/data-components": "latest",
     "@macrostrat/form-components": "^0.1.2",
     "@macrostrat/hyper": "^3.0.6",
     "@macrostrat/map-interface": "^1.2.2",
