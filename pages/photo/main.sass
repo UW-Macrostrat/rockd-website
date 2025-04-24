@@ -12,7 +12,7 @@
   @each $name, $color in $colors
     --#{$name}: #{$color}
 
-html, body
+html, body, #root, .app-shell
   width: 100%
   height: 100vh
   height: -webkit-fill-available
@@ -121,21 +121,17 @@ h4
   color: var(--panel-text)
   font-style: italic
 
-.observations
-  margin-top: 27vh
-  display: flex
-  flex-wrap: wrap
-  width: 100%
 
-  .observation
-    flex: 0 0 calc(33.33% - 10px)
-    margin: 5px
-    text-align: center
-    box-shadow: 0 0 0 1px var(--card-shadow-color)
+.observation-item
+  height: 80vh
+  width: 40%
+  margin: calc(20px + 7vh) 30% 0 30%
+  text-align: center
 
-    .observation-image
-      width: 100%
-      cursor: pointer
+  .observation-image
+    height: 80vh
+    width: 100%
+    object-fit: cover
 
 .overlay
   background-color: var(--panel-background-color)
@@ -149,18 +145,40 @@ h4
   .overlay-body
     margin: 0 30%
     width: 40%
+    border-radius: 2%
     box-shadow: 0 0 0 1px var(--card-shadow-color)
     margin: 5vh 30%
 
     img
       width: 100%
+      border-radius: 2% 2% 0 0
 
-    .observation-body
-      padding: 3px
-      color: var(--text)
-      text-align: center
-      padding-top: 10px
-      width: 100%
+.observation-body-container
+  position: absolute
+  bottom: 9vh
+  left: 0
+  padding: 3px
+  color: var(--text)
+  background-color: var(--panel-background)
+  text-align: center
+  width: 40%
+  margin-left: 30%
+  min-height: 50px
+  display: flex
+  align-items: center
+  justify-content: center
+
+  .close-body
+    position: absolute
+    top: 5px
+    left: 5px
+    cursor: pointer
+
+  .observation-body
+    position: relative
+    min-hegiht: 50px
+    width: 100%
+    
 
 .close
   position: absolute
@@ -173,35 +191,41 @@ h4
   &:hover
     background-color: grey
 
-.banner
+.photo-banner
   position: absolute
   top: 0
   left: 0
   z-index: 100
   width: 100%
-  background-color: var(--panel-text)
   height: 7vh
   display: flex
+  gap: 10px
+  padding-left: 20px
+  background-color: var(--panel-rule-color)
+  justify-content: space-between
 
-  
-  .banner-arrow
-    margin-left: 10px
-    svg
-      height: 7vh
-  
-  .banner-button
-    width: 100px
-    cursor: pointer
-    text-align: center
-    margin: 10px 0
-    background-color: var(--panel-background)
-    position: absolute
-    right: 15px
+  .right-side
+    display: flex
+    align-items: center
+    gap: 10px
+    height:100%
+    padding-right: 30px
+
+  .back-checkin
+    display: flex
+    align-items: center
+    gap: 10px  
+
+    h3
+      color: var(--text-emphasized-color)
+
+    &:hover
+      text-decoration: none
 
 .hide
   display: none
 
-.left-arrow
+.left-arrow, .right-arrow, .back-checkin-arrow
   filter: var(--anti-img-color)
   cursor: pointer
 
@@ -211,7 +235,7 @@ h4
 
 .observation-details
   text-align: left
-  margin: 10px
+  padding: 0 5px
   
   .observation-detail
     padding: 4px
@@ -233,19 +257,11 @@ h4
 .observation-header
   padding: 10px
 
-.back-arrow
-  filter: var(--img-color)
-  position: fixed
-  svg
-    height: 10vh
 
 .overlay-header
   position: absolute
   height: 10vh
   margin-left: 20%
-
-.container
-  position: relative
 
 .dark-mode-button
   height: 5vh
@@ -263,3 +279,44 @@ h4
 .error-img
   width: 50%
   text-align: center
+
+.left-arrow
+  position: absolute
+  top: 30%
+  left: 100px
+
+  svg
+    height: 50px
+    width: 50px
+
+.right-arrow
+  position: absolute
+  top: 30%
+  right: 100px
+
+  svg
+    height: 50px
+    width: 50px
+
+.circles
+  display: flex
+  justify-content: center
+  padding: 30px 0
+  filter: var(--anti-img-color)
+
+.info-btn
+  position: absolute
+  bottom: 10vh
+  right: 20%
+  svg
+    height: 20px
+    width: 20px
+
+.hide
+  display: none
+
+.page-container
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%

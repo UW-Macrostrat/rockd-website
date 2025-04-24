@@ -16,29 +16,16 @@ import {
   PanelCard,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
+import { set } from "react-datepicker/dist/date_utils";
+import { s } from "vite/dist/node/types.d-aGj9QkWt";
 
 const h = hyper.styled(styles);
 
 export function Trips({trip}) {
-    const center = null;
-    const mapRef = useRef(null);
     const [showSatelite, setSatelite] = useState(false);
-
     const userData = useRockdAPI("trips/" + trip);
 
     const style = useMapStyle({showSatelite});
-    
-    // when outside marker is clicked
-    useEffect(() => {
-        if (mapRef.current && center) {
-            mapRef.current.flyTo({
-                center: [center.lng, center.lat],
-                zoom: 12,
-                speed: 1,
-                curve: 1,
-            });
-        }
-    }, [center]);
 
     if (!userData) {
         return h("div", { className: 'loading' }, [
@@ -68,6 +55,7 @@ export function Trips({trip}) {
         ]);
     }
 
+
     let start = [data.stops[0].checkin.lng, data.stops[0].checkin.lat];
     const newMapPosition ={
             camera: {
@@ -76,6 +64,7 @@ export function Trips({trip}) {
               altitude: 300000,
             },
           };
+
 
     return h("div", {className: 'body'}, [
             h(
@@ -141,8 +130,10 @@ function SideBar({data}) {
     const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic-header"});
     const stops = data.stops;
 
-    if(!map) return h("div.stop-container", h(Spinner, {style: {"margin-top": "10vh"}}));
-
+    if(!map) return h("div", {className: "stop-container loading2"}, [
+        h("h1", "Loading trip " + data.trip_id + "..."),
+        h(Spinner, {style: {"margin-top": "30px"}})
+    ]);
 
     let arr = [];
     let lats = [];
@@ -184,8 +175,15 @@ function SideBar({data}) {
         [ Math.min(...lngs), Math.min(...lats) ]
     ];
 
-    map.fitBounds(bounds);    
-
+    map.fitBounds(bounds, {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 200,
+          right: 20
+        },
+        animate: false
+      });
     const stopCheckins = createCheckins(arr, mapRef, null);
 
     return h('div', { className: 'stop-container'}, [
@@ -196,16 +194,16 @@ function SideBar({data}) {
                     h('h3', {className: 'name'}, data.first_name + " " + data.last_name),
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
                 ]),
-            ]),
-        ]),
-        h('div', { className: 'stop-bottom' }, [
-            h("div.details", [
-                h('h1', {className: 'park'}, data.name),
-                h('p', {className: 'description'}, data.description),
-                h('p', {className: 'download-button'}, [
+                h('div', {className: 'download-button'}, [
                     h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                 ]),
             ]),
+            h("div.details", [
+                h('h1', {className: 'park'}, data.name),
+                h('p', {className: 'description'}, data.description),
+            ]),
+        ]),
+        h('div', { className: 'stop-bottom' }, [
             h('div', {className: 'stop-list'}, stopCheckins),
         ]),
     ]);

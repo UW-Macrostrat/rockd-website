@@ -178,9 +178,53 @@ function WeaverMap({
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
   const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData});
 
-  const test = h(createFilteredCheckins, {filteredData, setInspectPosition});
+  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
-  if(selectedCheckin && checkinData) {
+  console.log("filteredData", filteredData);
+
+  if(showFilter) {
+    overlay = h('div.sidebox', [
+      h('div.title', [
+        toolbar,
+        h("h1", "Filter Checkins"),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => {
+          setFilter(false);
+          setSettings(false);
+          setFilteredCheckins(false);
+          setFilteredData(null);
+          let previous = document.querySelectorAll('.filtered_pin');
+          previous.forEach((marker) => {
+            marker.remove();
+          }
+          );
+        }
+      }, "X"),
+      h("div.overlay-div", [
+        h('div.autocomplete-container', [
+          autoComplete,
+          filteredData ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
+        ])
+      ]),
+    ])
+  } else if(showSettings) {
+    overlay = h('div.sidebox', [
+      h('div.title', [
+        toolbar,
+        h("h1", "Settings"),
+      ]),
+      h("button", {
+        className: "close-btn",
+        onClick: () => {
+          setSettings(false);
+          setFilter(false);
+        }
+      }, "X"),
+      h("div.overlay-div", contextPanel),
+    ])
+  } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
 
     overlay = h("div.sidebox", [
@@ -199,17 +243,9 @@ function WeaverMap({
           });
         }
       }, "X"),
-      h("div.overlay-div", clickedCheckins),
-    ]);
-  } else if (filteredCheckins) {
-    overlay = h("div.sidebox", [
-      h('div.sidebox-header', [
-        h('div.title', [
-          toolbar,
-          h("h1", "Filtered Checkins"),
-        ]),
-      ]),
-      h("div.overlay-div", test),
+      h("div.overlay-div", 
+        h('div.checkin-container',clickedCheckins)
+      ),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -233,9 +269,9 @@ function WeaverMap({
 
   const mapPosition: MapPosition = {
           camera: {
-            lat: 0, 
-            lng: 0, 
-            altitude: 30000000,
+            lat: 39, 
+            lng: -98, 
+            altitude: 6000000,
           },
         };
 
@@ -246,12 +282,11 @@ function WeaverMap({
       h(
         MapAreaContainer,
         {
-          contextPanel: sidePanel,
           className: "map-area-container",
           style: { "padding-left": "calc(30% + 14px)",},
         },
         [
-          h(MapView, { style, mapboxToken }, [
+          h(MapView, { style, mapboxToken, mapPosition }, [
             h(MapMarker, {
               setPosition: onSelectPosition,
             }),
@@ -315,11 +350,11 @@ function FeatureDetails({setInspectPosition}) {
   let result;
 
   if(!map) {
-    result = getCheckins(0, 0, 0, 0);
+    result = getCheckins(40, 45, -60, -70);
   } else if (bounds) {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
   } else {
-    result = getCheckins(0, 0, 0, 0);
+    result = getCheckins(40, 45, -60, -70);
   }
 
   if (!bounds && map) {
@@ -370,13 +405,7 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 }
 
 function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
-  return h(PanelCard, { className: showSettings ? "settings-content" : "hide" }, [
-    h("div", { className: "settings-header" }, [
-      h(Icon, { className: "settings-icon", icon: "settings"}),
-      h("h1", "Settings"),
-    ]),
-    h(Divider, {className: "settings-divider"}),
-  h("div", { className: "settings" }, [
+  return h("div", { className: "settings-content" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
       h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
@@ -390,9 +419,7 @@ function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, set
               h(Icon, { className: "overlay-icon", icon: "map"}),
               h("p", "Overlay"),
           ]),
-    ]),
-      
-  ])
+    ]);
 }
 
 function ClickedCheckins({setSelectedCheckin}) {
@@ -415,7 +442,7 @@ function ClickedCheckins({setSelectedCheckin}) {
 
         map.flyTo({
           center: cluster[0].geometry.coordinates,
-          zoom: zoom,
+          zoom: zoom + 2,
           speed: 0.5,
         });
       }
@@ -476,12 +503,16 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   const [close, setClose] = useState(false);  
 
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
+  const foundData = person_data && person_data.length > 0;
 
-  if(person_data && person_data.length > 0) {
+  console.log("person_data", person_data);
+
+  if(foundData) {
     setFilteredCheckins(true);
     setFilteredData(person_data);
   } else {
     setFilteredCheckins(false);
+    setFilteredData(null);
   }
 
   // add markers for filtered checkins
@@ -554,6 +585,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
           input.value = "";
           setAutocompleteOpen(false);
           setClose(true);
+          setFilteredData(null);
           setFilters([]);
 
           let previous = document.querySelectorAll('.filtered_pin');
@@ -574,6 +606,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
             setFilters(filters.filter((filter) => filter != item));
             if(filters.length == 1) {
               setClose(true);
+              setFilteredData(null);
 
               let previous = document.querySelectorAll('.filtered_pin');
               previous.forEach((marker) => {
@@ -586,12 +619,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     })),
   ]) : null; 
   
-  if(!result || close) return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("div", { className: "search-header" }, [
-      h(Icon, { className: "search-icon", icon: "filter"}),
-      h("h1", "Filter Checkins"),
-    ]),
-    h(Divider, {className: "filter-divider"}),
+  if(!result || close) return h('div', {className: "autocomplete"}, [
     searchBar
   ]);
   result = result.success.data;
@@ -635,17 +663,12 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     results,
   ]);
 
-  return h(PanelCard, {className: showFilter ? "autocomplete" : "hide"}, [
-    h("div", { className: "search-header" }, [
-      h(Icon, { className: "search-icon", icon: "filter"}),
-      h("h1", "Filter Checkins"),
-    ]),
-    h(Divider, {className: "filter-divider"}),
+  return h('div.autocomplete', [
     searchBar,
-    wrapper
+    wrapper,
   ]);
 }
 
 function getPersonCheckins(personId) {
-  return useRockdAPI("protected/checkins?person_id=" + personId);
+  return useRockdAPI("protected/checkins?person_id=" + personId + "&all=100");
 }
