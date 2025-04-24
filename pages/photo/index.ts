@@ -110,10 +110,10 @@ export function Photos({photoID}) {
         }
     });
 
-    return h('div', { className: "container" }, [
+    return h('div', { className: "page-container" }, [
         h('div.photo-banner', [
-            h("a", {href: "/checkin/" + checkin.checkin_id}, [
-                h(Icon, {icon: "arrow-left", className: "back-arrow", style: {color: "white"}}),
+            h("a", {href: "/checkin/" + checkin.checkin_id, className: "back-checkin"}, [
+                h(Icon, {icon: "arrow-left", className: "back-checkin-arrow", style: {color: "white"}}),
                 h('h3', "CHECKIN")
             ]),
             h('div.right-side', [
