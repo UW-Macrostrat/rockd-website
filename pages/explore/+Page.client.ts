@@ -180,6 +180,8 @@ function WeaverMap({
 
   const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
+  console.log("filteredData", filteredData);
+
   if(showFilter) {
     overlay = h('div.sidebox', [
       h('div.title', [
@@ -191,6 +193,13 @@ function WeaverMap({
         onClick: () => {
           setFilter(false);
           setSettings(false);
+          setFilteredCheckins(false);
+          setFilteredData(null);
+          let previous = document.querySelectorAll('.filtered_pin');
+          previous.forEach((marker) => {
+            marker.remove();
+          }
+          );
         }
       }, "X"),
       h("div.overlay-div", [
@@ -237,16 +246,6 @@ function WeaverMap({
       h("div.overlay-div", 
         h('div.checkin-container',clickedCheckins)
       ),
-    ]);
-  } else if (filteredCheckins) {
-    overlay = h("div.sidebox", [
-      h('div.sidebox-header', [
-        h('div.title', [
-          toolbar,
-          h("h1", "Filtered Checkins"),
-        ]),
-      ]),
-      h("div.overlay-div", test),
     ]);
   } else {
     overlay = h("div.sidebox", [
@@ -506,11 +505,14 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
   const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
+  console.log("person_data", person_data);
+
   if(foundData) {
     setFilteredCheckins(true);
     setFilteredData(person_data);
   } else {
     setFilteredCheckins(false);
+    setFilteredData(null);
   }
 
   // add markers for filtered checkins
