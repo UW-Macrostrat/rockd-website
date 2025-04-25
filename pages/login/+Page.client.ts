@@ -66,6 +66,7 @@ function LoginForm() {
             }
           );
           const linkStraboBody = await linkStrabo.json();
+          console.log("Link Strabospot!", linkStraboBody);
           setLinkStraboResponse(linkStraboBody);
         }
         setLoggedIn(true);
@@ -83,6 +84,31 @@ function LoginForm() {
   };
 
   const className = classNames(Classes.INPUT, "bp4-large");
+
+  useEffect(() => {
+    const sendRockdJWTToStrabo = async () => {
+      if (loggedIn && linkStraboResponse && jParam) {
+        try {
+          const rockdJWTToStrabo = await fetch(
+            "https://strabospot.org/db/macroJWT",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jParam}`,
+              },
+              body: JSON.stringify(linkStraboResponse),
+            }
+          );
+          const straboResponse = await rockdJWTToStrabo.json();
+          console.log("Strabo Response:", straboResponse);
+        } catch (err) {
+          console.error("Failed to send Rockd JWT to Strabo:", err);
+        }
+      }
+    };
+    sendRockdJWTToStrabo();
+  }, [loggedIn, linkStraboResponse, jParam]);
 
   if (loggedIn) {
     return h("div", { className: "login-page" }, [
@@ -104,55 +130,55 @@ function LoginForm() {
         "Logout"
       ),
     ]);
-  }
-
-  return h("div", { className: "login-page" }, [
-    h("h2", "Login"),
-    error &&
-      h(Callout, {
-        className: "login-info",
-        title: "Login Error",
-        intent: Intent.DANGER,
-        children: error,
-      }),
-    h(
-      "form.login-form",
-      {
-        onSubmit: (e) => {
-          e.preventDefault(); // Prevent form reload
-          submitForm();
-        },
-      },
-      [
-        h("input", {
-          type: "text",
-          name: "username",
-          value: state.username,
-          onChange,
-          className,
-          placeholder: "Username",
+  } else {
+    return h("div", { className: "login-page" }, [
+      h("h2", "Login"),
+      error &&
+        h(Callout, {
+          className: "login-info",
+          title: "Login Error",
+          intent: Intent.DANGER,
+          children: error,
         }),
-        h("input", {
-          type: "password",
-          name: "password",
-          value: state.password,
-          onChange,
-          className,
-          placeholder: "Password",
-        }),
-        h(
-          Button,
-          {
-            intent: Intent.PRIMARY,
-            large: true,
-            type: "submit", // Important: treat this as a submit button
-            disabled: !isValid(state),
+      h(
+        "form.login-form",
+        {
+          onSubmit: (e) => {
+            e.preventDefault(); // Prevent form reload
+            submitForm();
           },
-          "Login"
-        ),
-      ]
-    ),
-  ]);
+        },
+        [
+          h("input", {
+            type: "text",
+            name: "username",
+            value: state.username,
+            onChange,
+            className,
+            placeholder: "Username",
+          }),
+          h("input", {
+            type: "password",
+            name: "password",
+            value: state.password,
+            onChange,
+            className,
+            placeholder: "Password",
+          }),
+          h(
+            Button,
+            {
+              intent: Intent.PRIMARY,
+              large: true,
+              type: "submit",
+              disabled: !isValid(state),
+            },
+            "Login"
+          ),
+        ]
+      ),
+    ]);
+  }
 }
 function InnerPage() {
   return h("div", { className: "container" }, [
