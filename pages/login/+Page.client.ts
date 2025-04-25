@@ -90,7 +90,7 @@ function LoginForm() {
       if (loggedIn && linkStraboResponse && jParam) {
         try {
           const rockdJWTToStrabo = await fetch(
-            "https://strabospot.org/db/macroJWT",
+            "https://strabospot.org/jwtdb/macroJWT",
             {
               method: "POST",
               headers: {
@@ -116,13 +116,6 @@ function LoginForm() {
         title: "Login Successful",
         intent: Intent.SUCCESS,
         className: "login-info",
-        children: linkStraboResponse
-          ? h(
-              "pre",
-              { className: "login-json" },
-              JSON.stringify(linkStraboResponse, null, 2)
-            )
-          : {},
       }),
       h(
         Button,
