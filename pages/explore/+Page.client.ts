@@ -108,7 +108,9 @@ function weaverStyle(type: object) {
         filter: ['has', 'n'],
         layout: {
             'text-field': ['get', 'n'],
-            'text-size': 10
+            'text-size': 10,
+            'text-allow-overlap': true,
+            'text-ignore-placement': false,
         },
         paint: {
           "text-color": "#fff"
