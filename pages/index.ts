@@ -89,7 +89,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         }
         
         let image;
-        const imgSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+        const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
         const showImage = checkin.photo
 
         if (showImage) {
@@ -139,7 +139,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
             }, [
             h('h1', {className: 'stop-name'}, stop_name),
             h('div', {className: 'checkin-header'}, [
-                !stop_name ? h('h3', {className: 'profile-pic'}, h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-pic"})) : null,
+                !stop_name ? h('h3', {className: 'profile-pic'}, h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-pic"})) : null,
                 h('div', {className: 'checkin-info'}, [
                     !stop_name ? h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name) : null,
                     h('h4', {className: 'edited'}, checkin.created),
@@ -179,7 +179,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
     return checkins;
 }
 export const apiURLOld = "https://rockd.org/api/v2/"; // old route
-export const apiURL = "https://dev.rockd.org/api/v2/"; // new route
+const apiURL = import.meta.env.ROCKD_API_URL; // new route
 
 export function useRockdAPI(src) {
     console.log("API CALLED")
@@ -195,4 +195,12 @@ export function imageExists(url) {
         return true;
     }
     return false
+}
+
+export function getImageUrl(person_id, photo_id) {
+    return apiURL + "protected/image/" + person_id + "/thumb_large/" + photo_id;
+}
+
+export function getProfilePicUrl(person_id) {
+    return apiURL + "protected/gravatar/" + person_id;
 }
