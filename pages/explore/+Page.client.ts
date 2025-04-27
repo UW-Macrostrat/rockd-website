@@ -381,7 +381,7 @@ function FeatureDetails({setInspectPosition}) {
     }
   }, [bounds]);
 
-  if (result == null) return h(Spinner);
+  if (result == null) return h(Spinner, { className: "loading-spinner" });
   result = result.success.data;  
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
