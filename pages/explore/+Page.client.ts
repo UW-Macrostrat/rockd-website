@@ -20,6 +20,7 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 
 const h = hyper.styled(styles);
 
