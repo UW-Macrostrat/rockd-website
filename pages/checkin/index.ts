@@ -102,7 +102,7 @@ export function Checkins({checkinID}) {
     // overlay
     let overlay = h('div', {className: 'overlay'}, [
         h('div.overlay-header', [
-            h(Icon, {className: "left-arrow back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
+            h(Icon, {className: "back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
                 onClick: () => {
                     setOverlayOpen(!overlayOpen);
                 }
@@ -264,7 +264,7 @@ function Map({center, showMap, setShowMap}) {
             ]
           ),
         h('div', {className: 'banner'}, [
-            h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
+            h(Icon, {className: "banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
                 setShowMap(!showMap);
               }}),
             h(PanelCard, {className: "banner-button", onClick: () => {
