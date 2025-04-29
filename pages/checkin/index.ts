@@ -2,7 +2,7 @@ import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Footer, apiURL, apiURLOld, useRockdAPI } from "../index";
+import { BlankImage, imageExists, Footer, getProfilePicUrl, useRockdAPI, getImageUrl } from "../index";
 import { Icon } from "@blueprintjs/core";
 import styles from "../main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -43,7 +43,7 @@ export function Checkins({checkinID}) {
         lng: checkin.lng
     }
 
-    let profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + checkin.person_id, className: "profile-picture"});
+    let profile_pic = h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-picture"});
     
     // format rating
     let ratingArr = [];
@@ -58,7 +58,7 @@ export function Checkins({checkinID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+    const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
     const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
@@ -75,7 +75,7 @@ export function Checkins({checkinID}) {
     checkin.observations.forEach(observation => {
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
-            const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
+            const imageSrc = getImageUrl(checkin.person_id, observation.photo);
             const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
             let observationBody = observationFooter(observation);
 
@@ -102,7 +102,7 @@ export function Checkins({checkinID}) {
     // overlay
     let overlay = h('div', {className: 'overlay'}, [
         h('div.overlay-header', [
-            h(Icon, {className: "left-arrow back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
+            h(Icon, {className: "back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
                 onClick: () => {
                     setOverlayOpen(!overlayOpen);
                 }
@@ -264,7 +264,7 @@ function Map({center, showMap, setShowMap}) {
             ]
           ),
         h('div', {className: 'banner'}, [
-            h(Icon, {className: "left-arrow banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
+            h(Icon, {className: "banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
                 setShowMap(!showMap);
               }}),
             h(PanelCard, {className: "banner-button", onClick: () => {

@@ -2,7 +2,7 @@ import hyper from "@macrostrat/hyper";
 import { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, apiURL, useRockdAPI, Image } from "../index";
+import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from "../index";
 import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -16,8 +16,6 @@ import {
   PanelCard,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { set } from "react-datepicker/dist/date_utils";
-import { s } from "vite/dist/node/types.d-aGj9QkWt";
 
 const h = hyper.styled(styles);
 
@@ -127,7 +125,7 @@ function useMapStyle({showSatelite}) {
 function SideBar({data}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
-    const profile_pic = h(BlankImage, {src: apiURL + "protected/gravatar/" + data.person_id, className: "profile-pic-header"});
+    const profile_pic = h(BlankImage, {src: getProfilePicUrl(data.person_id), className: "profile-pic-header"});
     const stops = data.stops;
 
     if(!map) return h("div", {className: "stop-container loading2"}, [
@@ -195,7 +193,7 @@ function SideBar({data}) {
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
                 ]),
                 h('div', {className: 'download-button'}, [
-                    h('a', {className: 'kmz', href: apiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                    h('a', {className: 'kmz', href: import.meta.env.ROCKD_API_URL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                 ]),
             ]),
             h("div.details", [

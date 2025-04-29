@@ -230,6 +230,9 @@ body
   display: flex
   justify-content: center
 
+  svg
+    filter: var(--anti-img-color)
+
   .likes-container
     display: grid
     grid-template-columns: 50% 50%
@@ -237,26 +240,17 @@ body
     justify-content: end
     place-items: center
 
-    .likes-image
-      width: 40px
-
   .comments-container
     display: grid
     grid-template-columns: 50% 50%
     width: 25%
     place-items: center
 
-    .comments-image
-      width: 40px
-
   .observations-container
     display: grid
     grid-template-columns: 50% 50%
     width: 25%
     place-items: center
-
-    .observations-image
-      width: 40px
 
 .marker
   height: 7vh
