@@ -20,6 +20,8 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
+import { CONTEXTMENU_WARN_DECORATOR_NEEDS_REACT_ELEMENT } from "@blueprintjs/core/lib/esm/legacy/contextMenuTargetLegacy";
 
 const h = hyper.styled(styles);
 
@@ -106,7 +108,9 @@ function weaverStyle(type: object) {
         filter: ['has', 'n'],
         layout: {
             'text-field': ['get', 'n'],
-            'text-size': 10
+            'text-size': 10,
+            'text-allow-overlap': true,
+            'text-ignore-placement': false,
         },
         paint: {
           "text-color": "#fff"
@@ -145,6 +149,7 @@ function WeaverMap({
   const [showFilter, setFilter] = useState(false);
   const [filteredCheckins, setFilteredCheckins] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
 
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
@@ -176,7 +181,7 @@ function WeaverMap({
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData});
+  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
   const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
 
@@ -205,7 +210,7 @@ function WeaverMap({
       h("div.overlay-div", [
         h('div.autocomplete-container', [
           autoComplete,
-          filteredData ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
+          filteredData && !autocompleteOpen ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
         ])
       ]),
     ])
@@ -376,7 +381,7 @@ function FeatureDetails({setInspectPosition}) {
     }
   }, [bounds]);
 
-  if (result == null) return h(Spinner);
+  if (result == null) return h(Spinner, { className: "loading-spinner" });
   result = result.success.data;  
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
@@ -494,15 +499,14 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
-function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
+function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [filters, setFilters] = useState([]);
-  const [autocompleteOpen, setAutocompleteOpen] = useState(true);
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
 
-  const person_data = getPersonCheckins(filters.length > 0 ? filters[0].id : 0)?.success.data;
+  const person_data = getPersonCheckins(filters.length > 0 ? filters.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
   console.log("person_data", person_data);
@@ -602,7 +606,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData}) {
     h('ul', filters.map((item) => {
       return h("div.filter-item", [
         h('li', item.name),
-        h(Icon, { icon: "cross", style: {color: "red"}, onClick: () => {
+        h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
             setFilters(filters.filter((filter) => filter != item));
             if(filters.length == 1) {
               setClose(true);

@@ -2,7 +2,7 @@ import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Image, apiURL, useRockdAPI } from "../index";
+import { BlankImage, imageExists, Image, getImageUrl, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
 import styles from "../main.module.sass";
 import "./main.sass";
@@ -47,7 +47,7 @@ export function Photos({photoID}) {
     let observations = [];
 
     // add checkin photo and notes
-    const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + checkin.photo;
+    const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
     const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
     const headerBody = h('div', {className: 'observation-body-container'}, [
         h(Icon, {className: "close-body", icon: "ban-circle", onClick: () => {
@@ -71,7 +71,7 @@ export function Photos({photoID}) {
         if(Object.keys(observation.rocks).length != 0) {
             photoIDArr.push(observation.photo);
             // if photo exists
-            const imageSrc = apiURL + "protected/image/" + checkin.person_id + "/thumb_large/" + observation.photo;
+            const imageSrc = getImageUrl(checkin.person_id, observation.photo);
             const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
             let observationBody = h(observationFooter, {observation, setBody});
 
