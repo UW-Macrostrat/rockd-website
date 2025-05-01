@@ -510,6 +510,19 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
 
+  // test 
+  const [people, setPeople] = useState([]);
+  const [taxa, setTaxa] = useState([]);
+  const [intervals, setIntervals] = useState([]);
+  const [lithologies, setLithologies] = useState([]);
+  const [lithologyTypes, setLithologyTypes] = useState([]);
+  const [lithologyClasses, setLithologyClasses] = useState([]);
+  const [lithologyAttributes, setLithologyAttributes] = useState([]);
+  const [stratNameConcepts, setStratNameConcepts] = useState([]);
+  const [stratNameOrphans, setStratNameOrphans] = useState([]);
+  const [structures, setStructures] = useState([]);
+  const [minerals, setMinerals] = useState([]);
+
   const person_data = getPersonCheckins(filters.length > 0 ? filters.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
@@ -808,6 +821,12 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
       minerals
     ]);
   }
+
+  /*
+  useEffect(() => {
+    setLithologyData(useRockdAPI("/proctected/checkins?lith_id=" + lithologies.map(item => item.id).join(',') + "&all=100"));
+  }, [lithologies]);
+  */
 
   const wrapper = h('div.autocomplete-wrapper', [
     filterContainer,
