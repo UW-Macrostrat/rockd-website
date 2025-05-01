@@ -6,7 +6,7 @@ import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from
 import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
-import { DarkModeButton } from "@macrostrat/ui-components";
+import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import "./main.sass";
 import { Divider, Icon, Spinner } from "@blueprintjs/core";
 import {
@@ -21,10 +21,9 @@ const h = hyper.styled(styles);
 
 export function Trips({trip}) {
     const [showSatelite, setSatelite] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
     const userData = useRockdAPI("/trips/" + trip);
 
-    const style = useMapStyle({showSatelite, darkMode});
+    const style = useMapStyle({showSatelite});
 
     if (!userData) {
         return h("div", { className: 'loading' }, [
@@ -45,7 +44,7 @@ export function Trips({trip}) {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     data.updated = date.toLocaleDateString('en-US', options);
 
-    const toolbar = h(Toolbar, {showSatelite, setSatelite, darkMode, setDarkMode});
+    const toolbar = h(Toolbar, {showSatelite, setSatelite});
     const sidebar = h(SideBar, {data});
 
     if (!sidebar) {
@@ -88,7 +87,7 @@ export function Trips({trip}) {
     ]);
 }
 
-function Toolbar({showSatelite, setSatelite, darkMode, setDarkMode}) {
+function Toolbar({showSatelite, setSatelite}) {
     const [showSettings, setSettings] = useState(false);
 
     return h(PanelCard, { className: "toolbar" }, [
@@ -104,9 +103,7 @@ function Toolbar({showSatelite, setSatelite, darkMode, setDarkMode}) {
         h("div", { className: showSettings ? "settings-content" : "hide" }, [
             h(Divider, { className: "divider" }),
             h("div", { className: "settings" }, [
-                h(DarkModeButton, { className: "dark-btn", showText: true, onClick: () => {
-                    setDarkMode(!darkMode);
-                } } ),
+                h(DarkModeButton, { className: "dark-btn", showText: true } ),
                 h(PanelCard, {className: "map-style", onClick: () => {
                         setSatelite(!showSatelite);
                     }}, [
@@ -118,12 +115,8 @@ function Toolbar({showSatelite, setSatelite, darkMode, setDarkMode}) {
       ]);
 }
 
-function useMapStyle({showSatelite, darkMode}) {
-    const white = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
-    const dark = "mapbox://styles/jczaplewski/cl5uoqzzq003614o6url9ou9z";
-    const satellite = 'mapbox://styles/mapbox/satellite-v9';
-
-    return showSatelite ? satellite : white;
+function useMapStyle({showSatelite}) {
+    return showSatelite ? SETTINGS.satelliteMapURL : useDarkMode()?.isEnabled ? SETTINGS.darkMapURL : SETTINGS.whiteMapURL;
 }
 
 function SideBar({data}) {
