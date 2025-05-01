@@ -5,6 +5,8 @@ export const rockdApiURL = getRuntimeConfig("ROCKD_API_URL");
 
 export const darkMapURL =
   "mapbox://styles/jczaplewski/cl5uoqzzq003614o6url9ou9z?optimize=true";
+export const whiteMapURL =
+  "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i?optimize=true";
 export const baseMapURL =
   "mapbox://styles/jczaplewski/clatdbkw4002q14lov8zx0bm0?optimize=true";
 export const satelliteMapURL =
@@ -48,6 +50,7 @@ export const SETTINGS = {
   rockdApiURL,
   cdrPrefix,
   darkMapURL,
+  whiteMapURL,
   baseMapURL,
   satelliteMapURL,
   burwellTileDomain,
