@@ -19,7 +19,7 @@ export function Photos({ photoID }) {
 }
 
 function PhotoFetcher({ photoID, setPhotoIDArr, setCachedCheckin }) {
-  const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
+  const checkinData = useRockdAPI("/protected/checkins?photo_id=" + photoID);
 
   if (!checkinData) {
     return h("div.loading", [h("h1", "Loading photo " + photoID + "...")]);

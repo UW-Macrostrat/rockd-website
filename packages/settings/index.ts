@@ -1,6 +1,8 @@
 /* Client-side code to access configuration variables */
 import { getRuntimeConfig } from "./utils";
 
+export const rockdApiURL = getRuntimeConfig("ROCKD_API_URL");
+
 export const darkMapURL =
   "mapbox://styles/jczaplewski/cl5uoqzzq003614o6url9ou9z?optimize=true";
 export const baseMapURL =
@@ -41,12 +43,9 @@ export const postgrestPrefix = getRuntimeConfig(
   apiDomain + "/api/pg"
 );
 
-export const macrostratInstance = getRuntimeConfig("MACROSTRAT_INSTANCE");
-
-export const elevationLayerURL = getRuntimeConfig("ELEVATION_LAYER_URL");
-
 /** Legacy settings object */
 export const SETTINGS = {
+  rockdApiURL,
   cdrPrefix,
   darkMapURL,
   baseMapURL,
