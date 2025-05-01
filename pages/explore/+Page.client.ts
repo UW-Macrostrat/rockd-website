@@ -20,8 +20,6 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
-import { CONTEXTMENU_WARN_DECORATOR_NEEDS_REACT_ELEMENT } from "@blueprintjs/core/lib/esm/legacy/contextMenuTargetLegacy";
 
 const h = hyper.styled(styles);
 
@@ -59,7 +57,7 @@ function weaverStyle(type: object) {
     sources: {
       weaver: {
         type: "vector",
-        tiles: [ "https://dev.rockd.org/api/v2/checkin-tile/{z}/{x}/{y}?cluster=true"],
+        tiles: [ SETTINGS.rockdApiURL + "/checkin-tile/{z}/{x}/{y}?cluster=true"],
       }
     },
     layers: [
@@ -176,7 +174,7 @@ function WeaverMap({
 
   // handle selected checkins
   const checkinData = useRockdAPI(
-    selectedCheckin ? `protected/checkins?checkin_id=${selectedCheckin}` : null
+    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` : null
   );
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
@@ -341,7 +339,7 @@ function getCheckins(lat1, lat2, lng1, lng2) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useRockdAPI("protected/checkins?minlat=" + minLat + 
+  return useRockdAPI("/protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
     "&maxlng=" + maxLng);
@@ -383,6 +381,12 @@ function FeatureDetails({setInspectPosition}) {
 
   if (result == null) return h(Spinner, { className: "loading-spinner" });
   result = result.success.data;  
+
+  result.sort((a, b) => {
+    if (a.photo === null && b.photo !== null) return 1;
+    if (a.photo !== null && b.photo === null) return -1;
+    return 0;
+  });
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
   
@@ -576,7 +580,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   let result = null;
 
   try {
-    result = useRockdAPI("autocomplete/" + input);
+    result = useRockdAPI("/autocomplete/" + input);
   } catch (e) {
     return null;
   }
@@ -674,5 +678,5 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 }
 
 function getPersonCheckins(personId) {
-  return useRockdAPI("protected/checkins?person_id=" + personId + "&all=100");
+  return useRockdAPI("/protected/checkins?person_id=" + personId + "&all=100");
 }
