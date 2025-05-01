@@ -15,7 +15,7 @@ const h = hyper.styled(styles);
 
 export function Photos({photoID}) {
     const [showBody, setBody] = useState(true);
-    const checkinData = useRockdAPI("protected/checkins?photo_id=" + photoID);
+    const checkinData = useRockdAPI("/protected/checkins?photo_id=" + photoID);
 
 
     if (!checkinData) {

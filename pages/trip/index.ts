@@ -21,9 +21,10 @@ const h = hyper.styled(styles);
 
 export function Trips({trip}) {
     const [showSatelite, setSatelite] = useState(false);
-    const userData = useRockdAPI("trips/" + trip);
+    const [darkMode, setDarkMode] = useState(false);
+    const userData = useRockdAPI("/trips/" + trip);
 
-    const style = useMapStyle({showSatelite});
+    const style = useMapStyle({showSatelite, darkMode});
 
     if (!userData) {
         return h("div", { className: 'loading' }, [
@@ -44,7 +45,7 @@ export function Trips({trip}) {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     data.updated = date.toLocaleDateString('en-US', options);
 
-    const toolbar = h(Toolbar, {showSatelite, setSatelite});
+    const toolbar = h(Toolbar, {showSatelite, setSatelite, darkMode, setDarkMode});
     const sidebar = h(SideBar, {data});
 
     if (!sidebar) {
@@ -87,7 +88,7 @@ export function Trips({trip}) {
     ]);
 }
 
-function Toolbar({showSatelite, setSatelite}) {
+function Toolbar({showSatelite, setSatelite, darkMode, setDarkMode}) {
     const [showSettings, setSettings] = useState(false);
 
     return h(PanelCard, { className: "toolbar" }, [
@@ -103,7 +104,9 @@ function Toolbar({showSatelite, setSatelite}) {
         h("div", { className: showSettings ? "settings-content" : "hide" }, [
             h(Divider, { className: "divider" }),
             h("div", { className: "settings" }, [
-                h(DarkModeButton, { className: "dark-btn", showText: true } ),
+                h(DarkModeButton, { className: "dark-btn", showText: true, onClick: () => {
+                    setDarkMode(!darkMode);
+                } } ),
                 h(PanelCard, {className: "map-style", onClick: () => {
                         setSatelite(!showSatelite);
                     }}, [
@@ -115,8 +118,9 @@ function Toolbar({showSatelite, setSatelite}) {
       ]);
 }
 
-function useMapStyle({showSatelite}) {
+function useMapStyle({showSatelite, darkMode}) {
     const white = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
+    const dark = "mapbox://styles/jczaplewski/cl5uoqzzq003614o6url9ou9z";
     const satellite = 'mapbox://styles/mapbox/satellite-v9';
 
     return showSatelite ? satellite : white;
