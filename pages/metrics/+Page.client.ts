@@ -11,10 +11,11 @@ import {
     AreaChart,
     ResponsiveContainer,
   } from "recharts";
-import { apiURLOld, Footer, useRockdAPI } from "../index";
+import { Footer, useRockdAPI } from "../index";
 import "./main.sass";
 import styles from "../main.module.sass";
-import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { SETTINGS } from "@macrostrat-web/settings";
 
 const h = hyper.styled(styles);
 
@@ -43,7 +44,7 @@ export function Page() {
     const [activeBound, setActive] = useState([lower, upper]);
 
     // new API doesn't return all data
-    const userData = useAPIResult(apiURLOld + "metrics");
+    const userData = useAPIResult(SETTINGS.rockdApiOldURL + "metrics");
 
     if (!userData) {
         return h("div", { className: 'loading' }, [
