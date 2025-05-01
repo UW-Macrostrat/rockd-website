@@ -382,6 +382,12 @@ function FeatureDetails({setInspectPosition}) {
   if (result == null) return h(Spinner, { className: "loading-spinner" });
   result = result.success.data;  
 
+  result.sort((a, b) => {
+    if (a.photo === null && b.photo !== null) return 1;
+    if (a.photo !== null && b.photo === null) return -1;
+    return 0;
+  });
+
   checkins = createCheckins(result, mapRef, setInspectPosition);
   
   return h("div", {className: 'checkin-container'}, [
