@@ -632,39 +632,182 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   ]);
   result = result.success.data;
 
-  let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
-      h('h2', "Taxa"),
-      h('ul', result.taxa.map((item) => {
-        return h('li', { 
-          onClick: () => { 
-            if(!filters.includes(item)) {
+  let results;
+
+  console.log("concepts", result?.strat_name_concepts);
+
+  if(autocompleteOpen) {
+    const intervals = result?.intervals?.length > 0 ? h('div.intervals', [
+      h('h2', "Intervals"),
+      h('ul', result.intervals.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
               setAutocompleteOpen(false);
               setFilters(filters.concat([item]));
-              console.log(item.id)
             }
           }
-        }, item.name);
-      }))
+        }, item.name)
+      ))
     ]) : null;
-
-  let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
-    h('h2', "People"),
-    h('ul', result.people.map((item) => {
-      return h('li', { 
-        onClick: () => { 
-          if(!filters.includes(item)) {
-            setAutocompleteOpen(false);
-            setFilters(filters.concat([item]));
+    
+    const lithologies = result?.lithologies?.length > 0 ? h('div.lithologies', [
+      h('h2', "Lithologies"),
+      h('ul', result.lithologies.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
           }
-        }
-      }, item.name);
-    }))
-  ]) : null;
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const lithology_types = result?.lithology_types?.length > 0 ? h('div.lithology_types', [
+      h('h2', "Lithology Types"),
+      h('ul', result.lithology_types.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const lithology_classes = result?.lithology_classes?.length > 0 ? h('div.lithology_classes', [
+      h('h2', "Lithology Classes"),
+      h('ul', result.lithology_classes.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const lithology_attributes = result?.lithology_attributes?.length > 0 ? h('div.lithology_attributes', [
+      h('h2', "Lithology Attributes"),
+      h('ul', result.lithology_attributes.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const strat_name_concepts = result?.strat_name_concepts?.length > 0 ? h('div.strat_name_concepts', [
+      h('h2', "Stratigraphic Name Concepts"),
+      h('ul', result.strat_name_concepts.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const strat_name_orphans = result?.strat_name_orphans?.length > 0 ? h('div.strat_name_orphans', [
+      h('h2', "Stratigraphic Name Orphans"),
+      h('ul', result.strat_name_orphans.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const structures = result?.structures?.length > 0 ? h('div.structures', [
+      h('h2', "Structures"),
+      h('ul', result.structures.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const minerals = result?.minerals?.length > 0 ? h('div.minerals', [
+      h('h2', "Minerals"),
+      h('ul', result.minerals.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const people = result.people.length > 0 ? h('div.people', [
+      h('h2', "People"),
+      h('ul', result.people.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
+    const taxa = result.taxa.length > 0 ? h('div.taxa', [
+      h('h2', "Taxa"),
+      h('ul', result.taxa.map((item) =>
+        h('li', {
+          onClick: () => {
+            if (!filters.includes(item)) {
+              setAutocompleteOpen(false);
+              setFilters(filters.concat([item]));
+            }
+          }
+        }, item.name)
+      ))
+    ]) : null;
+    
 
-  const results = h("div.results", [
-    taxa,
-    people,
-  ]);
+
+    // result
+    results = h('div.results', [
+      people,
+      taxa,
+      intervals,
+      lithologies,
+      lithology_types,
+      lithology_classes,
+      lithology_attributes,
+      strat_name_concepts,
+      strat_name_orphans,
+      structures,
+      minerals
+    ]);
+  }
 
   const wrapper = h('div.autocomplete-wrapper', [
     filterContainer,
