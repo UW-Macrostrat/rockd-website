@@ -180,12 +180,9 @@ export function createCheckins(result, mapRef, setInspectPosition) {
 }
 
 // remove when metrics works
-export const apiURLOld = "https://rockd.org/api/v2/"; // old route
 const apiURL = SETTINGS.rockdApiURL; // new route
-console.log("API URL: ", apiURL);
 
 export function useRockdAPI(src) {
-    console.log("API CALLED")
     return useAPIResult(apiURL + src);
 }
 
