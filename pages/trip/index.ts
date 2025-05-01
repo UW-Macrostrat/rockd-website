@@ -6,7 +6,7 @@ import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from
 import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
-import { DarkModeButton } from "@macrostrat/ui-components";
+import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import "./main.sass";
 import { Divider, Icon, Spinner } from "@blueprintjs/core";
 import {
@@ -21,7 +21,7 @@ const h = hyper.styled(styles);
 
 export function Trips({trip}) {
     const [showSatelite, setSatelite] = useState(false);
-    const userData = useRockdAPI("trips/" + trip);
+    const userData = useRockdAPI("/trips/" + trip);
 
     const style = useMapStyle({showSatelite});
 
@@ -116,10 +116,7 @@ function Toolbar({showSatelite, setSatelite}) {
 }
 
 function useMapStyle({showSatelite}) {
-    const white = "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i";
-    const satellite = 'mapbox://styles/mapbox/satellite-v9';
-
-    return showSatelite ? satellite : white;
+    return showSatelite ? SETTINGS.satelliteMapURL : useDarkMode()?.isEnabled ? SETTINGS.darkMapURL : SETTINGS.whiteMapURL;
 }
 
 function SideBar({data}) {

@@ -6,7 +6,6 @@ import { BlankImage, imageExists, Footer, getProfilePicUrl, useRockdAPI, getImag
 import { Icon } from "@blueprintjs/core";
 import styles from "../main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
-import { DarkModeButton } from "@macrostrat/ui-components";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
@@ -18,10 +17,8 @@ import { LithologyList } from "@macrostrat/data-components";
 const h = hyper.styled(styles);
 
 export function Checkins({checkinID}) {
-    const checkinData = useRockdAPI("protected/checkins?checkin_id=" + checkinID);
+    const checkinData = useRockdAPI("/protected/checkins?checkin_id=" + checkinID);
     const [overlayOpen, setOverlayOpen] = useState(false);
-    const [overlayImage, setOverlayImage] = useState(null);
-    const [overlayBody, setOverlayBody] = useState(null);
     const [showMap, setShowMap] = useState(false);
 
     if (!checkinData) {
@@ -108,10 +105,6 @@ export function Checkins({checkinID}) {
                 }
             }),
         ]),
-        h('div.overlay-body', [
-            h(BlankImage, { className: 'observation-image', src: overlayImage }),
-            overlayBody,
-        ])
     ]);
 
     const map = h(Map, {center, showMap, setShowMap});

@@ -4,6 +4,7 @@ import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import styles from "./main.module.sass";
+import { SETTINGS } from "@macrostrat-web/settings";
 
 const h = hyper.styled(styles);
 
@@ -147,7 +148,6 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                     LngLatCoords(LngLatProps),
                     h('h3', {className: 'rating'}, ratingArr),
                 ]),
-                // pin,
                 ]),
                 h('p', {className: 'description'}, checkin.notes),
                 h('a', {className: 'checkin-link', href: "/checkin/" + checkin.checkin_id, target: "_blank"}, [
@@ -178,11 +178,11 @@ export function createCheckins(result, mapRef, setInspectPosition) {
     
     return checkins;
 }
-export const apiURLOld = "https://rockd.org/api/v2/"; // old route
-const apiURL = import.meta.env.ROCKD_API_URL; // new route
+
+// remove when metrics works
+const apiURL = SETTINGS.rockdApiURL; // new route
 
 export function useRockdAPI(src) {
-    console.log("API CALLED")
     return useAPIResult(apiURL + src);
 }
 
@@ -198,9 +198,9 @@ export function imageExists(url) {
 }
 
 export function getImageUrl(person_id, photo_id) {
-    return apiURL + "protected/image/" + person_id + "/thumb_large/" + photo_id;
+    return apiURL + "/protected/image/" + person_id + "/thumb_large/" + photo_id;
 }
 
 export function getProfilePicUrl(person_id) {
-    return apiURL + "protected/gravatar/" + person_id;
+    return apiURL + "/protected/gravatar/" + person_id;
 }
