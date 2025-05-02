@@ -20,6 +20,8 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { set } from "react-datepicker/dist/date_utils";
+import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 
 const h = hyper.styled(styles);
 
@@ -108,7 +110,7 @@ function weaverStyle(type: object) {
             'text-field': ['get', 'n'],
             'text-size': 10,
             'text-allow-overlap': true,
-            'text-ignore-placement': false,
+            'text-ignore-placement': true,
         },
         paint: {
           "text-color": "#fff"
@@ -514,7 +516,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [people, setPeople] = useState([]);
   const [taxa, setTaxa] = useState([]);
   const [intervals, setIntervals] = useState([]);
-  const [lithologies, setLithologies] = useState([]);
+  const [lithologyIds, setLithologies] = useState([]);
   const [lithologyTypes, setLithologyTypes] = useState([]);
   const [lithologyClasses, setLithologyClasses] = useState([]);
   const [lithologyAttributes, setLithologyAttributes] = useState([]);
@@ -523,10 +525,10 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [structures, setStructures] = useState([]);
   const [minerals, setMinerals] = useState([]);
 
+  // filter data
+  const litData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
   const person_data = getPersonCheckins(filters.length > 0 ? filters.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
-
-  console.log("person_data", person_data);
 
   if(foundData) {
     setFilteredCheckins(true);
@@ -647,8 +649,6 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 
   let results;
 
-  console.log("concepts", result?.strat_name_concepts);
-
   if(autocompleteOpen) {
     const intervals = result?.intervals?.length > 0 ? h('div.intervals', [
       h('h2', "Intervals"),
@@ -672,6 +672,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
             if (!filters.includes(item)) {
               setAutocompleteOpen(false);
               setFilters(filters.concat([item]));
+              setLithologies([item.id].concat(lithologyIds));
             }
           }
         }, item.name)
@@ -840,5 +841,10 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 }
 
 function getPersonCheckins(personId) {
-  return useRockdAPI("/protected/checkins?person_id=" + personId + "&all=100");
+  return useRockdAPI("/protected/checkins?person_id=" + personId + "&all=1");
+}
+
+function getLithologyCheckins(lith_id) {
+  // find way to return more than 5 checkins
+  return useRockdAPI("/protected/checkins?lith_id=" + lith_id);
 }
