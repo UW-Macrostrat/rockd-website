@@ -38,17 +38,12 @@ body
       --#{$name}: #{$color}
 
     .selected
-      background-color: var(--panel-hover)
+      background-color: var(--accent-secondary-color)
 
     .bp5-input
       &::placeholder
         color: var(--secondary-color)
         box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
-
-.bp5-card, .bp5-navbar
-  border-radius: 4px
-  background-color: var(--panel-background-color)
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
 
 .map-container
   position: relative
@@ -458,4 +453,12 @@ body
   width: 100px
 
 .selected
-  background-color: var(--panel-hover)
+  background-color: var(--accent-secondary-color)
+
+.bp5-card, .bp5-navbar, .bp5-button
+  border-radius: 4px
+  background-color: var(--panel-background-color)
+  box-shadow: 0 0 0 1px var(--card-shadow-color)
+
+  &.selected
+    background-color: var(--accent-secondary-color)
