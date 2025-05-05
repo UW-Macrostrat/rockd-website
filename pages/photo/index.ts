@@ -69,7 +69,9 @@ export function Photos({photoID}) {
     // add observations
     checkin.observations.forEach(observation => {
         if(Object.keys(observation.rocks).length != 0) {
-            photoIDArr.push(observation.photo);
+            if(observation.photo) {
+                photoIDArr.push(observation.photo);
+            }
             // if photo exists
             const imageSrc = getImageUrl(checkin.person_id, observation.photo);
             const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
