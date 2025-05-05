@@ -495,24 +495,24 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   const [lithologyAttributes, setLithologyAttributes] = useState([]);
   const [stratNameOrphans, setStratNameOrphans] = useState([]);
   const [lithologyIds, setLithologies] = useState([]);
-  const [taxaIds, setTaxa] = useState([]); // fails
-  const [intervalIds, setIntervals] = useState([]); // fails
-  const [stratNameConcepts, setStratNameConcepts] = useState([]); // fails
-  const [minerals, setMinerals] = useState([]); // fails
-  const [lithologyTypes, setLithologyTypes] = useState([]); // doesn't exist
-  const [lithologyClasses, setLithologyClasses] = useState([]); // doesn't exist
+  // const [taxaIds, setTaxa] = useState([]); // fails
+  // const [intervalIds, setIntervals] = useState([]); // fails
+  // const [stratNameConcepts, setStratNameConcepts] = useState([]); // fails
+  // const [minerals, setMinerals] = useState([]); // fails
+  // const [lithologyTypes, setLithologyTypes] = useState([]); // doesn't exist
+  // const [lithologyClasses, setLithologyClasses] = useState([]); // doesn't exist
 
   const lithParam = "lith_id=" + lithologyIds.map(item => item.id).join(',');
   const peopleParam = "person_id=" + peopleIds.map(item => item.id).join(',');
   const stratNameOrphanParam = "strat_name_orphan_id=" + stratNameOrphans.map(item => item.id).join(',');
   const lithologyAttributeParam = "lith_att_id=" + lithologyAttributes.map(item => item.id).join(',');
   const structureParam = "structure_id=" + structures.map(item => item.id).join(',');
-  const taxaParam = "taxon_id=" + taxaIds.map(item => item.id).join(','); // fails
-  const intervalParam = "int_id=" + intervalIds.map(item => item.id).join(','); // fails
-  const stratNameConceptParam = "strat_name_concept_id=" + stratNameConcepts.map(item => item.id).join(','); // fails
-  const mineralParam = "mineral_id=" + minerals.map(item => item.id).join(','); // fails
-  const lithologyTypeParam = "=" + lithologyTypes.map(item => item.id).join(','); // doesn't exist
-  const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
+  // const taxaParam = "taxon_id=" + taxaIds.map(item => item.id).join(','); // fails
+  // const intervalParam = "int_id=" + intervalIds.map(item => item.id).join(','); // fails
+  // const stratNameConceptParam = "strat_name_concept_id=" + stratNameConcepts.map(item => item.id).join(','); // fails
+  // const mineralParam = "mineral_id=" + minerals.map(item => item.id).join(','); // fails
+  // const lithologyTypeParam = "=" + lithologyTypes.map(item => item.id).join(','); // doesn't exist
+  // const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
 
   // develop query
   const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
@@ -606,16 +606,16 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
 
   const sectionConfigs = [
     { label: 'People', data: peopleIds, setter: setPeople },
-    { label: 'Taxa', data: taxaIds, setter: setTaxa },
-    { label: 'Intervals', data: intervalIds, setter: setIntervals },
-    { label: 'Lithologies', data: lithologyIds, setter: setLithologies },
-    { label: 'Lithology Types', data: lithologyTypes, setter: setLithologyTypes },
-    { label: 'Lithology Classes', data: lithologyClasses, setter: setLithologyClasses },
-    { label: 'Lithology Attributes', data: lithologyAttributes, setter: setLithologyAttributes },
-    { label: 'Strat Name Concepts', data: stratNameConcepts, setter: setStratNameConcepts },
     { label: 'Strat Name Orphans', data: stratNameOrphans, setter: setStratNameOrphans },
     { label: 'Structures', data: structures, setter: setStructures },
-    { label: 'Minerals', data: minerals, setter: setMinerals },
+    { label: 'Lithologies', data: lithologyIds, setter: setLithologies },
+    { label: 'Lithology Attributes', data: lithologyAttributes, setter: setLithologyAttributes },
+    // { label: 'Taxa', data: taxaIds, setter: setTaxa },
+    // { label: 'Intervals', data: intervalIds, setter: setIntervals },
+    // { label: 'Lithology Types', data: lithologyTypes, setter: setLithologyTypes },
+    // { label: 'Lithology Classes', data: lithologyClasses, setter: setLithologyClasses },
+    // { label: 'Strat Name Concepts', data: stratNameConcepts, setter: setStratNameConcepts },
+    // { label: 'Minerals', data: minerals, setter: setMinerals },
   ];
   
   const sections = sectionConfigs
