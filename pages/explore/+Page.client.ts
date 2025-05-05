@@ -530,7 +530,30 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [structures, setStructures] = useState([]);
   const [minerals, setMinerals] = useState([]);
 
+  const lithParam = "lith_id=" + lithologyIds.map(item => item.id).join(',');
+  const peopleParam = "person_id=" + peopleIds.map(item => item.id).join(',');
+  const stratNameOrphanParam = "strat_name_orphan_id=" + stratNameOrphans.map(item => item.id).join(',');
+  const lithologyAttributeParam = "lith_att_id=" + lithologyAttributes.map(item => item.id).join(',');
+  const structureParam = "structure_id=" + structures.map(item => item.id).join(',');
+  const taxaParam = "taxon_id=" + taxaIds.map(item => item.id).join(','); // fails
+  const intervalParam = "int_id=" + intervalIds.map(item => item.id).join(','); // fails
+  const stratNameConceptParam = "strat_name_concept_id=" + stratNameConcepts.map(item => item.id).join(','); // fails
+  const mineralParam = "mineral_id=" + minerals.map(item => item.id).join(','); // fails
+  const lithologyTypeParam = "=" + lithologyTypes.map(item => item.id).join(','); // doesn't exist
+  const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
+
+  const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
+  const finalParams = params
+    .join('&');
+
+  const queryString = finalParams ? "/protected/checkins?" + finalParams : null //  + "&all=1";
+  console.log("queryString", queryString);
+
+  const data = useRockdAPI(queryString)?.success.data;
+  console.log("data", data);
+
   // filter data
+  /*
   const lithData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
   const person_data = getPersonCheckins(peopleIds?.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
@@ -542,14 +565,18 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
     setFilteredCheckins(false);
     setFilteredData(null);
   }
+  */
 
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
   let lats = [];
 
-  if(person_data && person_data.length > 0) {
-    person_data.forEach((checkin) => {
+  if(data && data.length > 0) {
+    setFilteredCheckins(true);
+    setFilteredData(data);
+
+    data.forEach((checkin) => {
       coordinates.push([checkin.lng, checkin.lat]);
       lngs.push(checkin.lng);
       lats.push(checkin.lat);
@@ -588,6 +615,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
         duration: 0,
         padding: 75
     });
+  } else {
+    setFilteredCheckins(false);
+    setFilteredData(null);
   }
 
   // rest
@@ -802,15 +832,6 @@ function createFilteredItems(arr, set, setClose) {
       h('div', item.name),
       h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
           set(arr.filter((person) => person != item));
-          if(arr.length == 1) {
-            setClose(true);
-            set([]);
-
-            let previous = document.querySelectorAll('.filtered_pin');
-            previous.forEach((marker) => {
-              marker.remove();
-            });
-          }
         } 
       })
     ])
