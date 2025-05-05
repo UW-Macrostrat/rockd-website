@@ -22,6 +22,7 @@ import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import { set } from "react-datepicker/dist/date_utils";
 import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
+import { streamPipeNodeToString } from "vike/dist/esm/node/runtime/html/stream";
 
 const h = hyper.styled(styles);
 
@@ -694,156 +695,57 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   if(autocompleteOpen) {
     const intervals = result?.intervals?.length > 0 ? h('div.intervals', [
       h('h2', "Intervals"),
-      h('ul', result.intervals.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!intervalIds.includes(item)) {
-              setAutocompleteOpen(false);
-              setIntervals(intervalIds.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.intervals, setIntervals, intervalIds, setAutocompleteOpen))
     ]) : null;
     
     const lithologies = result?.lithologies?.length > 0 ? h('div.lithologies', [
       h('h2', "Lithologies"),
-      h('ul', result.lithologies.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!lithologyIds.includes(item)) {
-              setAutocompleteOpen(false);
-              setLithologies(lithologyIds.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.lithologies, setLithologies, lithologyIds, setAutocompleteOpen))
     ]) : null;
     
     const lithology_types = result?.lithology_types?.length > 0 ? h('div.lithology_types', [
       h('h2', "Lithology Types"),
-      h('ul', result.lithology_types.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.lithology_types, setLithologyTypes, lithologyTypes, setAutocompleteOpen))
     ]) : null;
     
     const lithology_classes = result?.lithology_classes?.length > 0 ? h('div.lithology_classes', [
       h('h2', "Lithology Classes"),
-      h('ul', result.lithology_classes.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.lithology_classes, setLithologyClasses, lithologyClasses, setAutocompleteOpen))
     ]) : null;
     
     const lithology_attributes = result?.lithology_attributes?.length > 0 ? h('div.lithology_attributes', [
       h('h2', "Lithology Attributes"),
-      h('ul', result.lithology_attributes.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.lithology_attributes, setLithologyAttributes, lithologyAttributes, setAutocompleteOpen))
     ]) : null;
     
     const strat_name_concepts = result?.strat_name_concepts?.length > 0 ? h('div.strat_name_concepts', [
       h('h2', "Stratigraphic Name Concepts"),
-      h('ul', result.strat_name_concepts.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.strat_name_concepts, setStratNameConcepts, stratNameConcepts, setAutocompleteOpen))
     ]) : null;
     
     const strat_name_orphans = result?.strat_name_orphans?.length > 0 ? h('div.strat_name_orphans', [
       h('h2', "Stratigraphic Name Orphans"),
-      h('ul', result.strat_name_orphans.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.strat_name_orphans, setStratNameOrphans, stratNameOrphans, setAutocompleteOpen))
     ]) : null;
     
-    const structures = result?.structures?.length > 0 ? h('div.structures', [
+    const structures_items = result?.structures?.length > 0 ? h('div.structures', [
       h('h2', "Structures"),
-      h('ul', result.structures.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.structures, setStructures, structures, setAutocompleteOpen))
     ]) : null;
     
-    const minerals = result?.minerals?.length > 0 ? h('div.minerals', [
+    const minerals_items = result?.minerals?.length > 0 ? h('div.minerals', [
       h('h2', "Minerals"),
-      h('ul', result.minerals.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
-    ]) : null;
+      h('ul', createFilteredNames(result.minerals, setMinerals, minerals, setAutocompleteOpen))
+    ]) : null;    
     
     const people = result.people.length > 0 ? h('div.people', [
       h('h2', "People"),
-      h('ul', result.people.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!peopleIds.includes(item)) {
-              setAutocompleteOpen(false);
-              setPeople(peopleIds.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.people, setPeople, peopleIds, setAutocompleteOpen)),
     ]) : null;
     
     const taxa = result.taxa.length > 0 ? h('div.taxa', [
       h('h2', "Taxa"),
-      h('ul', result.taxa.map((item) =>
-        h('li', {
-          onClick: () => {
-            if (!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-            }
-          }
-        }, item.name)
-      ))
+      h('ul', createFilteredNames(result.taxa, setTaxa, taxaIds, setAutocompleteOpen)),
     ]) : null;
     
 
@@ -859,8 +761,8 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
       lithology_attributes,
       strat_name_concepts,
       strat_name_orphans,
-      structures,
-      minerals
+      structures_items,
+      minerals_items
     ]);
   }
 
@@ -911,13 +813,13 @@ function createFilteredItems(arr, set, setClose) {
   })
 }
 
-function createFilteredNames(arr, section, set, setAutocompleteOpen) {
-  return arr[section].map((item) =>
+function createFilteredNames(result, set, existing, setAutocompleteOpen) {
+  return result.map((item) =>
     h('li', {
       onClick: () => {
-        if (!arr.includes(item)) {
+        if (!existing.includes(item)) {
           setAutocompleteOpen(false);
-          set(arr.concat([item]));
+          set(existing.concat([item]));
         }
       }
     }, item.name)
