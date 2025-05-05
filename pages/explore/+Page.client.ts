@@ -514,8 +514,8 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 
   // test 
   const [peopleIds, setPeople] = useState([]);
-  const [taxa, setTaxa] = useState([]);
-  const [intervals, setIntervals] = useState([]);
+  const [taxaIds, setTaxa] = useState([]);
+  const [intervalIds, setIntervals] = useState([]);
   const [lithologyIds, setLithologies] = useState([]);
   const [lithologyTypes, setLithologyTypes] = useState([]);
   const [lithologyClasses, setLithologyClasses] = useState([]);
@@ -527,7 +527,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 
   // filter data
   const litData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
-  const person_data = getPersonCheckins(peopleIds.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
+  const person_data = getPersonCheckins(peopleIds?.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
   if(foundData) {
@@ -620,30 +620,67 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
     ]),
   ]);
 
-  let filterContainer = peopleIds.length != 0 ? h("div.filter-container", [
+  const sections = [
+    peopleIds.length > 0 && h('div', [
+      h('h3', 'People'),
+      createFilteredItems(peopleIds, setPeople, setClose)
+    ]),
+    
+    taxaIds.length > 0 && h('div', [
+      h('h3', 'Taxa'),
+      createFilteredItems(taxaIds, setTaxa, setClose)
+    ]),
+  
+    intervalIds.length > 0 && h('div', [
+      h('h3', 'Intervals'),
+      createFilteredItems(intervalIds, setIntervals, setClose)
+    ]),
+  
+    lithologyIds.length > 0 && h('div', [
+      h('h3', 'Lithologies'),
+      createFilteredItems(lithologyIds, setLithologies, setClose)
+    ]),
+  
+    lithologyTypes.length > 0 && h('div', [
+      h('h3', 'Lithology Types'),
+      createFilteredItems(lithologyTypes, setLithologyTypes, setClose)
+    ]),
+  
+    lithologyClasses.length > 0 && h('div', [
+      h('h3', 'Lithology Classes'),
+      createFilteredItems(lithologyClasses, setLithologyClasses, setClose)
+    ]),
+  
+    lithologyAttributes.length > 0 && h('div', [
+      h('h3', 'Lithology Attributes'),
+      createFilteredItems(lithologyAttributes, setLithologyAttributes, setClose)
+    ]),
+  
+    stratNameConcepts.length > 0 && h('div', [
+      h('h3', 'Strat Name Concepts'),
+      createFilteredItems(stratNameConcepts, setStratNameConcepts, setClose)
+    ]),
+  
+    stratNameOrphans.length > 0 && h('div', [
+      h('h3', 'Strat Name Orphans'),
+      createFilteredItems(stratNameOrphans, setStratNameOrphans, setClose)
+    ]),
+  
+    structures.length > 0 && h('div', [
+      h('h3', 'Structures'),
+      createFilteredItems(structures, setStructures, setClose)
+    ]),
+  
+    minerals.length > 0 && h('div', [
+      h('h3', 'Minerals'),
+      createFilteredItems(minerals, setMinerals, setClose)
+    ]),
+  ].filter(Boolean);
+
+  const filterContainer = sections.length != 0 ? h("div.filter-container", [
     h('h2', "Filters"),
     h('ul', [
-        peopleIds.length > 0 ? h('div', [
-        h('h3', "People "),
-        peopleIds.map((item) => {
-          return h("li.filter-item", [ 
-            h('div', item.name),
-            h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
-                setPeople(peopleIds.filter((person) => person != item));
-                if(peopleIds.length == 1) {
-                  setClose(true);
-                  setFilteredData(null);
-
-                  let previous = document.querySelectorAll('.filtered_pin');
-                  previous.forEach((marker) => {
-                    marker.remove();
-                  });
-                }
-              } 
-            })
-          ])
-        })
-      ]) : null,
+      sections
     ]),
   ]) : null; 
   
@@ -660,9 +697,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
       h('ul', result.intervals.map((item) =>
         h('li', {
           onClick: () => {
-            if (!filters.includes(item)) {
+            if (!intervalIds.includes(item)) {
               setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
+              setIntervals(intervalIds.concat([item]));
             }
           }
         }, item.name)
@@ -674,10 +711,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
       h('ul', result.lithologies.map((item) =>
         h('li', {
           onClick: () => {
-            if (!filters.includes(item)) {
+            if (!lithologyIds.includes(item)) {
               setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-              setLithologies([item.id].concat(lithologyIds));
+              setLithologies(lithologyIds.concat([item]));
             }
           }
         }, item.name)
@@ -862,7 +898,7 @@ function createFilteredItems(arr, set, setClose) {
           set(arr.filter((person) => person != item));
           if(arr.length == 1) {
             setClose(true);
-            set(null);
+            set([]);
 
             let previous = document.querySelectorAll('.filtered_pin');
             previous.forEach((marker) => {
@@ -873,4 +909,17 @@ function createFilteredItems(arr, set, setClose) {
       })
     ])
   })
+}
+
+function createFilteredNames(arr, section, set, setAutocompleteOpen) {
+  return arr[section].map((item) =>
+    h('li', {
+      onClick: () => {
+        if (!arr.includes(item)) {
+          setAutocompleteOpen(false);
+          set(arr.concat([item]));
+        }
+      }
+    }, item.name)
+  )
 }
