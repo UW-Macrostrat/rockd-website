@@ -23,6 +23,7 @@ import { MapPosition } from "@macrostrat/mapbox-utils";
 import { set } from "react-datepicker/dist/date_utils";
 import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 import { streamPipeNodeToString } from "vike/dist/esm/node/runtime/html/stream";
+import { query } from "express";
 
 const h = hyper.styled(styles);
 
@@ -542,6 +543,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const lithologyTypeParam = "=" + lithologyTypes.map(item => item.id).join(','); // doesn't exist
   const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
 
+  // develop query
   const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
   const finalParams = params
     .join('&');
@@ -549,30 +551,16 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const queryString = finalParams ? "/protected/checkins?" + finalParams : null //  + "&all=1";
   console.log("queryString", queryString);
 
+  // get data
   const data = useRockdAPI(queryString)?.success.data;
   console.log("data", data);
-
-  // filter data
-  /*
-  const lithData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
-  const person_data = getPersonCheckins(peopleIds?.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
-  const foundData = person_data && person_data.length > 0;
-
-  if(foundData) {
-    setFilteredCheckins(true);
-    setFilteredData(person_data);
-  } else {
-    setFilteredCheckins(false);
-    setFilteredData(null);
-  }
-  */
 
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
   let lats = [];
 
-  if(data && data.length > 0) {
+  if(data && data.length > 0 && queryString) {
     setFilteredCheckins(true);
     setFilteredData(data);
 
@@ -616,6 +604,11 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
         padding: 75
     });
   } else {
+    let previous = document.querySelectorAll('.filtered_pin');
+    previous.forEach((marker) => {
+      marker.remove();
+    });
+
     setFilteredCheckins(false);
     setFilteredData(null);
   }
