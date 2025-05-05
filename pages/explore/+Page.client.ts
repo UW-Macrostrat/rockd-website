@@ -527,7 +527,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [minerals, setMinerals] = useState([]);
 
   // filter data
-  const litData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
+  const lithData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
   const person_data = getPersonCheckins(peopleIds?.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
