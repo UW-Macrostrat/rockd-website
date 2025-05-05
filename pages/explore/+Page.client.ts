@@ -513,7 +513,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   const [close, setClose] = useState(false);  
 
   // test 
-  const [people, setPeople] = useState([]);
+  const [peopleIds, setPeople] = useState([]);
   const [taxa, setTaxa] = useState([]);
   const [intervals, setIntervals] = useState([]);
   const [lithologyIds, setLithologies] = useState([]);
@@ -527,7 +527,7 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
 
   // filter data
   const litData = getLithologyCheckins(lithologyIds.length > 0 ? lithologyIds.join(',') : null)?.success.data;
-  const person_data = getPersonCheckins(filters.length > 0 ? filters.map(item => item.id).join(',') : 0)?.success.data;
+  const person_data = getPersonCheckins(peopleIds.length > 0 ? peopleIds.map(item => item.id).join(',') : 0)?.success.data;
   const foundData = person_data && person_data.length > 0;
 
   if(foundData) {
@@ -620,26 +620,31 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
     ]),
   ]);
 
-  let filterContainer = filters.length != 0 ? h("div.filter-container", [
+  let filterContainer = peopleIds.length != 0 ? h("div.filter-container", [
     h('h2', "Filters"),
-    h('ul', filters.map((item) => {
-      return h("div.filter-item", [
-        h('li', item.name),
-        h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
-            setFilters(filters.filter((filter) => filter != item));
-            if(filters.length == 1) {
-              setClose(true);
-              setFilteredData(null);
+    h('ul', [
+        peopleIds.length > 0 ? h('div', [
+        h('h3', "People "),
+        peopleIds.map((item) => {
+          return h("li.filter-item", [ 
+            h('div', item.name),
+            h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
+                setPeople(peopleIds.filter((person) => person != item));
+                if(peopleIds.length == 1) {
+                  setClose(true);
+                  setFilteredData(null);
 
-              let previous = document.querySelectorAll('.filtered_pin');
-              previous.forEach((marker) => {
-                marker.remove();
-              });
-            }
-          } 
+                  let previous = document.querySelectorAll('.filtered_pin');
+                  previous.forEach((marker) => {
+                    marker.remove();
+                  });
+                }
+              } 
+            })
+          ])
         })
-      ])
-    })),
+      ]) : null,
+    ]),
   ]) : null; 
   
   if(!result || close) return h('div', {className: "autocomplete"}, [
@@ -782,9 +787,9 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
       h('ul', result.people.map((item) =>
         h('li', {
           onClick: () => {
-            if (!filters.includes(item)) {
+            if (!peopleIds.includes(item)) {
               setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
+              setPeople(peopleIds.concat([item]));
             }
           }
         }, item.name)
@@ -847,4 +852,25 @@ function getPersonCheckins(personId) {
 function getLithologyCheckins(lith_id) {
   // find way to return more than 5 checkins
   return useRockdAPI("/protected/checkins?lith_id=" + lith_id);
+}
+
+function createFilteredItems(arr, set, setClose) {
+  return arr.map((item) => {
+    return h("li.filter-item", [ 
+      h('div', item.name),
+      h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
+          set(arr.filter((person) => person != item));
+          if(arr.length == 1) {
+            setClose(true);
+            set(null);
+
+            let previous = document.querySelectorAll('.filtered_pin');
+            previous.forEach((marker) => {
+              marker.remove();
+            });
+          }
+        } 
+      })
+    ])
+  })
 }

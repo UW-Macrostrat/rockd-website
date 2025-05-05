@@ -306,18 +306,25 @@ body
   width: 100%
 
 
-.filter-item
-  display: flex
-  align-items: center
-  justify-content: space-between
-  padding-right: 10px
+.filter-container
+  h3
+    background-color: var(--accent-secondary-color)
+    padding: 5px 10px
+    margin: 0
+    border-top: solid var(--panel-background-color) 2px
 
-  li 
-    &:hover
-      background-color: var(--panel-background-color)
+  .filter-item
+    display: flex
+    align-items: center
+    justify-content: space-between
+    padding: 2px 20px
 
-  .red-cross
-    cursor: pointer
+    li 
+      &:hover
+        background-color: var(--panel-background-color)
+
+    .red-cross
+      cursor: pointer
 
 .loading-spinner
   margin-top: 50px
