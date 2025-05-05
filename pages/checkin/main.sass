@@ -73,8 +73,7 @@ h1, p
   object-fit: cover
 
 .stop-header
-  display: grid
-  grid-template-columns: 20% 80%
+  display: flex
   margin: auto
   position: absolute
   z-index: 2
@@ -84,19 +83,23 @@ h1, p
   align-items: center
   cursor: pointer
 
-.profile-picture
-  height: 100px
-  width: 100px
-  display: grid
-  margin: auto
-  margin-left: 50px
-  border-radius: 50%
+.profile-header
+  flex: 1
+  text-align: center
+
+  img
+    height: 100px
+    width: 100px
+    border-radius: 50%
 
 .stop-main-info
+  flex: 3
+  display: flex
+  flex-direction: column
   text-align: left
-  display: grid
-  margin: auto
-  margin-left: 0
+
+  h3
+    margin: 0
 
 .star
   height: 15px
