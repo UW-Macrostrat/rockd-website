@@ -1,7 +1,7 @@
 import hyper from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon, Divider } from "@blueprintjs/core";
+import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
@@ -419,17 +419,21 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
+      h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
           }}, [
-              h(Icon, { className: "satellite-icon", icon: "satellite"}),
-              h("p", "Satellite"),
+              h('div.btn-inside', [
+                h(Icon, { className: "satellite-icon", icon: "satellite"}),
+                h("p", "Satellite"),
+              ])
           ]),
-      h(PanelCard, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
+      h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
             setOverlay(!showOverlay);
           }}, [
-              h(Icon, { className: "overlay-icon", icon: "map"}),
-              h("p", "Overlay"),
+              h('div.btn-inside', [
+                h(Icon, { className: "overlay-icon", icon: "map"}),
+                h("p", "Overlay"),
+              ])
           ]),
     ]);
 }
