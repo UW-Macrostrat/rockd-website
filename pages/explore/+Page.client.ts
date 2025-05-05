@@ -7,7 +7,6 @@ import {
   MapAreaContainer,
   MapMarker,
   MapView,
-  PanelCard,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
@@ -20,14 +19,8 @@ import { createCheckins, useRockdAPI, Image } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { set } from "react-datepicker/dist/date_utils";
-import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
-import { streamPipeNodeToString } from "vike/dist/esm/node/runtime/html/stream";
-import { query } from "express";
 
 const h = hyper.styled(styles);
-
-let count = 0;
 
 export function Page() {
   return h(
@@ -179,7 +172,7 @@ function WeaverMap({
   );
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
-  const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
+  const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
   const autoComplete = h(AutoComplete, {setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
   const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
@@ -349,8 +342,6 @@ function FeatureDetails({setInspectPosition}) {
     setBounds(map.getBounds());
   }
 
-  count++;
-
   // Update bounds on move
   useEffect(() => {
     if(map) {
@@ -398,7 +389,7 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
     ]);
 }
 
-function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
+function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
       h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
@@ -500,16 +491,16 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
 
   // test 
   const [peopleIds, setPeople] = useState([]);
-  const [taxaIds, setTaxa] = useState([]);
-  const [intervalIds, setIntervals] = useState([]);
-  const [lithologyIds, setLithologies] = useState([]);
-  const [lithologyTypes, setLithologyTypes] = useState([]);
-  const [lithologyClasses, setLithologyClasses] = useState([]);
-  const [lithologyAttributes, setLithologyAttributes] = useState([]);
-  const [stratNameConcepts, setStratNameConcepts] = useState([]);
-  const [stratNameOrphans, setStratNameOrphans] = useState([]);
   const [structures, setStructures] = useState([]);
-  const [minerals, setMinerals] = useState([]);
+  const [lithologyAttributes, setLithologyAttributes] = useState([]);
+  const [stratNameOrphans, setStratNameOrphans] = useState([]);
+  const [lithologyIds, setLithologies] = useState([]);
+  const [taxaIds, setTaxa] = useState([]); // fails
+  const [intervalIds, setIntervals] = useState([]); // fails
+  const [stratNameConcepts, setStratNameConcepts] = useState([]); // fails
+  const [minerals, setMinerals] = useState([]); // fails
+  const [lithologyTypes, setLithologyTypes] = useState([]); // doesn't exist
+  const [lithologyClasses, setLithologyClasses] = useState([]); // doesn't exist
 
   const lithParam = "lith_id=" + lithologyIds.map(item => item.id).join(',');
   const peopleParam = "person_id=" + peopleIds.map(item => item.id).join(',');
@@ -651,31 +642,32 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   let results;
 
   if(autocompleteOpen) {
-    const intervals = renderSection("Intervals", "intervals", result?.intervals, setIntervals, intervalIds, setAutocompleteOpen);
     const lithologies = renderSection("Lithologies", "lithologies", result?.lithologies, setLithologies, lithologyIds, setAutocompleteOpen);
-    const lithology_types = renderSection("Lithology Types", "lithology_types", result?.lithology_types, setLithologyTypes, lithologyTypes, setAutocompleteOpen);
-    const lithology_classes = renderSection("Lithology Classes", "lithology_classes", result?.lithology_classes, setLithologyClasses, lithologyClasses, setAutocompleteOpen);
-    const lithology_attributes = renderSection("Lithology Attributes", "lithology_attributes", result?.lithology_attributes, setLithologyAttributes, lithologyAttributes, setAutocompleteOpen);
-    const strat_name_concepts = renderSection("Stratigraphic Name Concepts", "strat_name_concepts", result?.strat_name_concepts, setStratNameConcepts, stratNameConcepts, setAutocompleteOpen);
     const strat_name_orphans = renderSection("Stratigraphic Name Orphans", "strat_name_orphans", result?.strat_name_orphans, setStratNameOrphans, stratNameOrphans, setAutocompleteOpen);
     const structures_items = renderSection("Structures", "structures", result?.structures, setStructures, structures, setAutocompleteOpen);
-    const minerals_items = renderSection("Minerals", "minerals", result?.minerals, setMinerals, minerals, setAutocompleteOpen);
+    const lithology_attributes = renderSection("Lithology Attributes", "lithology_attributes", result?.lithology_attributes, setLithologyAttributes, lithologyAttributes, setAutocompleteOpen);
     const people = renderSection("People", "people", result?.people, setPeople, peopleIds, setAutocompleteOpen);
-    const taxa = renderSection("Taxa", "taxa", result?.taxa, setTaxa, taxaIds, setAutocompleteOpen);
+    // sections commented out that don't work or don't exist
+    // const intervals = renderSection("Intervals", "intervals", result?.intervals, setIntervals, intervalIds, setAutocompleteOpen);
+    // const lithology_types = renderSection("Lithology Types", "lithology_types", result?.lithology_types, setLithologyTypes, lithologyTypes, setAutocompleteOpen);
+    // const lithology_classes = renderSection("Lithology Classes", "lithology_classes", result?.lithology_classes, setLithologyClasses, lithologyClasses, setAutocompleteOpen);
+    // const strat_name_concepts = renderSection("Stratigraphic Name Concepts", "strat_name_concepts", result?.strat_name_concepts, setStratNameConcepts, stratNameConcepts, setAutocompleteOpen);
+    // const minerals_items = renderSection("Minerals", "minerals", result?.minerals, setMinerals, minerals, setAutocompleteOpen);
+    // const taxa = renderSection("Taxa", "taxa", result?.taxa, setTaxa, taxaIds, setAutocompleteOpen);
 
     // result
     results = h('div.results', [
       people,
-      taxa,
-      intervals,
       lithologies,
-      lithology_types,
-      lithology_classes,
       lithology_attributes,
-      strat_name_concepts,
       strat_name_orphans,
       structures_items,
-      minerals_items
+      // minerals_items,
+      // taxa,
+      // intervals,
+      // strat_name_concepts,
+      // lithology_types,
+      // lithology_classes,
     ]);
   }
 
