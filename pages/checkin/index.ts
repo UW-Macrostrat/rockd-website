@@ -40,7 +40,7 @@ export function Checkins({checkinID}) {
         lng: checkin.lng
     }
 
-    let profile_pic = h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-picture"});
+    let profile_pic = h('div.profile-header',h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-picture"}));
     
     // format rating
     let ratingArr = [];
