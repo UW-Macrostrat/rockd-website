@@ -1,13 +1,12 @@
 import hyper from "@macrostrat/hyper";
 
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon, Divider } from "@blueprintjs/core";
+import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
 import {
   MapAreaContainer,
   MapMarker,
   MapView,
-  PanelCard,
   buildInspectorStyle,
 } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
@@ -22,8 +21,6 @@ import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
 
 const h = hyper.styled(styles);
-
-let count = 0;
 
 export function Page() {
   return h(
@@ -108,7 +105,7 @@ function weaverStyle(type: object) {
             'text-field': ['get', 'n'],
             'text-size': 10,
             'text-allow-overlap': true,
-            'text-ignore-placement': false,
+            'text-ignore-placement': true,
         },
         paint: {
           "text-color": "#fff"
@@ -154,10 +151,7 @@ function WeaverMap({
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
-    let previousSelected = document.querySelectorAll('.selected_pin');
-    previousSelected.forEach((marker) => {
-      marker.remove();
-    });
+    deletePins('.selected_pin');
   }, []);
 
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
@@ -178,12 +172,10 @@ function WeaverMap({
   );
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
-  const contextPanel = h(ContextPanel, {showSettings, showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {showFilter, setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
+  const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
+  const autoComplete = h(AutoComplete, {setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
   const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
-
-  console.log("filteredData", filteredData);
 
   if(showFilter) {
     overlay = h('div.sidebox', [
@@ -198,11 +190,7 @@ function WeaverMap({
           setSettings(false);
           setFilteredCheckins(false);
           setFilteredData(null);
-          let previous = document.querySelectorAll('.filtered_pin');
-          previous.forEach((marker) => {
-            marker.remove();
-          }
-          );
+          deletePins('.filtered_pin');
         }
       }, "X"),
       h("div.overlay-div", [
@@ -239,11 +227,7 @@ function WeaverMap({
         className: "close-btn",
         onClick: () => {
           setSelectedCheckin(null);
-
-          let previousSelected = document.querySelectorAll('.selected_pin');
-          previousSelected.forEach((marker) => {
-            marker.remove();
-          });
+          deletePins('.selected_pin');
         }
       }, "X"),
       h("div.overlay-div", 
@@ -263,12 +247,6 @@ function WeaverMap({
   }
 
   if(style == null) return null;
-
-  const sidePanel = h("div.side-panel", [
-    autoComplete,
-    contextPanel,
-  ])
-
 
   const mapPosition: MapPosition = {
           camera: {
@@ -364,8 +342,6 @@ function FeatureDetails({setInspectPosition}) {
     setBounds(map.getBounds());
   }
 
-  count++;
-
   // Update bounds on move
   useEffect(() => {
     if(map) {
@@ -413,20 +389,24 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
     ]);
 }
 
-function ContextPanel({showSettings, showSatelite, setSatelite, showOverlay, setOverlay}) {
+function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
       h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(PanelCard, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
+      h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
             setSatelite(!showSatelite);
           }}, [
-              h(Icon, { className: "satellite-icon", icon: "satellite"}),
-              h("p", "Satellite"),
+              h('div.btn-inside', [
+                h(Icon, { className: "satellite-icon", icon: "satellite"}),
+                h("p", "Satellite"),
+              ])
           ]),
-      h(PanelCard, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
+      h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
             setOverlay(!showOverlay);
           }}, [
-              h(Icon, { className: "overlay-icon", icon: "map"}),
-              h("p", "Overlay"),
+              h('div.btn-inside', [
+                h(Icon, { className: "overlay-icon", icon: "map"}),
+                h("p", "Overlay"),
+              ])
           ]),
     ]);
 }
@@ -503,47 +483,66 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
-function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
+function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
-  const [filters, setFilters] = useState([]);
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
 
-  const person_data = getPersonCheckins(filters.length > 0 ? filters.map(item => item.id).join(',') : 0)?.success.data;
-  const foundData = person_data && person_data.length > 0;
+  // test 
+  const [peopleIds, setPeople] = useState([]);
+  const [structures, setStructures] = useState([]);
+  const [lithologyAttributes, setLithologyAttributes] = useState([]);
+  const [stratNameOrphans, setStratNameOrphans] = useState([]);
+  const [lithologyIds, setLithologies] = useState([]);
+  // const [taxaIds, setTaxa] = useState([]); // fails
+  // const [intervalIds, setIntervals] = useState([]); // fails
+  // const [stratNameConcepts, setStratNameConcepts] = useState([]); // fails
+  // const [minerals, setMinerals] = useState([]); // fails
+  // const [lithologyTypes, setLithologyTypes] = useState([]); // doesn't exist
+  // const [lithologyClasses, setLithologyClasses] = useState([]); // doesn't exist
 
-  console.log("person_data", person_data);
+  const lithParam = "lith_id=" + lithologyIds.map(item => item.id).join(',');
+  const peopleParam = "person_id=" + peopleIds.map(item => item.id).join(',');
+  const stratNameOrphanParam = "strat_name_orphan_id=" + stratNameOrphans.map(item => item.id).join(',');
+  const lithologyAttributeParam = "lith_att_id=" + lithologyAttributes.map(item => item.id).join(',');
+  const structureParam = "structure_id=" + structures.map(item => item.id).join(',');
+  // const taxaParam = "taxon_id=" + taxaIds.map(item => item.id).join(','); // fails
+  // const intervalParam = "int_id=" + intervalIds.map(item => item.id).join(','); // fails
+  // const stratNameConceptParam = "strat_name_concept_id=" + stratNameConcepts.map(item => item.id).join(','); // fails
+  // const mineralParam = "mineral_id=" + minerals.map(item => item.id).join(','); // fails
+  // const lithologyTypeParam = "=" + lithologyTypes.map(item => item.id).join(','); // doesn't exist
+  // const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
 
-  if(foundData) {
-    setFilteredCheckins(true);
-    setFilteredData(person_data);
-  } else {
-    setFilteredCheckins(false);
-    setFilteredData(null);
-  }
+  // develop query
+  const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
+  const finalParams = params
+    .join('&');
+
+  const queryString = finalParams ? "/protected/checkins?" + finalParams : null //  + "&all=1";
+  console.log("queryString", queryString);
+
+  // get data
+  const data = useRockdAPI(queryString)?.success.data;
+  console.log("data", data);
 
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
   let lats = [];
 
-  if(person_data && person_data.length > 0) {
-    person_data.forEach((checkin) => {
+  if(data && data.length > 0 && queryString) {
+    setFilteredCheckins(true);
+    setFilteredData(data);
+
+    data.forEach((checkin) => {
       coordinates.push([checkin.lng, checkin.lat]);
       lngs.push(checkin.lng);
       lats.push(checkin.lat);
     });
 
-    let previous = document.querySelectorAll('.filtered_pin');
-    previous.forEach((marker) => {
-      marker.remove();
-    });
-
-    let previousFeatured = document.querySelectorAll('.marker_pin');
-    previousFeatured.forEach((marker) => {
-      marker.remove();
-    });
+    deletePins('.filtered_pin');
+    deletePins('.marker_pin');
 
     if (!close) {
       let stop = 0;
@@ -568,6 +567,11 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
         duration: 0,
         padding: 75
     });
+  } else {
+    deletePins('.filtered_pin');
+
+    setFilteredCheckins(false);
+    setFilteredData(null);
   }
 
   // rest
@@ -594,37 +598,40 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
           setAutocompleteOpen(false);
           setClose(true);
           setFilteredData(null);
-          setFilters([]);
-
-          let previous = document.querySelectorAll('.filtered_pin');
-          previous.forEach((marker) => {
-            marker.remove();
-          });
+          deletePins('.filtered_pin');
         } 
       }),
     ]),
   ]);
 
-  let filterContainer = filters.length != 0 ? h("div.filter-container", [
-    h('h2', "Filters"),
-    h('ul', filters.map((item) => {
-      return h("div.filter-item", [
-        h('li', item.name),
-        h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
-            setFilters(filters.filter((filter) => filter != item));
-            if(filters.length == 1) {
-              setClose(true);
-              setFilteredData(null);
-
-              let previous = document.querySelectorAll('.filtered_pin');
-              previous.forEach((marker) => {
-                marker.remove();
-              });
-            }
-          } 
-        })
+  const sectionConfigs = [
+    { label: 'People', data: peopleIds, setter: setPeople },
+    { label: 'Strat Name Orphans', data: stratNameOrphans, setter: setStratNameOrphans },
+    { label: 'Structures', data: structures, setter: setStructures },
+    { label: 'Lithologies', data: lithologyIds, setter: setLithologies },
+    { label: 'Lithology Attributes', data: lithologyAttributes, setter: setLithologyAttributes },
+    // { label: 'Taxa', data: taxaIds, setter: setTaxa },
+    // { label: 'Intervals', data: intervalIds, setter: setIntervals },
+    // { label: 'Lithology Types', data: lithologyTypes, setter: setLithologyTypes },
+    // { label: 'Lithology Classes', data: lithologyClasses, setter: setLithologyClasses },
+    // { label: 'Strat Name Concepts', data: stratNameConcepts, setter: setStratNameConcepts },
+    // { label: 'Minerals', data: minerals, setter: setMinerals },
+  ];
+  
+  const sections = sectionConfigs
+    .filter(({ data }) => data.length > 0)
+    .map(({ label, data, setter }) =>
+      h('div', [
+        h('h3', label),
+        createFilteredItems(data, setter)
       ])
-    })),
+    );
+
+  const filterContainer = sections.length != 0 ? h("div.filter-container", [
+    h('h2', "Filters"),
+    h('ul', [
+      sections
+    ]),
   ]) : null; 
   
   if(!result || close) return h('div', {className: "autocomplete"}, [
@@ -632,39 +639,43 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   ]);
   result = result.success.data;
 
-  let taxa = result.taxa.length > 0  && autocompleteOpen ? h('div.taxa', [  
-      h('h2', "Taxa"),
-      h('ul', result.taxa.map((item) => {
-        return h('li', { 
-          onClick: () => { 
-            if(!filters.includes(item)) {
-              setAutocompleteOpen(false);
-              setFilters(filters.concat([item]));
-              console.log(item.id)
-            }
-          }
-        }, item.name);
-      }))
-    ]) : null;
+  let results;
 
-  let people = result.people.length > 0 && autocompleteOpen ? h('div.people', [  
-    h('h2', "People"),
-    h('ul', result.people.map((item) => {
-      return h('li', { 
-        onClick: () => { 
-          if(!filters.includes(item)) {
-            setAutocompleteOpen(false);
-            setFilters(filters.concat([item]));
-          }
-        }
-      }, item.name);
-    }))
-  ]) : null;
+  if(autocompleteOpen) {
+    const lithologies = renderSection("Lithologies", "lithologies", result?.lithologies, setLithologies, lithologyIds, setAutocompleteOpen);
+    const strat_name_orphans = renderSection("Stratigraphic Name Orphans", "strat_name_orphans", result?.strat_name_orphans, setStratNameOrphans, stratNameOrphans, setAutocompleteOpen);
+    const structures_items = renderSection("Structures", "structures", result?.structures, setStructures, structures, setAutocompleteOpen);
+    const lithology_attributes = renderSection("Lithology Attributes", "lithology_attributes", result?.lithology_attributes, setLithologyAttributes, lithologyAttributes, setAutocompleteOpen);
+    const people = renderSection("People", "people", result?.people, setPeople, peopleIds, setAutocompleteOpen);
+    // sections commented out that don't work or don't exist
+    // const intervals = renderSection("Intervals", "intervals", result?.intervals, setIntervals, intervalIds, setAutocompleteOpen);
+    // const lithology_types = renderSection("Lithology Types", "lithology_types", result?.lithology_types, setLithologyTypes, lithologyTypes, setAutocompleteOpen);
+    // const lithology_classes = renderSection("Lithology Classes", "lithology_classes", result?.lithology_classes, setLithologyClasses, lithologyClasses, setAutocompleteOpen);
+    // const strat_name_concepts = renderSection("Stratigraphic Name Concepts", "strat_name_concepts", result?.strat_name_concepts, setStratNameConcepts, stratNameConcepts, setAutocompleteOpen);
+    // const minerals_items = renderSection("Minerals", "minerals", result?.minerals, setMinerals, minerals, setAutocompleteOpen);
+    // const taxa = renderSection("Taxa", "taxa", result?.taxa, setTaxa, taxaIds, setAutocompleteOpen);
 
-  const results = h("div.results", [
-    taxa,
-    people,
-  ]);
+    // result
+    results = h('div.results', [
+      people,
+      lithologies,
+      lithology_attributes,
+      strat_name_orphans,
+      structures_items,
+      // minerals_items,
+      // taxa,
+      // intervals,
+      // strat_name_concepts,
+      // lithology_types,
+      // lithology_classes,
+    ]);
+  }
+
+  /*
+  useEffect(() => {
+    setLithologyData(useRockdAPI("/proctected/checkins?lith_id=" + lithologies.map(item => item.id).join(',') + "&all=100"));
+  }, [lithologies]);
+  */
 
   const wrapper = h('div.autocomplete-wrapper', [
     filterContainer,
@@ -677,6 +688,43 @@ function AutoComplete({showFilter, setFilteredCheckins, setFilteredData, autocom
   ]);
 }
 
-function getPersonCheckins(personId) {
-  return useRockdAPI("/protected/checkins?person_id=" + personId + "&all=100");
+function createFilteredItems(arr, set) {
+  return arr.map((item) => {
+    return h("li.filter-item", [ 
+      h('div', item.name),
+      h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
+          set(arr.filter((person) => person != item));
+        } 
+      })
+    ])
+  })
+}
+
+function createFilteredNames(result, set, existing, setAutocompleteOpen) {
+  return result.map((item) =>
+    h('li', {
+      onClick: () => {
+        if (!existing.includes(item)) {
+          setAutocompleteOpen(false);
+          set(existing.concat([item]));
+        }
+      }
+    }, item.name)
+  )
+}
+
+function deletePins(str) {
+  let previous = document.querySelectorAll(str);
+  previous.forEach((marker) => {
+    marker.remove();
+  });
+}
+
+function renderSection(label, key, resultList, setFn, existingIds, setAutocompleteOpen) {
+  return resultList?.length > 0
+    ? h(`div.${key}`, [
+        h('h2', label),
+        h('ul', createFilteredNames(resultList, setFn, existingIds, setAutocompleteOpen))
+      ])
+    : null;
 }
