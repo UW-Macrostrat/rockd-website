@@ -528,7 +528,6 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
     .join('&');
 
   const queryString = finalParams ? "/protected/checkins?" + finalParams + "&page=" + page : null //  + "&all=1";
-  console.log("queryString", queryString);
 
   // get data
   const data = useRockdAPI(queryString)?.success.data;
