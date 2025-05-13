@@ -145,7 +145,7 @@ function WeaverMap({
   const [filteredCheckins, setFilteredCheckins] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-
+  
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
 
@@ -309,7 +309,7 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   return actualStyle;
 }
 
-function getCheckins(lat1, lat2, lng1, lng2) {
+function getCheckins(lat1, lat2, lng1, lng2, page) {
   // abitrary bounds around click point
   let minLat = Math.floor(lat1 * 100) / 100;
   let maxLat = Math.floor(lat2 * 100) / 100;
@@ -320,22 +320,50 @@ function getCheckins(lat1, lat2, lng1, lng2) {
   return useRockdAPI("/protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
-    "&maxlng=" + maxLng);
+    "&maxlng=" + maxLng + 
+    "&page="  + page);
 }
 
 function FeatureDetails({setInspectPosition}) {
+  const [page, setPage] = useState(0);
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [bounds, setBounds] = useState(map?.getBounds());
   let checkins = [];
   let result;
 
+  const pages = h('div.pages', 
+    h('div.page-container', [
+      h('div', {
+        className: "page-btn",
+        onClick: () => {
+          setPage(page - 1);
+        }
+      }, [
+        h('div', { className: page != 0 ? 'btn-content' : 'hide'}, [
+          h(Icon, { icon: 'arrow-left' }),
+          h('p', "Previous"),
+        ])
+      ]),
+      h('p', 'Page ' + (page + 1)),
+      h('div', {
+        className: "page-btn",
+        onClick: () => {
+          setPage(page + 1);
+        }
+      }, [
+        h('p', "Next"),
+        h(Icon, { icon: 'arrow-right' }),
+      ]),
+    ])
+  );
+
   if(!map) {
-    result = getCheckins(40, 45, -60, -70);
+    result = getCheckins(40, 45, -60, -70, page);
   } else if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
   } else {
-    result = getCheckins(40, 45, -60, -70);
+    result = getCheckins(40, 45, -60, -70, page);
   }
 
   if (!bounds && map) {
@@ -367,7 +395,8 @@ function FeatureDetails({setInspectPosition}) {
   checkins = createCheckins(result, mapRef, setInspectPosition);
   
   return h("div", {className: 'checkin-container'}, [
-      h('div', checkins)
+      checkins,
+      pages
     ]);
 }
 
