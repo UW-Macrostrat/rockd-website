@@ -332,6 +332,36 @@ function FeatureDetails({setInspectPosition}) {
   let checkins = [];
   let result;
 
+  if(!map) {
+    result = getCheckins(40, 45, -60, -70, page);
+  } else if (bounds) {
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
+  } else {
+    result = getCheckins(40, 45, -60, -70, page);
+  }
+
+  if (!bounds && map) {
+    setBounds(map.getBounds());
+  }
+
+  // Update bounds on move
+  useEffect(() => {
+    if(map) {
+      const listener = () => {
+        setBounds(map.getBounds());
+        setPage(0);
+      };
+      map.on("moveend", listener);
+      return () => {
+        map.off("moveend", listener);
+      };
+    }
+  }, [bounds]);
+
+  if (result == null) return h(Spinner, { className: "loading-spinner" });
+  result = result.success.data;  
+
+  
   const pages = h('div.pages', 
     h('div.page-container', [
       h('div', {
@@ -352,39 +382,13 @@ function FeatureDetails({setInspectPosition}) {
           setPage(page + 1);
         }
       }, [
-        h('p', "Next"),
-        h(Icon, { icon: 'arrow-right' }),
+        h('div', { className: result.length == 5 ? 'btn-content' : 'hide'}, [
+          h('p', "Next"),
+          h(Icon, { icon: 'arrow-right' }),
+        ])
       ]),
     ])
   );
-
-  if(!map) {
-    result = getCheckins(40, 45, -60, -70, page);
-  } else if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
-  } else {
-    result = getCheckins(40, 45, -60, -70, page);
-  }
-
-  if (!bounds && map) {
-    setBounds(map.getBounds());
-  }
-
-  // Update bounds on move
-  useEffect(() => {
-    if(map) {
-      const listener = () => {
-        setBounds(map.getBounds());
-      };
-      map.on("moveend", listener);
-      return () => {
-        map.off("moveend", listener);
-      };
-    }
-  }, [bounds]);
-
-  if (result == null) return h(Spinner, { className: "loading-spinner" });
-  result = result.success.data;  
 
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
