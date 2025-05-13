@@ -15,7 +15,7 @@ import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../main.module.sass";
-import { createCheckins, useRockdAPI, Image } from "../index";
+import { createCheckins, useRockdAPI, Image, pageCarousel } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
@@ -362,33 +362,7 @@ function FeatureDetails({setInspectPosition}) {
   result = result.success.data;  
 
   
-  const pages = h('div.pages', 
-    h('div.page-container', [
-      h('div', {
-        className: "page-btn",
-        onClick: () => {
-          setPage(page - 1);
-        }
-      }, [
-        h('div', { className: page != 0 ? 'btn-content' : 'hide'}, [
-          h(Icon, { icon: 'arrow-left' }),
-          h('p', "Previous"),
-        ])
-      ]),
-      h('p', 'Page ' + (page + 1)),
-      h('div', {
-        className: "page-btn",
-        onClick: () => {
-          setPage(page + 1);
-        }
-      }, [
-        h('div', { className: result.length == 5 ? 'btn-content' : 'hide'}, [
-          h('p', "Next"),
-          h(Icon, { icon: 'arrow-right' }),
-        ])
-      ]),
-    ])
-  );
+  const pages = pageCarousel({page, setPage, result});
 
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
@@ -521,6 +495,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   const map = mapRef.current;
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
+  const [page, setPage] = useState(0);
 
   // test 
   const [peopleIds, setPeople] = useState([]);
@@ -552,7 +527,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   const finalParams = params
     .join('&');
 
-  const queryString = finalParams ? "/protected/checkins?" + finalParams : null //  + "&all=1";
+  const queryString = finalParams ? "/protected/checkins?" + finalParams + "&page=" + page : null //  + "&all=1";
   console.log("queryString", queryString);
 
   // get data

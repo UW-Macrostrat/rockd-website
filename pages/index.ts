@@ -204,3 +204,30 @@ export function getImageUrl(person_id, photo_id) {
 export function getProfilePicUrl(person_id) {
     return apiURL + "/protected/gravatar/" + person_id;
 }
+
+export function pageCarousel({page, setPage, result}) {
+    return h('div.pages', 
+        h('div.page-container', [
+          h('div', { className: "page-btn" }, [
+            h('div', { className: page != 0 ? 'btn-content' : 'hide',             
+                onClick: () => {
+                    setPage(page - 1);
+                }}, [
+              h(Icon, { icon: 'arrow-left' }),
+              h('p', "Previous"),
+            ])
+          ]),
+          h('p', 'Page ' + (page + 1)),
+          h('div', { className: "page-btn" }, [
+            h('div', { className: result.length == 5 ? 'btn-content' : 'hide',
+                onClick: () => {
+                    setPage(page + 1);
+                }
+            }, [
+              h('p', "Next"),
+              h(Icon, { icon: 'arrow-right' }),
+            ])
+          ]),
+        ])
+      );
+}
