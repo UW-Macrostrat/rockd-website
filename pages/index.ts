@@ -205,7 +205,9 @@ export function getProfilePicUrl(person_id) {
     return apiURL + "/protected/gravatar/" + person_id;
 }
 
-export function pageCarousel({page, setPage, result}) {
+export function pageCarousel({page, setPage, nextData}) {
+    console.log("params", nextData)
+
     return h('div.pages', 
         h('div.page-container', [
           h('div', { className: "page-btn" }, [
@@ -219,7 +221,7 @@ export function pageCarousel({page, setPage, result}) {
           ]),
           h('p', 'Page ' + (page + 1)),
           h('div', { className: "page-btn" }, [
-            h('div', { className: result.length == 5 ? 'btn-content' : 'hide',
+            h('div', { className: nextData && nextData?.success.data.length > 0 ? 'btn-content' : 'hide',
                 onClick: () => {
                     setPage(page + 1);
                 }
