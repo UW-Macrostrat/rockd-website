@@ -206,8 +206,6 @@ export function getProfilePicUrl(person_id) {
 }
 
 export function pageCarousel({page, setPage, nextData}) {
-    console.log("params", nextData)
-
     return h('div.pages', 
         h('div.page-container', [
           h('div', { className: "page-btn" }, [
