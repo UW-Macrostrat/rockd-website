@@ -331,13 +331,17 @@ function FeatureDetails({setInspectPosition}) {
   const [bounds, setBounds] = useState(map?.getBounds());
   let checkins = [];
   let result;
+  let nextData;
 
   if(!map) {
     result = getCheckins(40, 45, -60, -70, page);
+    nextData = getCheckins(40, 45, -60, -70, page + 1);
   } else if (bounds) {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
+    nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
   } else {
     result = getCheckins(40, 45, -60, -70, page);
+    nextData = getCheckins(40, 45, -60, -70, page + 1);
   }
 
   if (!bounds && map) {
@@ -362,7 +366,7 @@ function FeatureDetails({setInspectPosition}) {
   result = result.success.data;  
 
   
-  const pages = pageCarousel({page, setPage, result});
+  const pages = pageCarousel({page, setPage, nextData});
 
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
@@ -527,11 +531,10 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   const finalParams = params
     .join('&');
 
-  const queryString = finalParams ? "/protected/checkins?" + finalParams + "&page=" + page : null //  + "&all=1";
+  const queryString = finalParams ? "/protected/checkins?" + finalParams: null //  + "&all=1";
 
   // get data
-  const data = useRockdAPI(queryString)?.success.data;
-  console.log("data", data);
+  const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
 
   // add markers for filtered checkins
   let coordinates = [];
