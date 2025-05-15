@@ -328,7 +328,7 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
 }
 
 function FeatureDetails({setInspectPosition}) {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [bounds, setBounds] = useState(map?.getBounds());
@@ -498,12 +498,11 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
 }
 
 function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
-  console.log("called")
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   // test 
   const [peopleIds, setPeople] = useState([]);
@@ -552,6 +551,8 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   // get data
   const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
   const nextData = useRockdAPI(queryString + "&page=" + (page + 1))?.success.data;
+
+  console.log(queryString + "&page=" + page)
 
   // add markers for filtered checkins
   let coordinates = [];
@@ -632,6 +633,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
           setAutocompleteOpen(false);
           setClose(true);
           setFilteredData(null);
+          setPage(0);
           deletePins('.filtered_pin');
         } 
       }),
