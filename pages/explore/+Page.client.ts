@@ -542,7 +542,6 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   let lats = [];
 
   if(data && data.length > 0 && queryString) {
-    setFilteredCheckins(true);
     setFilteredData(data);
 
     data.forEach((checkin) => {
@@ -580,7 +579,6 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   } else {
     deletePins('.filtered_pin');
 
-    setFilteredCheckins(false);
     setFilteredData(null);
   }
 
