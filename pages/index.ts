@@ -206,6 +206,8 @@ export function getProfilePicUrl(person_id) {
 }
 
 export function pageCarousel({page, setPage, nextData}) {
+    console.log("page", page);
+    console.log("nextData", nextData);
     return h('div.pages', 
         h('div.page-container', [
           h('div', { className: "page-btn" }, [
@@ -219,7 +221,7 @@ export function pageCarousel({page, setPage, nextData}) {
           ]),
           h('p', 'Page ' + (page + 1)),
           h('div', { className: "page-btn" }, [
-            h('div', { className: nextData && nextData?.success.data.length > 0 ? 'btn-content' : 'hide',
+            h('div', { className: nextData && nextData?.length > 0 ? 'btn-content' : 'hide',
                 onClick: () => {
                     setPage(page + 1);
                 }
