@@ -13,12 +13,13 @@ import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import styles from "../main.module.sass";
 import { createCheckins, useRockdAPI, Image, pageCarousel } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 
 const h = hyper.styled(styles);
 
@@ -175,7 +176,8 @@ function WeaverMap({
   const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
   const autoComplete = h(AutoComplete, {setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
-  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
+  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData: filteredData?.current, setInspectPosition});
+  const filteredPages = pageCarousel({page: filteredData?.next.page, setPage: filteredData?.next.setPage, nextData: filteredData?.next.data});
 
   if(showFilter) {
     overlay = h('div.sidebox', [
@@ -197,6 +199,7 @@ function WeaverMap({
         h('div.autocomplete-container', [
           autoComplete,
           filteredData && !autocompleteOpen ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
+          filteredData && !autocompleteOpen ? filteredPages : null
         ])
       ]),
     ])
@@ -366,7 +369,7 @@ function FeatureDetails({setInspectPosition}) {
   result = result.success.data;  
 
   
-  const pages = pageCarousel({page, setPage, nextData});
+  const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
 
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
@@ -495,6 +498,7 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
 }
 
 function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
+  console.log("called")
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [input, setInput] = useState('');
@@ -528,59 +532,81 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
 
   // develop query
   const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
-  const finalParams = params
-    .join('&');
+  const finalParams = useMemo(() => {
+  const params = [
+      lithParam,
+      peopleParam,
+      lithologyAttributeParam,
+      stratNameOrphanParam,
+      structureParam
+    ].filter(param => /\d/.test(param));
 
-  const queryString = finalParams ? "/protected/checkins?" + finalParams: null //  + "&all=1";
+    return params.join('&');
+  }, [lithologyIds, peopleIds, lithologyAttributes, stratNameOrphans, structures]);
+
+  const queryString = useMemo(() => {
+    return finalParams ? `/protected/checkins?${finalParams}` : null;
+  }, [finalParams]);
+
 
   // get data
   const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
+  const nextData = useRockdAPI(queryString + "&page=" + (page + 1))?.success.data;
 
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
   let lats = [];
 
-  if(data && data.length > 0 && queryString) {
-    setFilteredData(data);
-
-    data.forEach((checkin) => {
-      coordinates.push([checkin.lng, checkin.lat]);
-      lngs.push(checkin.lng);
-      lats.push(checkin.lat);
-    });
-
-    deletePins('.filtered_pin');
-    deletePins('.marker_pin');
-
-    if (!close) {
-      let stop = 0;
-      coordinates.forEach((coord) => {
-        stop++;
-        // marker
-        const el = document.createElement('div');
-        el.className = 'filtered_pin';
-
-        // Create marker
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
+  useEffect(() => {
+    if(data && data.length > 0 && queryString) {
+      setFilteredData({
+        current: data,
+        next: {
+          data: nextData,
+          page: page,
+          setPage: setPage
+        }
       });
+
+      data.forEach((checkin) => {
+        coordinates.push([checkin.lng, checkin.lat]);
+        lngs.push(checkin.lng);
+        lats.push(checkin.lat);
+      });
+
+      deletePins('.filtered_pin');
+      deletePins('.marker_pin');
+
+      if (!close) {
+        let stop = 0;
+        coordinates.forEach((coord) => {
+          stop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'filtered_pin';
+
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
+
+      map.fitBounds([
+          [ Math.max(...lngs), Math.max(...lats) ],
+          [ Math.min(...lngs), Math.min(...lats) ]
+      ], {
+          maxZoom: 12,
+          duration: 0,
+          padding: 75
+      });
+    } else {
+      deletePins('.filtered_pin');
+
+      setFilteredData(null);
     }
-
-    map.fitBounds([
-        [ Math.max(...lngs), Math.max(...lats) ],
-        [ Math.min(...lngs), Math.min(...lats) ]
-    ], {
-        maxZoom: 12,
-        duration: 0,
-        padding: 75
-    });
-  } else {
-    deletePins('.filtered_pin');
-
-    setFilteredData(null);
-  }
+  }, [data, nextData, queryString]);
 
   // rest
   const handleInputChange = (event) => {
