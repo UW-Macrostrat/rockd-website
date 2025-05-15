@@ -209,7 +209,7 @@ export function pageCarousel({page, setPage, nextData}) {
     return h('div.pages', 
         h('div.page-container', [
           h('div', { className: "page-btn" }, [
-            h('div', { className: page != 0 ? 'btn-content' : 'hide',             
+            h('div', { className: page != 1 ? 'btn-content' : 'hide',             
                 onClick: () => {
                     setPage(page - 1);
                 }}, [

@@ -356,7 +356,7 @@ function FeatureDetails({setInspectPosition}) {
     if(map) {
       const listener = () => {
         setBounds(map.getBounds());
-        setPage(0);
+        setPage(1);
       };
       map.on("moveend", listener);
       return () => {
@@ -614,6 +614,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
     setAutocompleteOpen(true);
     setInput(event.target.value); 
     setClose(false);
+    setPage(1);
   };
 
   let result = null;
@@ -633,7 +634,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
           setAutocompleteOpen(false);
           setClose(true);
           setFilteredData(null);
-          setPage(0);
+          setPage(1);
           deletePins('.filtered_pin');
         } 
       }),
