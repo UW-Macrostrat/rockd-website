@@ -19,7 +19,6 @@ import { createCheckins, useRockdAPI, Image, pageCarousel } from "../index";
 import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { configDefinitionsBuiltInGlobal } from "vike/dist/esm/node/plugin/plugins/importUserCode/v1-design/getVikeConfig/configDefinitionsBuiltIn";
 
 const h = hyper.styled(styles);
 
@@ -143,7 +142,6 @@ function WeaverMap({
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
-  const [filteredCheckins, setFilteredCheckins] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
   
@@ -158,23 +156,14 @@ function WeaverMap({
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   let overlay;
 
-  const LngLatProps = {
-    position: {
-        lat: inspectPosition?.lat ?? 0,
-        lng: inspectPosition?.lng ?? 0
-    },
-    precision: 3,
-    zoom: 10
-  };
-
   // handle selected checkins
   const checkinData = useRockdAPI(
-    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` : null
+    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` :  `/protected/checkins?checkin_id=0`
   );
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
+  const autoComplete = h(AutoComplete, {setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
   const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData: filteredData?.current, setInspectPosition});
   const filteredPages = pageCarousel({page: filteredData?.next.page, setPage: filteredData?.next.setPage, nextData: filteredData?.next.data});
@@ -190,7 +179,6 @@ function WeaverMap({
         onClick: () => {
           setFilter(false);
           setSettings(false);
-          setFilteredCheckins(false);
           setFilteredData(null);
           deletePins('.filtered_pin');
         }
@@ -267,7 +255,7 @@ function WeaverMap({
         MapAreaContainer,
         {
           className: "map-area-container",
-          style: { "padding-left": "calc(30% + 14px)",},
+          style: { "paddingLeft": "calc(30% + 14px)",},
         },
         [
           h(MapView, { style, mapboxToken, mapPosition }, [
@@ -497,7 +485,7 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
-function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
+function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [input, setInput] = useState('');
@@ -530,7 +518,6 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   // const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
 
   // develop query
-  const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
   const finalParams = useMemo(() => {
   const params = [
       lithParam,
@@ -551,6 +538,9 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   // get data
   const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
   const nextData = useRockdAPI(queryString + "&page=" + (page + 1))?.success.data;
+
+  console.log("current", data)
+  console.log("next", nextData)
 
   console.log(queryString + "&page=" + page)
 
@@ -660,7 +650,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
     .map(({ label, data, setter }) =>
       h('div', [
         h('h3', label),
-        createFilteredItems(data, setter)
+        createFilteredItems(data, setter, setPage)
       ])
     );
 
@@ -725,12 +715,13 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   ]);
 }
 
-function createFilteredItems(arr, set) {
+function createFilteredItems(arr, set, setPage) {
   return arr.map((item) => {
     return h("li.filter-item", [ 
       h('div', item.name),
       h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
           set(arr.filter((person) => person != item));
+          setPage(1);
         } 
       })
     ])
