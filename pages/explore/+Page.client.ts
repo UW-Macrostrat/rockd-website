@@ -14,13 +14,10 @@ import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
-import styles from "../main.module.sass";
+import h from "./main.module.sass";
 import { createCheckins, useRockdAPI, Image, pageCarousel } from "../index";
-import "./main.sass";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-
-const h = hyper.styled(styles);
 
 export function Page() {
   return h(
