@@ -1,6 +1,6 @@
 import h from "./layout.module.sass";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
+import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
@@ -19,6 +19,8 @@ const handleClick = (e) => {
 };
 
 export function Footer() {
+    const isDarkMode = useDarkMode().isEnabled;
+
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
             h("h3", {className: "footer-text upper"}, [
@@ -35,29 +37,29 @@ export function Footer() {
         h("div", {className: "footer-links"},[
             h("ul", [
                 h("li", h("a", {href: "/", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "home", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "home", style: {color: 'white'}}),
                     h('p', "Home")
                 ])),
                 h("li", h("a", {href: "/explore", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "geosearch", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "geosearch", style: {color: 'white'}}),
                     h('p', "Explore")
                 ])),
                 h("li", h("a", {href: "/trip/1", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "route", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "route", style: {color: 'white'}}),
                     h('p', "Trip")
                 ])),
             ]),
             h("ul", [
                 h("li", h("a", {href: "/metrics", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "chart", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""), icon: "chart", style: {color: 'white'}}),
                     h('p', "Metrics")
                 ])),
                 h("li", h("a", {href: "/terms", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "manual", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "manual", style: {color: 'white'}}),
                     h('p', "Terms and Conditions")
                 ])),
                 h("li", h("a", {href: "/privacy", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "lock", style: {color: 'white'}}),
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "lock", style: {color: 'white'}}),
                     h('p', "Privacy")
                 ])),
             ]),
