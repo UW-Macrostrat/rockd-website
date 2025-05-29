@@ -1,13 +1,11 @@
-import hyper from "@macrostrat/hyper";
+import h from "./main.module.sass";
 import { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from "../index";
-import styles from "../main.module.sass";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import "./main.sass";
 import { Divider, Icon, Spinner } from "@blueprintjs/core";
 import {
   MapAreaContainer,
@@ -16,8 +14,6 @@ import {
   PanelCard,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
-
-const h = hyper.styled(styles);
 
 export function Trips({trip}) {
     const [showSatelite, setSatelite] = useState(false);
