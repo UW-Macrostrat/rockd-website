@@ -1,20 +1,16 @@
-import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useEffect, useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, imageExists, Footer, getProfilePicUrl, useRockdAPI, getImageUrl } from "../index";
 import { Icon } from "@blueprintjs/core";
-import styles from "../main.module.sass";
+import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
-import "./main.sass";
 import "@macrostrat/style-system";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
 import { LithologyList } from "@macrostrat/data-components";
-
-const h = hyper.styled(styles);
 
 export function Checkins({checkinID}) {
     const checkinData = useRockdAPI("/protected/checkins?checkin_id=" + checkinID);

@@ -1,4 +1,3 @@
-import hyper from "@macrostrat/hyper";
 import { useEffect, useState, PureComponent } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,12 +11,10 @@ import {
     ResponsiveContainer,
   } from "recharts";
 import { Footer, useRockdAPI } from "../index";
-import "./main.sass";
-import styles from "../main.module.sass";
+import h from "./main.module.sass";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SETTINGS } from "@macrostrat-web/settings";
 
-const h = hyper.styled(styles);
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
     const firstDayOfYear = new Date(year, 0, 1);
