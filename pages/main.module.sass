@@ -49,277 +49,263 @@ body
   background-color: var(--panel-background-color)
   box-shadow: 0 0 0 1px var(--card-shadow-color)
 
-.footer
-  display: flex
-  background-color: var(--panel-background-color)
-  text-align: center
-  color: var(--panel-text)
-  padding: 25px 0
-  height: 25vh
-  border-top: 2px solid var(--panel-text)
-  padding: 0 20%
-
-  ul
-    list-style-type: none
-    display: flex
-    gap: 10px
-    flex-direction: column
-
-    li
-      p
-        margin-bottom: 0
-
-  a
-    color: var(--panel-text)
-    font-weight: bold
-
-  a:hover
-    color: var(--panel-text)
-
-  .footer-text
-    font-size: 24px
-    font-weight: 500
-
-    .upper
-      margin-bottom: 0
-
-    a 
-      color: var(--panel-text)
-
-      &:hover
-        color: var(--panel-text)
-
-  .titles
-    display: flex
-    justify-content: center
-    gap: 30px
-    height: 25vh
-    flex-direction: column
-    width: 100%
-
-    h3
-      margin: 0
-  
-  .footer-links
-    display: flex
-    width: 100%
-    color: var(--text-emphasized-color)
-    margin: 0
-    justify-content: center
-    align-items: center
-    padding-inline-start: 0px
-
-    .footer-icon
-      filter: var(--anti-img-color)
-
-    a 
-      color: var(--panel-text)
-      display: flex
-      gap: 5px
-
-      &:hover
-        color: var(--panel-text)
-
-.row
+// Global Styles
+body, html
+  height: 100vh
   width: 100%
+  overflow-y: auto
 
-.checkin
-  background-color: var(--panel-background-color)
-  color: black
-  text-align: left
-  border: solid var(--card-shadow-color) 1px
-  padding: 6px 15px
-  padding-top: 2px
-  font-size: 14px
-  color: var(--text-emphasized-color)
-  margin-top: 10px
-  cursor: pointer
+p
+  line-height: 20px
 
-  &:hover 
-    border: solid var(--text-emphasized-color) 1px
+a
+  color: #fff
+  font-weight: bold
+  &:hover
+    color: #fff
+    text-decoration: underline
 
-  .description
-    padding: 0
-
-  h3
-    color: var(--text-emphasized-color)
-
-  a
-    color: black
-    text-decoration: none
-
-    &:hover
-      color: black
-
-  .star
-    height: 15px
-
-  .checkin-header
-    display: flex
-
-  .checkin-name
-    font-size: 20px
-    font-weight: 500
-    color: #333
-    margin-bottom: 0
-
-  .profile-pic
-    height: 80px
-    width: 80px
-    border-radius: 50%
-    display: inline-block
-    margin-right: 10px
-
-  .box-header
-    display: flex
-
-  .checkin-info
-    display: grid
-    margin: auto
-    margin-left: 0
-    margin-right: 0
-    p
-      padding: 0
-
-  h3, h4, p
-    margin: 0
-
-  .checkin-link
-    position: relative
-
-    .image-details
-      position: absolute
-      top: -150px
-      left: 0
-      right: 0
-      bottom: 0
-      display: flex
-      justify-content: center
-      align-items: center
-      display: none
-      color: white
-
-    .observation-img
-      margin-top: 10px
-      width: 100%
-      height: 150px
-      object-fit: cover
-      border-radius: 2%
-
-    &:hover
-      .observation-img
-        -webkit-filter: brightness(70%)
-      .image-details
-        display: flex
-
-  .description
-    margin-top: 10px
-
-  .no-image
-    color: var(--panel-text)
-    display: flex
-    justify-content: center
-    align-items: center
-    gap: 10px
-    marigin: 0
-
-    .details-image
-      filter: var(--anti-img-color)
-
-.checkin-footer
-  display: flex
-  justify-content: center
-
-  svg
-    filter: var(--anti-img-color)
-
-  .likes-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    justify-content: end
-    place-items: center
-
-  .comments-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    place-items: center
-
-  .observations-container
-    display: grid
-    grid-template-columns: 50% 50%
-    width: 25%
-    place-items: center
-
-.marker
-  height: 7vh
-  display: grid
-  margin: auto
-  margin-right: 0
-
-.details-image
-  width: 40px
-  margin-left: 10px
-  margin-top: 4px
-
-.checkin-info
-  display: grid
-  margin: auto
-  margin-left: 0
-
-.checkin-header
-  display: flex
-
-.description
-  margin-top: 10px
-
-.marker_container
-  position: relative
-  height: 7vh
-  margin-right: 10px
-
-  .marker-number
-    position: absolute
-    font-weight: bold
-    font-size: 16px
-    transform: translate(-50%, -50%)
-    top: 40%
-    left: 48%
-    color: white
-
-  .circle-number
-    position: absolute
-    font-weight: bold
-    font-size: 16px
-    transform: translate(-50%, -50%)
-    top: 50%
-    left: 50%
-    color: white
-
-.dark-mode
+// New Container
+.new_container
+  height: 100vh
+  width: 100%
   display: flex
   align-items: center
-
-.pages
-  margin: 10px 0
-  width: 100%
-  display: flex
-  text-align: center
   justify-content: center
 
-  .page-container
+// Headline Align
+.headline-alligner
+  display: flex
+  align-items: center
+  justify-content: center
+  height: 100%
+
+// Center Content
+.center
+  text-align: center
+  line-height: 35px
+  margin: auto
+
+  p
+    color: white
+    a
+      font-size: 17px
+      color: #dddddd
+
+    a:hover
+      color: white
+
+  h1
+    color: white
+    a
+      font-size: 40px
+      color: #dddddd
+
+    a:hover
+      color: white
+
+// Images
+img
+  width: 100%
+
+.dashboard-img-container
+  width: 100%
+  display: flex
+  flex-flow: row wrap
+  justify-content: center
+  margin-top: 40px
+
+  img
+    max-width: 160px
+
+.not-huge
+  max-width: 500px
+
+.row-eq-height
+  display: -webkit-box
+  display: -webkit-flex
+  display: -ms-flexbox
+  display: flex
+
+// Download Badge
+.download-badge
+  height: 60px
+  width: auto
+
+.ios
+  height: 40px
+
+// Map Shot
+.map-shot
+  object-fit: cover
+  padding: 0
+  height: 100%
+  background-size: cover
+  background-repeat: no-repeat
+
+// Half Height Row
+.half-height-row
+  height: 50%
+
+.no-padding
+  padding: 0
+
+// White Container
+.white-container
+  background-color: #fff
+  color: #777
+
+  a
+    color: #000
+    font-weight: bold
+
+    &:hover
+      color: #000
+      text-decoration: underline
+
+// Red Rock
+.red_rock
+  height: 100vh
+
+// Stats Container
+.stats-img
+  height: 500px
+  width: auto
+
+.stats-container
+  text-align: center
+
+.record-block
+  padding-top: 40px
+  padding-bottom: 40px
+  padding-right: 20px
+  padding-left: 20px
+  overflow-x: hidden
+  background-color: #363434
+
+.record-img
+  height: 500px
+  width: auto
+
+.record-img-caption
+  margin-top: 10px
+  font-size: 90%
+  background-color: rgba(100, 100, 100, 0.5)
+  padding: 10px
+  border-radius: 4px
+
+// Full Width/Height
+.full-width
+  width: 100%
+
+.full-height
+  height: 100%
+
+// Footer
+.footer
+  padding: 0 5%
+
+// Mask
+.mask
+  height: 100%
+  width: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 0 20px
+  background-color: rgba(0, 0, 0, 0.6)
+
+// Center Me
+.center-me
+  display: flex
+  align-items: center
+  justify-content: center
+
+// Explore Link
+.explore-link
+  font-weight: 400
+  color: #dddddd
+
+// Background Image
+.back-img
+  position: absolute
+  z-index: 1
+
+.img-container
+  position: absolute
+  z-index: 2
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+  padding: 30px
+
+.main-content
+  position: absolute
+  z-index: 2
+  background-color: rgba(0, 0, 0, 0.6)
+  height: 100vh
+  width: 100%
+
+.start-img
+  height: 100vh
+  width: 100%
+  object-fit: cover
+
+.red-rock-img
+  object-fit: cover
+  height: 100vh
+
+.profile-img
+  width: 300px
+
+.record-block-img
+  width: 300px
+
+.map-imgs
+  display: grid
+  grid-template-columns: 50% 50%
+  grid-template-rows: 25vh 25vh
+
+.curious
+  h1
+    color: #363434
+  p
+    color: #363434
+
+.side
+  display: grid
+  grid-template-columns: 50% 50%
+  margin: auto
+
+.main-img
+  width: 70%
+
+.image-grid
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+
+  .col-sm-6
+    padding: 30px
+
+.download-buttons
+  display: grid
+  margin: auto
+  grid-template-columns: 50% 50%
+
+  a
     display: grid
-    grid-template-columns: 100px 50px 100px
-    color: var(--text-emphasized-color)
+    margin: auto
 
-    .btn-content
-      display: flex
-      gap: 5px
-      align-items: center
-      justify-content: center
-      cursor: pointer
+.main-page
+  position: relative
 
-    p 
-      margin: 0
-      text-align: center
+.left
+  margin-right: 5%
+
+.right
+  margin-left: 5%
+
+.maps-container
+  padding: 0 10%
+  background-color: #363434
