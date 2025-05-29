@@ -1,17 +1,13 @@
-import hyper from "@macrostrat/hyper";
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, imageExists, Image, getImageUrl, useRockdAPI } from "../index";
 import { Icon } from "@blueprintjs/core";
-import styles from "../main.module.sass";
-import "./main.sass";
+import h from "./main.module.sass";
 import "@macrostrat/style-system";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { LithologyList } from "@macrostrat/data-components";
 import { DarkModeButton } from "@macrostrat/ui-components";
-
-const h = hyper.styled(styles);
 
 export function Photos({photoID}) {
     const [showBody, setBody] = useState(true);
