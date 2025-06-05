@@ -15,27 +15,14 @@ import {
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
 
-export function Trips({trip}) {
+export function Trips({data}) {
     const [showSatelite, setSatelite] = useState(false);
-    const userData = useRockdAPI("/trips/" + trip);
+    console.log("Trips data:", data);
 
     const style = useMapStyle({showSatelite});
 
-    if (!userData) {
-        return h("div", { className: 'loading' }, [
-            h("h1", "Loading trip..."),
-        ]);
-    }
-
-    if (userData.success.data.length == 0) {
-        return h("div", { className: 'error' }, [
-            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
-            h("h1", "Trip " + trip + " not found!"),  
-        ]);
-    }
-
     // format date
-    const data = userData.success.data[0];
+    const trip = data.trip_id;
     let date = new Date(data.updated);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     data.updated = date.toLocaleDateString('en-US', options);
