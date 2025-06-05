@@ -71,6 +71,7 @@ export function Footer() {
 }
 
 export function createCheckins(result, mapRef, setInspectPosition) {
+    const isDarkMode = useDarkMode().isEnabled;
     let checkins = [];
     const map = mapRef?.current;
 
@@ -157,15 +158,15 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                 ]),
                 h('div', {className: 'checkin-footer'}, [
                 h('div', {className: 'likes-container'}, [
-                    h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
+                    h(Icon, {className: 'likes-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "thumbs-up", style: {color: 'white'}}),
                     h('h3', {className: 'likes'}, checkin.likes),
                 ]),
                 h('div', {className: 'observations-container'}, [
-                    h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
+                    h(Icon, {className: 'observations-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "camera", style: {color: 'white'}}),
                     h('h3', {className: 'likes'}, checkin.observations.length),
                 ]),
                 h('div', {className: 'comments-container'}, [
-                    h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
+                    h(Icon, {className: 'comments-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "comment", style: {color: 'white'}}),
                     h('h3', {className: 'comments'}, checkin.comments),
                 ])
             ]),
