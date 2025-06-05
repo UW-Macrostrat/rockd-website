@@ -1,9 +1,9 @@
 import h from "@macrostrat/hyper";
-import { usePageContext } from 'vike-react/usePageContext';
 import { Trips } from "../index"; 
+import { useData } from "vike-react/useData";
 
 export function Page() {
-    const pageContext = usePageContext();
-    const trip = parseInt(pageContext.urlParsed.pathname.split("/")[2]);
-    return h(Trips, { trip});
+    const { data } = useData();
+
+    return h(Trips, { data: data.success.data[0]});
 }
