@@ -48,25 +48,24 @@ export function Trips({data}) {
 
 
     return h("div", {className: 'body'}, [
-            h(
-                "div.map-container",
+        h(
+            "div.map-container",
+            [
+                // The Map Area Container
+                h(
+                MapAreaContainer,
+                {
+                    className: "map-area-container",
+                    style: { 'padding-right': "calc(30% + 14px)"},
+                },
                 [
-                  // The Map Area Container
-                  h(
-                    MapAreaContainer,
-                    {
-                      className: "map-area-container",
-                      style: { 'padding-right': "calc(30% + 14px)"},
-                    },
-                    [
-                        h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
-                        ]),
-                        sidebar,
-                    ]
-                  ),
+                    h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }),
+                    sidebar,
                 ]
-              ),
-            toolbar,
+                ),
+            ]
+            ),
+        toolbar,
     ]);
 }
 
@@ -123,10 +122,25 @@ function SideBar({data}) {
 
         const count = index + 1;
         const el = document.createElement('div');
-        el.className = 'pin';
+        el.style.backgroundImage = 'url("https://storage.macrostrat.org/assets/rockd/marker_red.png")';
+        el.style.width = '60px';
+        el.style.height = '60px';
+        el.style.backgroundSize = '50%';
+        el.style.display = 'block';
+        el.style.border = 'none';
+        el.style.cursor = 'pointer';
+        el.style.backgroundRepeat = 'no-repeat';
+        el.style.backgroundPosition = 'center';
 
         const number = document.createElement('span');
         number.innerText = count;
+        number.style.position = 'absolute';
+        number.style.top = '45%';
+        number.style.left = '49%';
+        number.style.transform = 'translate(-50%, -50%)';
+        number.style.color = 'white';
+        number.style.fontSize = '12px';
+        number.style.fontWeight = 'bold';
 
         // Append the number to the marker
         el.appendChild(number);
