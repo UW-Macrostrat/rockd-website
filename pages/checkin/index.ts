@@ -238,7 +238,7 @@ function Map({center, showMap, setShowMap}) {
             ]
           ),
         h('div', {className: 'banner'}, [
-            h(Icon, {className: "banner-arrow", icon: "arrow-left", iconSize: "4vh", style: {color: 'black'}, onClick: () => {
+            h(Icon, {className: "banner-arrow", icon: "arrow-left", iconSize: "3vh", style: {color: 'white'}, onClick: () => {
                 setShowMap(!showMap);
               }}),
             h(PanelCard, {className: "banner-button", onClick: () => {
