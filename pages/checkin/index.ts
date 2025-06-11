@@ -12,25 +12,10 @@ import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
 import { LithologyList } from "@macrostrat/data-components";
 
-export function Checkins({checkinID}) {
-    const checkinData = useRockdAPI("/protected/checkins?checkin_id=" + checkinID);
+export function Checkins({checkin}) {
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [showMap, setShowMap] = useState(false);
 
-    if (!checkinData) {
-        return h("div", { className: 'loading' }, [
-            h("h1", "Loading checkin..."),
-        ]);       
-    }
-
-    if (checkinData.success.data.length == 0) {
-        return h("div", { className: 'error' }, [
-            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
-            h("h1", "Checkin " + checkinID + " not found!"),  
-        ]); 
-    }
-
-    const checkin = checkinData.success.data[0];
     const center = {
         lat: checkin.lat,
         lng: checkin.lng
