@@ -1,4 +1,4 @@
-import { Image, Footer } from "../index";
+import { Footer } from "~/components/general";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 
@@ -70,6 +70,6 @@ export function Page() {
               ])
             ])
           ]),
-        h(Footer)
+          h(Footer)
     ]);
 }

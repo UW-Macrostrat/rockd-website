@@ -1,4 +1,4 @@
-import { Image, Footer } from "./index";
+import { Image, Footer } from "~/components/general";
 import "@macrostrat/style-system";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
