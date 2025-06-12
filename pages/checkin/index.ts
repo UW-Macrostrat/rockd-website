@@ -1,7 +1,7 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Footer, getProfilePicUrl, useRockdAPI, getImageUrl } from "../index";
+import { BlankImage, imageExists, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";

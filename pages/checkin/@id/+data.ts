@@ -1,12 +1,8 @@
-import { rockdApiURL } from "@macrostrat-web/settings";
-
+import { fetchAPIData } from "~/components/general";
 
 export async function data(pageContext) {
-    const checkin = await fetch(
-        `${rockdApiURL}/protected/checkins?checkin_id=${pageContext.routeParams.id}`
-    ).then((response) => {
-        return response.json();
-    });
+    const id = pageContext.routeParams.id;
+    const checkin = await fetchAPIData(`/protected/checkins?checkin_id=${id}`)
 
     return { checkin: checkin.success.data[0] };
 }
