@@ -391,66 +391,6 @@ function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
     ]);
 }
 
-function ClickedCheckins({setSelectedCheckin}) {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-
-  useEffect(() => {
-    if (!map) return;
-
-    const handleClick = (e) => {
-      const cluster = map.queryRenderedFeatures(e.point, {
-        layers: ['clusters']
-      });
-
-      if(cluster.length > 0) {
-        const zoom = cluster[0].properties.expansion_zoom;
-        console.log("cluster", cluster[0]);
-
-        console.log("zoom", zoom);
-
-        map.flyTo({
-          center: cluster[0].geometry.coordinates,
-          zoom: zoom + 2,
-          speed: 0.5,
-        });
-      }
-
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: ['unclustered-point']
-      });
-
-      if (features.length > 0) {
-        const checkinId = features[0].properties.id;
-
-        // add marker
-        const coord = features[0].geometry.coordinates.slice();
-        console.log("coordinates", coord);
-
-        const el = document.createElement('div');
-        el.className = 'selected_pin';
-
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
-
-        console.log("data", features[0]);
-        setSelectedCheckin(checkinId);
-      } else {
-        setSelectedCheckin(null); 
-      }
-    };
-
-    map.on('click', handleClick);
-
-    return () => {
-      map.off('click', handleClick);
-    };
-  }, [map]);
-
-  return null;
-}
-
 function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
 

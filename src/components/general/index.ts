@@ -4,6 +4,7 @@ import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-compon
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
+import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 
 export function Footer() {
     const isDarkMode = useDarkMode().isEnabled;
@@ -120,7 +121,8 @@ export function pageCarousel({page, setPage, nextData}) {
       );
 }
 
-export function fetchAPIData(url) {
+export async function fetchAPIData(url) {
+    console.log("Fetching data from:", rockdApiURL + url);
     return fetch(rockdApiURL + url)
         .then(response => {
             if (!response.ok) {
