@@ -7,12 +7,7 @@ import { AnchorButton, ButtonGroup } from "@blueprintjs/core";
 const h = hyper.styled(styles);
 
 export function PageHeader(props) {
-  const {
-    title = "Rockd",
-    showSiteName = true,
-    children,
-    className,
-  } = props;
+  const { title = "Rockd", showSiteName = true, children, className } = props;
   const siteName = "Rockd";
   let _showSiteName = showSiteName;
   if (title == siteName) {

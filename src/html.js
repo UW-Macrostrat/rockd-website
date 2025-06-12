@@ -26,7 +26,7 @@ function html(title, initialState = {}, content = "", css) {
       <script src="../trip-dist/client.js"></script>
     </body>
     </html>
-  `
+  `;
 }
 
-module.exports = html
+module.exports = html;
