@@ -1,20 +1,16 @@
-import { connect } from 'react-redux'
-import App from '../components/App'
+import { connect } from "react-redux";
+import App from "../components/App";
 
 const mapStateToProps = (state) => {
   return {
     trip: state.main.trip,
-  }
-}
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-  }
-}
+  return {};
+};
 
-const AppContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App)
+const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
 
-export default AppContainer
+export default AppContainer;
