@@ -1,7 +1,7 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Image, getImageUrl, useRockdAPI } from "../index";
+import { BlankImage, imageExists, Image, getImageUrl, useRockdAPI } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
@@ -12,7 +12,6 @@ import { DarkModeButton } from "@macrostrat/ui-components";
 export function Photos({photoID}) {
     const [showBody, setBody] = useState(true);
     const checkinData = useRockdAPI("/protected/checkins?photo_id=" + photoID);
-
 
     if (!checkinData) {
         return h("div", { className: 'loading' }, [
