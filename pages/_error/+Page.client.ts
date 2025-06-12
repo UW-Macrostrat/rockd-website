@@ -1,7 +1,7 @@
 import { h } from '@macrostrat/map-interface'
 import { usePageContext } from 'vike-react/usePageContext'
 import "./main.styl"
-import { Image } from "../index"
+import { Image } from "~/components/general"
 
 function pageDoesntExist() {
 
