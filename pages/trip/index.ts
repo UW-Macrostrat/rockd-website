@@ -1,8 +1,9 @@
 import h from "./main.module.sass";
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from "../index";
+import { BlankImage, getProfilePicUrl, Image } from "~/components/general";
+import { createCheckins } from "../index";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";

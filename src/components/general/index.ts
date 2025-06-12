@@ -2,6 +2,7 @@ import h from "./layout.module.sass";
 import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
+import { rockdApiOldURL, rockdApiURL } from "@macrostrat-web/settings";
 
 export function Footer() {
     const isDarkMode = useDarkMode().isEnabled;
@@ -116,4 +117,32 @@ export function pageCarousel({page, setPage, nextData}) {
           ]),
         ])
       );
+}
+
+export function fetchAPIData(url) {
+    return fetch(rockdApiURL + url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+}
+
+export function fetchAPIDataOld(url) {
+    return fetch(rockdApiOldURL + url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
 }
