@@ -1,21 +1,28 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
-import {
-  MapAreaContainer,
-  MapMarker,
-  MapView,
-  buildInspectorStyle,
-} from "@macrostrat/map-interface";
+import {buildInspectorStyle } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import h from "./main.module.sass";
-import { createCheckins, useRockdAPI, Image, pageCarousel } from "../index";
+import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { ClientOnly } from "vike-react/ClientOnly";
+
+function MapContainer(props) {
+  return h(
+    ClientOnly,
+    {
+      load: () => import("./map.client").then((d) => d.WeaverMapContainer),
+      fallback: h("div.loading", "Loading map..."),
+    },
+    (component) => h(component, props)
+  );
+}
 
 export function Page() {
   return h(
@@ -242,31 +249,7 @@ function WeaverMap({
           },
         };
 
-  return h(
-    "div.map-container",
-    [
-      // The Map Area Container
-      h(
-        MapAreaContainer,
-        {
-          className: "map-area-container",
-          style: { "paddingLeft": "calc(30% + 14px)",},
-        },
-        [
-          h(MapView, { style, mapboxToken, mapPosition }, [
-            h(MapMarker, {
-              setPosition: onSelectPosition,
-            }),
-          ]),
-
-          // The Overlay Div
-          overlay,
-          h(ClickedCheckins, {setSelectedCheckin}),
-        ]
-      ),
-    ]
-  );
-  
+  return h(MapContainer, {style, mapPosition, onSelectPosition, setSelectedCheckin, overlay});
 }
 
 function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
