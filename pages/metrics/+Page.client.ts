@@ -147,8 +147,8 @@ export function Page() {
     // chart array
     let areaArr = [
         h(CartesianGrid, { strokeDasharray: "3 3" }),
-        h(XAxis, { dataKey: "name", stroke: "var(--text)" }),
-        h(YAxis, { stroke: "var(--text)" }),
+        h(XAxis, { dataKey: "name", stroke: "var(--text-emphasized-color)" }),
+        h(YAxis, { stroke: "var(--text-emphasized-color)" }),
         h(Tooltip),
         h(Area, { type: "monotone", dataKey: "Total", stroke: "#8884d8", fill: "#8884d8" }),
     ]

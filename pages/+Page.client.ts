@@ -148,9 +148,6 @@ export function Page()  {
                 ]),
               ])
             ]),
-          
-
           h(Footer)
-      
     ]);
 }
