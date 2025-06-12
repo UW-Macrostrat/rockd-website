@@ -1,4 +1,4 @@
-import { useEffect, useState, PureComponent } from 'react';
+import { useState } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -10,10 +10,9 @@ import {
     AreaChart,
     ResponsiveContainer,
   } from "recharts";
-import { Footer, useRockdAPI } from "../index";
+import { Footer } from "~/components/general";
 import h from "./main.module.sass";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { useData } from "vike-react/useData";
 
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
@@ -41,15 +40,7 @@ export function Page() {
     const [activeBound, setActive] = useState([lower, upper]);
 
     // new API doesn't return all data
-    const userData = useAPIResult(SETTINGS.rockdApiOldURL + "metrics");
-
-    if (!userData) {
-        return h("div", { className: 'loading' }, [
-            h("p", null, "Loading...")
-        ]);
-    }
-
-    const data = userData.success.data;
+    const { data } = useData();
 
     // format data
     interface InputData {
