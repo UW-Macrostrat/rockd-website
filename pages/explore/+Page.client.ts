@@ -1,5 +1,3 @@
-import hyper from "@macrostrat/hyper";
-
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
