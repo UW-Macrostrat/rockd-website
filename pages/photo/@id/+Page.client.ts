@@ -1,10 +1,8 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   BlankImage,
-  imageExists,
-  Image,
   getImageUrl,
   Footer,
 } from "~/components/general";
@@ -12,7 +10,7 @@ import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 import { LithologyList } from "@macrostrat/data-components";
-import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
+import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
 
@@ -34,23 +32,6 @@ export function Page() {
         });
     }
 
-    const observation = checkin.observations.find(
-        (obs) => obs.photo === photoID
-    );
-    const isObservation = observation !== undefined;
-    console.log("isObservation", isObservation, observation);
-    const imageSrc = getImageUrl(checkin.person_id, isObservation ? observation.photo : checkin.photo);
-    const imgURL =  isObservation ? (observation?.photo ? imageSrc : null) : (checkin?.photo ? imageSrc : null);
-    const bodyContent = isObservation
-        ? h(ObservationContent, { observation, onClose: () => {} })
-        : h("div", { className: "observation-body-container" }, [
-            h(Icon, {
-                className: "close-body",
-                icon: "ban-circle",
-            }),
-            checkin.notes,
-        ]);
-
   const photoIndex = photoIDArr.indexOf(photoID);
 
   return h("div", { className: "page-container" }, [
@@ -71,8 +52,8 @@ export function Page() {
             style: { color: isDarkMode ? "black" : "white" },
         })),
         h(Item, {
-            imgURL,
-            bodyContent,
+            checkin,
+            photoID,
         }),
         h.if(photoIndex !== photoIDArr.length - 1)("a", { href: "/photo/" + photoIDArr[photoIndex + 1] }, h(Icon, {
             className: "right-arrow",
@@ -91,7 +72,7 @@ export function Page() {
   ]);
 }
 
-function ObservationContent({ observation, onClose }) {
+function ObservationContent({ observation, setBody }) {
   const rocks = observation.rocks;
 
   function rgbaStringToHex(rgba) {
@@ -142,7 +123,7 @@ function ObservationContent({ observation, onClose }) {
     h(Icon, {
       className: "close-body",
       icon: "ban-circle",
-      onClick: onClose,
+      onClick: () => setBody(false),
       style: {
         paddingTop: "10px",
         cursor: "pointer",
@@ -161,20 +142,32 @@ function ObservationContent({ observation, onClose }) {
   ]);
 }
 
-function Item({ imgURL, bodyContent }) {
+function Item({ checkin, photoID }) {
   const [showBody, setBody] = useState(true);
+  
+    const observation = checkin.observations.find(
+        (obs) => obs.photo === photoID
+    );
+    const isObservation = observation !== undefined;
+    const imageSrc = getImageUrl(checkin.person_id, isObservation ? observation.photo : checkin.photo);
+    const imgURL =  isObservation ? (observation?.photo ? imageSrc : null) : (checkin?.photo ? imageSrc : null);
+    const bodyContent = isObservation
+        ? h(ObservationContent, { observation, setBody })
+        : h("div", { className: "observation-body-container" }, [
+            h(Icon, {
+                className: "close-body",
+                icon: "ban-circle",
+            }),
+            checkin.notes,
+        ]);
 
   return h("div", { className: "observation-item" }, [
-    imgURL
-      ? h(BlankImage, { className: "observation-image", src: imgURL })
-      : null,
+    h.if(imgURL)(BlankImage, { className: "observation-image", src: imgURL }),
     showBody ? bodyContent : null,
-    !showBody
-      ? h(Icon, {
-          className: "info-btn",
-          icon: "info-sign",
-          onClick: () => setBody(true),
-        })
-      : null,
+    h.if(!showBody)(Icon, {
+        className: "info-btn",
+        icon: "info-sign",
+        onClick: () => setBody(true),
+    })
   ]);
 }
