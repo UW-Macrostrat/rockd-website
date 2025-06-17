@@ -1,26 +1,28 @@
-import hyper from "@macrostrat/hyper";
-
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
 import { SETTINGS } from "@macrostrat-web/settings";
-import {
-  MapAreaContainer,
-  MapMarker,
-  MapView,
-  buildInspectorStyle,
-} from "@macrostrat/map-interface";
+import {buildInspectorStyle } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
 import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState } from "react";
-import styles from "../main.module.sass";
-import { createCheckins, useRockdAPI, Image } from "../index";
-import "./main.sass";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import h from "./main.module.sass";
+import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
+import { ClientOnly } from "vike-react/ClientOnly";
 
-const h = hyper.styled(styles);
+function MapContainer(props) {
+  return h(
+    ClientOnly,
+    {
+      load: () => import("./map.client").then((d) => d.WeaverMapContainer),
+      fallback: h("div.loading", "Loading map..."),
+    },
+    (component) => h(component, props)
+  );
+}
 
 export function Page() {
   return h(
@@ -142,10 +144,9 @@ function WeaverMap({
   const [selectedCheckin, setSelectedCheckin] = useState(null);  
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
-  const [filteredCheckins, setFilteredCheckins] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-
+  
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
 
@@ -157,25 +158,17 @@ function WeaverMap({
   const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   let overlay;
 
-  const LngLatProps = {
-    position: {
-        lat: inspectPosition?.lat ?? 0,
-        lng: inspectPosition?.lng ?? 0
-    },
-    precision: 3,
-    zoom: 10
-  };
-
   // handle selected checkins
   const checkinData = useRockdAPI(
-    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` : null
+    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` :  `/protected/checkins?checkin_id=0`
   );
 
   const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
   const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen});
+  const autoComplete = h(AutoComplete, {setFilteredData, autocompleteOpen, setAutocompleteOpen});
 
-  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData, setInspectPosition});
+  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData: filteredData?.current, setInspectPosition});
+  const filteredPages = pageCarousel({page: filteredData?.next.page, setPage: filteredData?.next.setPage, nextData: filteredData?.next.data});
 
   if(showFilter) {
     overlay = h('div.sidebox', [
@@ -188,7 +181,6 @@ function WeaverMap({
         onClick: () => {
           setFilter(false);
           setSettings(false);
-          setFilteredCheckins(false);
           setFilteredData(null);
           deletePins('.filtered_pin');
         }
@@ -197,6 +189,7 @@ function WeaverMap({
         h('div.autocomplete-container', [
           autoComplete,
           filteredData && !autocompleteOpen ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
+          filteredData && !autocompleteOpen ? filteredPages : null
         ])
       ]),
     ])
@@ -256,31 +249,7 @@ function WeaverMap({
           },
         };
 
-  return h(
-    "div.map-container",
-    [
-      // The Map Area Container
-      h(
-        MapAreaContainer,
-        {
-          className: "map-area-container",
-          style: { "padding-left": "calc(30% + 14px)",},
-        },
-        [
-          h(MapView, { style, mapboxToken, mapPosition }, [
-            h(MapMarker, {
-              setPosition: onSelectPosition,
-            }),
-          ]),
-
-          // The Overlay Div
-          overlay,
-          h(ClickedCheckins, {setSelectedCheckin}),
-        ]
-      ),
-    ]
-  );
-  
+  return h(MapContainer, {style, mapPosition, onSelectPosition, setSelectedCheckin, overlay});
 }
 
 function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
@@ -309,7 +278,7 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   return actualStyle;
 }
 
-function getCheckins(lat1, lat2, lng1, lng2) {
+function getCheckins(lat1, lat2, lng1, lng2, page) {
   // abitrary bounds around click point
   let minLat = Math.floor(lat1 * 100) / 100;
   let maxLat = Math.floor(lat2 * 100) / 100;
@@ -320,22 +289,28 @@ function getCheckins(lat1, lat2, lng1, lng2) {
   return useRockdAPI("/protected/checkins?minlat=" + minLat + 
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
-    "&maxlng=" + maxLng);
+    "&maxlng=" + maxLng + 
+    "&page="  + page);
 }
 
 function FeatureDetails({setInspectPosition}) {
+  const [page, setPage] = useState(1);
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [bounds, setBounds] = useState(map?.getBounds());
   let checkins = [];
   let result;
+  let nextData;
 
   if(!map) {
-    result = getCheckins(40, 45, -60, -70);
+    result = getCheckins(40, 45, -60, -70, page);
+    nextData = getCheckins(40, 45, -60, -70, page + 1);
   } else if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
+    nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
   } else {
-    result = getCheckins(40, 45, -60, -70);
+    result = getCheckins(40, 45, -60, -70, page);
+    nextData = getCheckins(40, 45, -60, -70, page + 1);
   }
 
   if (!bounds && map) {
@@ -347,6 +322,7 @@ function FeatureDetails({setInspectPosition}) {
     if(map) {
       const listener = () => {
         setBounds(map.getBounds());
+        setPage(1);
       };
       map.on("moveend", listener);
       return () => {
@@ -358,6 +334,9 @@ function FeatureDetails({setInspectPosition}) {
   if (result == null) return h(Spinner, { className: "loading-spinner" });
   result = result.success.data;  
 
+  
+  const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
+
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
     if (a.photo !== null && b.photo === null) return -1;
@@ -367,7 +346,8 @@ function FeatureDetails({setInspectPosition}) {
   checkins = createCheckins(result, mapRef, setInspectPosition);
   
   return h("div", {className: 'checkin-container'}, [
-      h('div', checkins)
+      checkins,
+      pages
     ]);
 }
 
@@ -411,66 +391,6 @@ function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
     ]);
 }
 
-function ClickedCheckins({setSelectedCheckin}) {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-
-  useEffect(() => {
-    if (!map) return;
-
-    const handleClick = (e) => {
-      const cluster = map.queryRenderedFeatures(e.point, {
-        layers: ['clusters']
-      });
-
-      if(cluster.length > 0) {
-        const zoom = cluster[0].properties.expansion_zoom;
-        console.log("cluster", cluster[0]);
-
-        console.log("zoom", zoom);
-
-        map.flyTo({
-          center: cluster[0].geometry.coordinates,
-          zoom: zoom + 2,
-          speed: 0.5,
-        });
-      }
-
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: ['unclustered-point']
-      });
-
-      if (features.length > 0) {
-        const checkinId = features[0].properties.id;
-
-        // add marker
-        const coord = features[0].geometry.coordinates.slice();
-        console.log("coordinates", coord);
-
-        const el = document.createElement('div');
-        el.className = 'selected_pin';
-
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
-
-        console.log("data", features[0]);
-        setSelectedCheckin(checkinId);
-      } else {
-        setSelectedCheckin(null); 
-      }
-    };
-
-    map.on('click', handleClick);
-
-    return () => {
-      map.off('click', handleClick);
-    };
-  }, [map]);
-
-  return null;
-}
-
 function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
 
@@ -483,11 +403,12 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
-function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
+function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [input, setInput] = useState('');
   const [close, setClose] = useState(false);  
+  const [page, setPage] = useState(1);
 
   // test 
   const [peopleIds, setPeople] = useState([]);
@@ -515,70 +436,93 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   // const lithologyClassParam = "=" + lithologyClasses.map(item => item.id).join(','); // doesn't exist
 
   // develop query
-  const params = [lithParam, peopleParam, lithologyAttributeParam, stratNameOrphanParam, structureParam].filter(param => /\d/.test(param));
-  const finalParams = params
-    .join('&');
+  const finalParams = useMemo(() => {
+  const params = [
+      lithParam,
+      peopleParam,
+      lithologyAttributeParam,
+      stratNameOrphanParam,
+      structureParam
+    ].filter(param => /\d/.test(param));
 
-  const queryString = finalParams ? "/protected/checkins?" + finalParams : null //  + "&all=1";
-  console.log("queryString", queryString);
+    return params.join('&');
+  }, [lithologyIds, peopleIds, lithologyAttributes, stratNameOrphans, structures]);
+
+  const queryString = useMemo(() => {
+    return finalParams ? `/protected/checkins?${finalParams}` : null;
+  }, [finalParams]);
+
 
   // get data
-  const data = useRockdAPI(queryString)?.success.data;
-  console.log("data", data);
+  const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
+  const nextData = useRockdAPI(queryString + "&page=" + (page + 1))?.success.data;
+
+  console.log("current", data)
+  console.log("next", nextData)
+
+  console.log(queryString + "&page=" + page)
 
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
   let lats = [];
 
-  if(data && data.length > 0 && queryString) {
-    setFilteredCheckins(true);
-    setFilteredData(data);
-
-    data.forEach((checkin) => {
-      coordinates.push([checkin.lng, checkin.lat]);
-      lngs.push(checkin.lng);
-      lats.push(checkin.lat);
-    });
-
-    deletePins('.filtered_pin');
-    deletePins('.marker_pin');
-
-    if (!close) {
-      let stop = 0;
-      coordinates.forEach((coord) => {
-        stop++;
-        // marker
-        const el = document.createElement('div');
-        el.className = 'filtered_pin';
-
-        // Create marker
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
+  useEffect(() => {
+    if(data && data.length > 0 && queryString) {
+      setFilteredData({
+        current: data,
+        next: {
+          data: nextData,
+          page: page,
+          setPage: setPage
+        }
       });
+
+      data.forEach((checkin) => {
+        coordinates.push([checkin.lng, checkin.lat]);
+        lngs.push(checkin.lng);
+        lats.push(checkin.lat);
+      });
+
+      deletePins('.filtered_pin');
+      deletePins('.marker_pin');
+
+      if (!close) {
+        let stop = 0;
+        coordinates.forEach((coord) => {
+          stop++;
+          // marker
+          const el = document.createElement('div');
+          el.className = 'filtered_pin';
+
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat(coord)
+            .addTo(map);
+        });
+      }
+
+      map.fitBounds([
+          [ Math.max(...lngs), Math.max(...lats) ],
+          [ Math.min(...lngs), Math.min(...lats) ]
+      ], {
+          maxZoom: 12,
+          duration: 0,
+          padding: 75
+      });
+    } else {
+      deletePins('.filtered_pin');
+
+      setFilteredData(null);
     }
-
-    map.fitBounds([
-        [ Math.max(...lngs), Math.max(...lats) ],
-        [ Math.min(...lngs), Math.min(...lats) ]
-    ], {
-        maxZoom: 12,
-        duration: 0,
-        padding: 75
-    });
-  } else {
-    deletePins('.filtered_pin');
-
-    setFilteredCheckins(false);
-    setFilteredData(null);
-  }
+  }, [data, nextData, queryString]);
 
   // rest
   const handleInputChange = (event) => {
     setAutocompleteOpen(true);
     setInput(event.target.value); 
     setClose(false);
+    setPage(1);
   };
 
   let result = null;
@@ -598,6 +542,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
           setAutocompleteOpen(false);
           setClose(true);
           setFilteredData(null);
+          setPage(1);
           deletePins('.filtered_pin');
         } 
       }),
@@ -623,7 +568,7 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
     .map(({ label, data, setter }) =>
       h('div', [
         h('h3', label),
-        createFilteredItems(data, setter)
+        createFilteredItems(data, setter, setPage)
       ])
     );
 
@@ -688,12 +633,13 @@ function AutoComplete({setFilteredCheckins, setFilteredData, autocompleteOpen, s
   ]);
 }
 
-function createFilteredItems(arr, set) {
+function createFilteredItems(arr, set, setPage) {
   return arr.map((item) => {
     return h("li.filter-item", [ 
       h('div', item.name),
       h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
           set(arr.filter((person) => person != item));
+          setPage(1);
         } 
       })
     ])

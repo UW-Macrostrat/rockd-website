@@ -1,13 +1,11 @@
-import hyper from "@macrostrat/hyper";
-import { useEffect, useState, useRef } from 'react';
+import h from "./main.module.sass";
+import { useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, createCheckins, getProfilePicUrl, useRockdAPI, Image } from "../index";
-import styles from "../main.module.sass";
+import { BlankImage, getProfilePicUrl, Image, createCheckins } from "~/components/general";
 import "@macrostrat/style-system";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import "./main.sass";
 import { Divider, Icon, Spinner } from "@blueprintjs/core";
 import {
   MapAreaContainer,
@@ -17,29 +15,14 @@ import {
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
 
-const h = hyper.styled(styles);
-
-export function Trips({trip}) {
+export function Trips({data}) {
     const [showSatelite, setSatelite] = useState(false);
-    const userData = useRockdAPI("/trips/" + trip);
+    console.log("Trips data:", data);
 
     const style = useMapStyle({showSatelite});
 
-    if (!userData) {
-        return h("div", { className: 'loading' }, [
-            h("h1", "Loading trip..."),
-        ]);
-    }
-
-    if (userData.success.data.length == 0) {
-        return h("div", { className: 'error' }, [
-            h(BlankImage, {className: "error-img", src: "https://rockd.org/assets/img/404.jpg"}),
-            h("h1", "Trip " + trip + " not found!"),  
-        ]);
-    }
-
     // format date
-    const data = userData.success.data[0];
+    const trip = data.trip_id;
     let date = new Date(data.updated);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     data.updated = date.toLocaleDateString('en-US', options);
@@ -65,25 +48,24 @@ export function Trips({trip}) {
 
 
     return h("div", {className: 'body'}, [
-            h(
-                "div.map-container",
+        h(
+            "div.map-container",
+            [
+                // The Map Area Container
+                h(
+                MapAreaContainer,
+                {
+                    className: "map-area-container",
+                    style: { paddingRight: "calc(30% + 14px)"},
+                },
                 [
-                  // The Map Area Container
-                  h(
-                    MapAreaContainer,
-                    {
-                      className: "map-area-container",
-                      style: { 'padding-right': "calc(30% + 14px)"},
-                    },
-                    [
-                        h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
-                        ]),
-                        sidebar,
-                    ]
-                  ),
+                    h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }),
+                    sidebar,
                 ]
-              ),
-            toolbar,
+                ),
+            ]
+            ),
+        toolbar,
     ]);
 }
 
@@ -127,7 +109,7 @@ function SideBar({data}) {
 
     if(!map) return h("div", {className: "stop-container loading2"}, [
         h("h1", "Loading trip " + data.trip_id + "..."),
-        h(Spinner, {style: {"margin-top": "30px"}})
+        h(Spinner, {style: {marginTop: "30px"}})
     ]);
 
     let arr = [];
@@ -140,10 +122,25 @@ function SideBar({data}) {
 
         const count = index + 1;
         const el = document.createElement('div');
-        el.className = 'pin';
+        el.style.backgroundImage = 'url("https://storage.macrostrat.org/assets/rockd/marker_red.png")';
+        el.style.width = '60px';
+        el.style.height = '60px';
+        el.style.backgroundSize = '50%';
+        el.style.display = 'block';
+        el.style.border = 'none';
+        el.style.cursor = 'pointer';
+        el.style.backgroundRepeat = 'no-repeat';
+        el.style.backgroundPosition = 'center';
 
         const number = document.createElement('span');
         number.innerText = count;
+        number.style.position = 'absolute';
+        number.style.top = '45%';
+        number.style.left = '49%';
+        number.style.transform = 'translate(-50%, -50%)';
+        number.style.color = 'white';
+        number.style.fontSize = '12px';
+        number.style.fontWeight = 'bold';
 
         // Append the number to the marker
         el.appendChild(number);

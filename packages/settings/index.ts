@@ -34,5 +34,5 @@ export const SETTINGS = {
   satelliteMapURL,
   burwellTileDomain,
   mapboxAccessToken,
-  rockdApiOldURL
+  rockdApiOldURL,
 };
