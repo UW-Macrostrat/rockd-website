@@ -14,17 +14,17 @@ export function buildCrossSectionLayers(): mapboxgl.Layer[] {
     "circle-radius": {
       stops: [
         [0, 3],
-        [12, 5]
-      ]
+        [12, 5],
+      ],
     },
     "circle-color": centerColor,
     "circle-stroke-width": {
       stops: [
         [0, 2],
-        [12, 4]
-      ]
+        [12, 4],
+      ],
     },
-    "circle-stroke-color": ruleColor
+    "circle-stroke-color": ruleColor,
   };
 
   return [
@@ -36,18 +36,18 @@ export function buildCrossSectionLayers(): mapboxgl.Layer[] {
         "line-width": {
           stops: [
             [0, 1],
-            [12, 3]
-          ]
+            [12, 3],
+          ],
         },
         "line-color": ruleColor,
-        "line-opacity": 1
-      }
+        "line-opacity": 1,
+      },
     },
     {
       id: "crossSectionEndpoint",
       type: "circle",
       source: "crossSectionEndpoints",
-      paint: crossSectionPointPaint
+      paint: crossSectionPointPaint,
     },
     {
       id: "elevationMarker",
@@ -55,8 +55,8 @@ export function buildCrossSectionLayers(): mapboxgl.Layer[] {
       source: "elevationMarker",
       paint: {
         ...crossSectionPointPaint,
-        "circle-color": "#4bc0c0"
-      }
-    }
+        "circle-color": "#4bc0c0",
+      },
+    },
   ];
 }

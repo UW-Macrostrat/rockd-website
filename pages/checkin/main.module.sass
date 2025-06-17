@@ -12,7 +12,7 @@
   @each $name, $color in $colors
     --#{$name}: #{$color}
 
-html, body, #root, .app-shell
+html, body
   width: 100%
   height: 100vh
   height: -webkit-fill-available
@@ -28,7 +28,7 @@ html, body, #root, .app-shell
   color: var(--text-subtle-color) !important
 
 body
-  color: var(--text-color)
+  color: var(--text-emphasized-color) !important
   margin: 0
   padding: 0
   font-family: 'Source Sans Pro', sans-serif
@@ -53,13 +53,9 @@ body
   
 .main
   background-color: var(--background-color)
-  color: var(--text)
   padding: 0 20% 5vh 20%
   margin: 0
   min-height: 74vh
-
-  h4 
-    color: var(--text)
 
 h1, p
   padding: 0
@@ -73,8 +69,7 @@ h1, p
   object-fit: cover
 
 .stop-header
-  display: grid
-  grid-template-columns: 20% 80%
+  display: flex
   margin: auto
   position: absolute
   z-index: 2
@@ -84,19 +79,24 @@ h1, p
   align-items: center
   cursor: pointer
 
-.profile-picture
-  height: 100px
-  width: 100px
-  display: grid
-  margin: auto
-  margin-left: 50px
-  border-radius: 50%
+.profile-header
+  flex: 1
+  text-align: center
+
+  img
+    height: 100px
+    width: 100px
+    border-radius: 50%
 
 .stop-main-info
+  flex: 3
+  display: flex
+  flex-direction: column
   text-align: left
-  display: grid
-  margin: auto
-  margin-left: 0
+  color: black
+
+  h3
+    margin: 0
 
 .star
   height: 15px
@@ -112,73 +112,31 @@ h4
 .checkin-head
   padding: 30px 0
   width: 100%
+  color: var(--text-emphasized-color)
 
 .loading
   height: 75vh
   padding-top: 20vh
   text-align: center
-  background-color: var(--panel-background-color)
-  color: var(--panel-text)
+  background-color: var(--background-color)
+  color: var(--text-emphasized-color)
   font-style: italic
 
-
-.observation-item
-  height: 80vh
-  width: 40%
-  margin: calc(20px + 7vh) 30% 0 30%
-  text-align: center
-
-  .observation-image
-    height: 80vh
-    width: 100%
-    object-fit: cover
-
-.overlay
-  background-color: var(--panel-background-color)
-  height: 100vh
-  width: 100%
-  top: 0
-  left: 0
-  overflow: auto
-
-
-  .overlay-body
-    margin: 0 30%
-    width: 40%
-    border-radius: 2%
-    box-shadow: 0 0 0 1px var(--card-shadow-color)
-    margin: 5vh 30%
-
-    img
-      width: 100%
-      border-radius: 2% 2% 0 0
-
-.observation-body-container
-  position: absolute
-  bottom: 9vh
-  left: 0
-  padding: 3px
-  color: var(--text)
-  background-color: var(--panel-background)
-  text-align: center
-  width: 40%
-  margin-left: 30%
-  min-height: 50px
+.observations
+  margin-top: 27vh
   display: flex
-  align-items: center
-  justify-content: center
+  flex-wrap: wrap
+  width: 100%
 
-  .close-body
-    position: absolute
-    top: 2px
-    left: 2px
-    cursor: pointer
+  .observation
+    flex: 0 0 calc(33.33% - 10px)
+    margin: 5px
+    text-align: center
+    box-shadow: 0 0 0 1px var(--card-shadow-color)
 
-  .observation-body
-    position: relative
-    min-hegiht: 50px
-    width: 100%
-    
+    .observation-image
+      width: 100%
+      cursor: pointer
 
 .close
   position: absolute
@@ -191,41 +149,37 @@ h4
   &:hover
     background-color: grey
 
-.photo-banner
+.banner
   position: absolute
   top: 0
   left: 0
   z-index: 100
   width: 100%
+  background-color: var(--panel-text)
   height: 7vh
   display: flex
-  gap: 10px
-  padding-left: 20px
-  background-color: var(--accent-secondary-color)
-  justify-content: space-between
+  align-items: center
 
-  .right-side
-    display: flex
-    align-items: center
-    gap: 10px
-    height:100%
-    padding-right: 30px
-
-  .back-checkin
-    display: flex
-    align-items: center
-    gap: 10px  
-
-    h3
-      color: var(--text-emphasized-color)
-
-    &:hover
-      text-decoration: none
+  
+  .banner-arrow
+    margin-left: 10px
+    cursor: pointer
+    svg
+      height: 7vh
+  
+  .banner-button
+    width: 100px
+    cursor: pointer
+    text-align: center
+    margin: 10px 0
+    background-color: var(--panel-background)
+    position: absolute
+    right: 15px
 
 .hide
   display: none
 
-.left-arrow, .right-arrow, .back-checkin-arrow
+.left-arrow
   filter: var(--anti-img-color)
   cursor: pointer
 
@@ -235,10 +189,11 @@ h4
 
 .observation-details
   text-align: left
+  margin: 10px
   
   .observation-detail
     padding: 4px
-    border: 1px solid var(--panel-text)
+    border: 1px solid var(--text-emphasized-color)
     margin: 4px
     border-radius: 4px
     display: inline-block
@@ -250,16 +205,29 @@ h4
     background-color: var(--liths-background)
 
   .notes
-    padding: 10px 25px
+    padding-top: 5px
+    padding-left: 5px
 
 .observation-header
   padding: 10px
+  color: var(--text-emphasized-color)
 
+.lnglat-container
+  color: var(--text-emphasized-color) !important
+
+.back-arrow
+  filter: var(--img-color)
+  position: fixed
+  svg
+    height: 10vh
 
 .overlay-header
   position: absolute
   height: 10vh
   margin-left: 20%
+
+.container
+  position: relative
 
 .dark-mode-button
   height: 5vh
@@ -277,44 +245,3 @@ h4
 .error-img
   width: 50%
   text-align: center
-
-.left-arrow
-  position: absolute
-  top: 30%
-  left: 100px
-
-  svg
-    height: 50px
-    width: 50px
-
-.right-arrow
-  position: absolute
-  top: 30%
-  right: 100px
-
-  svg
-    height: 50px
-    width: 50px
-
-.circles
-  display: flex
-  justify-content: center
-  padding: 30px 0
-  filter: var(--anti-img-color)
-
-.info-btn
-  position: absolute
-  bottom: 10vh
-  right: 20%
-  svg
-    height: 20px
-    width: 20px
-
-.hide
-  display: none
-
-.page-container
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%

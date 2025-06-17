@@ -1,28 +1,14 @@
-import hyper from "@macrostrat/hyper";
+import h from "./layout.module.sass";
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
+import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
-import styles from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
-
-const h = hyper.styled(styles);
-
-
-export function Image({ src, className, width, height, onClick }) {
-    const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
-    return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
-}
-
-export function BlankImage({ src, className, width, height, onClick, onError, alt }) {
-    return h("img", {src: src, className, width, height, onClick, onError, alt})
-}
-
-const handleClick = (e) => {
-    // Custom logic to navigate or do something without style transfer
-};
+import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 
 export function Footer() {
+    const isDarkMode = useDarkMode().isEnabled;
+
     return h("div", {className: "footer"}, [
         h("div", {className: "titles"}, [
             h("h3", {className: "footer-text upper"}, [
@@ -38,30 +24,30 @@ export function Footer() {
         ]),
         h("div", {className: "footer-links"},[
             h("ul", [
-                h("li", h("a", {href: "/", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "home", style: {color: 'white'}}),
+                h("li", h("a", {href: "/"}, [
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "home", style: {color: 'white'}}),
                     h('p', "Home")
                 ])),
-                h("li", h("a", {href: "/explore", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "geosearch", style: {color: 'white'}}),
+                h("li", h("a", {href: "/explore"}, [
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "geosearch", style: {color: 'white'}}),
                     h('p', "Explore")
                 ])),
-                h("li", h("a", {href: "/trip/1", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "route", style: {color: 'white'}}),
+                h("li", h("a", {href: "/trip/1"}, [
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "route", style: {color: 'white'}}),
                     h('p', "Trip")
                 ])),
             ]),
             h("ul", [
-                h("li", h("a", {href: "/metrics", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "chart", style: {color: 'white'}}),
+                h("li", h("a", {href: "/metrics"}, [
+                    h(Icon, {className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""), icon: "chart", style: {color: 'white'}}),
                     h('p', "Metrics")
                 ])),
-                h("li", h("a", {href: "/terms", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "manual", style: {color: 'white'}}),
+                h("li", h("a", {href: "/terms"}, [
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "manual", style: {color: 'white'}}),
                     h('p', "Terms and Conditions")
                 ])),
-                h("li", h("a", {href: "/privacy", onClick: handleClick}, [
-                    h(Icon, {className: "footer-icon", icon: "lock", style: {color: 'white'}}),
+                h("li", h("a", {href: "/privacy"}, [
+                    h(Icon, {className: "footer-icon"+ (isDarkMode ? "icon-dark-mode" : ""), icon: "lock", style: {color: 'white'}}),
                     h('p', "Privacy")
                 ])),
             ]),
@@ -72,7 +58,100 @@ export function Footer() {
     ]);
 }
 
+
+export function Image({ src, className, width, height, onClick }) {
+    const srcWithAddedPrefix = "https://storage.macrostrat.org/assets/rockd/" + src;
+    return h("img", {src: srcWithAddedPrefix, className, width, height, onClick})
+}
+
+export function BlankImage({ src, className, width, height, onClick, onError, alt }) {
+    return h("img", {src: src, className, width, height, onClick, onError, alt})
+}
+
+// remove when metrics works
+const apiURL = SETTINGS.rockdApiURL; // new route
+
+export function useRockdAPI(src) {
+    return useAPIResult(apiURL + src);
+}
+
+export function imageExists(url) {
+    var http = new XMLHttpRequest();
+    try {
+        http.open('HEAD', url, false);
+        http.send();
+    } catch (e) {
+        return true;
+    }
+    return false
+}
+
+export function getImageUrl(person_id, photo_id) {
+    return apiURL + "/protected/image/" + person_id + "/thumb_large/" + photo_id;
+}
+
+export function getProfilePicUrl(person_id) {
+    return apiURL + "/protected/gravatar/" + person_id;
+}
+
+export function pageCarousel({page, setPage, nextData}) {
+    return h('div.pages', 
+        h('div.page-container', [
+          h('div', { className: "page-btn" }, [
+            h('div', { className: page != 1 ? 'btn-content' : 'hide',             
+                onClick: () => {
+                    setPage(page - 1);
+                }}, [
+              h(Icon, { icon: 'arrow-left' }),
+              h('p', "Previous"),
+            ])
+          ]),
+          h('p', 'Page ' + page),
+          h('div', { className: "page-btn" }, [
+            h('div', { className: nextData && nextData?.length > 0 ? 'btn-content' : 'hide',
+                onClick: () => {
+                    setPage(page + 1);
+                }
+            }, [
+              h('p', "Next"),
+              h(Icon, { icon: 'arrow-right' }),
+            ])
+          ]),
+        ])
+      );
+}
+
+export async function fetchAPIData(url) {
+    console.log("Fetching data from:", rockdApiURL + url);
+    return fetch(rockdApiURL + url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+}
+
+export function fetchAPIDataOld(url) {
+    return fetch(rockdApiOldURL + url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+}
+
 export function createCheckins(result, mapRef, setInspectPosition) {
+    const isDarkMode = useDarkMode().isEnabled;
     let checkins = [];
     const map = mapRef?.current;
 
@@ -159,15 +238,15 @@ export function createCheckins(result, mapRef, setInspectPosition) {
                 ]),
                 h('div', {className: 'checkin-footer'}, [
                 h('div', {className: 'likes-container'}, [
-                    h(Icon, {className: 'likes-icon', icon: "thumbs-up", style: {color: 'white'}}),
+                    h(Icon, {className: 'likes-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "thumbs-up", style: {color: 'white'}}),
                     h('h3', {className: 'likes'}, checkin.likes),
                 ]),
                 h('div', {className: 'observations-container'}, [
-                    h(Icon, {className: 'observations-icon', icon: "camera", style: {color: 'white'}}),
+                    h(Icon, {className: 'observations-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "camera", style: {color: 'white'}}),
                     h('h3', {className: 'likes'}, checkin.observations.length),
                 ]),
                 h('div', {className: 'comments-container'}, [
-                    h(Icon, {className: 'comments-icon', icon: "comment", style: {color: 'white'}}),
+                    h(Icon, {className: 'comments-icon ' + (isDarkMode ? "icon-dark-mode" : ""), icon: "comment", style: {color: 'white'}}),
                     h('h3', {className: 'comments'}, checkin.comments),
                 ])
             ]),
@@ -177,30 +256,4 @@ export function createCheckins(result, mapRef, setInspectPosition) {
     });
     
     return checkins;
-}
-
-// remove when metrics works
-const apiURL = SETTINGS.rockdApiURL; // new route
-
-export function useRockdAPI(src) {
-    return useAPIResult(apiURL + src);
-}
-
-export function imageExists(url) {
-    var http = new XMLHttpRequest();
-    try {
-        http.open('HEAD', url, false);
-        http.send();
-    } catch (e) {
-        return true;
-    }
-    return false
-}
-
-export function getImageUrl(person_id, photo_id) {
-    return apiURL + "/protected/image/" + person_id + "/thumb_large/" + photo_id;
-}
-
-export function getProfilePicUrl(person_id) {
-    return apiURL + "/protected/gravatar/" + person_id;
 }
