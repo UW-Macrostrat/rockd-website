@@ -6,5 +6,5 @@ export async function data(pageContext) {
             console.error("Error fetching checkin data:", error);
         });
 
-    return { checkinData };
+    return { checkin: checkinData.success.data[0] || null };
 }

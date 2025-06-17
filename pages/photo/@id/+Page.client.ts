@@ -17,161 +17,81 @@ import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
 
 export function Page() {
-  const isDarkMode = useDarkMode()?.isEnabled;
-  const pageContext = usePageContext();
-  const photoID = pageContext.urlPathname
-    .split("/")[2]
-    .replace(/%40/g, "@")
-    .replace(/%2B/g, "+");
-  const { checkinData } = useData();
-  const checkin = checkinData.success.data[0];
+    const { checkin } = useData();
+    const isDarkMode = useDarkMode()?.isEnabled;
+    const pageContext = usePageContext();
+    const photoID = parseInt(pageContext.urlPathname
+        .split("/")[2]
+        .replace(/%40/g, "@")
+        .replace(/%2B/g, "+"));
 
-  let photoIDArr = [checkin.photo];
-
-  let ratingArr = [];
-  for (let i = 0; i < checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, {
-        className: "star",
-        icon: "star",
-        style: { color: "white" },
-      })
-    );
-  }
-  for (let i = 0; i < 5 - checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, {
-        className: "star",
-        icon: "star-empty",
-        style: { color: "white" },
-      })
-    );
-  }
-
-  let observations = [];
-
-  const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
-  const headerImgUrl = checkin.photo ? imageSrc : null;
-
-  const headerBody = ({ onClose }) =>
-    h("div", { className: "observation-body-container" }, [
-      h(Icon, {
-        className: "close-body",
-        icon: "ban-circle",
-        onClick: onClose,
-      }),
-      checkin.notes,
-    ]);
-
-  observations.push(
-    h(ObservationBody, {
-      headerImgUrl: headerImgUrl,
-      headerBody,
-    })
-  );
-
-  checkin.observations.forEach((observation) => {
-    if (Object.keys(observation.rocks).length !== 0) {
-      if (observation.photo) {
-        photoIDArr.push(observation.photo);
-      }
-
-      const imageSrc = getImageUrl(checkin.person_id, observation.photo);
-      const observationURL =
-        observation.photo ? imageSrc : null;
-
-      const observationBody = ({ onClose }) =>
-        h(observationFooter, { observation, onClose });
-
-      observations.push(
-        h(ObservationBody, {
-          headerImgUrl: observationURL,
-          headerBody: observationBody,
-        })
-      );
+    let photoIDArr = [checkin.photo];
+    if (checkin.observations) {
+        checkin.observations.forEach((obs) => {
+        if (obs.photo && !photoIDArr.includes(obs.photo)) {
+            photoIDArr.push(obs.photo);
+        }
+        });
     }
-  });
 
-  const photoIndex = photoIDArr.indexOf(parseInt(photoID));
-  const observation = observations[photoIndex];
-  const leftArrow = h(Icon, {
-    className: "left-arrow",
-    icon: "arrow-left",
-    style: { color: isDarkMode ? "black" : "white" },
-  });
-  const rightArrow = h(Icon, {
-    className: "right-arrow",
-    icon: "arrow-right",
-    style: { color: isDarkMode ? "black" : "white" },
-  });
+    const observation = checkin.observations.find(
+        (obs) => obs.photo === photoID
+    );
+    const isObservation = observation !== undefined;
+    console.log("isObservation", isObservation, observation);
+    const imageSrc = getImageUrl(checkin.person_id, isObservation ? observation.photo : checkin.photo);
+    const imgURL =  isObservation ? (observation?.photo ? imageSrc : null) : (checkin?.photo ? imageSrc : null);
+    const bodyContent = isObservation
+        ? h(ObservationContent, { observation, onClose: () => {} })
+        : h("div", { className: "observation-body-container" }, [
+            h(Icon, {
+                className: "close-body",
+                icon: "ban-circle",
+            }),
+            checkin.notes,
+        ]);
 
-
-  useEffect(() => {
-  if (photoIndex > 0) {
-    const prev = photoIDArr[photoIndex - 1];
-    const link = document.createElement("link");
-    link.rel = "prefetch";
-    link.href = `/photo/${prev}`;
-    document.head.appendChild(link);
-  }
-
-  if (photoIndex < photoIDArr.length - 1) {
-    const next = photoIDArr[photoIndex + 1];
-    const link = document.createElement("link");
-    link.rel = "prefetch";
-    link.href = `/photo/${next}`;
-    document.head.appendChild(link);
-  }
-}, [photoIndex]);
-
-
-  let footer = [];
-  photoIDArr.forEach((photo) => {
-    if (photo == photoID) {
-      footer.push(
-        h("div", h(Icon, { icon: "symbol-circle", style: { color: "grey" } }))
-      );
-    } else {
-      footer.push(
-        h("a", { href: "/photo/" + photo }, [
-          h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
-        ])
-      );
-    }
-  });
+  const photoIndex = photoIDArr.indexOf(photoID);
 
   return h("div", { className: "page-container" }, [
-    h("div.photo-banner", [
-      h("a", { href: "/checkin/" + checkin.checkin_id, className: "back-checkin" }, [
-        h(Icon, {
-          icon: "arrow-left",
-          className: "back-checkin-arrow",
-          style: { color: isDarkMode ? "black" : "white" },
-        }),
-        h("h3", "CHECKIN"),
-      ]),
-      h("div.right-side", [
-        h(DarkModeButton, { className: "dark-mode-btn", showText: true }),
-        h("a", { href: "/" }, [
-          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
+    h("div.photo-banner", 
+        h("a", { href: "/checkin/" + checkin.checkin_id, className: "back-checkin" }, [
+            h(Icon, {
+                icon: "arrow-left",
+                className: "back-checkin-arrow",
+                style: { color: isDarkMode ? "black" : "white" },
+            }),
+            h("h3", "Checkin #" + checkin.checkin_id),
         ]),
-      ]),
-    ]),
+    ),
     h("div", { className: "photos" }, [
-      photoIndex !== 0
-        ? h("a", { href: "/photo/" + photoIDArr[photoIndex - 1] }, leftArrow)
-        : null,
-      observation,
-      photoIndex !== photoIDArr.length - 1
-        ? h("a", { href: "/photo/" + photoIDArr[photoIndex + 1] }, rightArrow)
-        : null,
-    ]),
-    h("div.circles", footer),
-    h(Footer)
+        h.if(photoIndex !== 0)("a", { href: "/photo/" + photoIDArr[photoIndex - 1] }, h(Icon, {
+            className: "left-arrow",
+            icon: "arrow-left",
+            style: { color: isDarkMode ? "black" : "white" },
+        })),
+        h(Item, {
+            imgURL,
+            bodyContent,
+        }),
+        h.if(photoIndex !== photoIDArr.length - 1)("a", { href: "/photo/" + photoIDArr[photoIndex + 1] }, h(Icon, {
+            className: "right-arrow",
+            icon: "arrow-right",
+            style: { color: isDarkMode ? "black" : "white" },
+        }))
+    ]), h("div.circles", photoIDArr.map((photo) => {
+        if (photo == photoID) {
+            return h("div", h(Icon, { icon: "symbol-circle", style: { color: "grey" } }));
+        } else {
+            return h("a", { href: "/photo/" + photo }, [
+                h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
+            ]);
+        }
+    })), h(Footer)
   ]);
 }
 
-function observationFooter({ observation, onClose }) {
+function ObservationContent({ observation, onClose }) {
   const rocks = observation.rocks;
 
   function rgbaStringToHex(rgba) {
@@ -241,14 +161,14 @@ function observationFooter({ observation, onClose }) {
   ]);
 }
 
-function ObservationBody({ headerImgUrl, headerBody }) {
+function Item({ imgURL, bodyContent }) {
   const [showBody, setBody] = useState(true);
 
   return h("div", { className: "observation-item" }, [
-    headerImgUrl
-      ? h(BlankImage, { className: "observation-image", src: headerImgUrl })
+    imgURL
+      ? h(BlankImage, { className: "observation-image", src: imgURL })
       : null,
-    showBody ? headerBody({ onClose: () => setBody(false) }) : null,
+    showBody ? bodyContent : null,
     !showBody
       ? h(Icon, {
           className: "info-btn",
