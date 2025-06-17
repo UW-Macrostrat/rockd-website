@@ -10,7 +10,7 @@ import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
 
 
-export function MapContainer({center, showMap, setShowMap}) {
+export function MapContainer({center, setOverlayOpen}) {
     const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
     const [styleText, setStyleText] = useState("Show Satelite");
 
@@ -27,7 +27,7 @@ export function MapContainer({center, showMap, setShowMap}) {
     const whiteText = "Show White";
     const sateliteText = "Show Satelite";
 
-    return h("div.map", [
+    return h("div.overlay-container", [
         h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
             [
               h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
@@ -39,7 +39,7 @@ export function MapContainer({center, showMap, setShowMap}) {
           ),
         h('div', {className: 'banner'}, [
             h(Icon, {className: "banner-arrow", icon: "arrow-left", iconSize: "3vh", style: {color: 'white'}, onClick: () => {
-                setShowMap(!showMap);
+                setOverlayOpen(false);
               }}),
             h(PanelCard, {className: "banner-button", onClick: () => {
                 setStyle(style == whiteStyle ? sateliteStyle : whiteStyle);

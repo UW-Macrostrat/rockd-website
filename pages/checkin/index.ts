@@ -1,11 +1,12 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, imageExists, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
+import { Overlay2 } from "@blueprintjs/core";
 import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
@@ -25,6 +26,30 @@ function Map(props) {
 }
 
 export function Checkins({checkin}) {
+    /*
+const [isOpen, setIsOpen] = useState(false);
+    const toggleOverlay = useCallback(() => setIsOpen(open => !open), [setIsOpen]);
+
+    return h("div.container", [
+        h('button', {
+            className: "bp3-button bp3-intent-primary",
+            onClick: toggleOverlay
+        }, "Open Overlay"),
+         h(Overlay2,
+        {
+            isOpen,
+            onClose: toggleOverlay,
+            className: "checkin-overlay",
+            usePortal: true,
+            canEscapeKeyClose: true,
+            canOutsideClickClose: true,
+            hasBackdrop: true,
+        }, "hello"
+        
+    )
+    ]);
+    */
+
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [showMap, setShowMap] = useState(false);
 
@@ -89,26 +114,36 @@ export function Checkins({checkin}) {
         zoom: 10
     };
 
-    // overlay
-    let overlay = h('div', {className: 'overlay'}, [
-        h('div.overlay-header', [
-            h(Icon, {className: "back-arrow", icon: "arrow-left", iconSize: "5vh", style: {color: 'black'}, 
-                onClick: () => {
-                    setOverlayOpen(!overlayOpen);
-                }
-            }),
-        ]),
-    ]);
-
-    const map = h(Map, {center, showMap, setShowMap});
 
     let main = h('div', { className: "container" }, [
         h('div', { className: showMap ? 'hide' : 'main'}, [
             h('div', { className: "checkin-head" }, [
                 h('h1', checkin.notes),
             ]),
-            h(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
-            h('div', { className: 'stop-header', onClick: () => { setShowMap(true); console.log("center", center) } }, [
+            h(Overlay, {
+                checkin,
+                center,
+                LngLatProps,
+                ratingArr,
+                profile_pic,
+            }),
+            h('div', { className: 'observations' }, observations),
+        ]),
+        h('div', { className: showMap ? 'hide' : 'bottom' }, [
+            h(Footer),
+        ]),
+    ])
+
+    return main;
+}
+
+function Overlay({checkin, center, LngLatProps, ratingArr, profile_pic}) {
+    const [overlayOpen, setOverlayOpen] = useState(false);
+    const map = h(Map, {center, setOverlayOpen});
+
+    return h('div.overlay', [
+         h.if(!overlayOpen)(BlankImage, { className: "location-img", src: "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" + checkin.lng + "%2C" + checkin.lat + "%5D%7D)/" + checkin.lng + "," + checkin.lat + ",5,0/1200x400?access_token=" + SETTINGS.mapboxAccessToken }),
+            h.if(!overlayOpen)('div', { className: 'stop-header', onClick: () => { setOverlayOpen(true); console.log("center", center) } }, [
                 profile_pic,
                 h('div', {className: 'stop-main-info'}, [
                     h('h3', {className: 'name'}, checkin.first_name + " " + checkin.last_name),
@@ -120,16 +155,16 @@ export function Checkins({checkin}) {
                     h('h3', {className: 'rating'}, ratingArr),
                 ]),
             ]),
-            h('div', { className: 'observations' }, observations),
-        ]),
-        h('div', { className: showMap ? 'hide' : 'bottom' }, [
-            h(Footer),
-        ]),
-        h('div', { className: !showMap ? 'hide' : 'map'}, map)
-    ])
-
-
-    return overlayOpen ? overlay : main;
+            h(Overlay2, { 
+            isOpen: overlayOpen, 
+            onClose: () => setOverlayOpen(false), 
+            className: "map",
+            usePortal: true,
+            canEscapeKeyClose: true,
+            canOutsideClickClose: true,
+            hasBackdrop: false,
+        }, map),
+    ])      
 }
 
 function observationFooter(observation) {
