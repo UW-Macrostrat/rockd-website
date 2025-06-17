@@ -11,6 +11,9 @@ import { useEffect } from "react";
 import { useMapRef } from "@macrostrat/mapbox-react";
 
 export function WeaverMapContainer({style, mapPosition, onSelectPosition, setSelectedCheckin, overlay}) {
+  // Ensure the mapbox access token is setconsole
+  console.log("overla")
+
     return h(
         "div.map-container",
         [
