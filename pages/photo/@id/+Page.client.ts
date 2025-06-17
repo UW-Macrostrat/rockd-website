@@ -1,21 +1,23 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   BlankImage,
   imageExists,
   Image,
   getImageUrl,
+  Footer,
 } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 import { LithologyList } from "@macrostrat/data-components";
-import { DarkModeButton } from "@macrostrat/ui-components";
+import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
 
 export function Page() {
+  const isDarkMode = useDarkMode()?.isEnabled;
   const pageContext = usePageContext();
   const photoID = pageContext.urlPathname
     .split("/")[2]
@@ -49,7 +51,7 @@ export function Page() {
   let observations = [];
 
   const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
-  const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
+  const headerImgUrl = checkin.photo ? imageSrc : null;
 
   const headerBody = ({ onClose }) =>
     h("div", { className: "observation-body-container" }, [
@@ -76,7 +78,7 @@ export function Page() {
 
       const imageSrc = getImageUrl(checkin.person_id, observation.photo);
       const observationURL =
-        observation.photo && imageExists(imageSrc) ? imageSrc : null;
+        observation.photo ? imageSrc : null;
 
       const observationBody = ({ onClose }) =>
         h(observationFooter, { observation, onClose });
@@ -95,13 +97,33 @@ export function Page() {
   const leftArrow = h(Icon, {
     className: "left-arrow",
     icon: "arrow-left",
-    style: { color: "white" },
+    style: { color: isDarkMode ? "black" : "white" },
   });
   const rightArrow = h(Icon, {
     className: "right-arrow",
     icon: "arrow-right",
-    style: { color: "white" },
+    style: { color: isDarkMode ? "black" : "white" },
   });
+
+
+  useEffect(() => {
+  if (photoIndex > 0) {
+    const prev = photoIDArr[photoIndex - 1];
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = `/photo/${prev}`;
+    document.head.appendChild(link);
+  }
+
+  if (photoIndex < photoIDArr.length - 1) {
+    const next = photoIDArr[photoIndex + 1];
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = `/photo/${next}`;
+    document.head.appendChild(link);
+  }
+}, [photoIndex]);
+
 
   let footer = [];
   photoIDArr.forEach((photo) => {
@@ -124,7 +146,7 @@ export function Page() {
         h(Icon, {
           icon: "arrow-left",
           className: "back-checkin-arrow",
-          style: { color: "white" },
+          style: { color: isDarkMode ? "black" : "white" },
         }),
         h("h3", "CHECKIN"),
       ]),
@@ -145,6 +167,7 @@ export function Page() {
         : null,
     ]),
     h("div.circles", footer),
+    h(Footer)
   ]);
 }
 
@@ -196,6 +219,15 @@ function observationFooter({ observation, onClose }) {
   };
 
   return h("div", { className: "observation-body" }, [
+    h(Icon, {
+      className: "close-body",
+      icon: "ban-circle",
+      onClick: onClose,
+      style: {
+        paddingTop: "10px",
+        cursor: "pointer",
+      }
+    }),
     observation.lat && rocks.strat_name?.strat_name_long
       ? h("h4", { className: "observation-header" }, [
           rocks.strat_name.strat_name_long,
@@ -206,11 +238,6 @@ function observationFooter({ observation, onClose }) {
       h(LithologyList, { lithologies }),
       h("p", { className: "notes" }, rocks.notes),
     ]),
-    h(Icon, {
-      className: "close-body",
-      icon: "ban-circle",
-      onClick: onClose,
-    }),
   ]);
 }
 
