@@ -32,8 +32,8 @@ export function MapContainer({center, setOverlayOpen}) {
             [
               h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
                 h(MapMarker, {
-                    position: center,
-                   }),
+                  position: center,
+                }),
               ]),
             ]
           ),
