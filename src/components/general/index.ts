@@ -10,6 +10,7 @@ import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 import { useState } from "react";
+import { has } from "underscore";
 
 export function Footer() {
   const isDarkMode = useDarkMode().isEnabled;
@@ -109,26 +110,46 @@ export function Footer() {
   ]);
 }
 
-export function Image({ src, className, width, height, onClick }) {
-  const srcWithAddedPrefix =
+export function Image(props: ImageProps) {
+    const { src, className, width, height, onClick, alt } = props
+   const [hasError, setHasError] = useState(false);
+   const srcWithAddedPrefix =
     "https://storage.macrostrat.org/assets/rockd/" + src;
+
+    if (!src || hasError) {
+        return null;
+    }
+
+    return h("img", {
+        src: srcWithAddedPrefix,
+        className,
+        width,
+        height,
+        onClick,
+        onError: () => setHasError(true),
+        alt,
+    });
+}
+
+interface ImageProps {
+  src: string;
+  className?: string;
+  width?: number | string;
+  height?: number | string;
+  onClick?: () => void;
+  alt?: string; 
+  onError?: () => void; 
+}
+
+function TestImage({src, onError}) {
   return h("img", {
-    src: srcWithAddedPrefix,
-    className,
-    width,
-    height,
-    onClick,
+    src,
+    onError,
   });
 }
 
-export function BlankImage({
-  src,
-  className,
-  width,
-  height,
-  onClick,
-  alt,
-}) {
+export function BlankImage(props: ImageProps) {
+   const { src, className, width, height, onClick, alt } = props
    const [hasError, setHasError] = useState(false);
 
     if (!src || hasError) {
@@ -153,15 +174,13 @@ export function useRockdAPI(src) {
   return useAPIResult(apiURL + src);
 }
 
-export function imageExists(url) {
-  var http = new XMLHttpRequest();
-  try {
-    http.open("HEAD", url, false);
-    http.send();
-  } catch (e) {
-    return true;
-  }
-  return false;
+function imageExists(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = Image({ src });
+
+    img.onload = () => resolve(true); // No error
+    img.onerror = () => resolve(false); // Error occurred
+  });
 }
 
 export function getImageUrl(person_id, photo_id) {
@@ -236,13 +255,23 @@ export function fetchAPIDataOld(url) {
 }
 
 export function createCheckins(result, mapRef, setInspectPosition) {
-  const isDarkMode = useDarkMode().isEnabled;
-  let checkins = [];
-  const map = mapRef?.current;
-
   const len = result.length;
 
-  result.forEach((checkin) => {
+  return result.map((checkin, index) =>
+    h(Checkin, {  
+      checkin,
+      mapRef,
+      setInspectPosition,
+      len,
+      key: checkin.checkin_id || index, 
+    })
+  );
+}
+
+function Checkin({checkin, mapRef, setInspectPosition, len}) {
+    const [hasError, setHasError] = useState(false);
+    const isDarkMode = useDarkMode().isEnabled;
+    const map = mapRef?.current;
     // format rating
     let ratingArr = [];
     for (var i = 0; i < checkin.rating; i++) {
@@ -261,11 +290,18 @@ export function createCheckins(result, mapRef, setInspectPosition) {
       );
     }
 
+    
+
     let image;
     const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
     const showImage = checkin.photo;
 
-    if (showImage) {
+    const test = h(TestImage, {
+      src: imgSrc,
+      onError: () => setHasError(true),
+    });
+
+    if (!hasError) {
       image = h(BlankImage, { className: "observation-img", src: imgSrc });
     } else {
       image = h("div", { className: "no-image" }, [
@@ -318,6 +354,7 @@ export function createCheckins(result, mapRef, setInspectPosition) {
         },
       },
       [
+        h('div', {className: "hide"}, test),
         h("h1", { className: "stop-name" }, stop_name),
         h("div", { className: "checkin-header" }, [
           !stop_name
@@ -397,8 +434,6 @@ export function createCheckins(result, mapRef, setInspectPosition) {
       ]
     );
 
-    checkins.push(temp);
-  });
+    return temp
 
-  return checkins;
 }
