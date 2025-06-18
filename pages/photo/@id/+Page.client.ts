@@ -124,10 +124,6 @@ function ObservationContent({ observation, setBody }) {
       className: "close-body",
       icon: "ban-circle",
       onClick: () => setBody(false),
-      style: {
-        paddingTop: "10px",
-        cursor: "pointer",
-      }
     }),
     observation.lat && rocks.strat_name?.strat_name_long
       ? h("h4", { className: "observation-header" }, [
@@ -152,13 +148,14 @@ function Item({ checkin, photoID }) {
     const imageSrc = getImageUrl(checkin.person_id, isObservation ? observation.photo : checkin.photo);
     const imgURL =  isObservation ? (observation?.photo ? imageSrc : null) : (checkin?.photo ? imageSrc : null);
     const bodyContent = isObservation
-        ? h(ObservationContent, { observation, setBody })
-        : h("div", { className: "observation-body-container" }, [
+        ? h(ObservationContent, { observation, setBody, showBody })
+        : h("div", { className: "observation-body" }, [
             h(Icon, {
-                className: "close-body",
-                icon: "ban-circle",
+              className: "close-body",
+              icon: "ban-circle",
+              onClick: () => setBody(false),
             }),
-            checkin.notes,
+            h('div.notes', checkin.notes ?? "No notes available"),
         ]);
 
   return h("div", { className: "observation-item" }, [
