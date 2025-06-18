@@ -9,6 +9,7 @@ import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
+import { useState } from "react";
 
 export function Footer() {
   const isDarkMode = useDarkMode().isEnabled;
@@ -126,18 +127,23 @@ export function BlankImage({
   width,
   height,
   onClick,
-  onError,
   alt,
 }) {
-  return h("img", {
-    src: src,
-    className,
-    width,
-    height,
-    onClick,
-    onError,
-    alt,
-  });
+   const [hasError, setHasError] = useState(false);
+
+    if (!src || hasError) {
+        return null;
+    }
+
+    return h("img", {
+        src,
+        className,
+        width,
+        height,
+        onClick,
+        onError: () => setHasError(true),
+        alt,
+    });
 }
 
 // remove when metrics works
