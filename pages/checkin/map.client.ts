@@ -1,24 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
-import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
+import { MapAreaContainer, MapView } from "@macrostrat/map-interface";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import { PanelCard } from "@macrostrat/map-interface";
+import mapboxgl from 'mapbox-gl';
 
 
 export function MapContainer({center, setOverlayOpen}) {
     const [style, setStyle] = useState("mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i");
     const [styleText, setStyleText] = useState("Show Satelite");
+    const [map, setMap] = useState(null);
+
+    useEffect(() => {
+        if (map) {
+            new mapboxgl.Marker().setLngLat(center).addTo(map);
+        }
+    }, [style, map]);
 
     const newMapPosition: MapPosition = {
         camera: {
-          lat: center.lat,  // Latitude
-          lng: center.lng, // Longitude
-          altitude: 300000, // Altitude (height from the Earth's surface)
+          lat: center.lat, 
+          lng: center.lng, 
+          altitude: 300000, 
         },
       };
 
@@ -30,11 +38,10 @@ export function MapContainer({center, setOverlayOpen}) {
     return h("div.overlay-container", [
         h(MapAreaContainer, { style: {height: "93vh", top: "7vh"} },
             [
-              h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }, [
-                h(MapMarker, {
-                  position: center,
-                }),
-              ]),
+              h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition, onMapLoaded: (map) => {
+                console.log("Map loaded", map);
+                setMap(map);
+              }})
             ]
           ),
         h('div', {className: 'banner'}, [
