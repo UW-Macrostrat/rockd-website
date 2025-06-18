@@ -126,10 +126,17 @@ h4
 .observation-item
   width: 40%
   margin: calc(20px + 7vh) 30% 0 30%
+  position: relative
 
   .observation-image
     width: 100%
-    object-fit: cover
+  
+  .observation-body
+    background-color: var(--secondary-color)
+
+  .notes
+    text-align: center
+    padding-bottom: 10px
 
 .overlay
   background-color: var(--panel-background-color)
@@ -212,6 +219,7 @@ h4
 
 .observation-details
   text-align: left
+  padding: 5px
   
   .observation-detail
     padding: 4px
@@ -279,10 +287,6 @@ h4
   justify-content: center
   padding: 30px 0
 
-.info-btn
-  margin-top: 10px
-  cursor: pointer
-
 .hide
   display: none
 
@@ -291,3 +295,7 @@ h4
   top: 0
   left: 0
   width: 100%
+
+.close-body, .info-btn
+  padding: 5px 0 0 5px
+  cursor: pointer
