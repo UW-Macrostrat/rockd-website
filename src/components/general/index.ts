@@ -294,14 +294,15 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
 
     let image;
     const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
-    const showImage = checkin.photo;
 
     const test = h(TestImage, {
       src: imgSrc,
       onError: () => setHasError(true),
     });
 
-    if (!hasError) {
+    const showImage = !hasError;
+
+    if (showImage) {
       image = h(BlankImage, { className: "observation-img", src: imgSrc });
     } else {
       image = h("div", { className: "no-image" }, [
@@ -309,7 +310,7 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
         h(Icon, {
           className: "details-image",
           icon: "arrow-right",
-          style: { color: "white" },
+          style: { color: "black" },
         }),
       ]);
     }
