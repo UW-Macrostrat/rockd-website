@@ -146,7 +146,6 @@ function Item({ checkin, photoID }) {
     );
     const isObservation = observation !== undefined;
     const imageSrc = getImageUrl(checkin.person_id, isObservation ? observation.photo : checkin.photo);
-    const imgURL =  isObservation ? (observation?.photo ? imageSrc : null) : (checkin?.photo ? imageSrc : null);
     const bodyContent = isObservation
         ? h(ObservationContent, { observation, setBody, showBody })
         : h("div", { className: "observation-body" }, [
@@ -159,7 +158,7 @@ function Item({ checkin, photoID }) {
         ]);
 
   return h("div", { className: "observation-item" }, [
-    h.if(imgURL)(BlankImage, { className: "observation-image", src: imgURL }),
+    h(BlankImage, { className: "observation-image", src: imageSrc }),
     showBody ? bodyContent : null,
     h.if(!showBody)(Icon, {
         className: "info-btn",

@@ -1,16 +1,12 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useCallback } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, imageExists, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
+import { BlankImage, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
-import { MapAreaContainer, MapView, MapMarker } from "@macrostrat/map-interface";
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPosition } from "@macrostrat/mapbox-utils";
-import { PanelCard } from "@macrostrat/map-interface";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
 
@@ -74,14 +70,13 @@ const [isOpen, setIsOpen] = useState(false);
 
     // add checkin photo and notes
     const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
-    const headerImgUrl = checkin.photo && imageExists(imageSrc) ? imageSrc : null;
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
         h('div', {className: 'observation'}, [
-            headerImgUrl ? h('a', {href: "/photo/" + checkin.photo}, 
-                h(BlankImage, { className: 'observation-image', src: headerImgUrl})
-            ) : null,
+           h('a', {href: "/photo/" + checkin.photo}, 
+                h(BlankImage, { className: 'observation-image', src: imageSrc, alt: "presentation" })
+            ),
             h("div.observation-body", headerBody),
         ])
     );
@@ -91,14 +86,13 @@ const [isOpen, setIsOpen] = useState(false);
         if(Object.keys(observation.rocks).length != 0) {
             // if photo exists
             const imageSrc = getImageUrl(checkin.person_id, observation.photo);
-            const observationURL = observation.photo && imageExists(imageSrc) ? imageSrc : null;
             let observationBody = observationFooter(observation);
 
             observations.push(
                 h('div', {className: 'observation'}, [
-                    observationURL ? h('a', {href: "/photo/" + observation.photo}, 
-                        h(BlankImage, { className: 'observation-image', src: observationURL})
-                    ) : null,
+                    h('a', {href: "/photo/" + observation.photo}, 
+                        h(BlankImage, { className: 'observation-image', src: imageSrc })
+                    ),
                     observationBody,
                 ])
             );
