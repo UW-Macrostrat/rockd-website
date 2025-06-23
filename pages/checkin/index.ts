@@ -2,13 +2,14 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useCallback } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
-import { Icon } from "@blueprintjs/core";
+import { Icon, Divider } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
+import { ExpansionPanel } from "@macrostrat/map-interface";
 
 function Map(props) {
   return h(
@@ -252,22 +253,39 @@ function observationFooter(observation) {
 }
 
 function Comments({comments}) {
+   const commentArr = [];
+
+    comments.forEach((item, index) => {
+        const { created, comment, person_id, name, likes } = item;
+
+        const commentNode = h('div.comment', [
+            h('div.comment-author', [
+                h(BlankImage, {
+                    className: 'comment-pic',
+                    src: getProfilePicUrl(person_id),
+                    alt: "profile picture"
+                }),
+                h('p', { className: 'comment-author' }, name),
+            ]),
+            h('p', { className: 'comment-text' }, comment),
+            h('p', { className: 'comment-date' }, created),
+            h('div.comment-likes', [
+                h(Icon, { icon: 'thumbs-up', className: 'like-icon' }),
+                h('p', { className: 'comment-likes' }, String(likes)),
+            ])
+        ]);
+
+        commentArr.push(commentNode);
+
+        // Add divider between comments (but not after the last one)
+        if (index < comments.length - 1) {
+            commentArr.push(h(Divider));
+        }
+    });
+
     return h('div.comments', [
-        h('h3', 'Comments'), 
-        comments.map(item => {
-            const { created, comment, person_id, name, likes } = item; 
-            return h('div.comment', [
-                h('div.comment-author', [
-                    h(BlankImage, { className: 'profile-picture', src: getProfilePicUrl(person_id), alt: "profile picture" }),
-                    h('p', {className: 'comment-author'}, name),
-                ]),
-                h('p', {className: 'comment-text'}, comment),
-                h('p', {className: 'comment-date'}, created),
-                h('div.comment-likes', [
-                    h(Icon, {icon: 'thumbs-up', className: 'like-icon'}),
-                    h('p', {className: 'comment-likes'}, likes),
-                ])
-            ]);
-        })
+        h('h2', 'Comments'),
+        h(Divider),
+        ...commentArr
     ]);
 }
