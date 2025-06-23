@@ -21,7 +21,8 @@ function Map(props) {
   );
 }
 
-export function Checkins({checkin}) {
+export function Checkins({checkin, comments}) {
+    console.log("checkin", comments)
     /*
 const [isOpen, setIsOpen] = useState(false);
     const toggleOverlay = useCallback(() => setIsOpen(open => !open), [setIsOpen]);
@@ -123,9 +124,8 @@ const [isOpen, setIsOpen] = useState(false);
             }),
             h('div', { className: 'observations' }, observations),
         ]),
-        h('div', { className: showMap ? 'hide' : 'bottom' }, [
-            h(Footer),
-        ]),
+        h(Comments, { comments }),
+        h(Footer),
     ])
 
     return main;
@@ -248,5 +248,26 @@ function observationFooter(observation) {
             h(LithologyList, { lithologies }),
             h('p', {className: "notes"}, rocks.notes),
         ]),
+    ]);
+}
+
+function Comments({comments}) {
+    return h('div.comments', [
+        h('h3', 'Comments'), 
+        comments.map(item => {
+            const { created, comment, person_id, name, likes } = item; 
+            return h('div.comment', [
+                h('div.comment-author', [
+                    h(BlankImage, { className: 'profile-picture', src: getProfilePicUrl(person_id), alt: "profile picture" }),
+                    h('p', {className: 'comment-author'}, name),
+                ]),
+                h('p', {className: 'comment-text'}, comment),
+                h('p', {className: 'comment-date'}, created),
+                h('div.comment-likes', [
+                    h(Icon, {icon: 'thumbs-up', className: 'like-icon'}),
+                    h('p', {className: 'comment-likes'}, likes),
+                ])
+            ]);
+        })
     ]);
 }
