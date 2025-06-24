@@ -420,7 +420,7 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
               icon: "camera",
               style: { color: "white" },
             }),
-            h("h3", { className: "likes" }, checkin.observations.length),
+            h("h3", { className: "likes" }, checkin.likes),
           ]),
           h("div", { className: "comments-container" }, [
             h(Icon, {
