@@ -1,5 +1,5 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   BlankImage,
@@ -25,7 +25,7 @@ export function Page() {
         .replace(/%40/g, "@")
         .replace(/%2B/g, "+"));
 
-    let photoIDArr = getPhotoIDArr(checkin);
+  const photoIDArr = PhotoIDCollector({ checkin }).props.photoIDArr;
 
   const photoIndex = photoIDArr.indexOf(photoID);
 
@@ -163,35 +163,46 @@ function Item({ checkin, photoID }) {
   ]);
 }
 
-function getPhotoIDArr(checkin) {
-  const [photoIDArr, setPhotoIDArr] = useState([checkin.photo]);
-  if (checkin.observations) {
+function PhotoIDCollector({ checkin }) {
+  const [photoIDArr, setPhotoIDArr] = useState(() =>
+    checkin.photo ? [checkin.photo] : []
+  );
+  const [testedPhotos, setTestedPhotos] = useState([]);
+
+  useEffect(() => {
+    if (checkin.observations) {
       checkin.observations.forEach((obs) => {
-        const [hasError, setHasError] = useState(false);
         const photo = obs.photo;
-        const imgSrc = getImageUrl(checkin.person_id, photo);
-
-        const test = testImage({ setHasError, src: imgSrc });
-    
-        const showImage = !hasError;
-
-        console.log("Photo ID:", photo, "Show Image:", showImage);
-
-        if (showImage && photo && !photoIDArr.includes(photo)) {
-            setPhotoIDArr((prev) => [...prev, photo]);
+        if (photo && !testedPhotos.includes(photo)) {
+          setTestedPhotos((prev) => [...prev, photo]);
         }
       });
-  }
-  return photoIDArr;
-}
+    }
+  }, [checkin, testedPhotos]);
 
-function testImage({setHasError, src}) {
-  return h(TestImage, {
-    src,
-    onError: () => {
-      console.error("Error loading image:", src);
-      setHasError(true);
-    },
-  });
-  
+  const handleLoad = (photo) => {
+    setPhotoIDArr((prev) => {
+      if (!prev.includes(photo)) {
+        return [...prev, photo];
+      }
+      return prev;
+    });
+  };
+
+  const handleError = (photo) => {
+    console.warn("Image failed to load:", photo);
+  };
+
+  return h('div', { photoIDArr }, [
+    ...testedPhotos.map((photo) => {
+      console.log("Testing photo:", photo);
+      return h(TestImage, {
+        key: photo,
+        src: getImageUrl(checkin.person_id, photo),
+        onLoad: () => handleLoad(photo),
+        onError: () => handleError(photo),
+      });
+    }
+    ),
+  ]);
 }
