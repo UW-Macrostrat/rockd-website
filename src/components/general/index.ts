@@ -5,12 +5,11 @@ import {
   useAPIResult,
   useDarkMode,
 } from "@macrostrat/ui-components";
-import { Icon } from "@blueprintjs/core";
+import { Icon, Divider } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 import { useState } from "react";
-import { has } from "underscore";
 
 export function Footer() {
   const isDarkMode = useDarkMode().isEnabled;
@@ -437,4 +436,40 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
 
     return temp
 
+}
+
+export function Comments({comments}) {
+   const commentArr = [];
+
+    comments.forEach((item, index) => {
+        const { created, comment, person_id, name, likes } = item;
+
+        const commentNode = h('div.comment', [
+            h('div.comment-author', [
+                h(BlankImage, {
+                    className: 'comment-pic',
+                    src: getProfilePicUrl(person_id),
+                    alt: "profile picture"
+                }),
+                h('p', { className: 'comment-author' }, name),
+            ]),
+            h('p', { className: 'comment-text' }, comment),
+            h('p', { className: 'comment-date' }, created),
+            h('div.comment-likes', [
+                h(Icon, { icon: 'thumbs-up', className: 'like-icon' }),
+                h('p', { className: 'comment-likes' }, String(likes)),
+            ])
+        ]);
+
+        commentArr.push(commentNode);
+
+        // Add divider between comments (but not after the last one)
+        if (index < comments.length - 1) {
+            commentArr.push(h(Divider));
+        }
+    });
+
+    return h('div.comments', [
+        ...commentArr
+    ]);
 }

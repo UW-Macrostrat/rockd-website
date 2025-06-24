@@ -2,7 +2,7 @@ import h from "./main.module.sass";
 import { useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, getProfilePicUrl, Image, createCheckins } from "~/components/general";
+import { BlankImage, getProfilePicUrl, Image, createCheckins, Comments } from "~/components/general";
 import "@macrostrat/style-system";
 import { rockdApiURL, SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
@@ -102,7 +102,7 @@ function useMapStyle({showSatelite}) {
     return showSatelite ? SETTINGS.satelliteMapURL : useDarkMode()?.isEnabled ? SETTINGS.darkMapURL : SETTINGS.whiteMapURL;
 }
 
-function SideBar({data}) {
+function SideBar({data, commentsData}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
     const profile_pic = h(BlankImage, {src: getProfilePicUrl(data.person_id), className: "profile-pic-header"});
@@ -196,13 +196,27 @@ function SideBar({data}) {
             h("div.details", [
                 h('h1', {className: 'park'}, data.name),
                 h('p', {className: 'description'}, data.description),
-                h('div', {className: 'download-button', onClick: () => setCommentsOpen(true)}, [
+                h.if(commentsData?.length > 0)('div', {className: 'download-button', onClick: () => setCommentsOpen(true)}, [
                     h('div', {className: 'kmz'}, "View comments"),
                 ]),
-                h(Overlay2, {className: 'overlay', isOpen: commentsOpen, usePortal: true}, [
+                h.if(commentsData?.length > 0)(Overlay2, {className: 'overlay', isOpen: commentsOpen, usePortal: true}, [
                     h('div', {className: 'overlay-content'}, [
-                        h('h2', 'Trip Details'),
-                    ]),
+                        h('div.comments-container', [
+                            h('div.comments-header', [
+                                h('h2', {className: 'comments-title'}, "Comments"),
+                                h(Icon, {
+                                    icon: "cross",
+                                    className: "close-icon",
+                                    onClick: () => {
+                                        setCommentsOpen(false)
+                                    },
+                                    style: { cursor: "pointer", color: "red" },
+                                }),
+                            ]),
+                            h(Divider),
+                            h(Comments, {comments: commentsData}),
+                        ])
+                    ])
                 ])
             ]),
         ]),
