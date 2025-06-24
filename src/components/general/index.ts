@@ -412,14 +412,14 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
             }),
             h("h3", { className: "likes" }, checkin.likes),
           ]),
-          h("div", { className: "observations-container" }, [
+          h.if(checkin?.observations)("div", { className: "observations-container" }, [
             h(Icon, {
               className:
                 "observations-icon " + (isDarkMode ? "icon-dark-mode" : ""),
               icon: "camera",
               style: { color: "white" },
             }),
-            h("h3", { className: "likes" }, checkin.observations.length),
+            h("h3", { className: "likes" }, checkin.observations?.length),
           ]),
           h("div", { className: "comments-container" }, [
             h(Icon, {
