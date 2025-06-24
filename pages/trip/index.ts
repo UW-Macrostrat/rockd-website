@@ -14,11 +14,11 @@ import {
   PanelCard,
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
+import { map } from "underscore";
 
 export function Trips({data, commentsData}) {
     const [showSatelite, setSatelite] = useState(false);
-    console.log("Trips data:", data);
-    console.log("Comments data:", commentsData);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     const style = useMapStyle({showSatelite});
 
@@ -29,7 +29,7 @@ export function Trips({data, commentsData}) {
     data.updated = date.toLocaleDateString('en-US', options);
 
     const toolbar = h(Toolbar, {showSatelite, setSatelite});
-    const sidebar = h(SideBar, {data, commentsData});
+    const sidebar = h(SideBar, {data, commentsData, mapLoaded});
 
     if (!sidebar) {
         return h("div", { className: 'loading' }, [
@@ -60,7 +60,9 @@ export function Trips({data, commentsData}) {
                     style: { paddingRight: "calc(30% + 14px)"},
                 },
                 [
-                    h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition }),
+                    h(MapView, { style: style, mapboxToken: SETTINGS.mapboxAccessToken, mapPosition: newMapPosition, onMapLoaded: () => {
+                        setMapLoaded(true);
+                    }},),
                     sidebar,
                 ]
                 ),
@@ -102,15 +104,14 @@ function useMapStyle({showSatelite}) {
     return showSatelite ? SETTINGS.satelliteMapURL : useDarkMode()?.isEnabled ? SETTINGS.darkMapURL : SETTINGS.whiteMapURL;
 }
 
-function SideBar({data, commentsData}) {
+function SideBar({data, commentsData, mapLoaded}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
     const profile_pic = h(BlankImage, {src: getProfilePicUrl(data.person_id), className: "profile-pic-header"});
     const stops = data.stops;
     const [commentsOpen, setCommentsOpen] = useState(false);
-    console.log("commentsOpen:", commentsOpen); 
 
-    if(!map) return h("div", {className: "stop-container loading2"}, [
+    if(!mapLoaded) return h("div", {className: "stop-container loading2"}, [
         h("h1", "Loading trip " + data.trip_id + "..."),
         h(Spinner, {style: {marginTop: "30px"}})
     ]);
