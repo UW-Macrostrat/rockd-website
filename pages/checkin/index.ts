@@ -2,13 +2,15 @@ import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useCallback } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
-import { Icon } from "@blueprintjs/core";
+import { Icon, Divider } from "@blueprintjs/core";
 import h from "./main.module.sass";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { apiDomain, SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { a } from "vitest/dist/suite-IbNSsUWN";
 
 function Map(props) {
   return h(
@@ -22,29 +24,7 @@ function Map(props) {
 }
 
 export function Checkins({checkin}) {
-    /*
-const [isOpen, setIsOpen] = useState(false);
-    const toggleOverlay = useCallback(() => setIsOpen(open => !open), [setIsOpen]);
-
-    return h("div.container", [
-        h('button', {
-            className: "bp3-button bp3-intent-primary",
-            onClick: toggleOverlay
-        }, "Open Overlay"),
-         h(Overlay2,
-        {
-            isOpen,
-            onClose: toggleOverlay,
-            className: "checkin-overlay",
-            usePortal: true,
-            canEscapeKeyClose: true,
-            canOutsideClickClose: true,
-            hasBackdrop: true,
-        }, "hello"
-        
-    )
-    ]);
-    */
+    const allLiths = useAPIResult(apiDomain + "/api/defs/lithologies?all")?.success?.data || [];
 
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [showMap, setShowMap] = useState(false);
@@ -162,6 +142,8 @@ function Overlay({checkin, center, LngLatProps, ratingArr, profile_pic}) {
 }
 
 function observationFooter(observation) {
+    const [overlayOpen, setOverlayOpen] = useState(false);
+
     const LngLatProps = {
         position: {
             lat: observation.lat,
@@ -240,6 +222,8 @@ function observationFooter(observation) {
 
     // observation body
     return h('div', {className: 'observation-body'}, [
+        h('button.edit-button', {onClick: () => setOverlayOpen(true)}, "Edit"),
+        h(EditObservation, {observation, overlayOpen, setOverlayOpen}),
         observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
             rocks.strat_name?.strat_name_long,
             observation.lat ? LngLatCoords(LngLatProps) : null,
@@ -248,5 +232,79 @@ function observationFooter(observation) {
             h(LithologyList, { lithologies }),
             h('p', {className: "notes"}, rocks.notes),
         ]),
+    ]);
+}
+
+function EditCheckin({checkin}) {
+    console.log("EditCheckin", checkin);
+    return h(Overlay2, {
+            isOpen: true
+        },
+        h('div.edit-checkin-container', [
+            h('div.edit-checkin-header', [
+                h('h1', "Edit Checkin"),
+            ]),
+            h('div.form-item', [
+                h('label', "Notes"),
+                h('input', { 
+                    type: 'text', 
+                    className: 'bp3-input', 
+                        defaultValue: checkin.notes, 
+                    onChange: (e) => {
+                        // Handle note change
+                        console.log("New notes:", e.target.value);
+                    }
+                })
+            ]),
+        ]) 
+    );
+}
+
+
+function EditObservation({observation, overlayOpen, setOverlayOpen}) {
+    const liths = observation.rocks.liths || [];
+    return h(Overlay2, {
+            isOpen: overlayOpen
+        },
+        h('div.edit-observation-container', [
+            h('div.edit-content', [
+                h('div.edit-observation-header', [
+                    h('h1', "Edit Observation"),
+                    h(Icon, {icon: "cross", className: "close-icon", onClick: () => setOverlayOpen(false)}),
+                ]),
+                h('div.form-item', [
+                    h('label', "Liths"),
+                    h(LithList, { existingLiths: liths }),
+                ]),
+            ])
+        ]) 
+    );
+}
+
+function LithologyTag({lith, add, setExisting}) {
+    const color = lith.color.includes("#") ? lith.color : `rgba(${lith.color})`;
+
+    return h('div.lithology-tag', {style: {backgroundColor: color}}, [
+        h('p', lith.name),
+        h.if(!add)(Icon, {icon: "cross", className: "remove-icon", onClick: () => {
+            setExisting(existing => existing.filter(e => e.name !== lith.name));
+        }} ),
+        h.if(add)(Icon, {icon: "plus", className: "add-icon", onClick: () => {
+            setExisting(existing => [...existing, lith]);
+        }} )
+    ]);
+}
+
+function LithList({existingLiths}) {
+    const [existing, setExisting] = useState(existingLiths || []);
+
+    const liths = useAPIResult(apiDomain + "/api/defs/lithologies?all")?.success?.data.filter(lith => {
+        // Filter out existing lithologies
+        return !existing.some(existing => existing.name === lith.name);
+    }) || [];
+    return h('div.lithology-list', [
+        existing.map(lith => h(LithologyTag, { lith, add: false, setExisting })),
+        h(Divider),
+        liths.map(lith => h(LithologyTag, { lith, add: true, setExisting })),
     ]);
 }
