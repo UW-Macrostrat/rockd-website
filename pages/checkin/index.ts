@@ -22,6 +22,7 @@ function Map(props) {
 }
 
 export function Checkins({checkin, comments}) {
+    console.log("Checkin data:", checkin);
     const center = {
         lat: checkin.lat,
         lng: checkin.lng
