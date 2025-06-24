@@ -171,13 +171,7 @@ function getPhotoIDArr(checkin) {
         const photo = obs.photo;
         const imgSrc = getImageUrl(checkin.person_id, photo);
 
-        const test = h(TestImage, {
-          src: imgSrc,
-          onError: () => {
-            console.error("Error loading image:", imgSrc);
-            setHasError(true);
-          },
-        });
+        const test = testImage({ setHasError, src: imgSrc });
     
         const showImage = !hasError;
 
@@ -191,6 +185,13 @@ function getPhotoIDArr(checkin) {
   return photoIDArr;
 }
 
-function testImage() {
+function testImage({setHasError, src}) {
+  return h(TestImage, {
+    src,
+    onError: () => {
+      console.error("Error loading image:", src);
+      setHasError(true);
+    },
+  });
   
 }
