@@ -2,11 +2,11 @@ import h from "./main.module.sass";
 import { useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, getProfilePicUrl, Image, createCheckins } from "~/components/general";
+import { BlankImage, getProfilePicUrl, Image, createCheckins, Comments } from "~/components/general";
 import "@macrostrat/style-system";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { rockdApiURL, SETTINGS } from "@macrostrat-web/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import { Divider, Icon, Spinner } from "@blueprintjs/core";
+import { Divider, Icon, Overlay2, Spinner } from "@blueprintjs/core";
 import {
   MapAreaContainer,
   MapMarker,
@@ -15,9 +15,10 @@ import {
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
 
-export function Trips({data}) {
+export function Trips({data, commentsData}) {
     const [showSatelite, setSatelite] = useState(false);
     console.log("Trips data:", data);
+    console.log("Comments data:", commentsData);
 
     const style = useMapStyle({showSatelite});
 
@@ -28,7 +29,7 @@ export function Trips({data}) {
     data.updated = date.toLocaleDateString('en-US', options);
 
     const toolbar = h(Toolbar, {showSatelite, setSatelite});
-    const sidebar = h(SideBar, {data});
+    const sidebar = h(SideBar, {data, commentsData});
 
     if (!sidebar) {
         return h("div", { className: 'loading' }, [
@@ -101,11 +102,13 @@ function useMapStyle({showSatelite}) {
     return showSatelite ? SETTINGS.satelliteMapURL : useDarkMode()?.isEnabled ? SETTINGS.darkMapURL : SETTINGS.whiteMapURL;
 }
 
-function SideBar({data}) {
+function SideBar({data, commentsData}) {
     const mapRef = useMapRef();
     const map = mapRef.current;
     const profile_pic = h(BlankImage, {src: getProfilePicUrl(data.person_id), className: "profile-pic-header"});
     const stops = data.stops;
+    const [commentsOpen, setCommentsOpen] = useState(false);
+    console.log("commentsOpen:", commentsOpen); 
 
     if(!map) return h("div", {className: "stop-container loading2"}, [
         h("h1", "Loading trip " + data.trip_id + "..."),
@@ -187,12 +190,34 @@ function SideBar({data}) {
                     h('h4', {className: 'edited'}, "Edited " + data.updated),
                 ]),
                 h('div', {className: 'download-button'}, [
-                    h('a', {className: 'kmz', href: import.meta.env.ROCKD_API_URL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
+                    h('a', {className: 'kmz', href: rockdApiURL + "/trips/" + data.trip_id + "?format=kmz"}, "DOWNLOAD KMZ"),
                 ]),
             ]),
             h("div.details", [
                 h('h1', {className: 'park'}, data.name),
                 h('p', {className: 'description'}, data.description),
+                h.if(commentsData?.length > 0)('div', {className: 'download-button', onClick: () => setCommentsOpen(true)}, [
+                    h('div', {className: 'kmz'}, "View comments"),
+                ]),
+                h.if(commentsData?.length > 0)(Overlay2, {className: 'overlay', isOpen: commentsOpen, usePortal: true}, [
+                    h('div', {className: 'overlay-content'}, [
+                        h('div.comments-container', [
+                            h('div.comments-header', [
+                                h('h2', {className: 'comments-title'}, "Comments"),
+                                h(Icon, {
+                                    icon: "cross",
+                                    className: "close-icon",
+                                    onClick: () => {
+                                        setCommentsOpen(false)
+                                    },
+                                    style: { cursor: "pointer", color: "red" },
+                                }),
+                            ]),
+                            h(Divider),
+                            h(Comments, {comments: commentsData}),
+                        ])
+                    ])
+                ])
             ]),
         ]),
         h('div', { className: 'stop-bottom' }, [

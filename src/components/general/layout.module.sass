@@ -285,3 +285,28 @@
 
 .hide
   display: none
+
+
+.comments
+  h2
+    margin: 0
+  
+  .comment
+    display: grid
+    grid-template-columns: 25% 55% 15% 5% 
+    padding: .5em
+    align-items: center
+
+    .comment-likes
+      display: flex
+      gap: .5em
+
+    .comment-author
+      display: flex
+      flex-direction: column
+      justify-content: center
+      align-items: center
+
+    .comment-pic
+      height: 6em
+      width: 6em
