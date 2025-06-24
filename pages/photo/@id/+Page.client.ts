@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import {
   BlankImage,
   getImageUrl,
+  TestImage,
   Footer,
 } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
@@ -13,6 +14,7 @@ import { LithologyList } from "@macrostrat/data-components";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
+import { connect } from "react-redux";
 
 export function Page() {
     const { checkin } = useData();
@@ -23,14 +25,7 @@ export function Page() {
         .replace(/%40/g, "@")
         .replace(/%2B/g, "+"));
 
-    let photoIDArr = [checkin.photo];
-    if (checkin.observations) {
-        checkin.observations.forEach((obs) => {
-        if (obs.photo && !photoIDArr.includes(obs.photo)) {
-            photoIDArr.push(obs.photo);
-        }
-        });
-    }
+    let photoIDArr = getPhotoIDArr(checkin);
 
   const photoIndex = photoIDArr.indexOf(photoID);
 
@@ -166,4 +161,36 @@ function Item({ checkin, photoID }) {
         onClick: () => setBody(true),
     })
   ]);
+}
+
+function getPhotoIDArr(checkin) {
+  const [photoIDArr, setPhotoIDArr] = useState([checkin.photo]);
+  if (checkin.observations) {
+      checkin.observations.forEach((obs) => {
+        const [hasError, setHasError] = useState(false);
+        const photo = obs.photo;
+        const imgSrc = getImageUrl(checkin.person_id, photo);
+
+        const test = h(TestImage, {
+          src: imgSrc,
+          onError: () => {
+            console.error("Error loading image:", imgSrc);
+            setHasError(true);
+          },
+        });
+    
+        const showImage = !hasError;
+
+        console.log("Photo ID:", photo, "Show Image:", showImage);
+
+        if (showImage && photo && !photoIDArr.includes(photo)) {
+            setPhotoIDArr((prev) => [...prev, photo]);
+        }
+      });
+  }
+  return photoIDArr;
+}
+
+function testImage() {
+  
 }
