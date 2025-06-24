@@ -2,7 +2,7 @@ import { Footer } from "~/components/general";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 
-export function Page() {    
+export function Page() { 
     return h("div", { className: "main-page" }, [
         h("div", { className: "content" }, [
             h("div", { className: 'header' }, [

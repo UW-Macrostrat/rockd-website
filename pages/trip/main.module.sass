@@ -12,10 +12,6 @@
   @each $name, $color in $colors
     --#{$name}: #{$color}
 
-*
-  padding: 0
-  margin: 0
-
 body
   &.bp5-dark
     color-scheme: dark
@@ -315,10 +311,12 @@ html, body, .wrapper, #react, .app, #map
   display: flex
   justify-content: center
   align-items: center
-  a
+  cursor: pointer
+
+  .kmz
     color: var(--text-emphasized-color)
   
-  a:hover
+  .kmz:hover
     color: var(--text-emphasized-color)
     background-color: var(--scrollbar-thumb)
     text-decoration: none
@@ -386,3 +384,22 @@ html, body, .wrapper, #react, .app, #map
 #map
   width: 70%
   height: 100%
+
+.overlay-content
+  width: 70%
+  height: 80vh
+  display: flex
+  justify-content: center
+  align-items: center
+
+  h2
+    margin: 0
+
+  .comments-container
+    background-color: var(--background-color)
+    width: 80%
+    padding: 1em
+
+    .comments-header
+      display: flex
+      justify-content: space-between

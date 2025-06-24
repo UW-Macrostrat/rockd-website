@@ -1,8 +1,8 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
 import { useState, useCallback } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { BlankImage, Footer, getProfilePicUrl, getImageUrl } from "~/components/general";
-import { Icon } from "@blueprintjs/core";
+import { BlankImage, Footer, getProfilePicUrl, getImageUrl, Comments } from "~/components/general";
+import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
@@ -21,34 +21,7 @@ function Map(props) {
   );
 }
 
-export function Checkins({checkin}) {
-    /*
-const [isOpen, setIsOpen] = useState(false);
-    const toggleOverlay = useCallback(() => setIsOpen(open => !open), [setIsOpen]);
-
-    return h("div.container", [
-        h('button', {
-            className: "bp3-button bp3-intent-primary",
-            onClick: toggleOverlay
-        }, "Open Overlay"),
-         h(Overlay2,
-        {
-            isOpen,
-            onClose: toggleOverlay,
-            className: "checkin-overlay",
-            usePortal: true,
-            canEscapeKeyClose: true,
-            canOutsideClickClose: true,
-            hasBackdrop: true,
-        }, "hello"
-        
-    )
-    ]);
-    */
-
-    const [overlayOpen, setOverlayOpen] = useState(false);
-    const [showMap, setShowMap] = useState(false);
-
+export function Checkins({checkin, comments}) {
     const center = {
         lat: checkin.lat,
         lng: checkin.lng
@@ -110,7 +83,7 @@ const [isOpen, setIsOpen] = useState(false);
 
 
     let main = h('div', { className: "container" }, [
-        h('div', { className: showMap ? 'hide' : 'main'}, [
+        h('div', { className: 'main'}, [
             h('div', { className: "checkin-head" }, [
                 h('h1', checkin.notes),
             ]),
@@ -123,9 +96,12 @@ const [isOpen, setIsOpen] = useState(false);
             }),
             h('div', { className: 'observations' }, observations),
         ]),
-        h('div', { className: showMap ? 'hide' : 'bottom' }, [
-            h(Footer),
+        h.if(comments?.length > 0)('div.comments-container', [
+            h('h2', 'Comments'),
+            h(Divider),
+            h(Comments, { comments }),
         ]),
+        h(Footer),
     ])
 
     return main;
