@@ -83,7 +83,7 @@ function ObservationContent({ observation, setBody }) {
   }
 
   let lithologies = [];
-  rocks.liths.forEach((lith) => {
+  rocks.liths?.forEach((lith) => {
     if (!lith.color.includes("#")) {
       lithologies.push({ name: lith.name, color: rgbaStringToHex(lith.color) });
     } else {
