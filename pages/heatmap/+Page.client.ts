@@ -6,7 +6,6 @@ import {
   MapView,
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken } from "@macrostrat-web/settings";
-import mapboxgl from "mapbox-gl";
 
 export function Page() {   
     const coords = useAPIResult('/api/matomo', {
@@ -29,72 +28,127 @@ export function Page() {
 
     const style = 'mapbox://styles/mapbox/streets-v11';
 
-    console.log("Matomo API response:", coords);
-    console.log("Today's Matomo API response:", today);
-
     if (!coords || !today) {
       return h("div", "Loading data...");
     }
 
     const handleMapLoaded = (map) => {
         map.on('load', () => {
-            map.addSource('markers', {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: coords.map(coord => ({
+            // Combine coords and today coords, marking today's points
+            const allFeatures = coords.map((coord) => ({
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
                     coordinates: [coord.longitude, coord.latitude],
                 },
-                properties: {},
-                })),
-            },
+                properties: {
+                    isToday: false,
+                },
+            })).concat(
+                today.map((coord) => ({
+                    type: 'Feature',
+                    geometry: {
+                    type: 'Point',
+                    coordinates: [coord.longitude, coord.latitude],
+                    },
+                    properties: {
+                    isToday: true,
+                    },
+                }))
+            );
+
+            // Add clustered source
+            map.addSource('markers', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: allFeatures,
+                },
+                cluster: true,
+                clusterMaxZoom: 14, // Max zoom to cluster points on
+                clusterRadius: 50,  // Radius of each cluster in pixels
             });
 
+            // Cluster circles
             map.addLayer({
-            id: 'markers',
-            type: 'circle',
-            source: 'markers',
-            paint: {
-                'circle-radius': 6,
-                'circle-color': '#007cbf',
-            },
+                id: 'clusters',
+                type: 'circle',
+                source: 'markers',
+                filter: ['has', 'point_count'],
+                paint: {
+                    'circle-color': '#888',
+                    'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    15,
+                    10, 20,
+                    50, 25,
+                    100, 30
+                    ],
+                },
             });
 
-            const lngs = coords.map(c => c.longitude);
-            const lats = coords.map(c => c.latitude);
+            // Cluster count labels
+            map.addLayer({
+                id: 'cluster-count',
+                type: 'symbol',
+                source: 'markers',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': '{point_count_abbreviated}',
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                    'text-size': 12,
+                },
+            });
 
-            const bounds = [
-            [Math.min(...lngs), Math.min(...lats)],
-            [Math.max(...lngs), Math.max(...lats)],
-            ];
+            // Individual points - others (grey)
+            map.addLayer({
+                id: 'markers-other',
+                type: 'circle',
+                source: 'markers',
+                filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isToday'], false]],
+                paint: {
+                    'circle-radius': 5,
+                    'circle-color': '#888',
+                },
+            });
 
-            map.fitBounds(bounds, {
-            padding: { top: 20, bottom: 20, left: 200, right: 20 },
-            animate: false,
+            // Individual points - today (blue)
+            map.addLayer({
+                id: 'markers-today',
+                type: 'circle',
+                source: 'markers',
+                filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isToday'], true]],
+                paint: {
+                    'circle-radius': 6,
+                    'circle-color': '#007cbf',
+                },
             });
         });
-        };
-
+    };
 
     return h(
-            "div.map-container",
-            [
-              h(
-                MapAreaContainer,
-                {
+        "div.map-container",
+        [
+            h(
+            MapAreaContainer,
+            {
 
-                },
-                [
-                  h(MapView, { 
+            },
+            [
+                h(MapView, { 
                     style, 
                     mapboxToken: mapboxAccessToken, 
-                    onMapLoaded: handleMapLoaded
+                    onMapLoaded: handleMapLoaded,
+                    mapPosition:  {
+                        camera: {
+                            lat: 39, 
+                            lng: -98, 
+                            altitude: 6000000,
+                        },
+                    },
                 }),
-                ]
-              ),
-            ]
-          );
+            ]),
+        ]
+    );
 }
