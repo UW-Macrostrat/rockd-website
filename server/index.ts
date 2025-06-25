@@ -97,7 +97,9 @@ async function startServer() {
 
   
   app.get('/api/matomo', async (req, res) => {
-    const matomoUrl = 'https://analytics.svc.macrostrat.org/?module=API&method=Live.getLastVisitsDetails&idSite=1&period=day&date=yesterday&format=json&filter_limit=1000&token_auth=' + process.env.VITE_MATOMO_API_TOKEN;
+    console.log(req.query)
+
+    const matomoUrl = 'https://analytics.svc.macrostrat.org/?module=API&method=Live.getLastVisitsDetails&idSite=1&period=day&date=today&format=json&filter_limit=1000&token_auth=' + process.env.VITE_MATOMO_API_TOKEN;
 
     try {
       const response = await fetch(matomoUrl);
