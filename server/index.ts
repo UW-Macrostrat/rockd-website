@@ -95,20 +95,38 @@ async function startServer() {
     process.env.VITE_MACROSTRAT_INSTANCE
   );
 
-  /*
-  // Redirect from /trip/:trip to /trip with query parameter
-  app.get("/trip/:trip", (req, res) => {
-    const { trip } = req.params;
-    res.redirect(`/trip?trip=${trip}`);
-  });
+  
+  app.get('/api/matomo', async (req, res) => {
+    const { date, period, filter_limit, filter_offset, lastMinutes = null, doNotFetchActions, method = 'Live.getLastVisitsDetails'} = req.query;
 
-  // Redirect from /checkin/:checkin to /checkin with query parameter
-  app.get("/checkin/:checkin", (req, res) => {
-    const { checkin } = req.params;
-    // Redirect to /test with query parameter `id`
-    res.redirect(`/checkin?checkin=${checkin}`);
+    const baseUrl = 'https://analytics.svc.macrostrat.org/';
+    const params = {
+      module: 'API',
+      idSite: '1',
+      period,
+      method,
+      date,
+      format: 'json',
+      filter_limit,
+      lastMinutes,
+      token_auth: process.env.VITE_MATOMO_API_TOKEN
+    };
+
+    // Conditionally add doNotFetchActions param
+    if (doNotFetchActions) {
+      params.doNotFetchActions = '1';
+    }
+
+    const matomoUrl = `${baseUrl}?${new URLSearchParams(params).toString()}`;
+
+    try {
+      const response = await fetch(matomoUrl);
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: 'Matomo fetch failed', details: err });
+    }
   });
-  */
 
   /**
    * Vike route

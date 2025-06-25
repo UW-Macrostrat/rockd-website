@@ -26,6 +26,8 @@ export const ingestPrefix = getRuntimeConfig(
   apiDomain + "/api/ingest"
 );
 
+export const matomoToken = getRuntimeConfig("MATOMO_API_TOKEN");
+
 /** Legacy settings object */
 export const SETTINGS = {
   rockdApiURL,
@@ -35,4 +37,5 @@ export const SETTINGS = {
   burwellTileDomain,
   mapboxAccessToken,
   rockdApiOldURL,
+  matomoToken,
 };
