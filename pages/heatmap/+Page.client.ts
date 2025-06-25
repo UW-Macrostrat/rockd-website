@@ -2,11 +2,9 @@ import h from "@macrostrat/hyper";
 import { useAPIResult } from "@macrostrat/ui-components";
 import {
   MapAreaContainer,
-  MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken } from "@macrostrat-web/settings";
-import { get } from "underscore";
 
 export function Page() {
     return h('div.heatmap-page', [
@@ -70,47 +68,11 @@ function Map() {
                 }))
             );
 
-            // Add clustered source
             map.addSource('markers', {
                 type: 'geojson',
                 data: {
                     type: 'FeatureCollection',
                     features: allFeatures,
-                },
-                cluster: true,
-                clusterMaxZoom: 14,
-                clusterRadius: 50,
-            });
-
-            // Cluster circles
-            map.addLayer({
-                id: 'clusters',
-                type: 'circle',
-                source: 'markers',
-                filter: ['has', 'point_count'],
-                paint: {
-                    'circle-color': '#888',
-                    'circle-radius': [
-                    'step',
-                    ['get', 'point_count'],
-                        15,
-                        10, 20,
-                        50, 25,
-                        100, 30
-                    ],
-                },
-            });
-
-            // Cluster count labels
-            map.addLayer({
-                id: 'cluster-count',
-                type: 'symbol',
-                source: 'markers',
-                filter: ['has', 'point_count'],
-                layout: {
-                    'text-field': '{point_count_abbreviated}',
-                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                    'text-size': 12,
                 },
             });
 
@@ -121,7 +83,7 @@ function Map() {
                 source: 'markers',
                 filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isToday'], false]],
                 paint: {
-                    'circle-radius': 5,
+                    'circle-radius': 2,
                     'circle-color': '#888',
                 },
             });
@@ -133,7 +95,7 @@ function Map() {
                 source: 'markers',
                 filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isToday'], true]],
                 paint: {
-                    'circle-radius': 6,
+                    'circle-radius': 3,
                     'circle-color': '#007cbf',
                 },
             });
