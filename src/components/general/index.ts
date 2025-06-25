@@ -14,6 +14,18 @@ import { useState } from "react";
 export function Footer() {
   const isDarkMode = useDarkMode().isEnabled;
 
+  const footerLinks1 = [
+    { href: "/", icon: "home", text: "Home" },
+    { href: "/explore", icon: "geosearch", text: "Explore" },
+    { href: "/trip/1", icon: "route", text: "Trip" },
+  ];
+
+  const footerLinks2 = [
+    { href: "/metrics", icon: "chart", text: "Metrics" },
+    { href: "/terms", icon: "manual", text: "Terms and Conditions" },
+    { href: "/privacy", icon: "lock", text: "Privacy" },
+  ];
+
   return h("div", { className: "footer" }, [
     h("div", { className: "titles" }, [
       h("h3", { className: "footer-text upper" }, [
@@ -32,82 +44,30 @@ export function Footer() {
       ]),
     ]),
     h("div", { className: "footer-links" }, [
-      h("ul", [
-        h(
-          "li",
-          h("a", { href: "/" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "home",
-              style: { color: "white" },
-            }),
-            h("p", "Home"),
-          ])
-        ),
-        h(
-          "li",
-          h("a", { href: "/explore" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "geosearch",
-              style: { color: "white" },
-            }),
-            h("p", "Explore"),
-          ])
-        ),
-        h(
-          "li",
-          h("a", { href: "/trip/1" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "route",
-              style: { color: "white" },
-            }),
-            h("p", "Trip"),
-          ])
-        ),
-      ]),
-      h("ul", [
-        h(
-          "li",
-          h("a", { href: "/metrics" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "chart",
-              style: { color: "white" },
-            }),
-            h("p", "Metrics"),
-          ])
-        ),
-        h(
-          "li",
-          h("a", { href: "/terms" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "manual",
-              style: { color: "white" },
-            }),
-            h("p", "Terms and Conditions"),
-          ])
-        ),
-        h(
-          "li",
-          h("a", { href: "/privacy" }, [
-            h(Icon, {
-              className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "lock",
-              style: { color: "white" },
-            }),
-            h("p", "Privacy"),
-          ])
-        ),
-      ]),
+      h("ul", footerLinks1.map((props) => h(FooterLink, props))),
+      h("ul", footerLinks2.map((props) => h(FooterLink, props))),
     ]),
     h("div.dark-mode", [
       h(DarkModeButton, { className: "dark-mode-button", showText: true }),
     ]),
   ]);
 }
+
+function FooterLink({ href, icon, text }) {
+  const isDarkMode = useDarkMode().isEnabled;
+
+  return h("li", { onClick: () => window.scrollTo(0, 0) }, [
+    h("a", { href }, [
+      h(Icon, {
+        className: "footer-icon",
+        icon,
+        style: { color: isDarkMode ? "black" : "white" },
+      }),
+      h("p", text),
+    ]),
+  ]);
+}
+
 
 export function Image(props: ImageProps) {
     const { src, className, width, height, onClick, alt } = props
