@@ -134,7 +134,7 @@ function Map() {
 
 function getAllCoords() {
     return useAPIResult('/api/matomo', {
-        date: '2025-01-01,2025-06-24',
+        date: '2025-01-01,today',
         period: 'range',
         filter_limit: 10000,
         filter_offset: 0,
