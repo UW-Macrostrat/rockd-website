@@ -9,18 +9,20 @@ import { mapboxAccessToken } from "@macrostrat-web/settings";
 import mapboxgl from "mapbox-gl";
 
 export function Page() {   
-    const data = useAPIResult('/api/matomo')
-
-    const coords = data?.map(item => ({
-        lat: item.latitude,
-        lng: item.longitude,
-    }));
+    const coords = useAPIResult('/api/matomo', {
+        date: '2025-01-01,2025-06-24',
+        period: 'range',
+        filter_limit: 10000,
+        filter_offset: 0,
+        showColumns: 'latitude,longitude',
+        doNotFetchActions: true,
+    })
 
     const style = 'mapbox://styles/mapbox/streets-v11';
 
     console.log("Matomo API response:", coords);
 
-    if (!coords || coords.length === 0) {
+    if (!coords || coords?.length === 0) {
       return h("div", "Loading data...");
     }
 
@@ -34,7 +36,7 @@ export function Page() {
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [coord.lng, coord.lat],
+                    coordinates: [coord.longitude, coord.latitude],
                 },
                 properties: {},
                 })),
@@ -51,8 +53,8 @@ export function Page() {
             },
             });
 
-            const lngs = coords.map(c => c.lng);
-            const lats = coords.map(c => c.lat);
+            const lngs = coords.map(c => c.longitude);
+            const lats = coords.map(c => c.latitude);
 
             const bounds = [
             [Math.min(...lngs), Math.min(...lats)],
