@@ -10,10 +10,9 @@ import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 import { useState } from "react";
+import { navigate } from "vike/client/router";
 
 export function Footer() {
-  const isDarkMode = useDarkMode().isEnabled;
-
   const footerLinks1 = [
     { href: "/", icon: "home", text: "Home" },
     { href: "/explore", icon: "geosearch", text: "Explore" },
@@ -56,15 +55,16 @@ export function Footer() {
 function FooterLink({ href, icon, text }) {
   const isDarkMode = useDarkMode().isEnabled;
 
-  return h("li", { onClick: () => window.scrollTo(0, 0) }, [
-    h("a", { href }, [
-      h(Icon, {
-        className: "footer-icon",
-        icon,
-        style: { color: isDarkMode ? "black" : "white" },
-      }),
-      h("p", text),
-    ]),
+  return h("li", { onClick: (e) => {
+      e.preventDefault(); 
+      navigate(href); 
+  }}, [
+    h(Icon, {
+      className: "footer-icon",
+      icon,
+      style: { color: isDarkMode ? "black" : "white" },
+    }),
+    h("p", text),
   ]);
 }
 
