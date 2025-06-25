@@ -117,7 +117,9 @@ function ObservationContent({ observation, setBody }) {
     zoom: 10,
   };
 
-  return h.if(lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long)("div", { className: "observation-body" }, [
+  const show = lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long
+
+  return h.if(show)("div", { className: "observation-body" }, [
     h(Icon, {
       className: "close-body",
       icon: "ban-circle",
