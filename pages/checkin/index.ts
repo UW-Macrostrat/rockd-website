@@ -57,20 +57,18 @@ export function Checkins({checkin, comments}) {
 
     // add observations
     checkin.observations.forEach(observation => {
-        if(Object.keys(observation.rocks).length != 0) {
-            // if photo exists
-            const imageSrc = getImageUrl(checkin.person_id, observation.photo);
-            let observationBody = observationFooter(observation);
+        // if photo exists
+        const imageSrc = getImageUrl(checkin.person_id, observation.photo);
+        let observationBody = observationFooter(observation);
 
-            observations.push(
-                h('div', {className: 'observation'}, [
-                    h('a', {href: "/photo/" + observation.photo}, 
-                        h(BlankImage, { className: 'observation-image', src: imageSrc })
-                    ),
-                    observationBody,
-                ])
-            );
-        }        
+        observations.push(
+            h('div', {className: 'observation'}, [
+                h('a', {href: "/photo/" + observation.photo}, 
+                    h(BlankImage, { className: 'observation-image', src: imageSrc })
+                ),
+                observationBody,
+            ])
+        );
     });
 
     let LngLatProps = {
@@ -152,7 +150,7 @@ function observationFooter(observation) {
 
     // get liths
     let liths = [];
-    for(var j = 0; j < rocks.liths.length; j++) {                
+    for(var j = 0; j < rocks?.liths?.length; j++) {                
         liths.push(h('p', { className: "observation-detail liths"}, rocks.liths[j].name));
     }    
 
@@ -177,7 +175,7 @@ function observationFooter(observation) {
     let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
 
     let lithologies = [];
-    rocks.liths.forEach(lith => {
+    rocks.liths?.forEach(lith => {
         if(!lith.color.includes("#")) {
             lithologies.push({
                 name: lith.name,
@@ -204,7 +202,7 @@ function observationFooter(observation) {
             name: obsAge
         })
     }
-    if(rocks.interval.name) {
+    if(rocks.interval?.name) {
         lithologies.push({
             name: rocks.interval.name
         })
