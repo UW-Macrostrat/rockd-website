@@ -6,44 +6,50 @@ import {
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
+import { Divider, Spinner } from "@blueprintjs/core";
 
 export function Page() {
+    const coords = getAllCoords();
+
     return h('div.main', [
         h('div.heatmap-page', [
-            h(PageHeader),
-            h(Map)
+            h(PageHeader, { coords }),
+            h(Map, { coords })
         ]),
         h(Footer)
     ]) 
 }
 
-function PageHeader() {
+function PageHeader({ coords }) {
     const visitsToday = getVisitsToday();
+
+    const { visits, visitors } = visitsToday || {};
 
     const Visit = !visitsToday ? 
         h('p', 'Loading visits...') : 
         h('div.visits-today', [
-            h('p', `Visits today: ${visitsToday.visits}`),
-            h('p', `Unique visitors today: ${visitsToday.visitors}`),
+            h('h3', `${visits.toLocaleString()} visits today`),
+            h.if(coords?.length)('h3', `${coords?.length.toLocaleString()} visits this year`),
         ])
 
     return h('div.page-header', [
         h('h1', 'Heatmap'),
+        Visit,
+        h(Divider),
         h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
         h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
-        Visit
     ]);
 }
 
-function Map() {   
-    const coords = getAllCoords();
-
+function Map({coords}) {   
     const today = getTodayCoords();
 
     const style = 'mapbox://styles/mapbox/dark-v10';
 
     if (!coords || !today) {
-      return h("div.map-area-container", "Loading data...");
+      return h("div.map-area-container.loading", [
+        h(Spinner, { size: 50 }),
+      ]);
     }
 
     const handleMapLoaded = (map) => {
@@ -133,7 +139,7 @@ function Map() {
 
 function getAllCoords() {
     return useAPIResult('/api/matomo', {
-        date: '2022-01-01,today',
+        date: '2025-01-01,today',
         period: 'range',
         filter_limit: 10000,
         filter_offset: 0,
