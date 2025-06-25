@@ -26,7 +26,7 @@ export function Page() {
 
 
   const TestObject = PhotoIDCollector({ checkin })
-  const photoIDArr = TestObject.props.photoIDArr;
+  const photoIDArr = TestObject.props.photoIDArr.sort((a, b) => a - b);
 
   const photoIndex = photoIDArr.indexOf(photoID);
 
