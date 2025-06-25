@@ -14,7 +14,6 @@ import { LithologyList } from "@macrostrat/data-components";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
-import { connect } from "react-redux";
 
 export function Page() {
     const { checkin } = useData();
@@ -118,7 +117,7 @@ function ObservationContent({ observation, setBody }) {
     zoom: 10,
   };
 
-  return h("div", { className: "observation-body" }, [
+  return h.if(lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long)("div", { className: "observation-body" }, [
     h(Icon, {
       className: "close-body",
       icon: "ban-circle",
@@ -130,7 +129,7 @@ function ObservationContent({ observation, setBody }) {
           LngLatCoords(LngLatProps),
         ])
       : null,
-    h("div", { className: "observation-details" }, [
+    h.if(lithologies || rocks)("div", { className: "observation-details" }, [
       h(LithologyList, { lithologies }),
       h("p", { className: "notes" }, rocks.notes),
     ]),
