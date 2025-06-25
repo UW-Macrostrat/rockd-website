@@ -213,8 +213,10 @@ function observationFooter(observation) {
         })
     }
 
+    const show = lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long;
+
     // observation body
-    return h('div', {className: 'observation-body'}, [
+    return h.if(show)("div", {className: 'observation-body'}, [
         observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
             rocks.strat_name?.strat_name_long,
             observation.lat ? LngLatCoords(LngLatProps) : null,
