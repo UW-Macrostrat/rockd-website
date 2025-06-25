@@ -19,7 +19,6 @@ export function Page() {
 
 function PageHeader() {
     const visitsToday = getVisitsToday();
-    console.log('visitsToday', visitsToday);
 
     const Visit = !visitsToday ? 
         h('p', 'Loading visits...') : 
@@ -134,7 +133,7 @@ function Map() {
 
 function getAllCoords() {
     return useAPIResult('/api/matomo', {
-        date: '2025-01-01,today',
+        date: '2022-01-01,today',
         period: 'range',
         filter_limit: 10000,
         filter_offset: 0,
@@ -143,7 +142,7 @@ function getAllCoords() {
     })
 }
 
-function getTodayCoords() {
+function getTodayCoords(): Array<{ latitude: number, longitude: number }> | undefined {
     return useAPIResult('/api/matomo', {
         date: 'today',
         period: 'day',
@@ -154,7 +153,7 @@ function getTodayCoords() {
     })
 }
 
-function getVisitsToday() {
+function getVisitsToday(): { visits: number, visitors: number } | undefined {
     return useAPIResult('/api/matomo', {
         method: "Live.getCounters",
         idSite: 1,
