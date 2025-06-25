@@ -1,16 +1,20 @@
-import h from "@macrostrat/hyper";
+import h from "./main.module.sass";
 import { useAPIResult } from "@macrostrat/ui-components";
 import {
   MapAreaContainer,
   MapView,
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { Footer } from "~/components/general";
 
 export function Page() {
-    return h('div.heatmap-page', [
-        h(PageHeader),
-        h(Map),
-    ])
+    return h('div.main', [
+        h('div.heatmap-page', [
+            h(PageHeader),
+            h(Map)
+        ]),
+        h(Footer)
+    ]) 
 }
 
 function PageHeader() {
@@ -37,10 +41,10 @@ function Map() {
 
     const today = getTodayCoords();
 
-    const style = 'mapbox://styles/mapbox/streets-v11';
+    const style = 'mapbox://styles/mapbox/dark-v10';
 
     if (!coords || !today) {
-      return h("div", "Loading data...");
+      return h("div.map-area-container", "Loading data...");
     }
 
     const handleMapLoaded = (map) => {
@@ -108,7 +112,7 @@ function Map() {
             h(
             MapAreaContainer,
             {
-
+                className: "map-area-container",
             },
             [
                 h(MapView, { 
