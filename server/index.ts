@@ -95,20 +95,18 @@ async function startServer() {
     process.env.VITE_MACROSTRAT_INSTANCE
   );
 
-  /*
-  // Redirect from /trip/:trip to /trip with query parameter
-  app.get("/trip/:trip", (req, res) => {
-    const { trip } = req.params;
-    res.redirect(`/trip?trip=${trip}`);
-  });
+  
+  app.get('/api/matomo', async (req, res) => {
+    const matomoUrl = 'https://analytics.svc.macrostrat.org/?module=API&method=Live.getLastVisitsDetails&idSite=1&period=day&date=yesterday&format=json&filter_limit=1000&token_auth=' + process.env.VITE_MATOMO_API_TOKEN;
 
-  // Redirect from /checkin/:checkin to /checkin with query parameter
-  app.get("/checkin/:checkin", (req, res) => {
-    const { checkin } = req.params;
-    // Redirect to /test with query parameter `id`
-    res.redirect(`/checkin?checkin=${checkin}`);
+    try {
+      const response = await fetch(matomoUrl);
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: 'Matomo fetch failed', details: err });
+    }
   });
-  */
 
   /**
    * Vike route
