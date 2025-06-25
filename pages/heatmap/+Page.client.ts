@@ -6,25 +6,27 @@ import {
   MapView,
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { get } from "underscore";
 
-export function Page() {   
-    const coords = useAPIResult('/api/matomo', {
-        date: '2025-01-01,2025-06-24',
-        period: 'range',
-        filter_limit: 10000,
-        filter_offset: 0,
-        showColumns: 'latitude,longitude',
-        doNotFetchActions: true,
-    })
+export function Page() {
+    return h('div.heatmap-page', [
+        h(PageHeader),
+        h(Map),
+    ])
+}
 
-    const today = useAPIResult('/api/matomo', {
-        date: 'today',
-        period: 'day',
-        filter_limit: 10000,
-        filter_offset: 0,
-        showColumns: 'latitude,longitude',
-        doNotFetchActions: true,
-    })
+function PageHeader() {
+    return h('div.page-header', [
+        h('h1', 'Heatmap'),
+        h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
+        h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
+    ]);
+}
+
+function Map() {   
+    const coords = getAllCoords();
+
+    const today = getTodayCoords();
 
     const style = 'mapbox://styles/mapbox/streets-v11';
 
@@ -65,8 +67,8 @@ export function Page() {
                     features: allFeatures,
                 },
                 cluster: true,
-                clusterMaxZoom: 14, // Max zoom to cluster points on
-                clusterRadius: 50,  // Radius of each cluster in pixels
+                clusterMaxZoom: 14,
+                clusterRadius: 50,
             });
 
             // Cluster circles
@@ -80,10 +82,10 @@ export function Page() {
                     'circle-radius': [
                     'step',
                     ['get', 'point_count'],
-                    15,
-                    10, 20,
-                    50, 25,
-                    100, 30
+                        15,
+                        10, 20,
+                        50, 25,
+                        100, 30
                     ],
                 },
             });
@@ -151,4 +153,34 @@ export function Page() {
             ]),
         ]
     );
+}
+
+function getAllCoords() {
+    return useAPIResult('/api/matomo', {
+        date: '2025-01-01,2025-06-24',
+        period: 'range',
+        filter_limit: 10000,
+        filter_offset: 0,
+        showColumns: 'latitude,longitude',
+        doNotFetchActions: true,
+    })
+}
+
+function getTodayCoords() {
+    return useAPIResult('/api/matomo', {
+        date: 'today',
+        period: 'day',
+        filter_limit: 10000,
+        filter_offset: 0,
+        showColumns: 'latitude,longitude',
+        doNotFetchActions: true,
+    })
+}
+
+function getVisitsToday() {
+    return useAPIResult('/api/matomo', {
+        method: "Live.getCounters",
+        idSite: 1,
+        lastMinutes: 1440
+    })
 }
