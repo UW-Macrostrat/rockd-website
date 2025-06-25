@@ -57,13 +57,13 @@ export function Footer() {
         ),
         h(
           "li",
-          h("a", { href: "/trip/1" }, [
+          h("a", { href: "/heatmap" }, [
             h(Icon, {
               className: "footer-icon" + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "route",
+              icon: "map",
               style: { color: "white" },
             }),
-            h("p", "Trip"),
+            h("p", "Heatmap"),
           ])
         ),
       ]),
