@@ -1,9 +1,10 @@
 import { LngLatCoords } from "@macrostrat/map-interface";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   BlankImage,
   getImageUrl,
+  TestImage,
   Footer,
 } from "~/components/general";
 import { Icon } from "@blueprintjs/core";
@@ -23,14 +24,9 @@ export function Page() {
         .replace(/%40/g, "@")
         .replace(/%2B/g, "+"));
 
-    let photoIDArr = [checkin.photo];
-    if (checkin.observations) {
-        checkin.observations.forEach((obs) => {
-        if (obs.photo && !photoIDArr.includes(obs.photo)) {
-            photoIDArr.push(obs.photo);
-        }
-        });
-    }
+
+  const TestObject = PhotoIDCollector({ checkin })
+  const photoIDArr = TestObject.props.photoIDArr.sort((a, b) => a - b);
 
   const photoIndex = photoIDArr.indexOf(photoID);
 
@@ -68,7 +64,9 @@ export function Page() {
                 h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
             ]);
         }
-    })), h(Footer)
+    })), 
+    h('div.hide', TestObject),
+    h(Footer)
   ]);
 }
 
@@ -84,7 +82,7 @@ function ObservationContent({ observation, setBody }) {
   }
 
   let lithologies = [];
-  rocks.liths.forEach((lith) => {
+  rocks.liths?.forEach((lith) => {
     if (!lith.color.includes("#")) {
       lithologies.push({ name: lith.name, color: rgbaStringToHex(lith.color) });
     } else {
@@ -119,7 +117,9 @@ function ObservationContent({ observation, setBody }) {
     zoom: 10,
   };
 
-  return h("div", { className: "observation-body" }, [
+  const show = lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long
+
+  return h.if(show)("div", { className: "observation-body" }, [
     h(Icon, {
       className: "close-body",
       icon: "ban-circle",
@@ -131,7 +131,7 @@ function ObservationContent({ observation, setBody }) {
           LngLatCoords(LngLatProps),
         ])
       : null,
-    h("div", { className: "observation-details" }, [
+    h.if(lithologies || rocks)("div", { className: "observation-details" }, [
       h(LithologyList, { lithologies }),
       h("p", { className: "notes" }, rocks.notes),
     ]),
@@ -166,4 +166,53 @@ function Item({ checkin, photoID }) {
         onClick: () => setBody(true),
     })
   ]);
+}
+
+function PhotoIDCollector({ checkin }) {
+  const [photoIDArr, setPhotoIDArr] = useState(() =>
+    checkin.photo ? [checkin.photo] : []
+  );
+  const [testedPhotos, setTestedPhotos] = useState(() => {
+    return checkin.observations
+      ? checkin.observations.map(obs => obs.photo).filter(Boolean)
+      : [];
+  });
+
+  useEffect(() => {
+    // Only update if checkin changes
+    if (checkin.photo && !photoIDArr.includes(checkin.photo)) {
+      setPhotoIDArr(prev => [...prev, checkin.photo]);
+    }
+
+    const newPhotos = (checkin.observations || [])
+      .map(obs => obs.photo)
+      .filter(photo => photo && !testedPhotos.includes(photo));
+
+    if (newPhotos.length > 0) {
+      setTestedPhotos(prev => [...prev, ...newPhotos]);
+    }
+  }, [checkin]);
+
+  return h('div', { photoIDArr }, [
+    ...testedPhotos.map((photo) => {
+      return h(HideImage, {
+        key: photo,
+        checkin,
+        photo,
+        setPhotoIDArr,
+      });
+    })
+  ]);
+}
+
+
+function HideImage({ checkin, photo, setPhotoIDArr }) {
+  return h(TestImage, {
+    key: photo,
+    src: getImageUrl(checkin.person_id, photo),
+    onLoad: () => {
+      setPhotoIDArr((prev) => (prev.includes(photo) ? prev : [...prev, photo]));
+    },
+    onError: () => console.warn("Image failed to load:", photo),
+  });
 }
