@@ -18,11 +18,21 @@ export function Page() {
         doNotFetchActions: true,
     })
 
+    const today = useAPIResult('/api/matomo', {
+        date: 'today',
+        period: 'day',
+        filter_limit: 10000,
+        filter_offset: 0,
+        showColumns: 'latitude,longitude',
+        doNotFetchActions: true,
+    })
+
     const style = 'mapbox://styles/mapbox/streets-v11';
 
     console.log("Matomo API response:", coords);
+    console.log("Today's Matomo API response:", today);
 
-    if (!coords || coords?.length === 0) {
+    if (!coords || !today) {
       return h("div", "Loading data...");
     }
 
