@@ -110,24 +110,24 @@ export function Footer() {
 }
 
 export function Image(props: ImageProps) {
-    const { src, className, width, height, onClick, alt } = props
-   const [hasError, setHasError] = useState(false);
-   const srcWithAddedPrefix =
+  const { src, className, width, height, onClick, alt } = props;
+  const [hasError, setHasError] = useState(false);
+  const srcWithAddedPrefix =
     "https://storage.macrostrat.org/assets/rockd/" + src;
 
-    if (!src || hasError) {
-        return null;
-    }
+  if (!src || hasError) {
+    return null;
+  }
 
-    return h("img", {
-        src: srcWithAddedPrefix,
-        className,
-        width,
-        height,
-        onClick,
-        onError: () => setHasError(true),
-        alt,
-    });
+  return h("img", {
+    src: srcWithAddedPrefix,
+    className,
+    width,
+    height,
+    onClick,
+    onError: () => setHasError(true),
+    alt,
+  });
 }
 
 interface ImageProps {
@@ -136,8 +136,8 @@ interface ImageProps {
   width?: number | string;
   height?: number | string;
   onClick?: () => void;
-  alt?: string; 
-  onError?: () => void; 
+  alt?: string;
+  onError?: () => void;
 }
 
 export function TestImage({ src, onError, onLoad }) {
@@ -149,22 +149,22 @@ export function TestImage({ src, onError, onLoad }) {
 }
 
 export function BlankImage(props: ImageProps) {
-   const { src, className, width, height, onClick, alt } = props
-   const [hasError, setHasError] = useState(false);
+  const { src, className, width, height, onClick, alt } = props;
+  const [hasError, setHasError] = useState(false);
 
-    if (!src || hasError) {
-        return null;
-    }
+  if (!src || hasError) {
+    return null;
+  }
 
-    return h("img", {
-        src,
-        className,
-        width,
-        height,
-        onClick,
-        onError: () => setHasError(true),
-        alt,
-    });
+  return h("img", {
+    src,
+    className,
+    width,
+    height,
+    onClick,
+    onError: () => setHasError(true),
+    alt,
+  });
 }
 
 // remove when metrics works
@@ -258,162 +258,163 @@ export function createCheckins(result, mapRef, setInspectPosition) {
   const len = result.length;
 
   return result.map((checkin, index) =>
-    h(Checkin, {  
+    h(Checkin, {
       checkin,
       mapRef,
       setInspectPosition,
       len,
-      key: checkin.checkin_id || index, 
+      key: checkin.checkin_id || index,
     })
   );
 }
 
-function Checkin({checkin, mapRef, setInspectPosition, len}) {
-    const [hasError, setHasError] = useState(false);
-    const isDarkMode = useDarkMode().isEnabled;
-    const map = mapRef?.current;
-    // format rating
-    let ratingArr = [];
-    for (var i = 0; i < checkin.rating; i++) {
-      ratingArr.push(
-        h(Icon, { className: "star", icon: "star", style: { color: "white" } })
-      );
-    }
+function Checkin({ checkin, mapRef, setInspectPosition, len }) {
+  const [hasError, setHasError] = useState(false);
+  const isDarkMode = useDarkMode().isEnabled;
+  const map = mapRef?.current;
+  // format rating
+  let ratingArr = [];
+  for (var i = 0; i < checkin.rating; i++) {
+    ratingArr.push(
+      h(Icon, { className: "star", icon: "star", style: { color: "white" } })
+    );
+  }
 
-    for (var i = 0; i < 5 - checkin.rating; i++) {
-      ratingArr.push(
-        h(Icon, {
-          className: "star",
-          icon: "star-empty",
-          style: { color: "white" },
-        })
-      );
-    }
+  for (var i = 0; i < 5 - checkin.rating; i++) {
+    ratingArr.push(
+      h(Icon, {
+        className: "star",
+        icon: "star-empty",
+        style: { color: "white" },
+      })
+    );
+  }
 
-    
+  let image;
+  const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
 
-    let image;
-    const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
+  const test = h(TestImage, {
+    src: imgSrc,
+    onError: () => setHasError(true),
+  });
 
-    const test = h(TestImage, {
-      src: imgSrc,
-      onError: () => setHasError(true),
-    });
+  const showImage = !hasError;
 
-    const showImage = !hasError;
+  if (showImage) {
+    image = h(BlankImage, { className: "observation-img", src: imgSrc });
+  } else {
+    image = h("div", { className: "no-image" }, [
+      h("h1", "Details"),
+      h(Icon, {
+        className: "details-image",
+        icon: "arrow-right",
+        style: { color: "black" },
+      }),
+    ]);
+  }
 
-    if (showImage) {
-      image = h(BlankImage, { className: "observation-img", src: imgSrc });
-    } else {
-      image = h("div", { className: "no-image" }, [
-        h("h1", "Details"),
-        h(Icon, {
-          className: "details-image",
-          icon: "arrow-right",
-          style: { color: "black" },
-        }),
-      ]);
-    }
+  // for trips
+  const stop_name = checkin?.name ?? null;
+  const LngLatProps = {
+    position: {
+      lat: checkin.lat,
+      lng: checkin.lng,
+    },
+    precision: 3,
+    zoom: 10,
+  };
 
-    // for trips
-    const stop_name = checkin?.name ?? null;
-    const LngLatProps = {
-      position: {
-        lat: checkin.lat,
-        lng: checkin.lng,
+  let temp = h(
+    "div",
+    {
+      className: "checkin",
+      onClick: () => {
+        map.flyTo({ center: [checkin.lng, checkin.lat], zoom: 12 });
+        if (setInspectPosition)
+          setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
       },
-      precision: 3,
-      zoom: 10,
-    };
+      onMouseEnter: () => {
+        if (len > 1) {
+          // marker
+          const el = document.createElement("div");
+          el.className = "marker_pin";
 
-    let temp = h(
-      "div",
-      {
-        className: "checkin",
-        onClick: () => {
-          map.flyTo({ center: [checkin.lng, checkin.lat], zoom: 12 });
-          if (setInspectPosition)
-            setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
-        },
-        onMouseEnter: () => {
-          if (len > 1) {
-            // marker
-            const el = document.createElement("div");
-            el.className = "marker_pin";
-
-            // Create marker
-            new mapboxgl.Marker(el)
-              .setLngLat([checkin.lng, checkin.lat])
-              .addTo(map);
-          }
-        },
-        onMouseLeave: () => {
-          let previous = document.querySelectorAll(".marker_pin");
-          previous.forEach((marker) => {
-            marker.remove();
-          });
-        },
+          // Create marker
+          new mapboxgl.Marker(el)
+            .setLngLat([checkin.lng, checkin.lat])
+            .addTo(map);
+        }
       },
-      [
-        h('div', {className: "hide"}, test),
-        h("h1", { className: "stop-name" }, stop_name),
-        h("div", { className: "checkin-header" }, [
+      onMouseLeave: () => {
+        let previous = document.querySelectorAll(".marker_pin");
+        previous.forEach((marker) => {
+          marker.remove();
+        });
+      },
+    },
+    [
+      h("div", { className: "hide" }, test),
+      h("h1", { className: "stop-name" }, stop_name),
+      h("div", { className: "checkin-header" }, [
+        !stop_name
+          ? h(
+              "h3",
+              { className: "profile-pic" },
+              h(BlankImage, {
+                src: getProfilePicUrl(checkin.person_id),
+                className: "profile-pic",
+              })
+            )
+          : null,
+        h("div", { className: "checkin-info" }, [
           !stop_name
             ? h(
                 "h3",
-                { className: "profile-pic" },
-                h(BlankImage, {
-                  src: getProfilePicUrl(checkin.person_id),
-                  className: "profile-pic",
-                })
+                { className: "name" },
+                checkin.first_name + " " + checkin.last_name
               )
             : null,
-          h("div", { className: "checkin-info" }, [
-            !stop_name
-              ? h(
-                  "h3",
-                  { className: "name" },
-                  checkin.first_name + " " + checkin.last_name
-                )
-              : null,
-            h("h4", { className: "edited" }, checkin.created),
-            h("p", "Near " + checkin.near),
-            LngLatCoords(LngLatProps),
-            h("h3", { className: "rating" }, ratingArr),
-          ]),
+          h("h4", { className: "edited" }, checkin.created),
+          h("p", "Near " + checkin.near),
+          LngLatCoords(LngLatProps),
+          h("h3", { className: "rating" }, ratingArr),
         ]),
-        h("p", { className: "description" }, checkin.notes),
-        h(
-          "a",
-          {
-            className: "checkin-link",
-            href: "/checkin/" + checkin.checkin_id,
-            target: "_blank",
-          },
+      ]),
+      h("p", { className: "description" }, checkin.notes),
+      h(
+        "a",
+        {
+          className: "checkin-link",
+          href: "/checkin/" + checkin.checkin_id,
+          target: "_blank",
+        },
+        [
+          image,
+          showImage
+            ? h("div", { className: "image-details" }, [
+                h("h1", "Details"),
+                h(Icon, {
+                  className: "details-image",
+                  icon: "arrow-right",
+                  style: { color: "white" },
+                }),
+              ])
+            : null,
+        ]
+      ),
+      h("div", { className: "checkin-footer" }, [
+        h("div", { className: "likes-container" }, [
+          h(Icon, {
+            className: "likes-icon " + (isDarkMode ? "icon-dark-mode" : ""),
+            icon: "thumbs-up",
+            style: { color: "white" },
+          }),
+          h("h3", { className: "likes" }, checkin.likes),
+        ]),
+        h.if(checkin?.observations)(
+          "div",
+          { className: "observations-container" },
           [
-            image,
-            showImage
-              ? h("div", { className: "image-details" }, [
-                  h("h1", "Details"),
-                  h(Icon, {
-                    className: "details-image",
-                    icon: "arrow-right",
-                    style: { color: "white" },
-                  }),
-                ])
-              : null,
-          ]
-        ),
-        h("div", { className: "checkin-footer" }, [
-          h("div", { className: "likes-container" }, [
-            h(Icon, {
-              className: "likes-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "thumbs-up",
-              style: { color: "white" },
-            }),
-            h("h3", { className: "likes" }, checkin.likes),
-          ]),
-          h.if(checkin?.observations)("div", { className: "observations-container" }, [
             h(Icon, {
               className:
                 "observations-icon " + (isDarkMode ? "icon-dark-mode" : ""),
@@ -421,56 +422,53 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
               style: { color: "white" },
             }),
             h("h3", { className: "likes" }, checkin.observations?.length),
-          ]),
-          h("div", { className: "comments-container" }, [
-            h(Icon, {
-              className:
-                "comments-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "comment",
-              style: { color: "white" },
-            }),
-            h("h3", { className: "comments" }, checkin.comments),
-          ]),
+          ]
+        ),
+        h("div", { className: "comments-container" }, [
+          h(Icon, {
+            className: "comments-icon " + (isDarkMode ? "icon-dark-mode" : ""),
+            icon: "comment",
+            style: { color: "white" },
+          }),
+          h("h3", { className: "comments" }, checkin.comments),
         ]),
-      ]
-    );
+      ]),
+    ]
+  );
 
-    return temp
-
+  return temp;
 }
 
-export function Comments({comments}) {
-   const commentArr = [];
+export function Comments({ comments }) {
+  const commentArr = [];
 
-    comments.forEach((item, index) => {
-        const { created, comment, person_id, name, likes } = item;
+  comments.forEach((item, index) => {
+    const { created, comment, person_id, name, likes } = item;
 
-        const commentNode = h('div.comment', [
-            h('div.comment-author', [
-                h(BlankImage, {
-                    className: 'comment-pic',
-                    src: getProfilePicUrl(person_id),
-                    alt: "profile picture"
-                }),
-                h('p', { className: 'comment-author' }, name),
-            ]),
-            h('p', { className: 'comment-text' }, comment),
-            h('p', { className: 'comment-date' }, created),
-            h('div.comment-likes', [
-                h(Icon, { icon: 'thumbs-up', className: 'like-icon' }),
-                h('p', { className: 'comment-likes' }, String(likes)),
-            ])
-        ]);
-
-        commentArr.push(commentNode);
-
-        // Add divider between comments (but not after the last one)
-        if (index < comments.length - 1) {
-            commentArr.push(h(Divider));
-        }
-    });
-
-    return h('div.comments', [
-        ...commentArr
+    const commentNode = h("div.comment", [
+      h("div.comment-author", [
+        h(BlankImage, {
+          className: "comment-pic",
+          src: getProfilePicUrl(person_id),
+          alt: "profile picture",
+        }),
+        h("p", { className: "comment-author" }, name),
+      ]),
+      h("p", { className: "comment-text" }, comment),
+      h("p", { className: "comment-date" }, created),
+      h("div.comment-likes", [
+        h(Icon, { icon: "thumbs-up", className: "like-icon" }),
+        h("p", { className: "comment-likes" }, String(likes)),
+      ]),
     ]);
+
+    commentArr.push(commentNode);
+
+    // Add divider between comments (but not after the last one)
+    if (index < comments.length - 1) {
+      commentArr.push(h(Divider));
+    }
+  });
+
+  return h("div.comments", [...commentArr]);
 }
