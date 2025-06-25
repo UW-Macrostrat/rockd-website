@@ -140,10 +140,11 @@ interface ImageProps {
   onError?: () => void; 
 }
 
-export function TestImage({ src, onError }) {
+export function TestImage({ src, onError, onLoad }) {
   return h("img", {
     src,
     onError,
+    onLoad,
   });
 }
 
