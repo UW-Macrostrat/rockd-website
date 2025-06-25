@@ -16,10 +16,21 @@ export function Page() {
 }
 
 function PageHeader() {
+    const visitsToday = getVisitsToday();
+    console.log('visitsToday', visitsToday);
+
+    const Visit = !visitsToday ? 
+        h('p', 'Loading visits...') : 
+        h('div.visits-today', [
+            h('p', `Visits today: ${visitsToday.visits}`),
+            h('p', `Unique visitors today: ${visitsToday.visitors}`),
+        ])
+
     return h('div.page-header', [
         h('h1', 'Heatmap'),
         h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
         h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
+        Visit
     ]);
 }
 
@@ -182,5 +193,5 @@ function getVisitsToday() {
         method: "Live.getCounters",
         idSite: 1,
         lastMinutes: 1440
-    })
+    })?.[0]
 }

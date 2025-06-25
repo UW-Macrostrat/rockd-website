@@ -97,7 +97,7 @@ async function startServer() {
 
   
   app.get('/api/matomo', async (req, res) => {
-    const { date, period, filter_limit, filter_offset, doNotFetchActions, method = 'Live.getLastVisitsDetails'} = req.query;
+    const { date, period, filter_limit, filter_offset, lastMinutes = null, doNotFetchActions, method = 'Live.getLastVisitsDetails'} = req.query;
 
     const baseUrl = 'https://analytics.svc.macrostrat.org/';
     const params = {
@@ -108,6 +108,7 @@ async function startServer() {
       date,
       format: 'json',
       filter_limit,
+      lastMinutes,
       token_auth: process.env.VITE_MATOMO_API_TOKEN
     };
 
