@@ -331,7 +331,12 @@ function Checkin({checkin, mapRef, setInspectPosition, len}) {
       {
         className: "checkin",
         onClick: () => {
-          map.flyTo({ center: [checkin.lng, checkin.lat], zoom: 12 });
+          map.flyTo({ 
+            center: [checkin.lng, checkin.lat], 
+            zoom: 12,
+            speed: 2,
+            curve: 1.2 
+          });
           if (setInspectPosition)
             setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
         },
