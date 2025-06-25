@@ -25,7 +25,9 @@ export function Page() {
         .replace(/%40/g, "@")
         .replace(/%2B/g, "+"));
 
-  const photoIDArr = PhotoIDCollector({ checkin }).props.photoIDArr;
+
+  const TestObject = PhotoIDCollector({ checkin })
+  const photoIDArr = TestObject.props.photoIDArr;
 
   const photoIndex = photoIDArr.indexOf(photoID);
 
@@ -63,7 +65,9 @@ export function Page() {
                 h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
             ]);
         }
-    })), h(Footer)
+    })), 
+    h('div.hide', TestObject),
+    h(Footer)
   ]);
 }
 
@@ -167,42 +171,47 @@ function PhotoIDCollector({ checkin }) {
   const [photoIDArr, setPhotoIDArr] = useState(() =>
     checkin.photo ? [checkin.photo] : []
   );
-  const [testedPhotos, setTestedPhotos] = useState([]);
+  const [testedPhotos, setTestedPhotos] = useState(() => {
+    return checkin.observations
+      ? checkin.observations.map(obs => obs.photo).filter(Boolean)
+      : [];
+  });
 
   useEffect(() => {
-    if (checkin.observations) {
-      checkin.observations.forEach((obs) => {
-        const photo = obs.photo;
-        if (photo && !testedPhotos.includes(photo)) {
-          setTestedPhotos((prev) => [...prev, photo]);
-        }
-      });
+    // Only update if checkin changes
+    if (checkin.photo && !photoIDArr.includes(checkin.photo)) {
+      setPhotoIDArr(prev => [...prev, checkin.photo]);
     }
-  }, [checkin, testedPhotos]);
 
-  const handleLoad = (photo) => {
-    setPhotoIDArr((prev) => {
-      if (!prev.includes(photo)) {
-        return [...prev, photo];
-      }
-      return prev;
-    });
-  };
+    const newPhotos = (checkin.observations || [])
+      .map(obs => obs.photo)
+      .filter(photo => photo && !testedPhotos.includes(photo));
 
-  const handleError = (photo) => {
-    console.warn("Image failed to load:", photo);
-  };
+    if (newPhotos.length > 0) {
+      setTestedPhotos(prev => [...prev, ...newPhotos]);
+    }
+  }, [checkin]);
 
   return h('div', { photoIDArr }, [
     ...testedPhotos.map((photo) => {
-      console.log("Testing photo:", photo);
-      return h(TestImage, {
+      return h(HideImage, {
         key: photo,
-        src: getImageUrl(checkin.person_id, photo),
-        onLoad: () => handleLoad(photo),
-        onError: () => handleError(photo),
+        checkin,
+        photo,
+        setPhotoIDArr,
       });
-    }
-    ),
+    })
   ]);
+}
+
+
+function HideImage({ checkin, photo, setPhotoIDArr }) {
+  return h(TestImage, {
+    key: photo,
+    src: getImageUrl(checkin.person_id, photo),
+    onLoad: () => {
+      setPhotoIDArr((prev) => (prev.includes(photo) ? prev : [...prev, photo]));
+    },
+    onError: () => console.warn("Image failed to load:", photo),
+  });
 }
