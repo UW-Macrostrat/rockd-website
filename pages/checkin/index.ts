@@ -137,7 +137,7 @@ function Overlay({checkin, center, LngLatProps, ratingArr, profile_pic}) {
     ])      
 }
 
-function observationFooter(observation) {
+export function observationFooter(observation) {
     const LngLatProps = {
         position: {
             lat: observation.lat,

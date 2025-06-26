@@ -14,6 +14,7 @@ import { LithologyList } from "@macrostrat/data-components";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
+import { macrostratApiURL } from "@macrostrat-web/settings";
 
 export function Page() {
     const { checkin } = useData();
@@ -81,32 +82,44 @@ function ObservationContent({ observation, setBody }) {
       .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   }
 
-  let lithologies = [];
-  rocks.liths?.forEach((lith) => {
-    if (!lith.color.includes("#")) {
-      lithologies.push({ name: lith.name, color: rgbaStringToHex(lith.color) });
-    } else {
-      lithologies.push(lith);
-    }
-  });
-
-  if (rocks.strat_name?.strat_name_long) {
-    lithologies.push({ name: rocks.strat_name.strat_name_long });
-  }
-  if (rocks.map_unit?.unit_name) {
-    lithologies.push({ name: rocks.map_unit.unit_name });
-  }
-  if (observation.age_est) {
-    lithologies.push({
-      name: `${observation.age_est.name} (${observation.age_est.b_age} - ${observation.age_est.t_age})`,
+    let lithologies = [];
+    rocks.liths?.forEach(lith => {
+        if(!lith.color.includes("#")) {
+            lithologies.push({
+                ...lith,
+                color: rgbaStringToHex(lith.color),
+            });
+        } else {
+            lithologies.push(lith);
+        }
     });
-  }
-  if (rocks.interval?.name) {
-    lithologies.push({ name: rocks.interval.name });
-  }
-  if (observation.orientation.feature?.name) {
-    lithologies.push({ name: observation.orientation.feature.name });
-  }
+
+    if(rocks.interval?.name) {
+        lithologies.push({
+            name: rocks.interval.name,
+            int_id: rocks.interval.int_id,
+            color: `rgba(${rocks.interval.color})`,
+        })
+    }
+
+    if (rocks.strat_name?.strat_name_long) {
+        lithologies.push({
+            name: rocks.strat_name?.strat_name_long,
+            strat_id: rocks.strat_name?.strat_name_id
+        })
+    }
+
+    if(rocks.map_unit?.unit_name) {
+        lithologies.push({
+            name: rocks.map_unit?.unit_name
+        })
+    }
+    
+    if(observation.orientation.feature?.name) {
+        lithologies.push({
+            name: observation.orientation.feature?.name
+        })
+    }
 
   const LngLatProps = {
     position: {
@@ -118,6 +131,18 @@ function ObservationContent({ observation, setBody }) {
   };
 
   const show = lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long
+
+  const handleClick = (e, data) => {
+      if (data.int_id) {
+          window.open(macrostratApiURL + `/lex/intervals/${data.int_id}`, '_blank');
+      }
+      if (data.strat_id) {
+          window.open(macrostratApiURL + `/lex/strat-names/${data.strat_id}`, '_blank');
+      }
+      if (data.lith_id) {
+          window.open(macrostratApiURL + `/lex/lithology/${data.lith_id}`, '_blank');
+      }
+  };
 
   return h.if(show)("div", { className: "observation-body" }, [
     h(Icon, {
@@ -132,7 +157,7 @@ function ObservationContent({ observation, setBody }) {
         ])
       : null,
     h.if(lithologies || rocks)("div", { className: "observation-details" }, [
-      h(LithologyList, { lithologies }),
+      h(LithologyList, { lithologies, onClickItem: handleClick}),
       h("p", { className: "notes" }, rocks.notes),
     ]),
   ]);
