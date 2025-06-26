@@ -60,14 +60,13 @@ export function Checkins({checkin, comments}) {
     checkin.observations.forEach(observation => {
         // if photo exists
         const imageSrc = getImageUrl(checkin.person_id, observation.photo);
-        let observationBody = observationFooter(observation);
 
         observations.push(
             h('div', {className: 'observation'}, [
                 h('a', {href: "/photo/" + observation.photo}, 
                     h(BlankImage, { className: 'observation-image', src: imageSrc })
                 ),
-                observationBody,
+                h(ObservationFooter, {observation}),
             ])
         );
     });
@@ -137,7 +136,7 @@ function Overlay({checkin, center, LngLatProps, ratingArr, profile_pic}) {
     ])      
 }
 
-export function observationFooter(observation) {
+export function ObservationFooter({observation}) {
     const LngLatProps = {
         position: {
             lat: observation.lat,

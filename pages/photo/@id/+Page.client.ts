@@ -15,6 +15,7 @@ import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
 import { macrostratApiURL } from "@macrostrat-web/settings";
+import { ObservationFooter } from "#/checkin";
 
 export function Page() {
     const { checkin } = useData();
@@ -150,16 +151,7 @@ function ObservationContent({ observation, setBody }) {
       icon: "ban-circle",
       onClick: () => setBody(false),
     }),
-    observation.lat && rocks.strat_name?.strat_name_long
-      ? h("h4", { className: "observation-header" }, [
-          rocks.strat_name.strat_name_long,
-          LngLatCoords(LngLatProps),
-        ])
-      : null,
-    h.if(lithologies || rocks)("div", { className: "observation-details" }, [
-      h(LithologyList, { lithologies, onClickItem: handleClick}),
-      h("p", { className: "notes" }, rocks.notes),
-    ]),
+    h(ObservationFooter, { observation }),
   ]);
 }
 
