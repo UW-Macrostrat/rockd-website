@@ -2,6 +2,7 @@
 import { getRuntimeConfig } from "./utils";
 
 export const rockdApiURL = getRuntimeConfig("ROCKD_API_URL");
+export const macrostratApiURL = getRuntimeConfig("MACROSTRAT_API_DOMAIN");
 export const rockdApiOldURL = "https://rockd.org/api/v2/";
 
 export const darkMapURL =
