@@ -4,11 +4,12 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { BlankImage, Footer, getProfilePicUrl, getImageUrl, Comments } from "~/components/general";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { rockdApiOldURL, SETTINGS } from "@macrostrat-web/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
+import { macrostratApiURL } from "@macrostrat-web/settings";
 
 function Map(props) {
   return h(
@@ -59,14 +60,13 @@ export function Checkins({checkin, comments}) {
     checkin.observations.forEach(observation => {
         // if photo exists
         const imageSrc = getImageUrl(checkin.person_id, observation.photo);
-        let observationBody = observationFooter(observation);
 
         observations.push(
             h('div', {className: 'observation'}, [
                 h('a', {href: "/photo/" + observation.photo}, 
                     h(BlankImage, { className: 'observation-image', src: imageSrc })
                 ),
-                observationBody,
+                h(ObservationFooter, {observation}),
             ])
         );
     });
@@ -136,7 +136,7 @@ function Overlay({checkin, center, LngLatProps, ratingArr, profile_pic}) {
     ])      
 }
 
-function observationFooter(observation) {
+export function ObservationFooter({observation}) {
     const LngLatProps = {
         position: {
             lat: observation.lat,
@@ -172,22 +172,30 @@ function observationFooter(observation) {
         return `#${red}${green}${blue}`;
     }
 
-    let obsAge = observation.age_est ? observation.age_est.name + " (" + observation.age_est.b_age + " - " + observation?.age_est?.t_age + ")" : null;
-
     let lithologies = [];
     rocks.liths?.forEach(lith => {
         if(!lith.color.includes("#")) {
             lithologies.push({
-                name: lith.name,
-                color: rgbaStringToHex(lith.color)});
+                ...lith,
+                color: rgbaStringToHex(lith.color),
+            });
         } else {
             lithologies.push(lith);
         }
     });
 
+    if(rocks.interval?.name) {
+        lithologies.push({
+            name: rocks.interval.name,
+            int_id: rocks.interval.int_id,
+            color: `rgba(${rocks.interval.color})`,
+        })
+    }
+
     if (rocks.strat_name?.strat_name_long) {
         lithologies.push({
             name: rocks.strat_name?.strat_name_long,
+            strat_id: rocks.strat_name?.strat_name_id
         })
     }
 
@@ -197,16 +205,6 @@ function observationFooter(observation) {
         })
     }
     
-    if(obsAge) {
-        lithologies.push({
-            name: obsAge
-        })
-    }
-    if(rocks.interval?.name) {
-        lithologies.push({
-            name: rocks.interval.name
-        })
-    }
     if(observation.orientation.feature?.name) {
         lithologies.push({
             name: observation.orientation.feature?.name
@@ -215,6 +213,18 @@ function observationFooter(observation) {
 
     const show = lithologies.length > 0 || rocks?.notes?.length > 0 && observation.lat && rocks.strat_name?.strat_name_long;
 
+    const handleClick = (e, data) => {
+        if (data.int_id) {
+            window.open(macrostratApiURL + `/lex/intervals/${data.int_id}`, '_blank');
+        }
+        if (data.strat_id) {
+            window.open(macrostratApiURL + `/lex/strat-names/${data.strat_id}`, '_blank');
+        }
+        if (data.lith_id) {
+            window.open(macrostratApiURL + `/lex/lithology/${data.lith_id}`, '_blank');
+        }
+    };
+
     // observation body
     return h.if(show)("div", {className: 'observation-body'}, [
         observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
@@ -222,7 +232,7 @@ function observationFooter(observation) {
             observation.lat ? LngLatCoords(LngLatProps) : null,
         ]) : null,
         h('div', {className: 'observation-details'}, [
-            h(LithologyList, { lithologies }),
+            h(LithologyList, { lithologies, onClickItem: handleClick }),
             h('p', {className: "notes"}, rocks.notes),
         ]),
     ]);
