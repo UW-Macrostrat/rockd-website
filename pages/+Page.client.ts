@@ -2,9 +2,10 @@ import { Image, Footer } from "~/components/general";
 import "@macrostrat/style-system";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
+import { useEffect } from "react";
 
 export function Page()  {
-    return h("div", { className: "main-page" }, [
+    return h("div", { className: "main-page"}, [
       h("div", { className: "new_container field" }, [
           h("div", { className: "mask" }, [
             h(Image, { src: "main-page/field.jpg", className: "start-img back-img", alt: "Field" }),
