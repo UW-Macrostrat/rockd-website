@@ -57,7 +57,7 @@ function FooterLink({ href, icon, text }) {
 
   return h("li", { onClick: (e) => {
       e.preventDefault(); 
-      navigate(href); 
+      window.open(href, "_self"); 
   }}, [
     h(Icon, {
       className: "footer-icon",
