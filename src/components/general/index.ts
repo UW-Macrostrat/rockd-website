@@ -10,9 +10,20 @@ import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "@macrostrat-web/settings";
 import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
 import { useState } from "react";
+import { navigate } from "vike/client/router";
 
 export function Footer() {
-  const isDarkMode = useDarkMode().isEnabled;
+  const footerLinks1 = [
+    { href: "/", icon: "home", text: "Home" },
+    { href: "/explore", icon: "geosearch", text: "Explore" },
+    { href: "/trip/1", icon: "route", text: "Trip" },
+  ];
+
+  const footerLinks2 = [
+    { href: "/metrics", icon: "chart", text: "Metrics" },
+    { href: "/terms", icon: "manual", text: "Terms and Conditions" },
+    { href: "/privacy", icon: "lock", text: "Privacy" },
+  ];
 
   return h("div", { className: "footer" }, [
     h("div", { className: "titles" }, [
@@ -108,6 +119,23 @@ export function Footer() {
     ]),
   ]);
 }
+
+function FooterLink({ href, icon, text }) {
+  const isDarkMode = useDarkMode().isEnabled;
+
+  return h("li", { onClick: (e) => {
+      e.preventDefault(); 
+      window.open(href, "_self"); 
+  }}, [
+    h(Icon, {
+      className: "footer-icon",
+      icon,
+      style: { color: isDarkMode ? "black" : "white" },
+    }),
+    h("p", text),
+  ]);
+}
+
 
 export function Image(props: ImageProps) {
   const { src, className, width, height, onClick, alt } = props;
@@ -339,11 +367,46 @@ function Checkin({ checkin, mapRef, setInspectPosition, len }) {
           const el = document.createElement("div");
           el.className = "marker_pin";
 
+<<<<<<< HEAD
           // Create marker
           new mapboxgl.Marker(el)
             .setLngLat([checkin.lng, checkin.lat])
             .addTo(map);
         }
+=======
+    let temp = h(
+      "div",
+      {
+        className: "checkin",
+        onClick: () => {
+          map.flyTo({ 
+            center: [checkin.lng, checkin.lat], 
+            zoom: 12,
+            speed: 2,
+            curve: 1.2 
+          });
+          if (setInspectPosition)
+            setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
+        },
+        onMouseEnter: () => {
+          if (len > 1) {
+            // marker
+            const el = document.createElement("div");
+            el.className = "marker_pin";
+
+            // Create marker
+            new mapboxgl.Marker(el)
+              .setLngLat([checkin.lng, checkin.lat])
+              .addTo(map);
+          }
+        },
+        onMouseLeave: () => {
+          let previous = document.querySelectorAll(".marker_pin");
+          previous.forEach((marker) => {
+            marker.remove();
+          });
+        },
+>>>>>>> main
       },
       onMouseLeave: () => {
         let previous = document.querySelectorAll(".marker_pin");
