@@ -138,31 +138,44 @@ function Map({coords}) {
 }
 
 function getAllCoords() {
-    return useAPIResult('/api/matomo', {
-        date: '2025-01-01,today',
+    return useAPIResult('https://analytics.svc.macrostrat.org', {
+        date: '2025-07-01,today',
         period: 'range',
         filter_limit: 10000,
         filter_offset: 0,
         showColumns: 'latitude,longitude',
         doNotFetchActions: true,
+        module: 'API',
+        idSite: '1',
+        format: 'json',
+        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN,
+        method: 'Live.getLastVisitsDetails',
     })
 }
 
 function getTodayCoords(): Array<{ latitude: number, longitude: number }> | undefined {
-    return useAPIResult('/api/matomo', {
+    return useAPIResult('https://analytics.svc.macrostrat.org', {
         date: 'today',
         period: 'day',
         filter_limit: 10000,
         filter_offset: 0,
+        module: 'API',
+        format: 'json',
         showColumns: 'latitude,longitude',
         doNotFetchActions: true,
+        idSite: '1',
+        method: 'Live.getLastVisitsDetails',
+        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN
     })
 }
 
 function getVisitsToday(): { visits: number, visitors: number } | undefined {
-    return useAPIResult('/api/matomo', {
+    return useAPIResult('https://analytics.svc.macrostrat.org', {
         method: "Live.getCounters",
-        idSite: 1,
-        lastMinutes: 1440
+        lastMinutes: 1440,
+        module: 'API',
+        format: 'json',
+        idSite: '1',
+        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN
     })?.[0]
 }
