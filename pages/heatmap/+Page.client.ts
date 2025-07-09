@@ -4,7 +4,7 @@ import {
   MapAreaContainer,
   MapView,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken, matomoToken } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Divider, Spinner } from "@blueprintjs/core";
 
@@ -138,7 +138,7 @@ function Map({coords}) {
 }
 
 function getAllCoords() {
-    return useAPIResult('https://analytics.svc.macrostrat.org', {
+    return useAPIResult('https://analytics.svc.macrostrat.org/', {
         date: '2025-07-01,today',
         period: 'range',
         filter_limit: 10000,
@@ -148,13 +148,13 @@ function getAllCoords() {
         module: 'API',
         idSite: '1',
         format: 'json',
-        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN,
+        token_auth: matomoToken,
         method: 'Live.getLastVisitsDetails',
     })
 }
 
 function getTodayCoords(): Array<{ latitude: number, longitude: number }> | undefined {
-    return useAPIResult('https://analytics.svc.macrostrat.org', {
+    return useAPIResult('https://analytics.svc.macrostrat.org/', {
         date: 'today',
         period: 'day',
         filter_limit: 10000,
@@ -165,17 +165,17 @@ function getTodayCoords(): Array<{ latitude: number, longitude: number }> | unde
         doNotFetchActions: true,
         idSite: '1',
         method: 'Live.getLastVisitsDetails',
-        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN
+        token_auth: matomoToken
     })
 }
 
 function getVisitsToday(): { visits: number, visitors: number } | undefined {
-    return useAPIResult('https://analytics.svc.macrostrat.org', {
+    return useAPIResult('https://analytics.svc.macrostrat.org/', {
         method: "Live.getCounters",
         lastMinutes: 1440,
         module: 'API',
         format: 'json',
         idSite: '1',
-        token_auth: import.meta.env.VITE_MATOMO_API_TOKEN
+        token_auth: matomoToken
     })?.[0]
 }
