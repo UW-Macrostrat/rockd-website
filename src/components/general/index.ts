@@ -13,6 +13,7 @@ import { useState } from "react";
 import { navigate } from "vike/client/router";
 
 export function Footer() {
+  const isDarkMode = useDarkMode().isEnabled;
   const footerLinks1 = [
     { href: "/", icon: "home", text: "Home" },
     { href: "/explore", icon: "geosearch", text: "Explore" },
@@ -367,46 +368,11 @@ function Checkin({ checkin, mapRef, setInspectPosition, len }) {
           const el = document.createElement("div");
           el.className = "marker_pin";
 
-<<<<<<< HEAD
           // Create marker
           new mapboxgl.Marker(el)
             .setLngLat([checkin.lng, checkin.lat])
             .addTo(map);
         }
-=======
-    let temp = h(
-      "div",
-      {
-        className: "checkin",
-        onClick: () => {
-          map.flyTo({ 
-            center: [checkin.lng, checkin.lat], 
-            zoom: 12,
-            speed: 2,
-            curve: 1.2 
-          });
-          if (setInspectPosition)
-            setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
-        },
-        onMouseEnter: () => {
-          if (len > 1) {
-            // marker
-            const el = document.createElement("div");
-            el.className = "marker_pin";
-
-            // Create marker
-            new mapboxgl.Marker(el)
-              .setLngLat([checkin.lng, checkin.lat])
-              .addTo(map);
-          }
-        },
-        onMouseLeave: () => {
-          let previous = document.querySelectorAll(".marker_pin");
-          previous.forEach((marker) => {
-            marker.remove();
-          });
-        },
->>>>>>> main
       },
       onMouseLeave: () => {
         let previous = document.querySelectorAll(".marker_pin");
