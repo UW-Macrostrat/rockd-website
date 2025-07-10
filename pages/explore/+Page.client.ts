@@ -309,19 +309,35 @@ function FeatureDetails({setInspectPosition}) {
     setBounds(map.getBounds());
   }
 
-  // Update bounds on move
   useEffect(() => {
-    if(map) {
-      const listener = () => {
-        setBounds(map.getBounds());
-        setPage(1);
-      };
-      map.on("moveend", listener);
-      return () => {
-        map.off("moveend", listener);
-      };
+    if (!map) return;
+
+    const handleMapReady = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
+
+    if (map.isStyleLoaded()) {
+      handleMapReady(); 
+    } else {
+      map.once("load", handleMapReady); 
     }
-  }, [bounds]);
+
+    const onMoveEnd = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
+
+    map.on("moveend", onMoveEnd);
+
+    return () => {
+      map.off("moveend", onMoveEnd);
+      map.off("load", handleMapReady);
+    };
+  }, [map]);
+
 
   result = result?.success?.data;  
   if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
