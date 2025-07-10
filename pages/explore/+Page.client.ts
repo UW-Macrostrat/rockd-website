@@ -11,7 +11,6 @@ import h from "./main.module.sass";
 import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { ClientOnly } from "vike-react/ClientOnly";
 import {
   MapAreaContainer,
   MapMarker,
@@ -100,10 +99,10 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['has', 'n'],
         layout: {
-            'text-field': ['get', 'n'],
-            'text-size': 10,
-            'text-allow-overlap': true,
-            'text-ignore-placement': true,
+          'text-field': ['get', 'n'],
+          'text-size': 10,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
         },
         paint: {
           "text-color": "#fff"
@@ -116,10 +115,10 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['<=', ['get', 'n'], clusterThreshold],
         paint: {
-            'circle-color': baseColor,
-            'circle-radius': 4,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
+          'circle-color': baseColor,
+          'circle-radius': 4,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
         }
       },
     ],
@@ -481,7 +480,6 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
       });
 
       deletePins('.filtered_pin');
-      deletePins('.marker_pin');
 
       if (!close) {
         let stop = 0;
@@ -490,6 +488,11 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
           // marker
           const el = document.createElement('div');
           el.className = 'filtered_pin';
+          el.style.backgroundColor = 'green';
+          el.style.borderRadius = '50%';
+          el.style.border = '2px solid white';
+          el.style.width = '15px';
+          el.style.height = '15px';
 
           // Create marker
           new mapboxgl.Marker(el)
@@ -734,10 +737,15 @@ function ClickedCheckins({setSelectedCheckin}) {
 
         // add marker
         const coord = features[0].geometry.coordinates.slice();
-        console.log("coordinates", coord);
 
         const el = document.createElement('div');
         el.className = 'selected_pin';
+        el.style.backgroundColor = 'blue';
+        el.style.borderRadius = '50%';
+        el.style.border = '2px solid white';
+        el.style.width = '15px';
+        el.style.height = '15px';
+
 
         new mapboxgl.Marker(el)
           .setLngLat(coord)
