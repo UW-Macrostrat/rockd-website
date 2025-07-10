@@ -297,15 +297,12 @@ function FeatureDetails({setInspectPosition}) {
   let result;
   let nextData;
 
-  if(!map) {
-    result = getCheckins(40, 45, -60, -70, page);
-    nextData = getCheckins(40, 45, -60, -70, page + 1);
-  } else if (bounds) {
+  if (bounds) {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
     nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
   } else {
-    result = getCheckins(40, 45, -60, -70, page);
-    nextData = getCheckins(40, 45, -60, -70, page + 1);
+    result = getCheckins(0, 0, 0, 0, 1);
+    nextData = getCheckins(0, 0, 0, 0, 2);
   }
 
   if (!bounds && map) {
@@ -326,10 +323,9 @@ function FeatureDetails({setInspectPosition}) {
     }
   }, [bounds]);
 
-  if (result == null) return h(Spinner, { className: "loading-spinner" });
-  result = result.success.data;  
+  result = result?.success?.data;  
+  if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
 
-  
   const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
 
   result.sort((a, b) => {
@@ -366,24 +362,24 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 
 function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
-      h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
-            setSatelite(!showSatelite);
-          }}, [
-              h('div.btn-inside', [
-                h(Icon, { className: "satellite-icon", icon: "satellite"}),
-                h("p", "Satellite"),
-              ])
-          ]),
-      h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
-            setOverlay(!showOverlay);
-          }}, [
-              h('div.btn-inside', [
-                h(Icon, { className: "overlay-icon", icon: "map"}),
-                h("p", "Overlay"),
-              ])
-          ]),
-    ]);
+    h(DarkModeButton, { className: "dark-btn", showText: true } ),
+    h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
+      setSatelite(!showSatelite);
+    }}, [
+        h('div.btn-inside', [
+          h(Icon, { className: "satellite-icon", icon: "satellite"}),
+          h("p", "Satellite"),
+        ])
+    ]),
+    h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
+      setOverlay(!showOverlay);
+    }}, [
+      h('div.btn-inside', [
+        h(Icon, { className: "overlay-icon", icon: "map"}),
+        h("p", "Overlay"),
+      ])
+    ]),
+  ]);
 }
 
 function createSelectedCheckins(result, setInspectPosition) {
