@@ -27,6 +27,8 @@ export const ingestPrefix = getRuntimeConfig(
   apiDomain + "/api/ingest"
 );
 
+export const matomoApiURL = getRuntimeConfig("MATOMO_API_URL");
+
 export const matomoToken = getRuntimeConfig("MATOMO_API_TOKEN");
 
 /** Legacy settings object */
