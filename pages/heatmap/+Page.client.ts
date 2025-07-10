@@ -4,7 +4,7 @@ import {
   MapAreaContainer,
   MapView,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken, matomoToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken, matomoToken, matomoApiURL } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Divider, Spinner } from "@blueprintjs/core";
 
@@ -138,7 +138,7 @@ function Map({coords}) {
 }
 
 function getAllCoords() {
-    return useAPIResult('https://analytics.svc.macrostrat.org/', {
+    return useAPIResult(matomoApiURL, {
         date: '2025-07-01,today',
         period: 'range',
         filter_limit: 10000,
@@ -154,7 +154,7 @@ function getAllCoords() {
 }
 
 function getTodayCoords(): Array<{ latitude: number, longitude: number }> | undefined {
-    return useAPIResult('https://analytics.svc.macrostrat.org/', {
+    return useAPIResult(matomoApiURL, {
         date: 'today',
         period: 'day',
         filter_limit: 10000,
@@ -170,7 +170,7 @@ function getTodayCoords(): Array<{ latitude: number, longitude: number }> | unde
 }
 
 function getVisitsToday(): { visits: number, visitors: number } | undefined {
-    return useAPIResult('https://analytics.svc.macrostrat.org/', {
+    return useAPIResult(matomoApiURL, {
         method: "Live.getCounters",
         lastMinutes: 1440,
         module: 'API',
