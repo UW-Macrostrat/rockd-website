@@ -11,7 +11,6 @@ import h from "./main.module.sass";
 import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
-import { ClientOnly } from "vike-react/ClientOnly";
 import {
   MapAreaContainer,
   MapMarker,
@@ -100,10 +99,10 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['has', 'n'],
         layout: {
-            'text-field': ['get', 'n'],
-            'text-size': 10,
-            'text-allow-overlap': true,
-            'text-ignore-placement': true,
+          'text-field': ['get', 'n'],
+          'text-size': 10,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
         },
         paint: {
           "text-color": "#fff"
@@ -116,10 +115,10 @@ function weaverStyle(type: object) {
         "source-layer": "default",
         filter: ['<=', ['get', 'n'], clusterThreshold],
         paint: {
-            'circle-color': baseColor,
-            'circle-radius': 4,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
+          'circle-color': baseColor,
+          'circle-radius': 4,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
         }
       },
     ],
@@ -298,39 +297,51 @@ function FeatureDetails({setInspectPosition}) {
   let result;
   let nextData;
 
-  if(!map) {
-    result = getCheckins(40, 45, -60, -70, page);
-    nextData = getCheckins(40, 45, -60, -70, page + 1);
-  } else if (bounds) {
+  if (bounds) {
     result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
     nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
   } else {
-    result = getCheckins(40, 45, -60, -70, page);
-    nextData = getCheckins(40, 45, -60, -70, page + 1);
+    result = getCheckins(0, 0, 0, 0, 1);
+    nextData = getCheckins(0, 0, 0, 0, 2);
   }
 
   if (!bounds && map) {
     setBounds(map.getBounds());
   }
 
-  // Update bounds on move
   useEffect(() => {
-    if(map) {
-      const listener = () => {
-        setBounds(map.getBounds());
-        setPage(1);
-      };
-      map.on("moveend", listener);
-      return () => {
-        map.off("moveend", listener);
-      };
+    if (!map) return;
+
+    const handleMapReady = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
+
+    if (map.isStyleLoaded()) {
+      handleMapReady(); 
+    } else {
+      map.once("load", handleMapReady); 
     }
-  }, [bounds]);
 
-  if (result == null) return h(Spinner, { className: "loading-spinner" });
-  result = result.success.data;  
+    const onMoveEnd = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
 
-  
+    map.on("moveend", onMoveEnd);
+
+    return () => {
+      map.off("moveend", onMoveEnd);
+      map.off("load", handleMapReady);
+    };
+  }, [map]);
+
+
+  result = result?.success?.data;  
+  if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
+
   const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
 
   result.sort((a, b) => {
@@ -367,24 +378,24 @@ function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
 
 function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
-      h(DarkModeButton, { className: "dark-btn", showText: true } ),
-      h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
-            setSatelite(!showSatelite);
-          }}, [
-              h('div.btn-inside', [
-                h(Icon, { className: "satellite-icon", icon: "satellite"}),
-                h("p", "Satellite"),
-              ])
-          ]),
-      h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
-            setOverlay(!showOverlay);
-          }}, [
-              h('div.btn-inside', [
-                h(Icon, { className: "overlay-icon", icon: "map"}),
-                h("p", "Overlay"),
-              ])
-          ]),
-    ]);
+    h(DarkModeButton, { className: "dark-btn", showText: true } ),
+    h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
+      setSatelite(!showSatelite);
+    }}, [
+        h('div.btn-inside', [
+          h(Icon, { className: "satellite-icon", icon: "satellite"}),
+          h("p", "Satellite"),
+        ])
+    ]),
+    h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
+      setOverlay(!showOverlay);
+    }}, [
+      h('div.btn-inside', [
+        h(Icon, { className: "overlay-icon", icon: "map"}),
+        h("p", "Overlay"),
+      ])
+    ]),
+  ]);
 }
 
 function createSelectedCheckins(result, setInspectPosition) {
@@ -481,7 +492,6 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
       });
 
       deletePins('.filtered_pin');
-      deletePins('.marker_pin');
 
       if (!close) {
         let stop = 0;
@@ -490,6 +500,11 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
           // marker
           const el = document.createElement('div');
           el.className = 'filtered_pin';
+          el.style.backgroundColor = 'green';
+          el.style.borderRadius = '50%';
+          el.style.border = '2px solid white';
+          el.style.width = '15px';
+          el.style.height = '15px';
 
           // Create marker
           new mapboxgl.Marker(el)
@@ -734,10 +749,15 @@ function ClickedCheckins({setSelectedCheckin}) {
 
         // add marker
         const coord = features[0].geometry.coordinates.slice();
-        console.log("coordinates", coord);
 
         const el = document.createElement('div');
         el.className = 'selected_pin';
+        el.style.backgroundColor = 'blue';
+        el.style.borderRadius = '50%';
+        el.style.border = '2px solid white';
+        el.style.width = '15px';
+        el.style.height = '15px';
+
 
         new mapboxgl.Marker(el)
           .setLngLat(coord)
