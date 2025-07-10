@@ -7,10 +7,21 @@ import {
 import { mapboxAccessToken, matomoToken, matomoApiURL } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
+import { useEffect, useState } from "react";
+
 
 export function Page() {
-    const coords = getAllCoords();
+    const [coords, setCoords] = useState<Array<{ latitude: number; longitude: number }> | null>(null);
     const today = getTodayCoords();
+
+    useEffect(() => {
+        (async () => {
+            const data = await getAllCoords();
+            setCoords(data);
+        })();
+    }, []);
+
+    console.log("Coordinates:", coords);
 
     return h('div.main', [
         h('div.heatmap-page', [
@@ -39,7 +50,7 @@ function PageHeader({ coords }) {
         h('p', 'Loading visits...') : 
         h('div.visits-today', [
             h('h3', `${visits.toLocaleString()} visits today`),
-            h.if(coords?.length)('h3', `${coords?.length.toLocaleString()} visits this year`),
+            h.if(coords?.length)('h3', `${coords?.length?.toLocaleString()} visits this year`),
         ])
 
     return h('div.page-header', [
@@ -186,21 +197,41 @@ function TodayMap({today}) {
     return h(MapInner, { handleMapLoaded });
 }
 
-function getAllCoords() {
-    return useAPIResult(matomoApiURL, {
-        date: '2025-07-01,today',
-        period: 'range',
-        filter_limit: 10000,
-        filter_offset: 0,
-        showColumns: 'latitude,longitude',
-        doNotFetchActions: true,
-        module: 'API',
-        idSite: '1',
-        format: 'json',
-        token_auth: matomoToken,
-        method: 'Live.getLastVisitsDetails',
-    })
+async function getAllCoords(): Promise<Array<{ latitude: number, longitude: number }>> {
+    const allCoords: Array<{ latitude: number, longitude: number }> = [];
+    const pageSize = 10000;
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+        const result = await fetch(`${matomoApiURL}?${new URLSearchParams({
+            date: '2025-07-01,today',
+            period: 'range',
+            filter_limit: pageSize.toString(),
+            filter_offset: offset.toString(),
+            showColumns: 'latitude,longitude',
+            doNotFetchActions: 'true',
+            module: 'API',
+            idSite: '1',
+            format: 'json',
+            token_auth: matomoToken,
+            method: 'Live.getLastVisitsDetails',
+        })}`).then(res => res.json());
+
+        if (Array.isArray(result) && result.length > 0) {
+            allCoords.push(...result);
+            offset += pageSize;
+            if (result.length < pageSize) {
+                hasMore = false;
+            }
+        } else {
+            hasMore = false; 
+        }
+    }
+
+    return allCoords;
 }
+
 
 function getTodayCoords(): Array<{ latitude: number, longitude: number }> | undefined {
     return useAPIResult(matomoApiURL, {
