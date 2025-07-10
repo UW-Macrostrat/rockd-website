@@ -6,18 +6,28 @@ import {
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken, matomoToken, matomoApiURL } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
-import { Divider, Spinner } from "@blueprintjs/core";
+import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
 
 export function Page() {
     const coords = getAllCoords();
+    const today = getTodayCoords();
 
     return h('div.main', [
         h('div.heatmap-page', [
             h(PageHeader, { coords }),
-            h(Map, { coords })
+            h(
+                Tabs,
+                {
+                    id: 'heatmap-tabs',
+                },
+                [
+                    h(Tab, { id: 'today', title: 'Today', panelClassName: 'today-tab-panel', panel: h(TodayMap, { today }) }),
+                    h(Tab, { id: 'all', title: 'All', panelClassName: 'all-tab-panel', panel: h(AllMap, { coords, today }) }),
+                ]
+            )
         ]),
         h(Footer)
-    ]) 
+    ]);
 }
 
 function PageHeader({ coords }) {
@@ -41,11 +51,7 @@ function PageHeader({ coords }) {
     ]);
 }
 
-function Map({coords}) {   
-    const today = getTodayCoords();
-
-    const style = 'mapbox://styles/mapbox/dark-v10';
-
+function AllMap({coords, today}) {   
     if (!coords || !today) {
       return h("div.map-area-container.loading", [
         h(Spinner, { size: 50 }),
@@ -111,30 +117,73 @@ function Map({coords}) {
         });
     };
 
+    return h(MapInner, { handleMapLoaded });
+}
+
+function MapInner({handleMapLoaded}) {
+    const style = 'mapbox://styles/mapbox/dark-v10';
+
     return h(
-        "div.map-container",
+        MapAreaContainer,
+        {
+            className: "map-area-container",
+        },
         [
-            h(
-            MapAreaContainer,
-            {
-                className: "map-area-container",
-            },
-            [
-                h(MapView, { 
-                    style, 
-                    mapboxToken: mapboxAccessToken, 
-                    onMapLoaded: handleMapLoaded,
-                    mapPosition:  {
-                        camera: {
-                            lat: 39, 
-                            lng: -98, 
-                            altitude: 6000000,
-                        },
+            h(MapView, { 
+                style, 
+                mapboxToken: mapboxAccessToken, 
+                onMapLoaded: handleMapLoaded,
+                mapPosition:  {
+                    camera: {
+                        lat: 39, 
+                        lng: -98, 
+                        altitude: 6000000,
                     },
-                }),
-            ]),
+                },
+            }),
         ]
     );
+}
+
+function TodayMap({today}) {   
+    if (!today) {
+      return h("div.map-area-container.loading", [
+        h(Spinner, { size: 50 }),
+      ]);
+    }
+
+    const handleMapLoaded = (map) => {
+        map.on('load', () => {
+            // Combine coords and today coords, marking today's points
+            const allFeatures = today.map((coord) => ({
+                type: 'Feature',
+                geometry: {
+                type: 'Point',
+                coordinates: [coord.longitude, coord.latitude],
+                },
+            }))
+
+            map.addSource('markers', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: allFeatures,
+                },
+            });
+
+            map.addLayer({
+                id: 'markers-today',
+                type: 'circle',
+                source: 'markers',
+                paint: {
+                    'circle-radius': 3,
+                    'circle-color': '#007cbf',
+                },
+            });
+        });
+    };
+
+    return h(MapInner, { handleMapLoaded });
 }
 
 function getAllCoords() {
