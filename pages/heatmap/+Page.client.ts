@@ -11,6 +11,35 @@ import { useEffect, useState } from "react";
 
 
 export function Page() {
+    const [data, setData] = useState<Array<{ lat: number; lng: number }> | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await fetchAllUsageStats();
+            setData(result);
+        };
+
+        fetchData();
+    }, []);
+
+    console.log("Data:", data);
+
+    return h('div.main', [
+        h('div.heatmap-page', [
+            h(
+                Tabs,
+                {
+                    id: 'heatmap-tabs',
+                },
+                [
+                    h(Tab, { id: 'today', title: 'Today', panelClassName: 'today-tab-panel', panel: h(TodayMap, { data }) }),
+                ]
+            )
+        ]),
+        h(Footer)
+    ]);
+
+
     const [coords, setCoords] = useState<Array<{ latitude: number; longitude: number }> | null>(null);
     const today = getTodayCoords();
 
@@ -156,8 +185,8 @@ function MapInner({handleMapLoaded}) {
     );
 }
 
-function TodayMap({today}) {   
-    if (!today) {
+function TodayMap({data}) {   
+    if (!data) {
       return h("div.map-area-container.loading", [
         h(Spinner, { size: 50 }),
       ]);
@@ -166,11 +195,11 @@ function TodayMap({today}) {
     const handleMapLoaded = (map) => {
         map.on('load', () => {
             // Combine coords and today coords, marking today's points
-            const allFeatures = today.map((coord) => ({
+            const allFeatures = data.map((coord) => ({
                 type: 'Feature',
                 geometry: {
                 type: 'Point',
-                coordinates: [coord.longitude, coord.latitude],
+                coordinates: [coord.lng, coord.lat],
                 },
             }))
 
@@ -258,4 +287,34 @@ function getVisitsToday(): { visits: number, visitors: number } | undefined {
         idSite: '1',
         token_auth: matomoToken
     })?.[0]
+}
+
+async function fetchAllUsageStats() {
+  let allData = [];
+  let lastId = 0;
+  const limit = 10000;
+  let keepFetching = true;
+
+  while (keepFetching) {
+    const url = `http://localhost:5500/usage-stats?id=${lastId}&limit=${limit}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    const batch = json.data || [];
+
+    allData = allData.concat(batch);
+
+    if (batch.length < limit) {
+      // Less than limit means no more data
+      keepFetching = false;
+    } else {
+      // Update lastId to the max id from this batch
+      lastId = batch.reduce((max, item) => (item.id > max ? item.id : max), lastId);
+    }
+  }
+
+  return allData;
 }
