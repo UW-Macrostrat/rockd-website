@@ -464,11 +464,6 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
   const data = useRockdAPI(queryString + "&page=" + page)?.success.data;
   const nextData = useRockdAPI(queryString + "&page=" + (page + 1))?.success.data;
 
-  console.log("current", data)
-  console.log("next", nextData)
-
-  console.log(queryString + "&page=" + page)
-
   // add markers for filtered checkins
   let coordinates = [];
   let lngs = [];
@@ -729,14 +724,12 @@ function ClickedCheckins({setSelectedCheckin}) {
 
       if(cluster.length > 0) {
         const zoom = cluster[0].properties.expansion_zoom;
-        console.log("cluster", cluster[0]);
-
-        console.log("zoom", zoom);
 
         map.flyTo({
           center: cluster[0].geometry.coordinates,
           zoom: zoom + 2,
-          speed: 0.5,
+          speed: 10,
+          curve: .5,
         });
       }
 
