@@ -14,7 +14,9 @@ import {
 import { mapboxAccessToken } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Tabs, Tab } from "@blueprintjs/core";
+import { mergeStyles } from "@macrostrat/mapbox-utils";
 
+const tileServer = 'http://localhost:5500';
 
 export function Page() {
     return h('div.main', [
@@ -26,7 +28,8 @@ export function Page() {
                     id: 'heatmap-tabs',
                 },
                 [
-                    h(Tab, { id: 'all', title: 'All', panelClassName: 'all-tab-panel', panel: h(UsageMap, { mapboxToken: mapboxAccessToken }) }),
+                  h(Tab, { id: 'all', title: 'All', panelClassName: 'all-tab-panel', panel: h(Heatmap, { mapboxToken: mapboxAccessToken, today: false }) }),
+                  h(Tab, { id: 'today', title: 'Today', panelClassName: 'today-tab-panel', panel: h(Heatmap, { mapboxToken: mapboxAccessToken, today: true }) }),
                 ]
             )
         ]),
@@ -36,40 +39,60 @@ export function Page() {
 
 mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
 
-function weaverStyle() {
+function todayStyle() {
   return {
     sources: {
-      usage: {
+      today: {
         type: "vector",
-        tiles: [ "http://localhost:5500/stats-tile/{z}/{x}/{y}?cluster=false"],
+        tiles: [ tileServer + "/stats-tile/{z}/{x}/{y}?date=today" ],
       }
     },
     layers: [
       {
-        id: 'unclustered-point',
+        id: 'today-points',
         type: 'circle',
-        source: 'usage',
+        source: 'today',
         "source-layer": "default",
         paint: {
-          'circle-color': "#00f",
+          'circle-color': "#6488ea",
           'circle-radius': 4,
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#fff'
         }
       },
     ],
   };
 }
 
-function UsageMap({
+function allStyle() {
+  return {
+    sources: {
+      all: {
+        type: "vector",
+        tiles: [ tileServer + "/stats-tile/{z}/{x}/{y}" ],
+      }
+    },
+    layers: [
+      {
+        id: 'all-points',
+        type: 'circle',
+        source: 'all',
+        "source-layer": "default",
+        paint: {
+          'circle-color': "#5e5e5e",
+          'circle-radius': 4,
+        }
+      },
+    ],
+  };
+}
+
+function Heatmap({
   mapboxToken,
+  today,
 }: {
-  headerElement?: React.ReactElement;
-  title?: string;
-  children?: React.ReactNode;
-  mapboxToken?: string;
+  mapboxToken: string;
+  today: boolean;
 }) {
-  const style = useMapStyle(mapboxToken);
+  const style = useMapStyle(mapboxToken, today);
 
   if(style == null) return null;
 
@@ -84,7 +107,7 @@ function UsageMap({
   return h(MapContainer, {style, mapPosition});
 }
 
-function useMapStyle(mapboxToken) {
+function useMapStyle(mapboxToken, today) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
@@ -93,7 +116,7 @@ function useMapStyle(mapboxToken) {
     : "mapbox://styles/mapbox/light-v10";
 
   const [actualStyle, setActualStyle] = useState(null);
-  const overlayStyle = weaverStyle();
+  const overlayStyle = today ? todayStyle() : mergeStyles(allStyle(), todayStyle());
 
   // Auto select sample type
   useEffect(() => {
