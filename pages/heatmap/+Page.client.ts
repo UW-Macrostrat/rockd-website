@@ -22,10 +22,9 @@ export function Page() {
         fetchData();
     }, []);
 
-    console.log("Data:", data);
-
     return h('div.main', [
         h('div.heatmap-page', [
+            h(PageHeader, { coords: data }),
             h(
                 Tabs,
                 {
@@ -38,53 +37,12 @@ export function Page() {
         ]),
         h(Footer)
     ]);
-
-
-    const [coords, setCoords] = useState<Array<{ latitude: number; longitude: number }> | null>(null);
-    const today = getTodayCoords();
-
-    useEffect(() => {
-        (async () => {
-            const data = await getAllCoords();
-            setCoords(data);
-        })();
-    }, []);
-
-    console.log("Coordinates:", coords);
-
-    return h('div.main', [
-        h('div.heatmap-page', [
-            h(PageHeader, { coords }),
-            h(
-                Tabs,
-                {
-                    id: 'heatmap-tabs',
-                },
-                [
-                    h(Tab, { id: 'today', title: 'Today', panelClassName: 'today-tab-panel', panel: h(TodayMap, { today }) }),
-                    h(Tab, { id: 'all', title: 'All', panelClassName: 'all-tab-panel', panel: h(AllMap, { coords, today }) }),
-                ]
-            )
-        ]),
-        h(Footer)
-    ]);
 }
 
 function PageHeader({ coords }) {
-    const visitsToday = getVisitsToday();
-
-    const { visits, visitors } = visitsToday || {};
-
-    const Visit = !visitsToday ? 
-        h('p', 'Loading visits...') : 
-        h('div.visits-today', [
-            h('h3', `${visits.toLocaleString()} visits today`),
-            h.if(coords?.length)('h3', `${coords?.length?.toLocaleString()} visits this year`),
-        ])
-
     return h('div.page-header', [
         h('h1', 'Heatmap'),
-        Visit,
+        h.if(coords?.length)('h3', `${coords?.length?.toLocaleString()} visits this year`),
         h(Divider),
         h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
         h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
