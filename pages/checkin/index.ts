@@ -10,6 +10,7 @@ import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
 import { macrostratApiURL } from "@macrostrat-web/settings";
+import { ContentPage } from "~/layouts";
 
 function Map(props) {
   return h(
@@ -23,13 +24,22 @@ function Map(props) {
 }
 
 export function Checkins({checkin, comments}) {
-    console.log("Checkin data:", checkin);
+    if (checkin === undefined) {
+        return h('div', [
+            h(ContentPage, [
+                h('h2', "Checkin not found"),
+                h(Divider),
+                h('p', "This checkin does not exist or has been deleted."),
+            ]),
+            h(Footer)
+        ]);
+    }
     const center = {
         lat: checkin.lat,
         lng: checkin.lng
     }
 
-    let profile_pic = h('div.profile-header',h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-picture"}));
+    let profile_pic = h('div.profile-header', h(BlankImage, {src: getProfilePicUrl(checkin.person_id), className: "profile-picture"}));
     
     // format rating
     let ratingArr = [];
@@ -48,8 +58,8 @@ export function Checkins({checkin, comments}) {
     const headerBody = h('h4', {className: 'observation-header'}, checkin.notes);
 
     observations.push(
-        h('div', {className: 'observation'}, [
-           h('a', {href: "/photo/" + checkin.photo}, 
+        h.if(checkin.photo || checkin.notes)('div', {className: 'observation'}, [
+           h.if(checkin.photo)('a', {href: "/photo/" + checkin.photo}, 
                 h(BlankImage, { className: 'observation-image', src: imageSrc, alt: "presentation" })
             ),
             h("div.observation-body", headerBody),
@@ -61,9 +71,11 @@ export function Checkins({checkin, comments}) {
         // if photo exists
         const imageSrc = getImageUrl(checkin.person_id, observation.photo);
 
+        console.log("Observation data:", observation);
+
         observations.push(
-            h('div', {className: 'observation'}, [
-                h('a', {href: "/photo/" + observation.photo}, 
+            h.if(observation.photo || observation.lat || observation.lng || !objectNull(observation.fossils) || !objectNull(observation.minerals) || !objectNull(observation.rocks))('div', {className: 'observation'}, [
+                h.if(observation.photo)('a', {href: "/photo/" + observation.photo}, 
                     h(BlankImage, { className: 'observation-image', src: imageSrc })
                 ),
                 h(ObservationFooter, {observation}),
@@ -188,7 +200,7 @@ export function ObservationFooter({observation}) {
         lithologies.push({
             name: rocks.interval.name,
             int_id: rocks.interval.int_id,
-            color: `rgba(${rocks.interval.color})`,
+            color: rocks.interval.color.includes("#") ? rocks.interval.color : `rgba(${rocks.interval.color})`,
         })
     }
 
@@ -225,6 +237,8 @@ export function ObservationFooter({observation}) {
         }
     };
 
+    console.log("Rocks data:", lithologies);
+
     // observation body
     return h.if(show)("div", {className: 'observation-body'}, [
         observation.lat && rocks.strat_name?.strat_name_long ? h('h4', {className: 'observation-header'}, [
@@ -236,4 +250,8 @@ export function ObservationFooter({observation}) {
             h('p', {className: "notes"}, rocks.notes),
         ]),
     ]);
+}
+
+function objectNull(obj) {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
