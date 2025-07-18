@@ -1,4 +1,5 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
+import { PostgrestInfiniteScrollView } from "@macrostrat/ui-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useState, useMemo } from "react";
