@@ -5,7 +5,7 @@ import {
   MapView,
   buildInspectorStyle
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken, matomoToken, matomoApiURL } from "@macrostrat-web/settings";
+import { mapboxAccessToken, matomoToken, matomoApiURL, tileserverDomain } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -37,7 +37,7 @@ function todayStyle() {
     sources: {
       today: {
         type: "vector",
-        tiles: ["http://localhost:8000/usage-stats/rockd/{z}/{x}/{y}?today=true"],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}?today=true" ],
       }
     },
     layers: [
@@ -60,7 +60,7 @@ function allStyle() {
     sources: {
       all: {
         type: "vector",
-        tiles: ["http://localhost:8000/usage-stats/rockd/{z}/{x}/{y}"],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}"],
       }
     },
     layers: [
@@ -125,7 +125,7 @@ function useMapStyle() {
     : "mapbox://styles/mapbox/light-v10";
 
   const [actualStyle, setActualStyle] = useState(null);
-    const overlayStyle = mergeStyles(allStyle(), todayStyle()); // OVERLAY
+    const overlayStyle = mergeStyles(allStyle(), todayStyle());
 
   // Auto select sample type
   useEffect(() => {
