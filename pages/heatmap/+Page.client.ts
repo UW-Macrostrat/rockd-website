@@ -27,7 +27,7 @@ function PageHeader() {
     return h('div.page-header', [
         h('h1', 'Heatmap'),
         h(Divider),
-        h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
+        h('p', 'This is a heatmap of all the locations where Rockd has been accessed.'),
         h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
     ]);
 }
