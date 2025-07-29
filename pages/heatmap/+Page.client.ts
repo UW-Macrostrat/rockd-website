@@ -11,12 +11,10 @@ import {
   MapAreaContainer,
   MapView,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
 import { Tabs, Tab } from "@blueprintjs/core";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
-
-const tileServer = 'http://localhost:5500';
 
 export function Page() {
     return h('div.main', [
@@ -44,7 +42,7 @@ function todayStyle() {
     sources: {
       today: {
         type: "vector",
-        tiles: [ tileServer + "/stats-tile/{z}/{x}/{y}?date=today" ],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}?date=today" ],
       }
     },
     layers: [
@@ -67,7 +65,7 @@ function allStyle() {
     sources: {
       all: {
         type: "vector",
-        tiles: [ tileServer + "/stats-tile/{z}/{x}/{y}" ],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}" ],
       }
     },
     layers: [
