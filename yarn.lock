@@ -2392,12 +2392,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@macrostrat-web/settings@workspace:*, @macrostrat-web/settings@workspace:packages/settings":
-  version: 0.0.0-use.local
-  resolution: "@macrostrat-web/settings@workspace:packages/settings"
-  languageName: unknown
-  linkType: soft
-
 "@macrostrat/color-utils@npm:1.0.1, @macrostrat/color-utils@npm:^1.0.0, @macrostrat/color-utils@npm:^1.0.1":
   version: 1.0.1
   resolution: "@macrostrat/color-utils@npm:1.0.1"
@@ -2724,7 +2718,6 @@ __metadata:
     "@blueprintjs/core": "npm:^5.10.2"
     "@blueprintjs/table": "npm:^5.1.4"
     "@loadable/component": "npm:^5.14.1"
-    "@macrostrat-web/settings": "workspace:*"
     "@macrostrat/color-utils": "npm:^1.0.0"
     "@macrostrat/data-components": "npm:^0.2.0"
     "@macrostrat/form-components": "npm:^0.1.2"

@@ -5,7 +5,7 @@ import {
   MapView,
   buildInspectorStyle
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken, matomoToken, matomoApiURL, tileserverDomain } from "@macrostrat-web/settings";
+import { mapboxAccessToken, matomoToken, matomoApiURL, tileserverDomain } from "~/settings";
 import { Footer } from "~/components/general";
 import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -93,8 +93,8 @@ function HeatMap({
 
   const mapPosition = {
           camera: {
-            lat: 39, 
-            lng: -98, 
+            lat: 39,
+            lng: -98,
             altitude: 6000000,
           },
         };
