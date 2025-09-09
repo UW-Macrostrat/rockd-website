@@ -1,14 +1,10 @@
 import revisionInfo from "@macrostrat/revision-info-webpack";
-import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import ssr from "vike/plugin";
 import { defineConfig, Plugin } from "vite";
 import cesium from "vite-plugin-cesium";
 import pkg from "./package.json";
-
-// Non-transpiled typescript can't be imported as a standalone package
-import textToolchain from "./packages/text-toolchain/src";
 
 const aliasedModules = [
   "ui-components",
@@ -71,10 +67,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    textToolchain({
-      contentDir: path.resolve(__dirname, "content"),
-      wikiPrefix: "/dev/docs",
-    }),
     /* Fix error with single-page app reloading where paths
     with dots (e.g., locations) are not rewritten to index
     to allow for client-side routing */
