@@ -5,7 +5,6 @@ import compression from "compression";
 
 import { vikeHandler } from "./vike-handler";
 import { createMiddleware } from "@universal-middleware/express";
-import { createMacrostratQlrAPI } from "@macrostrat-web/qgis-integration";
 import express from "express";
 import sirv from "sirv";
 
@@ -87,34 +86,33 @@ async function startServer() {
     app.use(viteDevMiddleware);
   }
 
-  // API layer handler: should restructure this as a middleware
-  createMacrostratQlrAPI(
-    app,
-    "/docs/integrations/qgis/layers",
-    process.env.VITE_MACROSTRAT_TILESERVER_DOMAIN,
-    process.env.VITE_MACROSTRAT_INSTANCE
-  );
+  app.get("/api/matomo", async (req, res) => {
+    const {
+      date,
+      period,
+      filter_limit,
+      filter_offset,
+      lastMinutes = null,
+      doNotFetchActions,
+      method = "Live.getLastVisitsDetails",
+    } = req.query;
 
-  
-  app.get('/api/matomo', async (req, res) => {
-    const { date, period, filter_limit, filter_offset, lastMinutes = null, doNotFetchActions, method = 'Live.getLastVisitsDetails'} = req.query;
-
-    const baseUrl = 'https://analytics.svc.macrostrat.org/';
+    const baseUrl = "https://analytics.svc.macrostrat.org/";
     const params = {
-      module: 'API',
-      idSite: '1',
+      module: "API",
+      idSite: "1",
       period,
       method,
       date,
-      format: 'json',
+      format: "json",
       filter_limit,
       lastMinutes,
-      token_auth: process.env.VITE_MATOMO_API_TOKEN
+      token_auth: process.env.VITE_MATOMO_API_TOKEN,
     };
 
     // Conditionally add doNotFetchActions param
     if (doNotFetchActions) {
-      params.doNotFetchActions = '1';
+      params.doNotFetchActions = "1";
     }
 
     const matomoUrl = `${baseUrl}?${new URLSearchParams(params).toString()}`;
@@ -124,7 +122,7 @@ async function startServer() {
       const data = await response.json();
       res.json(data);
     } catch (err) {
-      res.status(500).json({ error: 'Matomo fetch failed', details: err });
+      res.status(500).json({ error: "Matomo fetch failed", details: err });
     }
   });
 
