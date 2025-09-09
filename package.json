@@ -91,5 +91,5 @@
   "prettier": {
     "proseWrap": "always"
   },
-  "packageManager": "yarn@4.3.1"
+  "packageManager": "yarn@4.9.4"
 }
