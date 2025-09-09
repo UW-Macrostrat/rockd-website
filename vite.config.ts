@@ -1,14 +1,9 @@
 import revisionInfo from "@macrostrat/revision-info-webpack";
-import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import ssr from "vike/plugin";
 import { defineConfig, Plugin } from "vite";
-import cesium from "vite-plugin-cesium";
 import pkg from "./package.json";
-
-// Non-transpiled typescript can't be imported as a standalone package
-import textToolchain from "./packages/text-toolchain/src";
 
 const aliasedModules = [
   "ui-components",
@@ -25,14 +20,14 @@ const aliasedModules = [
   "map-components",
 ];
 
-const gitEnv = revisionInfo(pkg, "https://github.com/UW-Macrostrat/web");
+const gitEnv = revisionInfo(
+  pkg,
+  "https://github.com/UW-Macrostrat/rockd-website"
+);
 // prefix with VITE_ to make available to client
 for (const [key, value] of Object.entries(gitEnv)) {
   process.env["VITE_" + key] = value;
 }
-
-const cesiumRoot = require.resolve("cesium").replace("/index.cjs", "/Build");
-const cesiumBuildPath = path.resolve(cesiumRoot, "Cesium");
 
 // Check if we are building for server context
 
@@ -69,33 +64,12 @@ export default defineConfig({
     },
     dedupe: [...aliasedModules.map((d) => "@macrostrat/" + d)],
   },
-  plugins: [
-    react(),
-    textToolchain({
-      contentDir: path.resolve(__dirname, "content"),
-      wikiPrefix: "/dev/docs",
-    }),
-    /* Fix error with single-page app reloading where paths
-    with dots (e.g., locations) are not rewritten to index
-    to allow for client-side routing */
-    //rewriteAll(),
-    cesium({
-      cesiumBuildPath,
-      cesiumBuildRootPath: cesiumRoot,
-    }),
-    hyperStyles(),
-    ssr(),
-  ],
+  plugins: [react(), hyperStyles(), ssr()],
   envDir: path.resolve(__dirname),
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
     sourcemap: true,
-  },
-  define: {
-    // Cesium base URL
-    CESIUM_BASE_URL: JSON.stringify("/cesium"),
-    // If not building for server context
   },
   ssr: {
     noExternal: [
@@ -104,8 +78,6 @@ export default defineConfig({
        */
       "@macrostrat/form-components",
       "@macrostrat/ui-components",
-      "@macrostrat/column-components",
-      "@macrostrat/column-views",
       "@macrostrat/data-components",
       "@macrostrat/map-interface",
     ],

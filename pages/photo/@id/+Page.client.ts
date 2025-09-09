@@ -6,7 +6,7 @@ import {
   getImageUrl,
   TestImage,
   Footer,
-} from "~/components/general";
+} from "~/components";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
@@ -14,7 +14,7 @@ import { LithologyList } from "@macrostrat/data-components";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { usePageContext } from "vike-react/usePageContext";
 import { useData } from "vike-react/useData";
-import { macrostratApiURL } from "@macrostrat-web/settings";
+import { macrostratApiURL } from "~/settings";
 import { ObservationFooter } from "#/checkin";
 
 export function Page() {
@@ -33,7 +33,7 @@ export function Page() {
   const photoIndex = photoIDArr.indexOf(photoID);
 
   return h("div", { className: "page-container" }, [
-    h("div.photo-banner", 
+    h("div.photo-banner",
         h("a", { href: "/checkin/" + checkin.checkin_id, className: "back-checkin" }, [
             h(Icon, {
                 icon: "arrow-left",
@@ -66,7 +66,7 @@ export function Page() {
                 h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
             ]);
         }
-    })), 
+    })),
     h('div.hide', TestObject),
     h(Footer)
   ]);
@@ -115,7 +115,7 @@ function ObservationContent({ observation, setBody }) {
             name: rocks.map_unit?.unit_name
         })
     }
-    
+
     if(observation.orientation.feature?.name) {
         lithologies.push({
             name: observation.orientation.feature?.name
@@ -157,7 +157,7 @@ function ObservationContent({ observation, setBody }) {
 
 function Item({ checkin, photoID }) {
   const [showBody, setBody] = useState(true);
-  
+
     const observation = checkin.observations.find(
         (obs) => obs.photo === photoID
     );
