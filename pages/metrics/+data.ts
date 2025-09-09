@@ -1,4 +1,4 @@
-import { fetchAPIDataOld } from "~/components/general";
+import { fetchAPIDataOld } from "~/components";
 import { rockdApiOldURL } from "~/settings";
 
 

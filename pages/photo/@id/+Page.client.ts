@@ -6,7 +6,7 @@ import {
   getImageUrl,
   TestImage,
   Footer,
-} from "~/components/general";
+} from "~/components";
 import { Icon } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";

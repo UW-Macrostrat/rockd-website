@@ -1,4 +1,4 @@
-import { fetchAPIData } from "~/components/general";
+import { fetchAPIData } from "~/components";
 import { rockdApiURL } from "~/settings";
 
 export async function data(pageContext) {

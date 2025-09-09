@@ -8,7 +8,7 @@ import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
+import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import {

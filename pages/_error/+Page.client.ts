@@ -1,7 +1,7 @@
 import { h } from '@macrostrat/map-interface'
 import { usePageContext } from 'vike-react/usePageContext'
 import "./main.styl"
-import { Image } from "~/components/general"
+import { Image } from "~/components"
 
 function pageDoesntExist() {
 
@@ -15,13 +15,13 @@ function pageDoesntExist() {
         h('button', { className: "btn", onClick: () => history.back() }, "Go back"),
         h('a', { className: "btn", href: "/" }, "Go home")
       ]),
-    ])  
+    ])
   ])
 }
 
 export function Page() {
   const pageContext = usePageContext()
- 
+
   let msg: string // Message shown to the user
   const { abortReason, abortStatusCode } = pageContext
   if (abortReason?.notAdmin) {

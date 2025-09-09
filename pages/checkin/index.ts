@@ -7,7 +7,7 @@ import {
   getProfilePicUrl,
   getImageUrl,
   Comments,
-} from "~/components/general";
+} from "~/components";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
 import { rockdApiOldURL, SETTINGS } from "~/settings";

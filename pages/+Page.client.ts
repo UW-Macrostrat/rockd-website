@@ -1,4 +1,4 @@
-import { Image, Footer } from "~/components/general";
+import { Image, Footer } from "~/components";
 import "@macrostrat/style-system";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
@@ -55,7 +55,7 @@ export function Page()  {
               ])
             ])
         ]),
-        
+
           h("div", { className: "new_container white-container" }, [
               h("div", { className: "row" }, [
               h("div", { className: "col-sm-6 col-sm-offset-3" }, [
@@ -79,12 +79,12 @@ export function Page()  {
           ]),
           h("div", { className: "new_container red_rock" }, [
               h(Image, { src: "main-page/red_rock.jpg", className: "back-img red-rock-img" }),
-          
+
               h("div", { className: "img-container row row-eq-height" }, [
                 h("div", { className: "col-sm-6 stats-container" }, [
                   h(Image, { src: "main-page/profile.png", className: "profile-img" })
                 ]),
-          
+
                 h("div", { className: "col-sm-6 center-me" }, [
                   h("div", { className: "headline-alligner" }, [
                     h("div", { className: "center" }, [
@@ -105,7 +105,7 @@ export function Page()  {
                     ])
                   ])
                 ]),
-          
+
                 h("div", { className: "image-grid" }, [
                   h("div", { className: "col-sm-6" }, [
                       h("div", { className: "headline-alligner" }, [
@@ -115,7 +115,7 @@ export function Page()  {
                         ])
                       ])
                     ]),
-              
+
                     h("div", { className: "col-sm-6" }, [
                       h("div", { className: "headline-alligner" }, [
                         h("div", { className: "center right" }, [
@@ -124,7 +124,7 @@ export function Page()  {
                         ])
                       ])
                     ]),
-              
+
                     h("div", { className: "col-sm-6" }, [
                       h("div", { className: "headline-alligner" }, [
                         h("div", { className: "center left" }, [
@@ -133,7 +133,7 @@ export function Page()  {
                         ])
                       ])
                     ]),
-              
+
                     h("div", { className: "col-sm-6" }, [
                       h("div", { className: "headline-alligner" }, [
                         h("div", { className: "center right" }, [
