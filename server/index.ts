@@ -68,10 +68,6 @@ async function startServer() {
   //
   if (isProduction) {
     app.use(sirv(`${root}/dist/client`));
-    // Special case for cesium files at /cesium prefix
-    // These should be copied into the client bundle but are not right now.
-    // Ideally we'd be able to remove this fix.
-    app.use("/cesium", sirv(`${root}/dist/cesium`));
   } else {
     // Instantiate Vite's development server and integrate its middleware to our server.
     // ⚠️ We should instantiate it *only* in development. (It isn't needed in production
