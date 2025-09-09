@@ -8,7 +8,7 @@ import {
   Image,
   createCheckins,
   Comments,
-} from "~/components/general";
+} from "~/components";
 import "@macrostrat/style-system";
 import { rockdApiURL, SETTINGS } from "~/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";

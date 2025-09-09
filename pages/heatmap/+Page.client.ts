@@ -6,7 +6,7 @@ import {
   buildInspectorStyle
 } from "@macrostrat/map-interface";
 import { mapboxAccessToken, matomoToken, matomoApiURL, tileserverDomain } from "~/settings";
-import { Footer } from "~/components/general";
+import { Footer } from "~/components";
 import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
