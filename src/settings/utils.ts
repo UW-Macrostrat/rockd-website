@@ -10,6 +10,7 @@ export function getRuntimeConfig(
     val = process.env["VITE_" + key];
   } else if (window.env !== undefined) {
     // We are running on the client and have access to window..env
+    // @ts-ignore
     val = window.env[key];
   }
   if (val === undefined) {

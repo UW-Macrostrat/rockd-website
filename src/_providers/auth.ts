@@ -4,7 +4,7 @@ import {
   AsyncAuthAction,
 } from "@macrostrat/form-components";
 import h from "@macrostrat/hyper";
-import { ingestPrefix } from "../../packages/settings";
+import { ingestPrefix } from "../settings";
 
 async function authTransformer(
   action: AuthAction | AsyncAuthAction
