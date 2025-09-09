@@ -1,5 +1,5 @@
 import { PostgrestClient } from "@supabase/postgrest-js";
-import { postgrestPrefix } from "@macrostrat-web/settings";
+import { postgrestPrefix } from "~/settings";
 
 const postgrest = new PostgrestClient(postgrestPrefix);
 

@@ -1,5 +1,5 @@
 import { fetchAPIDataOld } from "~/components/general";
-import { rockdApiOldURL } from "@macrostrat-web/settings";
+import { rockdApiOldURL } from "~/settings";
 
 
 export async function data() {

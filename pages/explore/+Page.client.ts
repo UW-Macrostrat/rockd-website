@@ -1,6 +1,6 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner, Icon, Divider, Button } from "@blueprintjs/core";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { SETTINGS } from "~/settings";
 import {buildInspectorStyle } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
@@ -16,7 +16,7 @@ import {
   MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken } from "~/settings";
 
 
 export function Page() {
@@ -34,7 +34,7 @@ const _macrostratStyle = buildMacrostratStyle({
   strokeOpacity: 0.1,
 }) as mapboxgl.Style;
 
-const type = 
+const type =
   {
     id: "Sample",
     name: "Sample",
@@ -69,7 +69,7 @@ function weaverStyle(type: object) {
             9, 100,
             11, 150,
             13, 200,
-            15, 
+            15,
           ],
           "circle-color": [
             'step',
@@ -86,7 +86,7 @@ function weaverStyle(type: object) {
             "#8b8eab", 50,
             '#7a7e96', 100,
             '#5d5f7c', 150,
-            '#484b63', 
+            '#484b63',
           ],
           "circle-stroke-width": 3,
           "circle-stroke-opacity": 1,
@@ -136,12 +136,12 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const [showOverlay, setOverlay] = useState(true);
   const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
-  const [selectedCheckin, setSelectedCheckin] = useState(null);  
+  const [selectedCheckin, setSelectedCheckin] = useState(null);
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-  
+
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
 
@@ -218,7 +218,7 @@ function WeaverMap({
           deletePins('.selected_pin');
         }
       }, "X"),
-      h("div.overlay-div", 
+      h("div.overlay-div",
         h('div.checkin-container',clickedCheckins)
       ),
     ]);
@@ -238,8 +238,8 @@ function WeaverMap({
 
   const mapPosition: MapPosition = {
           camera: {
-            lat: 39, 
-            lng: -98, 
+            lat: 39,
+            lng: -98,
             altitude: 6000000,
           },
         };
@@ -281,10 +281,10 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useRockdAPI("/protected/checkins?minlat=" + minLat + 
+  return useRockdAPI("/protected/checkins?minlat=" + minLat +
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
-    "&maxlng=" + maxLng + 
+    "&maxlng=" + maxLng +
     "&page="  + page);
 }
 
@@ -319,9 +319,9 @@ function FeatureDetails({setInspectPosition}) {
     };
 
     if (map.isStyleLoaded()) {
-      handleMapReady(); 
+      handleMapReady();
     } else {
-      map.once("load", handleMapReady); 
+      map.once("load", handleMapReady);
     }
 
     const onMoveEnd = () => {
@@ -339,7 +339,7 @@ function FeatureDetails({setInspectPosition}) {
   }, [map]);
 
 
-  result = result?.success?.data;  
+  result = result?.success?.data;
   if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
 
   const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
@@ -351,7 +351,7 @@ function FeatureDetails({setInspectPosition}) {
   });
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
-  
+
   return h("div", {className: 'checkin-container'}, [
       checkins,
       pages
@@ -361,7 +361,7 @@ function FeatureDetails({setInspectPosition}) {
 function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
   return h("div", { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
-        h("a", { href: "/" }, 
+        h("a", { href: "/" },
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
         h(Icon, { className: "settings-icon", icon: "filter", onClick: () => {
@@ -406,7 +406,7 @@ function createSelectedCheckins(result, setInspectPosition) {
 
 function createFilteredCheckins(filteredData, setInspectPosition) {
   const mapRef = useMapRef();
-  
+
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
@@ -414,10 +414,10 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
   const mapRef = useMapRef();
   const map = mapRef.current;
   const [input, setInput] = useState('');
-  const [close, setClose] = useState(false);  
+  const [close, setClose] = useState(false);
   const [page, setPage] = useState(1);
 
-  // test 
+  // test
   const [peopleIds, setPeople] = useState([]);
   const [structures, setStructures] = useState([]);
   const [lithologyAttributes, setLithologyAttributes] = useState([]);
@@ -526,7 +526,7 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
   // rest
   const handleInputChange = (event) => {
     setAutocompleteOpen(true);
-    setInput(event.target.value); 
+    setInput(event.target.value);
     setClose(false);
     setPage(1);
   };
@@ -550,7 +550,7 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
           setFilteredData(null);
           setPage(1);
           deletePins('.filtered_pin');
-        } 
+        }
       }),
     ]),
   ]);
@@ -568,7 +568,7 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
     // { label: 'Strat Name Concepts', data: stratNameConcepts, setter: setStratNameConcepts },
     // { label: 'Minerals', data: minerals, setter: setMinerals },
   ];
-  
+
   const sections = sectionConfigs
     .filter(({ data }) => data.length > 0)
     .map(({ label, data, setter }) =>
@@ -583,8 +583,8 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
     h('ul', [
       sections
     ]),
-  ]) : null; 
-  
+  ]) : null;
+
   if(!result || close) return h('div', {className: "autocomplete"}, [
     searchBar
   ]);
@@ -641,12 +641,12 @@ function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) 
 
 function createFilteredItems(arr, set, setPage) {
   return arr.map((item) => {
-    return h("li.filter-item", [ 
+    return h("li.filter-item", [
       h('div', item.name),
       h(Icon, { className: 'red-cross', icon: "cross", style: {color: "red"}, onClick: () => {
           set(arr.filter((person) => person != item));
           setPage(1);
-        } 
+        }
       })
     ])
   })
@@ -699,7 +699,7 @@ export function MapContainer({style, mapPosition, onSelectPosition, setSelectedC
                   setPosition: onSelectPosition,
                 }),
               ]),
-    
+
               // The Overlay Div
               overlay,
               h(ClickedCheckins, {setSelectedCheckin}),
@@ -759,7 +759,7 @@ function ClickedCheckins({setSelectedCheckin}) {
         console.log("data", features[0]);
         setSelectedCheckin(checkinId);
       } else {
-        setSelectedCheckin(null); 
+        setSelectedCheckin(null);
       }
     };
 

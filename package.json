@@ -16,11 +16,9 @@
     "test:runtime": "tsx tests/test-urls.ts",
     "test": "vitest"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "authors": [
-    "David Sklar <dsklar@wisc.edu>"
+    "David Sklar <dsklar@wisc.edu>",
+    "Daven Quinn <dev@davenquinn.com>"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -46,7 +44,6 @@
     "@blueprintjs/core": "^5.10.2",
     "@blueprintjs/table": "^5.1.4",
     "@loadable/component": "^5.14.1",
-    "@macrostrat-web/settings": "workspace:*",
     "@macrostrat/color-utils": "^1.0.0",
     "@macrostrat/data-components": "^0.2.0",
     "@macrostrat/form-components": "^0.1.2",

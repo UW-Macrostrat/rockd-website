@@ -7,8 +7,8 @@ import {
 } from "@macrostrat/ui-components";
 import { Icon, Divider } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
-import { SETTINGS } from "@macrostrat-web/settings";
-import { rockdApiURL, rockdApiOldURL } from "@macrostrat-web/settings";
+import { SETTINGS } from "~/settings";
+import { rockdApiURL, rockdApiOldURL } from "~/settings";
 import { useState } from "react";
 import { navigate } from "vike/client/router";
 
@@ -43,8 +43,14 @@ export function Footer() {
       ]),
     ]),
     h("div", { className: "footer-links" }, [
-      h("ul", footerLinks1.map((props) => h(FooterLink, props))),
-      h("ul", footerLinks2.map((props) => h(FooterLink, props))),
+      h(
+        "ul",
+        footerLinks1.map((props) => h(FooterLink, props))
+      ),
+      h(
+        "ul",
+        footerLinks2.map((props) => h(FooterLink, props))
+      ),
     ]),
     h("div.dark-mode", [
       h(DarkModeButton, { className: "dark-mode-button", showText: true }),
@@ -55,19 +61,24 @@ export function Footer() {
 function FooterLink({ href, icon, text }) {
   const isDarkMode = useDarkMode().isEnabled;
 
-  return h("li", { onClick: (e) => {
-      e.preventDefault(); 
-      window.open(href, "_self"); 
-  }}, [
-    h(Icon, {
-      className: "footer-icon",
-      icon,
-      style: { color: isDarkMode ? "black" : "white" },
-    }),
-    h("p", text),
-  ]);
+  return h(
+    "li",
+    {
+      onClick: (e) => {
+        e.preventDefault();
+        window.open(href, "_self");
+      },
+    },
+    [
+      h(Icon, {
+        className: "footer-icon",
+        icon,
+        style: { color: isDarkMode ? "black" : "white" },
+      }),
+      h("p", text),
+    ]
+  );
 }
-
 
 export function Image(props: ImageProps) {
   const { src, className, width, height, onClick, alt } = props;

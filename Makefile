@@ -24,5 +24,3 @@ publish:
 	git tag -a v$(VERSION) -m "Version $(VERSION)"
 	docker build --platform=linux/amd64 -t $(TAG) .
 	docker push $(TAG)
-
-#nothing changing; testing CI/CD pipeline
