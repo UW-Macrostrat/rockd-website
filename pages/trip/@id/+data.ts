@@ -1,4 +1,4 @@
-import { rockdApiURL } from "@macrostrat-web/settings";
+import { rockdApiURL } from "~/settings";
 
 
 export async function data(pageContext) {
