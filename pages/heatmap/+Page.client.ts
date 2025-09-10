@@ -10,39 +10,41 @@ import { MapPosition } from "@macrostrat/mapbox-utils";
 import {
   MapAreaContainer,
   MapView,
+  buildInspectorStyle
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken, tileserverDomain } from "@macrostrat-web/settings";
+import { mapboxAccessToken, matomoToken, matomoApiURL, tileserverDomain } from "@macrostrat-web/settings";
 import { Footer } from "~/components/general";
-import { Tabs, Tab } from "@blueprintjs/core";
+import { Divider, Spinner, Tabs, Tab } from "@blueprintjs/core";
+import { useEffect, useState } from "react";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
+import { useDarkMode } from "@macrostrat/ui-components";
+
 
 export function Page() {
     return h('div.main', [
         h('div.heatmap-page', [
             h(PageHeader),
-            h(
-                Tabs,
-                {
-                    id: 'heatmap-tabs',
-                },
-                [
-                  h(Tab, { id: 'all', title: 'All', panelClassName: 'all-tab-panel', panel: h(Heatmap, { mapboxToken: mapboxAccessToken, today: false }) }),
-                  h(Tab, { id: 'today', title: 'Today', panelClassName: 'today-tab-panel', panel: h(Heatmap, { mapboxToken: mapboxAccessToken, today: true }) }),
-                ]
-            )
+            h(HeatMap)
         ]),
         h(Footer)
     ]);
 }
 
-mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
+function PageHeader() {
+    return h('div.page-header', [
+        h('h1', 'Heatmap'),
+        h(Divider),
+        h('p', 'This is a heatmap of all the locations where Rockd has been accessed.'),
+        h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
+    ]);
+}
 
 function todayStyle() {
   return {
     sources: {
       today: {
         type: "vector",
-        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}?date=today" ],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}?today=true" ],
       }
     },
     layers: [
@@ -52,7 +54,7 @@ function todayStyle() {
         source: 'today',
         "source-layer": "default",
         paint: {
-          'circle-color': "#6488ea",
+          'circle-color': "#373ec4",
           'circle-radius': 4,
         }
       },
@@ -65,7 +67,7 @@ function allStyle() {
     sources: {
       all: {
         type: "vector",
-        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}" ],
+        tiles: [ tileserverDomain + "/usage-stats/rockd/{z}/{x}/{y}"],
       }
     },
     layers: [
@@ -75,7 +77,7 @@ function allStyle() {
         source: 'all',
         "source-layer": "default",
         paint: {
-          'circle-color': "#5e5e5e",
+          'circle-color': "#838383",
           'circle-radius': 4,
         }
       },
@@ -83,18 +85,20 @@ function allStyle() {
   };
 }
 
-function Heatmap({
-  mapboxToken,
-  today,
-}: {
-  mapboxToken: string;
-  today: boolean;
-}) {
-  const style = useMapStyle(mapboxToken, today);
 
+function HeatMap({
+  mapboxToken,
+}: {
+  headerElement?: React.ReactElement;
+  title?: string;
+  children?: React.ReactNode;
+  mapboxToken?: string;
+}) {
+
+  const style = useMapStyle();
   if(style == null) return null;
 
-  const mapPosition: MapPosition = {
+  const mapPosition = {
           camera: {
             lat: 39, 
             lng: -98, 
@@ -102,43 +106,14 @@ function Heatmap({
           },
         };
 
-  return h(MapContainer, {style, mapPosition});
-}
-
-function useMapStyle(mapboxToken, today) {
-  const dark = useDarkMode();
-  const isEnabled = dark?.isEnabled;
-
-  const baseStyle = isEnabled
-    ? "mapbox://styles/mapbox/dark-v10"
-    : "mapbox://styles/mapbox/light-v10";
-
-  const [actualStyle, setActualStyle] = useState(null);
-  const overlayStyle = today ? todayStyle() : mergeStyles(allStyle(), todayStyle());
-
-  // Auto select sample type
-  useEffect(() => {
-      buildInspectorStyle(baseStyle, overlayStyle, {
-        mapboxToken,
-        inDarkMode: isEnabled,
-      }).then((s) => {
-        setActualStyle(s);
-      });
-  }, [isEnabled]);
-
-  return actualStyle;
-}
-
-export function MapContainer({style, mapPosition}) {
-    return h(
+  return h(
         "div.map-container",
         [
           // The Map Area Container
           h(
             MapAreaContainer,
             {
-              className: "map-area-container",
-              style: { "paddingLeft": "calc(30% + 14px)",},
+                className: 'map-area-container',
             },
             [
               h(MapView, { style, mapboxToken: mapboxAccessToken, mapPosition }),
@@ -148,12 +123,26 @@ export function MapContainer({style, mapPosition}) {
       );
 }
 
+function useMapStyle() {
+  const dark = useDarkMode();
+  const isEnabled = dark?.isEnabled;
 
-function PageHeader() {
-    return h('div.page-header', [
-        h('h1', 'Heatmap'),
-        h(Divider),
-        h('p', 'This is a heatmap of all the locations where Macrostrat has been accessed.'),
-        h('p', 'The blue markers indicate today\'s accesses, while the grey markers indicate accesses from other days.'),
-    ]);
+  const baseStyle = isEnabled
+    ? "mapbox://styles/mapbox/dark-v10"
+    : "mapbox://styles/mapbox/light-v10";
+
+  const [actualStyle, setActualStyle] = useState(null);
+    const overlayStyle = mergeStyles(allStyle(), todayStyle());
+
+  // Auto select sample type
+  useEffect(() => {
+      buildInspectorStyle(baseStyle, overlayStyle, {
+        mapboxToken: mapboxAccessToken,
+        inDarkMode: isEnabled,
+      }).then((s) => {
+        setActualStyle(s);
+      });
+  }, [isEnabled]);
+
+  return actualStyle;
 }
