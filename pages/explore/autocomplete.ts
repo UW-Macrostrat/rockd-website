@@ -3,7 +3,7 @@ import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useState, useMemo } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI } from "~/components/general";
+import { useRockdAPI } from "~/components";
 import { deletePins } from "./utils";
 
 export function AutoComplete({setFilteredData, autocompleteOpen, setAutocompleteOpen}) {
