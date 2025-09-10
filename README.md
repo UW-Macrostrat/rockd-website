@@ -15,3 +15,9 @@ The new website also contains an updated version of [trips viewer](https://githu
 4. Run `make` (or `yarn install`) to pull down submodules and update packages
 5. Start the live-reloading development server with `yarn run dev`. The server will be available at
    `http://localhost:3000` by default.
+
+## Publishing
+
+- Commit all changes and merge to `main` (optional). Update the package.json version to the desired number.
+- Run `make publish` to sync the `package.json` version to a git tag
+- Push the tag to GitHub, which should kick off CI to build and publish to OSG Harbor.

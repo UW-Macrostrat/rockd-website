@@ -19,6 +19,6 @@ debug:
 		node --inspect=0.0.0.0:9229 /code/server.js
 
 publish:
-	docker build --platform=linux/amd64 -t $(TAG) .
-	docker push $(TAG)
-
+	# Ensure the git repository is clean
+	@git diff --quiet || (echo "Uncommitted changes present. Please commit or stash them before publishing." && exit 1)
+	git tag -a v$(VERSION) -m "Version $(VERSION)"

@@ -1,6 +1,6 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Icon, Button } from "@blueprintjs/core";
-import { SETTINGS } from "@macrostrat-web/settings";
+import { Spinner, Icon, Button } from "@blueprintjs/core";
+import { SETTINGS } from "~/settings";
 import {buildInspectorStyle } from "@macrostrat/map-interface";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { mergeStyles } from "@macrostrat/mapbox-utils";
@@ -8,7 +8,7 @@ import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components/general";
+import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import {
@@ -16,7 +16,7 @@ import {
   MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken } from "~/settings";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
@@ -37,7 +37,7 @@ const _macrostratStyle = buildMacrostratStyle({
   strokeOpacity: 0.1,
 }) as mapboxgl.Style;
 
-const type = 
+const type =
   {
     id: "Sample",
     name: "Sample",
@@ -72,7 +72,7 @@ function weaverStyle(type: object) {
             9, 100,
             11, 150,
             13, 200,
-            15, 
+            15,
           ],
           "circle-color": [
             'step',
@@ -89,7 +89,7 @@ function weaverStyle(type: object) {
             "#8b8eab", 50,
             '#7a7e96', 100,
             '#5d5f7c', 150,
-            '#484b63', 
+            '#484b63',
           ],
           "circle-stroke-width": 3,
           "circle-stroke-opacity": 1,
@@ -139,12 +139,12 @@ function WeaverMap({
   const [showSatelite, setSatelite] = useState(false);
   const [showOverlay, setOverlay] = useState(true);
   const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
-  const [selectedCheckin, setSelectedCheckin] = useState(null);  
+  const [selectedCheckin, setSelectedCheckin] = useState(null);
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
-  
+
   // overlay
   const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
 
@@ -221,7 +221,7 @@ function WeaverMap({
           deletePins('.selected_pin');
         }
       }, "X"),
-      h("div.overlay-div", 
+      h("div.overlay-div",
         h('div.checkin-container',clickedCheckins)
       ),
     ]);
@@ -241,8 +241,8 @@ function WeaverMap({
 
   const mapPosition: MapPosition = {
           camera: {
-            lat: 39, 
-            lng: -98, 
+            lat: 39,
+            lng: -98,
             altitude: 6000000,
           },
         };
@@ -276,10 +276,95 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   return actualStyle;
 }
 
+function getCheckins(lat1, lat2, lng1, lng2, page) {
+  // abitrary bounds around click point
+  let minLat = Math.floor(lat1 * 100) / 100;
+  let maxLat = Math.floor(lat2 * 100) / 100;
+  let minLng = Math.floor(lng1 * 100) / 100;
+  let maxLng = Math.floor(lng2 * 100) / 100;
+
+  // change use map coords
+  return useRockdAPI("/protected/checkins?minlat=" + minLat +
+    "&maxlat=" + maxLat +
+    "&minlng=" + minLng +
+    "&maxlng=" + maxLng +
+    "&page="  + page);
+}
+
+function FeatureDetails({setInspectPosition}) {
+  const [page, setPage] = useState(1);
+  const mapRef = useMapRef();
+  const map = mapRef.current;
+  const [bounds, setBounds] = useState(map?.getBounds());
+  let checkins = [];
+  let result;
+  let nextData;
+
+  if (bounds) {
+    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
+    nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
+  } else {
+    result = getCheckins(0, 0, 0, 0, 1);
+    nextData = getCheckins(0, 0, 0, 0, 2);
+  }
+
+  if (!bounds && map) {
+    setBounds(map.getBounds());
+  }
+
+  useEffect(() => {
+    if (!map) return;
+
+    const handleMapReady = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
+
+    if (map.isStyleLoaded()) {
+      handleMapReady();
+    } else {
+      map.once("load", handleMapReady);
+    }
+
+    const onMoveEnd = () => {
+      const newBounds = map.getBounds();
+      setBounds(newBounds);
+      setPage(1);
+    };
+
+    map.on("moveend", onMoveEnd);
+
+    return () => {
+      map.off("moveend", onMoveEnd);
+      map.off("load", handleMapReady);
+    };
+  }, [map]);
+
+
+  result = result?.success?.data;
+  if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
+
+  const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
+
+  result.sort((a, b) => {
+    if (a.photo === null && b.photo !== null) return 1;
+    if (a.photo !== null && b.photo === null) return -1;
+    return 0;
+  });
+
+  checkins = createCheckins(result, mapRef, setInspectPosition);
+
+  return h("div", {className: 'checkin-container'}, [
+      checkins,
+      pages
+    ]);
+}
+
 function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
   return h("div", { className: "toolbar", style: {padding: "0"} }, [
       h("div.toolbar-header", [
-        h("a", { href: "/" }, 
+        h("a", { href: "/" },
           h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
         ),
         h(Icon, { className: "settings-icon", icon: "filter", onClick: () => {
@@ -324,7 +409,7 @@ function createSelectedCheckins(result, setInspectPosition) {
 
 function createFilteredCheckins(filteredData, setInspectPosition) {
   const mapRef = useMapRef();
-  
+
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
@@ -345,7 +430,7 @@ export function MapContainer({style, mapPosition, onSelectPosition, setSelectedC
                   setPosition: onSelectPosition,
                 }),
               ]),
-    
+
               // The Overlay Div
               overlay,
               h(ClickedCheckins, {setSelectedCheckin}),
@@ -405,7 +490,7 @@ function ClickedCheckins({setSelectedCheckin}) {
         console.log("data", features[0]);
         setSelectedCheckin(checkinId);
       } else {
-        setSelectedCheckin(null); 
+        setSelectedCheckin(null);
       }
     };
 

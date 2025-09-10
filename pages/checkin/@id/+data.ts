@@ -1,5 +1,5 @@
-import { fetchAPIData } from "~/components/general";
-import { rockdApiURL } from "@macrostrat-web/settings";
+import { fetchAPIData } from "~/components";
+import { rockdApiURL } from "~/settings";
 
 export async function data(pageContext) {
     const id = parseInt(pageContext.urlParsed.pathname.split("/")[2]);

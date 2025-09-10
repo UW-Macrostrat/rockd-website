@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import {
     XAxis,
     YAxis,
@@ -8,11 +7,14 @@ import {
     Tooltip,
     Area,
     AreaChart,
+    Bar,
+    BarChart,
     ResponsiveContainer,
   } from "recharts";
-import { Footer } from "~/components/general";
+import { Footer } from "~/components";
 import h from "./main.module.sass";
 import { useData } from "vike-react/useData";
+import { Switch } from '@blueprintjs/core';
 
 
 function getDateFromYearAndWeek(year: number, week: number): Date {
@@ -35,9 +37,10 @@ export function Page() {
     lower.setFullYear(currentDate.getFullYear() - 1);
     let upper = new Date();
 
-    const [checkinBound, setCheckin] = useState([lower, upper]);    
+    const [checkinBound, setCheckin] = useState([lower, upper]);
     const [signupBound, setSignup] = useState([lower, upper]);
     const [activeBound, setActive] = useState([lower, upper]);
+    const [showBar, setShowBar] = useState(false);
 
     // new API doesn't return all data
     const { data } = useData();
@@ -48,7 +51,7 @@ export function Page() {
         week: number;
         count: string;
     }
-    
+
     interface TransformedData {
         name: string;
         Total: number;
@@ -75,7 +78,7 @@ export function Page() {
 
         if(checkinBound[0] <= tempDate && tempDate <= checkinBound[1]) {
             checkins_by_week.push({
-                name: `${item.year}-W${item.week}`, 
+                name: `${item.year}-W${item.week}`,
                 Total: parseInt(item.count)
             });
         }
@@ -84,11 +87,11 @@ export function Page() {
     // checkins by month
     for (const item of data.checkins_by_month) {
         checkins_by_month.push({
-            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            name: `${item.month}/${String(item.year).slice(-2)}`,
             Total: parseInt(item.count)
         });
     }
-    checkins_by_month.pop();      
+    checkins_by_month.pop();
     currentTotal = checkins_by_month[checkins_by_month.length - 1].Total;
     currentName = checkins_by_month[checkins_by_month.length - 1].name;
     checkins_by_month[checkins_by_month.length - 1].Total = Math.round(currentTotal * scale);
@@ -100,7 +103,7 @@ export function Page() {
 
         if(signupBound[0] <= tempDate && tempDate <= signupBound[1]) {
             signups_by_week.push({
-                name: `${item.year}-W${item.week}`, 
+                name: `${item.year}-W${item.week}`,
                 Total: parseInt(item.count)
             });
         }
@@ -110,9 +113,9 @@ export function Page() {
     for (const item of data.signups_by_month) {
         signups_by_month.push({
             name: `${item.month}/${String(item.year).slice(-2)}`,
-            Total: parseInt(item.count) 
+            Total: parseInt(item.count)
         });
-    }  
+    }
     signups_by_month.pop();
     currentTotal = signups_by_month[signups_by_month.length - 1].Total;
     currentName = signups_by_month[signups_by_month.length - 1].name;
@@ -124,7 +127,7 @@ export function Page() {
 
         if(activeBound[0] <= tempDate && tempDate <= activeBound[1]) {
             active_users_by_week.push({
-                name: `${item.year}-W${item.week}`, 
+                name: `${item.year}-W${item.week}`,
                 Total: parseInt(item.count)
             });
         }
@@ -132,10 +135,10 @@ export function Page() {
 
     for (const item of data.active_users_by_month) {
         active_users_by_month.push({
-            name: `${item.month}/${String(item.year).slice(-2)}`, 
+            name: `${item.month}/${String(item.year).slice(-2)}`,
             Total: parseInt(item.count)
         });
-    }     
+    }
     active_users_by_month.pop();
     currentTotal = active_users_by_month[active_users_by_month.length - 1].Total;
     currentName = active_users_by_month[active_users_by_month.length - 1].name;
@@ -145,7 +148,7 @@ export function Page() {
     console.log("Scaled the month: ", currentName)
 
     // chart array
-    let areaArr = [
+    const areaArr = [
         h(CartesianGrid, { strokeDasharray: "3 3" }),
         h(XAxis, { dataKey: "name", stroke: "var(--text-emphasized-color)" }),
         h(YAxis, { stroke: "var(--text-emphasized-color)" }),
@@ -153,7 +156,24 @@ export function Page() {
         h(Area, { type: "monotone", dataKey: "Total", stroke: "#8884d8", fill: "#8884d8" }),
     ]
 
+    const barArr = [
+        h(CartesianGrid, { strokeDasharray: "3 3" }),
+        h(XAxis, { dataKey: "name", stroke: "var(--text-emphasized-color)" }),
+        h(YAxis, { stroke: "var(--text-emphasized-color)" }),
+        h(Tooltip),
+        h(Bar, { dataKey: "Total", fill: "#8884d8" }),
+    ];
+
+    const arr = showBar ? barArr : areaArr;
+    const ChartComponent = showBar ? BarChart : AreaChart;
+
     return h('div', { className: "container" }, [
+        h(Switch, {
+            className: "switch",
+            value: showBar,
+            label: "Show bar charts",
+            onChange: () => setShowBar(!showBar)
+        }),
         h("div", { className: 'metrics' }, [
             h("div", { className: 'header' }, [
                 h("h1", "Metrics"),
@@ -188,7 +208,7 @@ export function Page() {
                 h("div", { className: 'checkins_week' }, [
                     h("h2", "Checkins by week"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: checkins_by_week }, areaArr),
+                        h(ChartComponent, { className: "chart", data: checkins_by_week }, arr),
                     ]),
                     h('div', { className: 'date-picker' }, [
                         h('p', 'Select date range:'),
@@ -200,13 +220,13 @@ export function Page() {
                 h("div", { className: 'checkins_month' }, [
                     h("h2", "Checkins by month"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: checkins_by_month }, areaArr)
+                        h(ChartComponent, { className: "chart", data: checkins_by_month }, arr)
                     ]),
                 ]),
                 h("div", { className: 'signups_week' }, [
                     h("h2", "Signups by week"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: signups_by_week }, areaArr),
+                        h(ChartComponent, { className: "chart", data: signups_by_week }, arr),
                     ]),
                     h('div', { className: 'date-picker' }, [
                         h('p', 'Select date range:'),
@@ -218,13 +238,13 @@ export function Page() {
                 h("div", { className: 'signups_month' }, [
                     h("h2", "Signups by month"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: signups_by_month }, areaArr)
+                        h(ChartComponent, { className: "chart", data: signups_by_month }, arr)
                     ]),
                 ]),
                 h("div", { className: 'users_week' }, [
                     h("h2", "Active Users by week"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: active_users_by_week }, areaArr),
+                        h(ChartComponent, { className: "chart", data: active_users_by_week }, arr),
                     ]),
                     h('div', { className: 'date-picker' }, [
                         h('p', 'Select date range:'),
@@ -236,7 +256,7 @@ export function Page() {
                 h("div", { className: 'users_month' }, [
                     h("h2", "Active Users by month"),
                     h(ResponsiveContainer, { width: "100%", height: 300 }, [
-                        h(AreaChart, { className: "chart", data: active_users_by_month }, areaArr)
+                        h(ChartComponent, { className: "chart", data: active_users_by_month }, arr)
                     ]),
                 ]),
             ])
