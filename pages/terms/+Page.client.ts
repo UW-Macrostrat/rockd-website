@@ -1,18 +1,18 @@
-import { Footer } from "~/components/general";
+import { Footer } from "~/components";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 
-export function Page() { 
+export function Page() {
     return h("div", { className: "main-page" }, [
         h("div", { className: "content" }, [
             h("div", { className: 'header' }, [
                 h("h1", "Rockd Terms and Conditions"),
-            ]),        
+            ]),
             h("div", { className: "section" }, [
               h("h3", { className: "header" }, "Overview"),
               "Rockd is designed to facilitate the collection and use of field-based geological observations of all types. The Rockd Application (Application) and the data it contains are provided freely and on an as-is basis to users. All Users are expected to follow these terms of use outlined in this Terms of Use document."
             ]),
-        
+
             h("div", { className: "section" }, [
               h("h3", {}, "Use of Application and Data Services"),
               h("span", { className: "highlight-answer" }, [
@@ -20,21 +20,21 @@ export function Page() {
                 h("b", {}, "We reserve the right to remove any content that violates these terms of service")
               ])
             ]),
-        
+
             h("div", { className: "section" }, [
               h("h3", {}, "External Content"),
               h("span", { className: "highlight-answer" }, [
                 "Our Services and Application display some content that is not created by us. This content is the sole responsibility of the entity that makes it available. We may review content to determine whether it is illegal or violates our policies, and we may remove or refuse to display content that we reasonably believe violates our policies or the law. But that does not necessarily mean that we review content or agree with content, so please don’t assume that we do."
               ])
             ]),
-        
+
             h("div", { className: "section" }, [
               h("h3", {}, "Your Rockd Account"),
               h("span", { className: "highlight-answer" }, [
                 "You need a Rockd Account in order to use some of our Services. You may create your own Account. To protect your Account, keep your password confidential. You are responsible for the activity that happens on or through your Account. Try not to reuse your Account password on third-party applications."
               ])
             ]),
-        
+
             h("div", { className: "section" }, [
               h("h3", {}, "Your Content"),
               h("span", { className: "highlight-answer" }, [
@@ -45,7 +45,7 @@ export function Page() {
                 "If you have a Rockd Account, we may display your name, Profile photo, and actions you take on Rockd. We will respect the choices you make to limit sharing or visibility settings in your Rockd Account. For example, you can choose your settings so your checkins are not Publicly displayed."
               ])
             ]),
-        
+
             h("div", { className: "section" }, [
               h("h3", {}, "Privacy and Copyright Protection"),
               h("span", { className: "highlight-answer" }, [
@@ -55,7 +55,7 @@ export function Page() {
                 "We respond to notices of alleged copyright infringement and terminate accounts of repeat infringers according to the process set out in the U.S. Digital Millennium Copyright Act."
               ])
             ]),
-        
+
             h("div", { className: "section bottoms" }, [
               h("h3", {}, "Warranties and Disclaimers"),
               h("span", { className: "highlight-answer" }, [

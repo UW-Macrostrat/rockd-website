@@ -5,7 +5,7 @@ import {
 } from "@macrostrat/map-interface";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
-import { mapboxAccessToken } from "@macrostrat-web/settings";
+import { mapboxAccessToken } from "~/settings";
 import mapboxgl from "mapbox-gl";
 import { useEffect } from "react";
 import { useMapRef } from "@macrostrat/mapbox-react";
