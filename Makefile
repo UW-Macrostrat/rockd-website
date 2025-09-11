@@ -22,3 +22,5 @@ publish:
 	# Ensure the git repository is clean
 	@git diff --quiet || (echo "Uncommitted changes present. Please commit or stash them before publishing." && exit 1)
 	git tag -a v$(VERSION) -m "Version $(VERSION)"
+
+# testing automated workflow
