@@ -2,9 +2,15 @@ all:
 	docker build -t rockd_website:latest .
 	docker run --rm -it -p 5500:5500 --name rockd_website --env-file .env rockd_website:latest
 
-VERSION := $(shell jq -r .version ./package.json)
 
 TAG := hub.opensciencegrid.org/macrostrat/rockd-website:$(VERSION)
+VERSION := $(shell node -p "require('./package.json').version")
+
+release:
+	# Ensure that the repository is clean
+	git diff-index --quiet HEAD --
+	git tag -a v$(VERSION) -m "Version $(VERSION)"
+	git push origin tag v$(VERSION)
 
 debug:
 	docker build -t rockd_website:latest .
@@ -17,10 +23,3 @@ debug:
 		--env-file .env \
 		rockd_website:latest \
 		node --inspect=0.0.0.0:9229 /code/server.js
-
-publish:
-	# Ensure the git repository is clean
-	@git diff --quiet || (echo "Uncommitted changes present. Please commit or stash them before publishing." && exit 1)
-	git tag -a v$(VERSION) -m "Version $(VERSION)"
-
-# testing automated workflow
