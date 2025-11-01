@@ -31,6 +31,11 @@ export const matomoApiURL = getRuntimeConfig("MATOMO_API_URL");
 
 export const matomoToken = getRuntimeConfig("MATOMO_API_TOKEN");
 
+export const postgrestPrefix = getRuntimeConfig(
+  "MACROSTRAT_POSTGREST_PREFIX",
+  apiDomain + "/api/pg"
+);
+
 /** Legacy settings object */
 export const SETTINGS = {
   rockdApiURL,
