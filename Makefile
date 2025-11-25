@@ -1,6 +1,6 @@
 all:
 	docker build -t rockd_website:latest .
-	docker run --rm -it -p 5500:5500 --name rockd_website --env-file .env rockd_website:latest
+	docker run --rm -it -p 3000:3000 --name rockd_website --env-file .env rockd_website:latest
 
 
 TAG := hub.opensciencegrid.org/macrostrat/rockd-website:$(VERSION)

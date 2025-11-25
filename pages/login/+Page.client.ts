@@ -25,8 +25,11 @@ function LoginForm() {
   });
   const [error, setError] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
   const [linkStraboResponse, setLinkStraboResponse] = useState<any>(null);
   const [jParam, setJParam] = useState<string | null>(null);
+  const addLog = (msg) => setLogs((prev) => [...prev, msg]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const j = params.get("j");
@@ -66,7 +69,7 @@ function LoginForm() {
             }
           );
           const linkStraboBody = await linkStrabo.json();
-          console.log("Link Strabospot!", linkStraboBody);
+          addLog(`Saving to Rockd database: ${JSON.stringify(linkStraboBody)}`);
           setLinkStraboResponse(linkStraboBody);
         }
         setLoggedIn(true);
@@ -101,7 +104,9 @@ function LoginForm() {
             }
           );
           const straboResponse = await rockdJWTToStrabo.json();
-          console.log("Strabo Response:", straboResponse);
+          addLog(
+            `Rockd token sent to Strabospot: ${JSON.stringify(straboResponse)}`
+          );
         } catch (err) {
           console.error("Failed to send Rockd JWT to Strabo:", err);
         }
@@ -112,11 +117,20 @@ function LoginForm() {
 
   if (loggedIn) {
     return h("div", { className: "login-page" }, [
+      h("img", {
+        src: "https://storage.macrostrat.org/assets/rockd/main-page/rockd_transparent.png",
+        alt: "Rockd logo",
+        className: "rockd-logo",
+      }),
       h(Callout, {
         title: "Login Successful",
         intent: Intent.SUCCESS,
         className: "login-info",
       }),
+      h("div", { className: "login-logs" }, [
+        h("h4", "Debug logs"),
+        h("pre", logs.map((l) => `${l}\n`).join("")),
+      ]),
       h(
         Button,
         { intent: Intent.DANGER, onClick: () => setLoggedIn(false) },
@@ -125,6 +139,11 @@ function LoginForm() {
     ]);
   } else {
     return h("div", { className: "login-page" }, [
+      h("img", {
+        src: "https://storage.macrostrat.org/assets/rockd/main-page/rockd_transparent.png",
+        alt: "Rockd logo",
+        className: "rockd-logo",
+      }),
       h("h2", "Login"),
       error &&
         h(Callout, {
