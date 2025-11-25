@@ -350,6 +350,17 @@ function Checkin({ checkin, mapRef, setInspectPosition, len }) {
           LngLatCoords(LngLatProps),
           h("h3", { className: "rating" }, ratingArr),
         ]),
+        checkin.spot_id != null &&
+          h(
+            "a",
+            {
+              className: "strabo-link",
+              href: "https://strabospot.org",
+              target: "_blank",
+              rel: "noopener noreferrer",
+            },
+            "via StraboSpot"
+          ),
       ]),
       h("p", { className: "description" }, checkin.notes),
       h(
