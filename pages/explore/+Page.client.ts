@@ -10,6 +10,8 @@ import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import h from "./main.module.sass";
 import { pageCarousel, useRockdAPI } from "~/components";
@@ -25,19 +27,32 @@ import { type ReactNode } from "react";
 
 interface SidebarProps {
   title: string;
-  toolbar: ReactNode;
   onClose?: () => void;
-  children: ReactNode;
+  children?: ReactNode;
   showCloseButton?: boolean;
+  showSettings?: boolean;
+  setSettings?: (show: boolean) => void;
+  showFilter?: boolean;
+  setFilter?: (show: boolean) => void;
 }
 
 function Sidebar({
   title,
-  toolbar,
   onClose,
   children,
   showCloseButton = true,
+  showSettings,
+  setSettings,
+  showFilter,
+  setFilter,
 }: SidebarProps) {
+  const toolbar = h(Toolbar, {
+    showSettings,
+    setSettings,
+    showFilter,
+    setFilter,
+  }) as ReactNode;
+
   const _showCloseButton = showCloseButton && onClose != null;
   return h("div.sidebar", [
     h("div.sidebar-header", [
@@ -48,14 +63,7 @@ function Sidebar({
   ]);
 }
 
-export function Page() {
-  return h(
-    "div.weaver-page",
-    h(WeaverMap, { mapboxToken: SETTINGS.mapboxAccessToken })
-  );
-}
-
-mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
+mapboxgl.accessToken = mapboxAccessToken;
 
 const _macrostratStyle = buildMacrostratStyle({
   tileserverDomain: SETTINGS.burwellTileDomain,
@@ -69,17 +77,10 @@ const type = {
   color: "purple",
 };
 
-function WeaverMap({
-  mapboxToken,
-}: {
-  headerElement?: ReactElement;
-  title?: string;
-  children?: React.ReactNode;
-  mapboxToken?: string;
-}) {
+export function Page() {
   const [showSatelite, setSatelite] = useState(false);
   const [showOverlay, setOverlay] = useState(true);
-  const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
+  const style = useMapStyle(type, mapboxAccessToken, showSatelite, showOverlay);
   const [selectedCheckin, setSelectedCheckin] = useState(null);
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
@@ -104,12 +105,6 @@ function WeaverMap({
       : `/protected/checkins?checkin_id=0`
   );
 
-  const toolbar = h(Toolbar, {
-    showSettings,
-    setSettings,
-    showFilter,
-    setFilter,
-  }) as ReactNode;
   const contextPanel = h(ContextPanel, {
     showSatelite,
     setSatelite,
@@ -135,7 +130,10 @@ function WeaverMap({
   if (showFilter) {
     overlay = h(Sidebar, {
       title: "Filter checkins",
-      toolbar,
+      showSettings,
+      setSettings,
+      showFilter,
+      setFilter,
       onClose: () => {
         setFilter(false);
         setSettings(false);
@@ -155,7 +153,10 @@ function WeaverMap({
       Sidebar,
       {
         title: "Settings",
-        toolbar,
+        showSettings,
+        setSettings,
+        showFilter,
+        setFilter,
         onClose: () => {
           setSettings(false);
           setFilter(false);
@@ -173,7 +174,10 @@ function WeaverMap({
       Sidebar,
       {
         title: "Selected checkins",
-        toolbar,
+        showSettings,
+        setSettings,
+        showFilter,
+        setFilter,
         onClose: () => {
           setSelectedCheckin(null);
           deletePins(".selected_pin");
@@ -186,7 +190,10 @@ function WeaverMap({
       Sidebar,
       {
         title: "Featured checkins",
-        toolbar,
+        showSettings,
+        setSettings,
+        showFilter,
+        setFilter,
         showCloseButton: false,
       },
       h(FeatureDetails, { setInspectPosition })
@@ -230,7 +237,7 @@ function WeaverMap({
   );
 }
 
-function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
+function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
@@ -238,7 +245,7 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
   const sateliteStyle = "mapbox://styles/mapbox/satellite-v9";
-  const finalStyle = showSatelite ? sateliteStyle : baseStyle;
+  const finalStyle = showSatellite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
   const overlayStyle = showOverlay
@@ -253,7 +260,7 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
     }).then((s) => {
       setActualStyle(s);
     });
-  }, [isEnabled, showSatelite, showOverlay]);
+  }, [isEnabled, showSatellite, showOverlay]);
 
   return actualStyle;
 }

@@ -44,14 +44,8 @@ export default defineConfig({
     dedupe: ["react", "react-dom", ...macrostratPackages],
   },
   plugins: [react(), hyperStyles(), vike()],
-  envDir: path.resolve(__dirname),
-  build: {
-    outDir: path.resolve(__dirname, "dist"),
-    emptyOutDir: true,
-    sourcemap: true,
-  },
   ssr: {
-    noExternal: [...macrostratPackages, "@brillout/picocolors"],
+    noExternal: macrostratPackages,
   },
   css: {
     preprocessorOptions: {
