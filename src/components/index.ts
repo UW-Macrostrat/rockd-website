@@ -1,4 +1,4 @@
-import h from "./layout.module.sass";
+import h from "./index.module.sass";
 import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-components";
 import { Divider, Icon } from "@blueprintjs/core";
 import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";

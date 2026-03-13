@@ -1,0 +1,188 @@
+.footer
+  display: flex
+  background-color: var(--panel-background-color)
+  text-align: center
+  color: var(--text-emphasized-color)
+  padding: 25px 0
+  height: 25vh
+  border-top: 2px solid var(--text-emphasized-color)
+  padding: 0 20%
+
+  a
+    color: var(--text-emphasized-color) !important
+
+
+  ul
+    list-style-type: none
+    display: flex
+    gap: 10px
+    flex-direction: column
+
+    li
+      p
+        margin-bottom: 0
+
+  a
+    color: var(--panel-text)
+    font-weight: bold
+
+  a:hover
+    color: var(--panel-text)
+
+  .footer-text
+    font-size: 24px
+    font-weight: 500
+
+    .upper
+      margin-bottom: 0
+
+    a
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
+
+  .titles
+    display: flex
+    justify-content: center
+    gap: 30px
+    height: 25vh
+    flex-direction: column
+    width: 100%
+
+    h3
+      margin: 0
+
+  .footer-links
+    display: flex
+    width: 100%
+    color: var(--text-emphasized-color)
+    margin: 0
+    justify-content: center
+    align-items: center
+    padding-inline-start: 0px
+
+    .footer-icon
+      filter: var(--anti-img-color)
+
+    li
+      display: flex
+      gap: 5px
+      cursor: pointer
+
+.row
+  width: 100%
+
+.marker
+  height: 7vh
+  display: grid
+  margin: auto
+  margin-right: 0
+
+.no-image
+  color: var(--text-emphasized-color) !important
+
+.details-image
+  width: 40px
+  margin-left: 10px
+  margin-top: 4px
+
+.checkin-info
+  display: grid
+  margin: auto
+  margin-left: 0
+
+.checkin-header
+  display: flex
+  .strabo-link
+    margin-left: auto
+    font-size: 0.8rem
+    color: #1a73e8
+    text-decoration: underline
+
+    &:hover
+      color: #b01594
+
+.description
+  margin-top: 10px
+
+.marker_container
+  position: relative
+  height: 7vh
+  margin-right: 10px
+
+  .marker-number
+    position: absolute
+    font-weight: bold
+    font-size: 16px
+    transform: translate(-50%, -50%)
+    top: 40%
+    left: 48%
+    color: white
+
+  .circle-number
+    position: absolute
+    font-weight: bold
+    font-size: 16px
+    transform: translate(-50%, -50%)
+    top: 50%
+    left: 50%
+    color: white
+
+.dark-mode
+  display: flex
+  align-items: center
+
+.pages
+  margin: 10px 0
+  width: 100%
+  display: flex
+  text-align: center
+  justify-content: center
+
+  .page-container
+    display: grid
+    grid-template-columns: 100px 50px 100px
+    color: var(--text-emphasized-color)
+
+    .btn-content
+      display: flex
+      gap: 5px
+      align-items: center
+      justify-content: center
+      cursor: pointer
+
+    p
+      margin: 0
+      text-align: center
+
+.icon-dark-mode
+  filter: invert(1)
+
+.hide
+  display: none
+
+
+.comments
+  h2
+    margin: 0
+
+  .comment
+    display: grid
+    grid-template-columns: 25% 55% 15% 5%
+    padding: .5em
+    align-items: center
+
+    .comment-likes
+      display: flex
+      gap: .5em
+
+    .comment-author
+      display: flex
+      flex-direction: column
+      justify-content: center
+      align-items: center
+
+    .comment-pic
+      height: 6em
+      width: 6em

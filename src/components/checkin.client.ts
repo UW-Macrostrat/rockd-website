@@ -1,12 +1,12 @@
 import { useState } from "react";
-import h from "~/components/layout.module.sass";
+import h from "./checkin.client.module.sass";
 import { BlankImage, getImageUrl, getProfilePicUrl, TestImage } from "~/components/index";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { LngLatCoords } from "@macrostrat/data-components";
 import { Icon } from "@blueprintjs/core";
 import mapboxgl from "mapbox-gl";
 
-export function CheckinClient({ checkin, mapRef, setInspectPosition, len }) {
+export function Checkin({ checkin, mapRef, setInspectPosition, len }) {
   const [hasError, setHasError] = useState(false);
   const isDarkMode = useDarkMode().isEnabled;
   const map = mapRef?.current;
@@ -41,7 +41,7 @@ export function CheckinClient({ checkin, mapRef, setInspectPosition, len }) {
   if (showImage) {
     image = h(BlankImage, { className: "observation-img", src: imgSrc });
   } else {
-    image = h("div", { className: "no-image" }, [
+    image = h("div.no-image", [
       h("h1", "Details"),
       h(Icon, {
         className: "details-image",
@@ -90,78 +90,73 @@ export function CheckinClient({ checkin, mapRef, setInspectPosition, len }) {
       },
     },
     [
-      h("div", { className: "hide" }, test),
-      h("h1", { className: "stop-name" }, stop_name),
-      h("div", { className: "checkin-header" }, [
+      h("div.hide", test),
+      h("h1.stop-name", stop_name),
+      h("div.checkin-header", [
         !stop_name
           ? h(
-              "h3",
-              { className: "profile-pic" },
-              h(BlankImage, {
-                src: getProfilePicUrl(checkin.person_id),
-                className: "profile-pic",
-              })
-            )
+            "h3.profile-pic",
+            h(BlankImage, {
+              src: getProfilePicUrl(checkin.person_id),
+              className: "profile-pic",
+            })
+          )
           : null,
-        h("div", { className: "checkin-info" }, [
+        h("div.checkin-info", [
           !stop_name
             ? h(
-                "h3",
-                { className: "name" },
-                checkin.first_name + " " + checkin.last_name
-              )
+              "h3.name",
+              checkin.first_name + " " + checkin.last_name
+            )
             : null,
-          h("h4", { className: "edited" }, checkin.created),
+          h("h4.edited", checkin.created),
           h("p", "Near " + checkin.near),
           LngLatCoords(LngLatProps),
-          h("h3", { className: "rating" }, ratingArr),
+          h("h3.rating", ratingArr),
         ]),
         checkin.spot_id != null &&
-          h(
-            "a",
-            {
-              className: "strabo-link",
-              href: "https://strabospot.org",
-              target: "_blank",
-              rel: "noopener noreferrer",
-            },
-            "via StraboSpot"
-          ),
+        h(
+          "a.strabo-link",
+          {
+            href: "https://strabospot.org",
+            target: "_blank",
+            rel: "noopener noreferrer",
+          },
+          "via StraboSpot"
+        ),
       ]),
-      h("p", { className: "description" }, checkin.notes),
+      h("p.description", checkin.notes),
       h(
-        "a",
+        "a.checkin-link",
         {
-          className: "checkin-link",
           href: "/checkin/" + checkin.checkin_id,
           target: "_blank",
         },
         [
           image,
           showImage
-            ? h("div", { className: "image-details" }, [
-                h("h1", "Details"),
-                h(Icon, {
-                  className: "details-image",
-                  icon: "arrow-right",
-                  style: { color: "white" },
-                }),
-              ])
+            ? h("div.image-details", [
+              h("h1", "Details"),
+              h(Icon, {
+                className: "details-image",
+                icon: "arrow-right",
+                style: { color: "white" },
+              }),
+            ])
             : null,
         ]
       ),
-      h("div", { className: "checkin-footer" }, [
-        h("div", { className: "likes-container" }, [
+      h("div.checkin-footer", [
+        h("div.likes-container", [
           h(Icon, {
             className: "likes-icon " + (isDarkMode ? "icon-dark-mode" : ""),
             icon: "thumbs-up",
             style: { color: "white" },
           }),
-          h("h3", { className: "likes" }, checkin.likes),
+          h("h3.likes", checkin.likes),
         ]),
         h.if(checkin?.observations)(
-          "div",
-          { className: "observations-container" },
+          "div.observations-container",
           [
             h(Icon, {
               className:
@@ -169,16 +164,16 @@ export function CheckinClient({ checkin, mapRef, setInspectPosition, len }) {
               icon: "camera",
               style: { color: "white" },
             }),
-            h("h3", { className: "likes" }, checkin.observations?.length),
+            h("h3.likes", checkin.observations?.length),
           ]
         ),
-        h("div", { className: "comments-container" }, [
+        h("div.comments-container", [
           h(Icon, {
             className: "comments-icon " + (isDarkMode ? "icon-dark-mode" : ""),
             icon: "comment",
             style: { color: "white" },
           }),
-          h("h3", { className: "comments" }, checkin.comments),
+          h("h3.comments", checkin.comments),
         ]),
       ]),
     ]
@@ -186,11 +181,12 @@ export function CheckinClient({ checkin, mapRef, setInspectPosition, len }) {
 
   return temp;
 }
+
 export function createCheckins(result, mapRef, setInspectPosition) {
   const len = result.length;
 
   return result.map((checkin, index) =>
-    h(CheckinClient, {
+    h(Checkin, {
       checkin,
       mapRef,
       setInspectPosition,
