@@ -13,7 +13,7 @@ export function getRuntimeConfig(
     // @ts-ignore
     val = window.env[key];
   }
-  if (val === undefined) {
+  if (val === undefined && import.meta.env != null) {
     val = import.meta.env["VITE_" + key];
     if (val !== undefined && import.meta.env.DEV) {
       console.warn(`Environment variable ${key} loaded statically`);

@@ -1,9 +1,17 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "baseUrl": "./",
     // Allow importing of JSON and default imports from CommonJS modules
-    "esModuleInterop": true,
-    "jsx": "react",
     "types": [
       "@macrostrat/vite-plugin-hyperstyles/client",
       "vite/client",
@@ -14,5 +22,5 @@
       "#/*": ["pages/*"]
     }
   },
-  "include": ["vite.config.ts", "src/**/*", "pages/**/*"]
+  "exclude": ["dist"]
 }

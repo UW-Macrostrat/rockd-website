@@ -7,7 +7,7 @@ export default {
   title: "Rockd",
   description:
     "A platform for geological data exploration, integration, and analysis.",
-  extends: vikeReact,
+  extends: [vikeReact],
   passToClient: [
     "pageProps",
     "supportsDarkMode",

@@ -1,8 +1,9 @@
+// @ts-ignore
 import revisionInfo from "@macrostrat/revision-info-webpack";
 import hyperStyles from "@macrostrat/vite-plugin-hyperstyles";
 import react from "@vitejs/plugin-react";
-import path from "path";
-import ssr from "vike/plugin";
+import path from "node:path";
+import vike from "vike/plugin";
 import { defineConfig, Plugin } from "vite";
 import pkg from "./package.json";
 
@@ -25,7 +26,6 @@ const macrostratPackages = Object.keys(pkg.dependencies).filter(
   (name: string) => name.startsWith("@macrostrat/")
 );
 
-
 const gitEnv = revisionInfo(
   pkg,
   "https://github.com/UW-Macrostrat/rockd-website"
@@ -35,21 +35,15 @@ for (const [key, value] of Object.entries(gitEnv)) {
   process.env["VITE_" + key] = value;
 }
 
-// Check if we are building for server context
-
-const cssModuleMatcher = /\.module\.(css|scss|sass|styl)$/;
-
 export default defineConfig({
-  //root: path.resolve("./src"),
   resolve: {
-    conditions: ["source"],
     alias: {
       "~": path.resolve("./src"),
       "#": path.resolve("./pages"),
     },
-    dedupe: [...aliasedModules.map((d) => "@macrostrat/" + d)],
+    dedupe: ["react", "react-dom", ...macrostratPackages],
   },
-  plugins: [react(), hyperStyles(), ssr()],
+  plugins: [react(), hyperStyles(), vike()],
   envDir: path.resolve(__dirname),
   build: {
     outDir: path.resolve(__dirname, "dist"),
@@ -57,7 +51,7 @@ export default defineConfig({
     sourcemap: true,
   },
   ssr: {
-    noExternal: macrostratPackages
+    noExternal: [...macrostratPackages, "@brillout/picocolors"],
   },
   css: {
     preprocessorOptions: {
