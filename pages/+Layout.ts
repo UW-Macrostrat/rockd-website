@@ -9,7 +9,7 @@ import { usePageContext } from "vike-react/usePageContext";
 
 import "~/styles/core.sass";
 import "~/styles/padding.css";
-import h from "./layout.module.sass";
+import h from "./+Layout.module.sass";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const pageContext = usePageContext();
