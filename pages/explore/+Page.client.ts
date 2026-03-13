@@ -39,13 +39,14 @@ export function Sidebar({
   children,
   showCloseButton = true,
 }: SidebarProps) {
+  console.log("Rendering sidebar", children);
   const _showCloseButton = showCloseButton && onClose != null;
   return h("div.sidebar", [
     h("div.sidebar-header", [
       h("div.title", [toolbar, h("h1", title)]),
       h.if(_showCloseButton)(Button, { icon: "cross" }),
     ]),
-    h("div.sidebar-content", children),
+    h("div.sidebar-content", null, children),
   ]);
 }
 
@@ -96,7 +97,6 @@ function WeaverMap({
     deletePins(".selected_pin");
   }, []);
 
-  const featuredCheckin = h(FeatureDetails, { setInspectPosition });
   let overlay;
 
   // handle selected checkins
@@ -124,7 +124,7 @@ function WeaverMap({
     setAutocompleteOpen,
   });
 
-  const filteredCheckinsComplete = h(createFilteredCheckins, {
+  const filteredCheckinsComplete = h(FilteredCheckins, {
     filteredData: filteredData?.current,
     setInspectPosition,
   });
@@ -185,7 +185,7 @@ function WeaverMap({
         toolbar,
         showCloseButton: false,
       },
-      featuredCheckin
+      h(FeatureDetails, { setInspectPosition })
     );
   }
 
@@ -419,9 +419,9 @@ function createSelectedCheckins(result, setInspectPosition) {
   return createCheckins(result.data, mapRef, setInspectPosition);
 }
 
-function createFilteredCheckins(filteredData, setInspectPosition) {
+function FilteredCheckins({ filteredData, setInspectPosition }) {
   const mapRef = useMapRef();
-
+  console.log("Filtered checkins", filteredData);
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 

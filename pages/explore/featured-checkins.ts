@@ -1,22 +1,45 @@
-import { useMapRef } from "@macrostrat/mapbox-react";
+import { useMapPosition, useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, pageCarousel } from "~/components"
+import { useRockdAPI, pageCarousel } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
 
-export function FeatureDetails({setInspectPosition}) {
+export function FeatureDetails({ setInspectPosition }) {
+  console.log("setInspectPosition", setInspectPosition);
   const [page, setPage] = useState(1);
   const mapRef = useMapRef();
+
+  console.log("Feature details", mapRef);
+  return null;
+
+  console.log("mapRef", mapRef);
   const map = mapRef.current;
   const [bounds, setBounds] = useState(map?.getBounds());
+
+  const position = useMapPosition();
+  console.log("Map position", position);
+  console.log("Map ref", map);
+
   let checkins = [];
   let result;
   let nextData;
 
   if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
-    nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
+    result = getCheckins(
+      bounds.getSouth(),
+      bounds.getNorth(),
+      bounds.getWest(),
+      bounds.getEast(),
+      page
+    );
+    nextData = getCheckins(
+      bounds.getSouth(),
+      bounds.getNorth(),
+      bounds.getWest(),
+      bounds.getEast(),
+      page + 1
+    );
   } else {
     result = getCheckins(0, 0, 0, 0, 1);
     nextData = getCheckins(0, 0, 0, 0, 2);
@@ -55,11 +78,15 @@ export function FeatureDetails({setInspectPosition}) {
     };
   }, [map]);
 
-
   result = result?.success?.data;
-  if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
+  if (result == null || result.length === 0)
+    return h(Spinner, { className: "loading-spinner" });
 
-  const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
+  const pages = pageCarousel({
+    page,
+    setPage,
+    nextData: nextData?.success.data,
+  });
 
   result.sort((a, b) => {
     if (a.photo === null && b.photo !== null) return 1;
@@ -69,10 +96,7 @@ export function FeatureDetails({setInspectPosition}) {
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
 
-  return h("div", {className: 'checkin-container'}, [
-      checkins,
-      pages
-    ]);
+  return h("div", { className: "checkin-container" }, [checkins, pages]);
 }
 
 function getCheckins(lat1, lat2, lng1, lng2, page) {
@@ -83,9 +107,16 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useRockdAPI("/protected/checkins?minlat=" + minLat +
-    "&maxlat=" + maxLat +
-    "&minlng=" + minLng +
-    "&maxlng=" + maxLng +
-    "&page="  + page);
+  return useRockdAPI(
+    "/protected/checkins?minlat=" +
+      minLat +
+      "&maxlat=" +
+      maxLat +
+      "&minlng=" +
+      minLng +
+      "&maxlng=" +
+      maxLng +
+      "&page=" +
+      page
+  );
 }
