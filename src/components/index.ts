@@ -10,7 +10,6 @@ import mapboxgl from "mapbox-gl";
 import { SETTINGS } from "~/settings";
 import { rockdApiURL, rockdApiOldURL } from "~/settings";
 import { useState } from "react";
-import { navigate } from "vike/client/router";
 
 export function Footer() {
   const footerLinks1 = [
