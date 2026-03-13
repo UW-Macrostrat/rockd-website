@@ -1,9 +1,8 @@
 import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon, Spinner } from "@blueprintjs/core";
+import { Button, Icon } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
-  MapAreaContainer,
   MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
@@ -39,14 +38,13 @@ function Sidebar({
   children,
   showCloseButton = true,
 }: SidebarProps) {
-  console.log("Rendering sidebar", children);
   const _showCloseButton = showCloseButton && onClose != null;
   return h("div.sidebar", [
     h("div.sidebar-header", [
       h("div.title", [toolbar, h("h1", title)]),
       h.if(_showCloseButton)(Button, { icon: "cross" }),
     ]),
-    h("div.sidebar-content", {}, children),
+    h("div.sidebar-content", children as any),
   ]);
 }
 
@@ -111,18 +109,18 @@ function WeaverMap({
     setSettings,
     showFilter,
     setFilter,
-  });
+  }) as ReactNode;
   const contextPanel = h(ContextPanel, {
     showSatelite,
     setSatelite,
     showOverlay,
     setOverlay,
-  });
+  }) as ReactNode;
   const autoComplete = h(AutoComplete, {
     setFilteredData,
     autocompleteOpen,
     setAutocompleteOpen,
-  });
+  }) as ReactNode;
 
   const filteredCheckinsComplete = h(FilteredCheckins, {
     filteredData: filteredData?.current,
@@ -136,7 +134,7 @@ function WeaverMap({
 
   if (showFilter) {
     overlay = h(Sidebar, {
-      title: "Filter Checkins",
+      title: "Filter checkins",
       toolbar,
       onClose: () => {
         setFilter(false);
@@ -150,7 +148,7 @@ function WeaverMap({
           ? h("div.filtered-checkins", filteredCheckinsComplete)
           : null,
         filteredData && !autocompleteOpen ? filteredPages : null,
-      ]),
+      ]) as any,
     });
   } else if (showSettings) {
     overlay = h(
@@ -174,7 +172,7 @@ function WeaverMap({
     overlay = h(
       Sidebar,
       {
-        title: "Selected Checkins",
+        title: "Selected checkins",
         toolbar,
         onClose: () => {
           setSelectedCheckin(null);
@@ -187,7 +185,7 @@ function WeaverMap({
     overlay = h(
       Sidebar,
       {
-        title: "Featured Checkins",
+        title: "Featured checkins",
         toolbar,
         showCloseButton: false,
       },

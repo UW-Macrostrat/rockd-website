@@ -4,18 +4,15 @@
     // Allow importing of JSON and default imports from CommonJS modules
     "esModuleInterop": true,
     "jsx": "react",
+    "types": [
+      "@macrostrat/vite-plugin-hyperstyles/client",
+      "vite/client",
+      "vike-react"
+    ],
     "paths": {
-      "~/*": [
-        "src/*"
-      ],
-      "#/*": [
-        "pages/*"
-      ]
+      "~/*": ["src/*"],
+      "#/*": ["pages/*"]
     }
   },
-  "include": [
-    "packages/*/src/**/*",
-    "src/**/*",
-    "pages/**/*"
-  ]
+  "include": ["vite.config.ts", "src/**/*", "pages/**/*"]
 }
