@@ -1,5 +1,5 @@
 import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon } from "@blueprintjs/core";
+import { Button, Icon, Navbar } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
@@ -21,7 +21,7 @@ import { deletePins } from "./utils";
 import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "./map-style";
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 
 import { type ReactNode } from "react";
 
@@ -41,22 +41,11 @@ function Sidebar({
   onClose,
   children,
   showCloseButton = true,
-  showSettings,
-  setSettings,
-  showFilter,
-  setFilter,
 }: SidebarProps) {
-  const toolbar = h(Toolbar, {
-    showSettings,
-    setSettings,
-    showFilter,
-    setFilter,
-  }) as ReactNode;
-
   const _showCloseButton = showCloseButton && onClose != null;
   return h("div.sidebar", [
-    h("div.sidebar-header", [
-      h("div.title", [toolbar, h("h1", title)]),
+    h(Navbar, { className: "sidebar-header" }, [
+      h("div.sidebar-header-left", [h(Toolbar), h("h1.page-title", title)]),
       h.if(_showCloseButton)(Button, { icon: "cross" }),
     ]),
     h("div.sidebar-content", children as any),
@@ -77,6 +66,12 @@ const type = {
   color: "purple",
 };
 
+const showSatelliteAtom = atom(false);
+const showOverlayAtom = atom(true);
+const showSettingsAtom = atom(false);
+const showFilterAtom = atom(false);
+const autocompleteOpenAtom = atom(false);
+
 export function Page() {
   const [showSatellite, setShowSatellite] = useState(false);
   const [showOverlay, setOverlay] = useState(true);
@@ -90,7 +85,7 @@ export function Page() {
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
   const [filteredData, setFilteredData] = useState(null);
-  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [autocompleteOpen, setAutocompleteOpen] = useAtom(autocompleteOpenAtom);
 
   // overlay
   const [inspectPosition, setInspectPosition] =
@@ -110,12 +105,6 @@ export function Page() {
       : `/protected/checkins?checkin_id=0`
   );
 
-  const contextPanel = h(ContextPanel, {
-    showSatellite: showSatellite,
-    setSatellite: setShowSatellite,
-    showOverlay,
-    setOverlay,
-  }) as ReactNode;
   const autoComplete = h(AutoComplete, {
     setFilteredData,
     autocompleteOpen,
@@ -135,10 +124,6 @@ export function Page() {
   if (showFilter) {
     overlay = h(Sidebar, {
       title: "Filter checkins",
-      showSettings,
-      setSettings,
-      showFilter,
-      setFilter,
       onClose: () => {
         setFilter(false);
         setSettings(false);
@@ -158,16 +143,12 @@ export function Page() {
       Sidebar,
       {
         title: "Settings",
-        showSettings,
-        setSettings,
-        showFilter,
-        setFilter,
         onClose: () => {
           setSettings(false);
           setFilter(false);
         },
       },
-      contextPanel
+      h(ContextPanel)
     );
   } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {
@@ -179,10 +160,6 @@ export function Page() {
       Sidebar,
       {
         title: "Selected checkins",
-        showSettings,
-        setSettings,
-        showFilter,
-        setFilter,
         onClose: () => {
           setSelectedCheckin(null);
           deletePins(".selected_pin");
@@ -195,10 +172,6 @@ export function Page() {
       Sidebar,
       {
         title: "Featured checkins",
-        showSettings,
-        setSettings,
-        showFilter,
-        setFilter,
         showCloseButton: false,
       },
       h(FeatureDetails, { setInspectPosition })
@@ -270,38 +243,32 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
   return actualStyle;
 }
 
-function Toolbar({ showSettings, setSettings, showFilter, setFilter }) {
-  return h("div.toolbar", [
-    h("div.toolbar-header", [
-      h(
-        "a",
-        { href: "/" },
-        h("img", { className: "home-icon", src: "/rockd-icon-256.png" })
-      ),
-      h(Icon, {
-        className: "settings-icon",
-        icon: "filter",
-        onClick: () => {
-          setFilter(!showFilter);
-        },
-      }),
-      h(Icon, {
-        className: "settings-icon",
-        icon: "settings",
-        onClick: () => {
-          setSettings(!showSettings);
-        },
-      }),
-    ]),
+function Toolbar() {
+  const [showSettings, setShowSettings] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
+  return h("div.toolbar-header", [
+    h("a", { href: "/" }, h("img.rockd-icon", { src: "/rockd-icon-256.png" })),
+    h(Icon, {
+      className: "settings-icon",
+      icon: "filter",
+      onClick: () => {
+        setShowFilter(!showFilter);
+      },
+    }),
+    h(Icon, {
+      className: "settings-icon",
+      icon: "settings",
+      onClick: () => {
+        setShowSettings(!showSettings);
+      },
+    }),
   ]);
 }
 
-function ContextPanel({
-  showSatellite,
-  setSatellite,
-  showOverlay,
-  setOverlay,
-}) {
+function ContextPanel() {
+  const [showOverlay, setOverlay] = useAtom(showFilterAtom);
+  const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
+
   return h("div", { className: "settings-content" }, [
     h(DarkModeButton, { className: "dark-btn", showText: true }),
     h(

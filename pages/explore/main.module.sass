@@ -24,76 +24,38 @@
 
 .sidebar-content
   padding-top: 0
-  border-top: 2px solid var(--panel-text)
   flex-grow: 1
 
+.rockd-icon
+  height: 50px
+  width: 50px
+
+.sidebar-header
+  border-radius: 0 !important
+  display: flex
+  flex-direction: row
+  background-color: var(--panel-background-color) !important
 
 .sidebar
   height: 100vh
   width: 30%
+  min-width: 420px
   display: flex
   flex-direction: column
+  border-right: 1px solid var(--panel-rule-color)
   background: var(--panel-background-color)
 
-  .title-header, .coordinates
-    display: flex
-    justify-content: center
-
   .title
-    display: flex
-    width: 100%
-    color: black
-    position: fixed
-    width: 30%
-    background: rgba(255, 255, 255, 0.85)
-    height: 7vh
-    background-color: var(--panel-background-color)
-    color: var(--text-emphasized-color) !important
-    padding: 0
 
     h1
       padding: 0
-      margin: auto
-      font-size: 24px
-      margin-left: 10px
 
-  .header-divider
-    position: absolute
-    width: 100%
-    top: 10vh
-    z-index: 100
-
-
-  .close-btn
-    position: absolute
-    top: 10px
-    right: 10px
-    background-color: var(--panel-background)
-    color: var(--panel-text)
-    border: none
-    border-radius: 50%
-    width: 30px
-    height: 30px
-    display: flex
-    justify-content: center
-    align-items: center
-    font-size: 15px
-    cursor: pointer
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
-    transition: background-color 0.3s, box-shadow 0.3s
-
-    &:hover
-      background-color: var(--panel-hover)
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3)
 
 .marker
   height: 7vh
   display: grid
   margin: auto
   margin-right: 0
-
-.selcted-center
-  display: flex
 
 .details-image
   width: 40px
@@ -123,13 +85,6 @@ body
 .checkin-footer
   img
     filter: var(--img-color)
-
-.close-btn
-  background-color: var(--accent-secondary-color)
-  color: var(--text-emphasized-color)
-
-  &:hover
-    background-color: var(--accent-secondary-hover-color)
 
 .sort-dropdown
   height: 3vh
@@ -231,7 +186,6 @@ body
     background-color: var(--accent-secondary-color)
     padding: 5px 10px
     margin: 0
-    border-top: solid var(--panel-background-color) 2px
 
   .filter-item
     display: flex
@@ -363,11 +317,6 @@ body
 
 .selected
   background-color: var(--accent-secondary-color) !important
-
-.bp6-card, .bp6-navbar, .bp6-button
-  border-radius: 4px
-  background-color: var(--panel-background-color)
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
 
 .settings-icon
   cursor: pointer
