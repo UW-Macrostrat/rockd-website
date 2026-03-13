@@ -1,5 +1,9 @@
 import h from "./index.module.sass";
-import { DarkModeButton, useAPIResult, useDarkMode } from "@macrostrat/ui-components";
+import {
+  DarkModeButton,
+  useAPIResult,
+  useDarkMode,
+} from "@macrostrat/ui-components";
 import { Divider, Icon } from "@blueprintjs/core";
 import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
 import { useState } from "react";
@@ -132,6 +136,10 @@ export function BlankImage(props: ImageProps) {
 
 // remove when metrics works
 const apiURL = SETTINGS.rockdApiURL; // new route
+
+export async function fetchRockdData(url: string) {
+  return await fetch(apiURL + url);
+}
 
 export function useRockdAPI(src) {
   return useAPIResult(apiURL + src);

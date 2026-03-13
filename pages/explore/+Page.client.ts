@@ -1,4 +1,4 @@
-import { useMapRef } from "@macrostrat/mapbox-react";
+import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
 import { Button, Icon, Spinner } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
@@ -13,7 +13,7 @@ import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import h from "./main.module.sass";
-import { Image, pageCarousel, useRockdAPI } from "~/components";
+import { pageCarousel, useRockdAPI } from "~/components";
 import "@macrostrat/style-system";
 
 import { AutoComplete } from "./autocomplete";
@@ -21,6 +21,33 @@ import { deletePins } from "./utils";
 import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "./map-style";
+
+import { type ReactNode } from "react";
+
+interface SidebarProps {
+  title: string;
+  toolbar: ReactNode;
+  onClose?: () => void;
+  children: ReactNode;
+  showCloseButton?: boolean;
+}
+
+export function Sidebar({
+  title,
+  toolbar,
+  onClose,
+  children,
+  showCloseButton = true,
+}: SidebarProps) {
+  const _showCloseButton = showCloseButton && onClose != null;
+  return h("div.sidebar", [
+    h("div.sidebar-header", [
+      h("div.title", [toolbar, h("h1", title)]),
+      h.if(_showCloseButton)(Button, { icon: "cross" }),
+    ]),
+    h("div.sidebar-content", children),
+  ]);
+}
 
 export function Page() {
   return h(
@@ -108,75 +135,58 @@ function WeaverMap({
   });
 
   if (showFilter) {
-    overlay = h("div.sidebox", [
-      h("div.title", [toolbar, h("h1", "Filter Checkins")]),
-      h(
-        "button",
-        {
-          className: "close-btn",
-          onClick: () => {
-            setFilter(false);
-            setSettings(false);
-            setFilteredData(null);
-            deletePins(".filtered_pin");
-          },
-        },
-        "X"
-      ),
-      h("div.overlay-div", [
-        h("div.autocomplete-container", [
-          autoComplete,
-          filteredData && !autocompleteOpen
-            ? h("div.filtered-checkins", filteredCheckinsComplete)
-            : null,
-          filteredData && !autocompleteOpen ? filteredPages : null,
-        ]),
+    overlay = h(Sidebar, {
+      title: "Filter Checkins",
+      toolbar,
+      onClose: () => {
+        setFilter(false);
+        setSettings(false);
+        setFilteredData(null);
+        deletePins(".filtered_pin");
+      },
+      children: h("div.autocomplete-container", [
+        autoComplete,
+        filteredData && !autocompleteOpen
+          ? h("div.filtered-checkins", filteredCheckinsComplete)
+          : null,
+        filteredData && !autocompleteOpen ? filteredPages : null,
       ]),
-    ]);
+    });
   } else if (showSettings) {
-    overlay = h("div.sidebox", [
-      h("div.title", [toolbar, h("h1", "Settings")]),
-      h(
-        "button",
-        {
-          className: "close-btn",
-          onClick: () => {
-            setSettings(false);
-            setFilter(false);
-          },
-        },
-        "X"
-      ),
-      h("div.overlay-div", contextPanel),
-    ]);
+    overlay = h(Sidebar, {
+      title: "Settings",
+      toolbar,
+      onClose: () => {
+        setSettings(false);
+        setFilter(false);
+      },
+      children: contextPanel,
+    });
   } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {
       data: checkinData?.success.data,
       setInspectPosition,
     });
 
-    overlay = h("div.sidebox", [
-      h("div.title", [toolbar, h("h1", "Selected Checkins")]),
-      h(
-        "button",
-        {
-          className: "close-btn",
-          onClick: () => {
-            setSelectedCheckin(null);
-            deletePins(".selected_pin");
-          },
-        },
-        "X"
-      ),
-      h("div.overlay-div", h("div.checkin-container", clickedCheckins)),
-    ]);
+    overlay = h(Sidebar, {
+      title: "Selected Checkins",
+      toolbar,
+      onClose: () => {
+        setSelectedCheckin(null);
+        deletePins(".selected_pin");
+      },
+      children: h("div.checkin-container", clickedCheckins),
+    });
   } else {
-    overlay = h("div.sidebox", [
-      h("div.sidebox-header", [
-        h("div.title", [toolbar, h("h1", "Featured Checkins")]),
-      ]),
-      h("div.overlay-div", featuredCheckin),
-    ]);
+    overlay = h(
+      Sidebar,
+      {
+        title: "Featured Checkins",
+        toolbar,
+        showCloseButton: false,
+      },
+      featuredCheckin
+    );
   }
 
   if (style == null) return null;
@@ -189,13 +199,21 @@ function WeaverMap({
     },
   };
 
-  return h(MapContainer, {
-    style,
-    mapPosition,
-    onSelectPosition,
-    setSelectedCheckin,
-    overlay,
-  });
+  return h(
+    MapboxMapProvider,
+    h("div.map-page", [
+      overlay,
+      h("div.map-container", [
+        h(MapView, { style, mapboxToken: mapboxAccessToken, mapPosition }, [
+          h(MapMarker, {
+            setPosition: onSelectPosition,
+          }),
+        ]),
+        // The Overlay Div
+        h(ClickedCheckins, { setSelectedCheckin }),
+      ]),
+    ])
+  );
 }
 
 function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
@@ -332,12 +350,12 @@ function FeatureDetails({ setInspectPosition }) {
 }
 
 function Toolbar({ showSettings, setSettings, showFilter, setFilter }) {
-  return h("div", { className: "toolbar", style: { padding: "0" } }, [
+  return h("div.toolbar", [
     h("div.toolbar-header", [
       h(
         "a",
         { href: "/" },
-        h(Image, { className: "home-icon", src: "favicon-32x32.png" })
+        h("img", { className: "home-icon", src: "/rockd-icon-256.png" })
       ),
       h(Icon, {
         className: "settings-icon",
@@ -405,32 +423,6 @@ function createFilteredCheckins(filteredData, setInspectPosition) {
   const mapRef = useMapRef();
 
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
-}
-
-export function MapContainer({
-  style,
-  mapPosition,
-  onSelectPosition,
-  setSelectedCheckin,
-  overlay,
-}) {
-  return h(
-    MapAreaContainer,
-    {
-      className: "map-area-container",
-    },
-    [
-      overlay,
-      h(MapView, { style, mapboxToken: mapboxAccessToken, mapPosition }, [
-        h(MapMarker, {
-          setPosition: onSelectPosition,
-        }),
-      ]),
-
-      // The Overlay Div
-      h(ClickedCheckins, { setSelectedCheckin }),
-    ]
-  );
 }
 
 function ClickedCheckins({ setSelectedCheckin }) {
