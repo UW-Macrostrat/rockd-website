@@ -15,13 +15,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useState, type ReactElement } from "react";
 import h from "./main.module.sass";
 import { pageCarousel, useRockdAPI } from "~/components";
-import "@macrostrat/style-system";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
 import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "./map-style";
+import { atom } from "jotai";
 
 import { type ReactNode } from "react";
 
@@ -78,9 +78,14 @@ const type = {
 };
 
 export function Page() {
-  const [showSatelite, setSatelite] = useState(false);
+  const [showSatellite, setShowSatellite] = useState(false);
   const [showOverlay, setOverlay] = useState(true);
-  const style = useMapStyle(type, mapboxAccessToken, showSatelite, showOverlay);
+  const style = useMapStyle(
+    type,
+    mapboxAccessToken,
+    showSatellite,
+    showOverlay
+  );
   const [selectedCheckin, setSelectedCheckin] = useState(null);
   const [showSettings, setSettings] = useState(false);
   const [showFilter, setFilter] = useState(false);
@@ -106,8 +111,8 @@ export function Page() {
   );
 
   const contextPanel = h(ContextPanel, {
-    showSatelite,
-    setSatelite,
+    showSatellite: showSatellite,
+    setSatellite: setShowSatellite,
     showOverlay,
     setOverlay,
   }) as ReactNode;
@@ -291,17 +296,22 @@ function Toolbar({ showSettings, setSettings, showFilter, setFilter }) {
   ]);
 }
 
-function ContextPanel({ showSatelite, setSatelite, showOverlay, setOverlay }) {
+function ContextPanel({
+  showSatellite,
+  setSatellite,
+  showOverlay,
+  setOverlay,
+}) {
   return h("div", { className: "settings-content" }, [
     h(DarkModeButton, { className: "dark-btn", showText: true }),
     h(
       Button,
       {
-        className: showSatelite
+        className: showSatellite
           ? "selected satellite-style"
           : "satellite-style",
         onClick: () => {
-          setSatelite(!showSatelite);
+          setSatellite(!showSatellite);
         },
       },
       [

@@ -1436,6 +1436,7 @@ __metadata:
     cookie-parser: "npm:^1.4.6"
     eslint-plugin-react-hooks: "npm:^4.6.2"
     hex-to-css-filter: "npm:^5.4.0"
+    jotai: "npm:^2.18.1"
     mapbox-gl: "npm:^3.20.0"
     prettier: "npm:^2.7.1"
     react: "npm:^19.2.4"
@@ -5850,7 +5851,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jotai@npm:^2.17.0":
+"jotai@npm:^2.17.0, jotai@npm:^2.18.1":
   version: 2.18.1
   resolution: "jotai@npm:2.18.1"
   peerDependencies:
