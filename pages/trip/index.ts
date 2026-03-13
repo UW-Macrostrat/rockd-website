@@ -6,7 +6,6 @@ import {
   BlankImage,
   getProfilePicUrl,
   Image,
-  createCheckins,
   Comments,
 } from "~/components";
 import "@macrostrat/style-system";
@@ -21,6 +20,7 @@ import {
 } from "@macrostrat/map-interface";
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { map } from "underscore";
+import { createCheckins } from "~/components/checkin.client";
 
 export function Trips({ data, commentsData }) {
   const [showSatelite, setSatelite] = useState(false);

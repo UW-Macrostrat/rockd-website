@@ -8,7 +8,7 @@ import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import { useCallback, useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components";
+import { useRockdAPI, Image, pageCarousel } from "~/components";
 import "@macrostrat/style-system";
 import { MapPosition } from "@macrostrat/mapbox-utils";
 import {
@@ -21,6 +21,7 @@ import { mapboxAccessToken } from "~/settings";
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
 import { FeatureDetails } from "./featuredcheckins";
+import { createCheckins } from "~/components/checkin.client";
 
 export function Page() {
   return h(
