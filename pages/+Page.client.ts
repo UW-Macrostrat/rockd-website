@@ -2,7 +2,6 @@ import { Image, Footer } from "~/components";
 import "@macrostrat/style-system";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
-import { useEffect } from "react";
 
 export function Page()  {
     return h("div", { className: "main-page"}, [

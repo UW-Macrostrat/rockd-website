@@ -54,6 +54,7 @@
     "@macrostrat/mapbox-utils": "^1.4.0",
     "@macrostrat/style-system": "^0.2.0",
     "@macrostrat/ui-components": "^4.4.4",
+    "@macrostrat/vite-plugin-hyperstyles": "^2.0.0",
     "@supabase/postgrest-js": "^1.11.0",
     "@universal-middleware/express": "^0.0.2",
     "@vitejs/plugin-react": "^4.0.4",
@@ -91,5 +92,5 @@
   "prettier": {
     "proseWrap": "always"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.13.0"
 }
