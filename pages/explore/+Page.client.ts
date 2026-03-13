@@ -32,7 +32,7 @@ interface SidebarProps {
   showCloseButton?: boolean;
 }
 
-export function Sidebar({
+function Sidebar({
   title,
   toolbar,
   onClose,
@@ -46,7 +46,7 @@ export function Sidebar({
       h("div.title", [toolbar, h("h1", title)]),
       h.if(_showCloseButton)(Button, { icon: "cross" }),
     ]),
-    h("div.sidebar-content", null, children),
+    h("div.sidebar-content", {}, children),
   ]);
 }
 
@@ -153,30 +153,36 @@ function WeaverMap({
       ]),
     });
   } else if (showSettings) {
-    overlay = h(Sidebar, {
-      title: "Settings",
-      toolbar,
-      onClose: () => {
-        setSettings(false);
-        setFilter(false);
+    overlay = h(
+      Sidebar,
+      {
+        title: "Settings",
+        toolbar,
+        onClose: () => {
+          setSettings(false);
+          setFilter(false);
+        },
       },
-      children: contextPanel,
-    });
+      contextPanel
+    );
   } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {
       data: checkinData?.success.data,
       setInspectPosition,
     });
 
-    overlay = h(Sidebar, {
-      title: "Selected Checkins",
-      toolbar,
-      onClose: () => {
-        setSelectedCheckin(null);
-        deletePins(".selected_pin");
+    overlay = h(
+      Sidebar,
+      {
+        title: "Selected Checkins",
+        toolbar,
+        onClose: () => {
+          setSelectedCheckin(null);
+          deletePins(".selected_pin");
+        },
       },
-      children: h("div.checkin-container", clickedCheckins),
-    });
+      h("div.checkin-container", clickedCheckins)
+    );
   } else {
     overlay = h(
       Sidebar,
@@ -204,11 +210,21 @@ function WeaverMap({
     h("div.map-page", [
       overlay,
       h("div.map-container", [
-        h(MapView, { style, mapboxToken: mapboxAccessToken, mapPosition }, [
-          h(MapMarker, {
-            setPosition: onSelectPosition,
-          }),
-        ]),
+        h(
+          MapView,
+          {
+            style,
+            mapboxToken: mapboxAccessToken,
+            mapPosition,
+            standalone: false,
+            className: "map-view",
+          },
+          [
+            h(MapMarker, {
+              setPosition: onSelectPosition,
+            }),
+          ]
+        ),
         // The Overlay Div
         h(ClickedCheckins, { setSelectedCheckin }),
       ]),
@@ -242,111 +258,6 @@ function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
   }, [isEnabled, showSatelite, showOverlay]);
 
   return actualStyle;
-}
-
-function getCheckins(lat1, lat2, lng1, lng2, page) {
-  // abitrary bounds around click point
-  let minLat = Math.floor(lat1 * 100) / 100;
-  let maxLat = Math.floor(lat2 * 100) / 100;
-  let minLng = Math.floor(lng1 * 100) / 100;
-  let maxLng = Math.floor(lng2 * 100) / 100;
-
-  // change use map coords
-  return useRockdAPI(
-    "/protected/checkins?minlat=" +
-      minLat +
-      "&maxlat=" +
-      maxLat +
-      "&minlng=" +
-      minLng +
-      "&maxlng=" +
-      maxLng +
-      "&page=" +
-      page
-  );
-}
-
-function FeatureDetails({ setInspectPosition }) {
-  const [page, setPage] = useState(1);
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  const [bounds, setBounds] = useState(map?.getBounds());
-  let checkins = [];
-  let result;
-  let nextData;
-
-  if (bounds) {
-    result = getCheckins(
-      bounds.getSouth(),
-      bounds.getNorth(),
-      bounds.getWest(),
-      bounds.getEast(),
-      page
-    );
-    nextData = getCheckins(
-      bounds.getSouth(),
-      bounds.getNorth(),
-      bounds.getWest(),
-      bounds.getEast(),
-      page + 1
-    );
-  } else {
-    result = getCheckins(0, 0, 0, 0, 1);
-    nextData = getCheckins(0, 0, 0, 0, 2);
-  }
-
-  if (!bounds && map) {
-    setBounds(map.getBounds());
-  }
-
-  useEffect(() => {
-    if (!map) return;
-
-    const handleMapReady = () => {
-      const newBounds = map.getBounds();
-      setBounds(newBounds);
-      setPage(1);
-    };
-
-    if (map.isStyleLoaded()) {
-      handleMapReady();
-    } else {
-      map.once("load", handleMapReady);
-    }
-
-    const onMoveEnd = () => {
-      const newBounds = map.getBounds();
-      setBounds(newBounds);
-      setPage(1);
-    };
-
-    map.on("moveend", onMoveEnd);
-
-    return () => {
-      map.off("moveend", onMoveEnd);
-      map.off("load", handleMapReady);
-    };
-  }, [map]);
-
-  result = result?.success?.data;
-  if (result == null || result.length === 0)
-    return h(Spinner, { className: "loading-spinner" });
-
-  const pages = pageCarousel({
-    page,
-    setPage,
-    nextData: nextData?.success.data,
-  });
-
-  result.sort((a, b) => {
-    if (a.photo === null && b.photo !== null) return 1;
-    if (a.photo !== null && b.photo === null) return -1;
-    return 0;
-  });
-
-  checkins = createCheckins(result, mapRef, setInspectPosition);
-
-  return h("div", { className: "checkin-container" }, [checkins, pages]);
 }
 
 function Toolbar({ showSettings, setSettings, showFilter, setFilter }) {

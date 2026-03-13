@@ -2,52 +2,25 @@ import { useMapPosition, useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, pageCarousel } from "~/components";
+import { pageCarousel, fetchRockdData } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
+import { useAsyncMemo } from "@macrostrat/ui-components";
 
 export function FeatureDetails({ setInspectPosition }) {
-  console.log("setInspectPosition", setInspectPosition);
   const [page, setPage] = useState(1);
   const mapRef = useMapRef();
 
-  console.log("Feature details", mapRef);
-  return null;
-
-  console.log("mapRef", mapRef);
   const map = mapRef.current;
   const [bounds, setBounds] = useState(map?.getBounds());
 
   const position = useMapPosition();
-  console.log("Map position", position);
-  console.log("Map ref", map);
+  useEffect(() => {
+    setBounds(map?.getBounds());
+  }, [position]);
 
   let checkins = [];
-  let result;
-  let nextData;
 
-  if (bounds) {
-    result = getCheckins(
-      bounds.getSouth(),
-      bounds.getNorth(),
-      bounds.getWest(),
-      bounds.getEast(),
-      page
-    );
-    nextData = getCheckins(
-      bounds.getSouth(),
-      bounds.getNorth(),
-      bounds.getWest(),
-      bounds.getEast(),
-      page + 1
-    );
-  } else {
-    result = getCheckins(0, 0, 0, 0, 1);
-    nextData = getCheckins(0, 0, 0, 0, 2);
-  }
-
-  if (!bounds && map) {
-    setBounds(map.getBounds());
-  }
+  const [result, nextData] = useRockdCheckins(bounds, page);
 
   useEffect(() => {
     if (!map) return;
@@ -78,14 +51,13 @@ export function FeatureDetails({ setInspectPosition }) {
     };
   }, [map]);
 
-  result = result?.success?.data;
   if (result == null || result.length === 0)
     return h(Spinner, { className: "loading-spinner" });
 
   const pages = pageCarousel({
     page,
     setPage,
-    nextData: nextData?.success.data,
+    nextData,
   });
 
   result.sort((a, b) => {
@@ -96,10 +68,33 @@ export function FeatureDetails({ setInspectPosition }) {
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
 
-  return h("div", { className: "checkin-container" }, [checkins, pages]);
+  return h("div.checkin-container", [checkins, pages]);
 }
 
-function getCheckins(lat1, lat2, lng1, lng2, page) {
+function useRockdCheckins(bounds: any, page: number) {
+  const result = useAsyncMemo(async () => {
+    return await fetchRockdCheckinsByBounds(bounds, page);
+  }, [bounds, page]);
+
+  const next = useAsyncMemo(async () => {
+    return await fetchRockdCheckinsByBounds(bounds, page + 1);
+  }, [bounds, page]);
+
+  return [result, next];
+}
+
+async function fetchRockdCheckinsByBounds(bounds: any, page: number) {
+  const res = await fetchRockdCheckins(
+    bounds?.getSouth() ?? 0,
+    bounds?.getNorth() ?? 0,
+    bounds?.getWest() ?? 0,
+    bounds?.getEast() ?? 0,
+    page
+  );
+  return res?.success?.data;
+}
+
+async function fetchRockdCheckins(lat1, lat2, lng1, lng2, page) {
   // abitrary bounds around click point
   let minLat = Math.floor(lat1 * 100) / 100;
   let maxLat = Math.floor(lat2 * 100) / 100;
@@ -107,7 +102,7 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useRockdAPI(
+  const res = await fetchRockdData(
     "/protected/checkins?minlat=" +
       minLat +
       "&maxlat=" +
@@ -119,4 +114,6 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
       "&page=" +
       page
   );
+  // Get json
+  return res.json();
 }
