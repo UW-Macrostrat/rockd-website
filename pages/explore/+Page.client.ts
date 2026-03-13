@@ -20,7 +20,7 @@ import { mapboxAccessToken } from "~/settings";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
-import { FeatureDetails } from "./featuredcheckins";
+import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 
 export function Page() {

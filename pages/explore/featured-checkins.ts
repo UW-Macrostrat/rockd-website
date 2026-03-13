@@ -2,8 +2,8 @@ import { useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { useRockdAPI, pageCarousel, createCheckins } from "~/components/general";
-import "@macrostrat/style-system";
+import { useRockdAPI, pageCarousel } from "~/components"
+import { createCheckins } from "~/components/checkin.client";
 
 export function FeatureDetails({setInspectPosition}) {
   const [page, setPage] = useState(1);
@@ -36,9 +36,9 @@ export function FeatureDetails({setInspectPosition}) {
     };
 
     if (map.isStyleLoaded()) {
-      handleMapReady(); 
+      handleMapReady();
     } else {
-      map.once("load", handleMapReady); 
+      map.once("load", handleMapReady);
     }
 
     const onMoveEnd = () => {
@@ -56,7 +56,7 @@ export function FeatureDetails({setInspectPosition}) {
   }, [map]);
 
 
-  result = result?.success?.data;  
+  result = result?.success?.data;
   if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
 
   const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
@@ -68,7 +68,7 @@ export function FeatureDetails({setInspectPosition}) {
   });
 
   checkins = createCheckins(result, mapRef, setInspectPosition);
-  
+
   return h("div", {className: 'checkin-container'}, [
       checkins,
       pages
@@ -83,9 +83,9 @@ function getCheckins(lat1, lat2, lng1, lng2, page) {
   let maxLng = Math.floor(lng2 * 100) / 100;
 
   // change use map coords
-  return useRockdAPI("/protected/checkins?minlat=" + minLat + 
+  return useRockdAPI("/protected/checkins?minlat=" + minLat +
     "&maxlat=" + maxLat +
     "&minlng=" + minLng +
-    "&maxlng=" + maxLng + 
+    "&maxlng=" + maxLng +
     "&page="  + page);
 }

@@ -1,12 +1,12 @@
 import { DarkModeProvider } from "@macrostrat/ui-components";
 import { ReactNode } from "react";
 import "@macrostrat/style-system";
+import "@blueprintjs/select/lib/css/blueprint-select.css";
+import "@blueprintjs/core/lib/css/blueprint.css";
 
 import { AuthProvider } from "~/_providers/auth";
 import { usePageContext } from "vike-react/usePageContext";
 
-import "~/styles/blueprint-core";
-import "~/styles/_theme.styl";
 import "~/styles/core.sass";
 import "~/styles/padding.css";
 import h from "./layout.module.sass";

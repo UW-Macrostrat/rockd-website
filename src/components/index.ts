@@ -17,13 +17,13 @@ export function Footer() {
     { href: "/privacy", icon: "lock", text: "Privacy" },
   ];
 
-  return h("div", { className: "footer" }, [
-    h("div", { className: "titles" }, [
-      h("h3", { className: "footer-text upper" }, [
+  return h("div.footer", [
+    h("div.titles", [
+      h("h3.footer-text.upper", [
         "Produced by the ",
         h("a", { href: "https://macrostrat.org" }, "UW Macrostrat Lab"),
       ]),
-      h("h3", { className: "footer-text lower" }, [
+      h("h3.footer-text.lower", [
         "Funded by ",
         h("a", { href: "https://nsf.gov" }, "NSF"),
         " and ",
@@ -34,7 +34,7 @@ export function Footer() {
         ),
       ]),
     ]),
-    h("div", { className: "footer-links" }, [
+    h("div.footer-links", [
       h(
         "ul",
         footerLinks1.map((props) => h(FooterLink, props))
