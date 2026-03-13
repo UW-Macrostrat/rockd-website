@@ -1,4 +1,4 @@
-import { LngLatCoords } from "@macrostrat/map-interface";
+import { LngLatCoords } from "@macrostrat/data-components";
 import { useState, useCallback } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {

@@ -21,6 +21,11 @@ const aliasedModules = [
   "map-components",
 ];
 
+const macrostratPackages = Object.keys(pkg.dependencies).filter(
+  (name: string) => name.startsWith("@macrostrat/")
+);
+
+
 const gitEnv = revisionInfo(
   pkg,
   "https://github.com/UW-Macrostrat/rockd-website"
@@ -52,15 +57,7 @@ export default defineConfig({
     sourcemap: true,
   },
   ssr: {
-    noExternal: [
-      /** All dependencies that cannot be bundled on the server (e.g., due to CSS imports)
-       * should be listed here.
-       */
-      "@macrostrat/form-components",
-      "@macrostrat/ui-components",
-      "@macrostrat/data-components",
-      "@macrostrat/map-interface",
-    ],
+    noExternal: macrostratPackages
   },
   css: {
     preprocessorOptions: {

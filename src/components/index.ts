@@ -1,5 +1,5 @@
 import h from "./layout.module.sass";
-import { LngLatCoords } from "@macrostrat/map-interface";
+import { LngLatCoords } from "@macrostrat/data-components";
 import {
   DarkModeButton,
   useAPIResult,
