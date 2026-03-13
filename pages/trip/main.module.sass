@@ -13,7 +13,7 @@
     --#{$name}: #{$color}
 
 body
-  &.bp5-dark
+  &.bp6-dark
     color-scheme: dark
     color: $dark-text
     background-color: $dark-background
@@ -21,7 +21,7 @@ body
     @each $name, $color in $dark-colors
       --#{$name}: #{$color}
 
-    .bp5-input
+    .bp6-input
       &::placeholder
         color: var(--secondary-color)
         box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
@@ -104,7 +104,7 @@ html, body, .wrapper, #react, .app, #map
   font-size: 20px
   font-weight: 600
   color: var(--text-emphasized-color)
-  padding: 10px 0 
+  padding: 10px 0
   text-align: left
 
 .stop-description
@@ -124,11 +124,11 @@ html, body, .wrapper, #react, .app, #map
   background-color: black
   color: white
   display: grid
-  margin: auto  
+  margin: auto
 
   .trip-input
     padding-left: 5px
-  
+
   .search-btn
     margin-left: 20px
 
@@ -137,7 +137,7 @@ html, body, .wrapper, #react, .app, #map
   padding-top: 30px
   text-align: center
 
-.map  
+.map
   display: grid
   grid-template-columns: 70% 30%
 
@@ -149,14 +149,14 @@ html, body, .wrapper, #react, .app, #map
   color: var(--text-emphasized-color)
   width: 30%
   text-align: center
-  top:0 
+  top:0
   right: 0
   z-index: 10000
   height: 100vh
 
 .trip-input-container
   width: 40%
-  display: grid 
+  display: grid
   grid-template-columns: 80% 20%
   margin: auto
   padding-bottom: 30px
@@ -173,12 +173,12 @@ html, body, .wrapper, #react, .app, #map
   margin-left: 2.5%
   padding: 15px
   border-radius: 2%
-  
+
 .stop-list
   padding: 20px 10px
   padding-top: 0
 
-.map 
+.map
   height: 100vh
 
 .box-header
@@ -238,10 +238,10 @@ html, body, .wrapper, #react, .app, #map
     object-fit: cover
     border-radius: 2%
 
-.stop-link:hover 
-  .checkin-card-img 
+.stop-link:hover
+  .checkin-card-img
     -webkit-filter: brightness(70%)
-  .image-details 
+  .image-details
     display: flex
 
 .details-image
@@ -304,7 +304,7 @@ html, body, .wrapper, #react, .app, #map
     color: var(--text-emphasized-color)
 
 .checkin-footer
-  img 
+  img
     filter: var(--img-color)
 
 .download-button
@@ -315,7 +315,7 @@ html, body, .wrapper, #react, .app, #map
 
   .kmz
     color: var(--text-emphasized-color)
-  
+
   .kmz:hover
     color: var(--text-emphasized-color)
     background-color: var(--scrollbar-thumb)
@@ -330,7 +330,7 @@ html, body, .wrapper, #react, .app, #map
   text-align: left
   h3, h4
     margin: 0
-    
+
   display: grid
   margin: auto
 
@@ -377,7 +377,7 @@ html, body, .wrapper, #react, .app, #map
 
   .unclicked
     background-color: green
-  
+
 .hide
   display: none
 

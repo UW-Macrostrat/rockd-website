@@ -15,13 +15,13 @@ html, body
   height: 100vh
   height: -webkit-fill-available
 
-.bp5-input
+.bp6-input
   box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15), inset 0 1px 1px rgba(16, 22, 26, 0.2)
 
-.bp5-button
+.bp6-button
   color: var(--text-color)
 
-.bp5-control
+.bp6-control
   color: var(--text-subtle-color) !important
 
 body
@@ -30,7 +30,7 @@ body
   padding: 0
   font-family: 'Source Sans Pro', sans-serif
 
-  &.bp5-dark
+  &.bp6-dark
     color-scheme: dark
     color: $dark-text
     // each item in color map
@@ -40,7 +40,7 @@ body
     .selected
       background-color: var(--accent-secondary-color)
 
-    .bp5-input
+    .bp6-input
       &::placeholder
         color: var(--secondary-color)
         box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
@@ -92,14 +92,14 @@ body
     background-color: var(--panel-background-color)
     color: var(--text-emphasized-color) !important
     padding: 0
-    
+
     h1
       padding: 0
       margin: auto
       font-size: 24px
       margin-left: 10px
 
-  .header-divider 
+  .header-divider
     position: absolute
     width: 100%
     top: 10vh
@@ -133,14 +133,14 @@ body
   display: grid
   margin: auto
   margin-right: 0
-  
+
 .selcted-center
   display: flex
 
 .details-image
   width: 40px
   margin-left: 10px
-  margin-top: 4px    
+  margin-top: 4px
 
 .checkin-info
   color: var(--text-emphasized-color)
@@ -153,23 +153,23 @@ body
   overflow: auto
   height: 93vh
 
-body 
+body
   color: var(--text-emphasized-color)
 
 .observation-img
   background-color: rgba(var(--text-emphasized-color), 0.5)
 
-.star 
+.star
   filter: var(--anti-img-color)
 
 .checkin-footer
-  img 
+  img
     filter: var(--img-color)
 
-.close-btn 
+.close-btn
   background-color: var(--accent-secondary-color)
   color: var(--text-emphasized-color)
-  
+
   &:hover
     background-color: var(--accent-secondary-hover-color)
 
@@ -196,7 +196,7 @@ body
     margin-left: 5px
     border: none
 
-.dark-button 
+.dark-button
   margin: 6px 15px
   background-color: green
 
@@ -204,7 +204,7 @@ body
   position: relative
   width: 300px
   padding-top: 10px
-  
+
   .search-icon
     top: 10px
     position: absolute
@@ -237,7 +237,7 @@ body
   flex-direction: column
   align-items: center
 
-  h1 
+  h1
     margin:0
     text-align: center
 
@@ -245,7 +245,7 @@ body
     background-color: var(--accent-secondary-color)
     padding: 10px
     margin: 0
-  
+
   li
     list-style-type: none
     background-color: var(--panel-background-color)
@@ -256,7 +256,7 @@ body
 
   p
     padding-left: 10px
-  
+
   ul
     margin-top: 0
     padding-left: 0
@@ -281,7 +281,7 @@ body
     justify-content: space-between
     padding: 2px 20px
 
-    li 
+    li
       &:hover
         background-color: var(--panel-background-color)
 
@@ -412,7 +412,7 @@ body
 .selected
   background-color: var(--accent-secondary-color) !important
 
-.bp5-card, .bp5-navbar, .bp5-button
+.bp6-card, .bp6-navbar, .bp6-button
   border-radius: 4px
   background-color: var(--panel-background-color)
   box-shadow: 0 0 0 1px var(--card-shadow-color)
