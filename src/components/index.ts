@@ -1,4 +1,3 @@
-import h from "./index.module.sass";
 import {
   DarkModeButton,
   useAPIResult,
@@ -7,6 +6,7 @@ import {
 import { Divider, Icon } from "@blueprintjs/core";
 import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
 import { useState } from "react";
+import h from "#/explore/main.module.sass";
 
 export function Footer() {
   const footerLinks1 = [
@@ -257,4 +257,12 @@ export function Comments({ comments }) {
   });
 
   return h("div.comments", [...commentArr]);
+}
+
+export function RockdSiteIcon({ className }) {
+  return h(
+    "a",
+    { href: "/", className },
+    h("img.rockd-icon", { src: "/rockd-icon-256.png" })
+  );
 }

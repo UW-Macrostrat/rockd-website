@@ -2,31 +2,34 @@ import h from "./main.module.sass";
 import { useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "@macrostrat/map-interface/dist/map-interface.css";
 import {
   BlankImage,
   getProfilePicUrl,
   Image,
   Comments,
+  RockdSiteIcon,
 } from "~/components";
 import "@macrostrat/style-system";
 import { rockdApiURL, SETTINGS } from "~/settings";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import { Divider, Icon, Overlay2, Spinner } from "@blueprintjs/core";
 import {
-  MapAreaContainer,
-  MapMarker,
-  MapView,
-  PanelCard,
-} from "@macrostrat/map-interface";
-import { useMapRef } from "@macrostrat/mapbox-react";
-import { map } from "underscore";
+  Button,
+  ButtonGroup,
+  Divider,
+  Icon,
+  Overlay2,
+  Spinner,
+} from "@blueprintjs/core";
+import { MapView, PanelCard } from "@macrostrat/map-interface";
+import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
 import { createCheckins } from "~/components/checkin.client";
 
 export function Trips({ data, commentsData }) {
-  const [showSatelite, setSatelite] = useState(false);
+  const [showSatellite, setShowSatellite] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  const style = useMapStyle({ showSatelite });
+  const style = useMapStyle({ showSatellite });
 
   // format date
   const trip = data.trip_id;
@@ -38,8 +41,11 @@ export function Trips({ data, commentsData }) {
   };
   data.updated = date.toLocaleDateString("en-US", options);
 
-  const toolbar = h(Toolbar, { showSatelite, setSatelite });
-  const sidebar = h(SideBar, { data, commentsData, mapLoaded });
+  const toolbar = h(Toolbar, {
+    showSatellite,
+    setShowSatellite,
+  });
+  const sidebar = h(Sidebar, { data, commentsData, mapLoaded });
 
   if (!sidebar) {
     return h("div", { className: "loading" }, [h("h1", "Loading trip...")]);
@@ -54,45 +60,35 @@ export function Trips({ data, commentsData }) {
     },
   };
 
-  return h("div", { className: "body" }, [
-    h("div.map-container", [
-      // The Map Area Container
-      h(
-        MapAreaContainer,
-        {
-          className: "map-area-container",
-          style: { paddingRight: "calc(30% + 14px)" },
-        },
-        [
-          h(MapView, {
-            style: style,
-            mapboxToken: SETTINGS.mapboxAccessToken,
-            mapPosition: newMapPosition,
-            onMapLoaded: () => {
-              setMapLoaded(true);
-            },
-          }),
-          sidebar,
-        ]
-      ),
+  return h(MapboxMapProvider, [
+    h("div.trips-page", [
+      h("div.map-area", [
+        h(MapView, {
+          className: "map-view",
+          style: style,
+          mapboxToken: SETTINGS.mapboxAccessToken,
+          mapPosition: newMapPosition,
+          onMapLoaded: () => {
+            setMapLoaded(true);
+          },
+        }),
+        toolbar,
+      ]),
+      h("div.sidebar-area", [sidebar]),
     ]),
-    toolbar,
   ]);
 }
 
-function Toolbar({ showSatelite, setSatelite }) {
+function Toolbar({ showSatellite, setShowSatellite }) {
   const [showSettings, setSettings] = useState(false);
 
   return h(PanelCard, { className: "toolbar" }, [
     h("div.toolbar-header", [
-      h(
-        "a",
-        { href: "/" },
-        h(Image, { className: "home-icon", src: "favicon-32x32.png" })
-      ),
-      h(Icon, {
+      h(RockdSiteIcon, { className: "site-icon" }),
+      h(Button, {
         className: "settings-icon",
         icon: "settings",
+        minimal: true,
         onClick: () => {
           setSettings(!showSettings);
         },
@@ -101,34 +97,33 @@ function Toolbar({ showSatelite, setSatelite }) {
     h("div", { className: showSettings ? "settings-content" : "hide" }, [
       h(Divider, { className: "divider" }),
       h("div", { className: "settings" }, [
-        h(DarkModeButton, { className: "dark-btn", showText: true }),
-        h(
-          PanelCard,
-          {
-            className: "map-style",
-            onClick: () => {
-              setSatelite(!showSatelite);
+        h(ButtonGroup, { vertical: true }, [
+          h(DarkModeButton, { className: "dark-btn", showText: true }),
+          h(
+            Button,
+            {
+              onClick: () => {
+                setShowSatellite(!showSatellite);
+              },
+              icon: "satellite",
             },
-          },
-          [
-            h(Icon, { className: "satellite-icon", icon: "satellite" }),
-            h("p", "Satellite"),
-          ]
-        ),
+            "Satellite"
+          ),
+        ]),
       ]),
     ]),
   ]);
 }
 
-function useMapStyle({ showSatelite }) {
-  return showSatelite
+function useMapStyle({ showSatellite }) {
+  return showSatellite
     ? SETTINGS.satelliteMapURL
     : useDarkMode()?.isEnabled
     ? SETTINGS.darkMapURL
     : SETTINGS.whiteMapURL;
 }
 
-function SideBar({ data, commentsData, mapLoaded }) {
+function Sidebar({ data, commentsData, mapLoaded }) {
   const mapRef = useMapRef();
   const map = mapRef.current;
   const profile_pic = h(BlankImage, {

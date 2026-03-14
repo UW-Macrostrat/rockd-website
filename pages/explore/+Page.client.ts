@@ -12,9 +12,9 @@ import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import { useCallback, useEffect, useState, type ReactElement } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { pageCarousel, useRockdAPI } from "~/components";
+import { pageCarousel, RockdSiteIcon, useRockdAPI } from "~/components";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
@@ -22,8 +22,6 @@ import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "./map-style";
 import { atom, useAtom } from "jotai";
-
-import { type ReactNode } from "react";
 
 interface SidebarProps {
   title: string;
@@ -266,14 +264,6 @@ function ToolButton({ icon, onClick }) {
     minimal: true,
     onClick,
   });
-}
-
-function RockdSiteIcon({ className }) {
-  return h(
-    "a",
-    { href: "/", className },
-    h("img.rockd-icon", { src: "/rockd-icon-256.png" })
-  );
 }
 
 function ContextPanel() {
