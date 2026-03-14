@@ -1,5 +1,6 @@
 import h from "@macrostrat/hyper";
 import { usePageContext } from "vike-react/usePageContext";
+import { GoogleFonts } from "~/styles";
 
 export default function Head() {
   const ctx = usePageContext();
@@ -36,10 +37,11 @@ export default function Head() {
       href: "/rockd-icon-256.png",
     }),
     h("link", { rel: "manifest", href: "/site.webmanifest" }),
-    h("link", {
-      href: "https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro",
-      rel: "stylesheet",
-    }),
+    h(GoogleFonts),
+    // h("link", {
+    //   href: "https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro",
+    //   rel: "stylesheet",
+    // }),
     h("meta", { name: "description", content: "Rockd" }),
     h("script", {
       type: "text/javascript",

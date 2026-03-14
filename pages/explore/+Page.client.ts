@@ -43,10 +43,27 @@ function Sidebar({
   showCloseButton = true,
 }: SidebarProps) {
   const _showCloseButton = showCloseButton && onClose != null;
+  const [showSettings, setShowSettings] = useAtom(showSettingsAtom);
+  const [showFilter, setShowFilter] = useAtom(showFilterAtom);
   return h("div.sidebar", [
     h(Navbar, { className: "sidebar-header" }, [
-      h("div.sidebar-header-left", [h(Toolbar), h("h1.page-title", title)]),
-      h.if(_showCloseButton)(Button, { icon: "cross" }),
+      h(RockdSiteIcon, { className: "site-icon" }),
+      h("h1.page-title", title),
+      h("div.tools", [
+        h(ToolButton, {
+          icon: "filter",
+          onClick: () => {
+            setShowFilter(!showFilter);
+          },
+        }),
+        h(ToolButton, {
+          icon: "settings",
+          onClick: () => {
+            setShowSettings(!showSettings);
+          },
+        }),
+        h.if(_showCloseButton)(ToolButton, { icon: "cross", onClick: onClose }),
+      ]),
     ]),
     h("div.sidebar-content", children as any),
   ]);
@@ -73,8 +90,8 @@ const showFilterAtom = atom(false);
 const autocompleteOpenAtom = atom(false);
 
 export function Page() {
-  const [showSatellite, setShowSatellite] = useState(false);
-  const [showOverlay, setOverlay] = useState(true);
+  const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
+  const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const style = useMapStyle(
     type,
     mapboxAccessToken,
@@ -82,8 +99,8 @@ export function Page() {
     showOverlay
   );
   const [selectedCheckin, setSelectedCheckin] = useState(null);
-  const [showSettings, setSettings] = useState(false);
-  const [showFilter, setFilter] = useState(false);
+  const [showSettings, setSettings] = useAtom(showSettingsAtom);
+  const [showFilter, setFilter] = useAtom(showFilterAtom);
   const [filteredData, setFilteredData] = useState(null);
   const [autocompleteOpen, setAutocompleteOpen] = useAtom(autocompleteOpenAtom);
 
@@ -243,26 +260,20 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
   return actualStyle;
 }
 
-function Toolbar() {
-  const [showSettings, setShowSettings] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
-  return h("div.toolbar-header", [
-    h("a", { href: "/" }, h("img.rockd-icon", { src: "/rockd-icon-256.png" })),
-    h(Icon, {
-      className: "settings-icon",
-      icon: "filter",
-      onClick: () => {
-        setShowFilter(!showFilter);
-      },
-    }),
-    h(Icon, {
-      className: "settings-icon",
-      icon: "settings",
-      onClick: () => {
-        setShowSettings(!showSettings);
-      },
-    }),
-  ]);
+function ToolButton({ icon, onClick }) {
+  return h(Button, {
+    icon,
+    minimal: true,
+    onClick,
+  });
+}
+
+function RockdSiteIcon({ className }) {
+  return h(
+    "a",
+    { href: "/", className },
+    h("img.rockd-icon", { src: "/rockd-icon-256.png" })
+  );
 }
 
 function ContextPanel() {

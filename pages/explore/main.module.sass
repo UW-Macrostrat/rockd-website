@@ -27,14 +27,25 @@
   flex-grow: 1
 
 .rockd-icon
-  height: 50px
-  width: 50px
+  height: 45px
+  width: 45px
 
 .sidebar-header
   border-radius: 0 !important
   display: flex
   flex-direction: row
   background-color: var(--panel-background-color) !important
+  gap: 5px
+  align-items: center
+
+  .page-title
+    margin: 0
+    flex-grow: 1
+
+  .site-icon
+    display: block
+    margin-left: -1em
+
 
 .sidebar
   height: 100vh
@@ -44,11 +55,6 @@
   flex-direction: column
   border-right: 1px solid var(--panel-rule-color)
   background: var(--panel-background-color)
-
-  .title
-
-    h1
-      padding: 0
 
 
 .marker
