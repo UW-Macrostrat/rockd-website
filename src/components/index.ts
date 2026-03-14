@@ -1,12 +1,8 @@
-import {
-  DarkModeButton,
-  useAPIResult,
-  useDarkMode,
-} from "@macrostrat/ui-components";
-import { Divider, Icon } from "@blueprintjs/core";
+import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
+import { AnchorButton, Button, Divider, Icon } from "@blueprintjs/core";
 import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
 import { useState } from "react";
-import h from "#/explore/main.module.sass";
+import h from "./index.module.sass";
 
 export function Footer() {
   const footerLinks1 = [
@@ -38,42 +34,26 @@ export function Footer() {
         ),
       ]),
     ]),
-    h("div.footer-links", [
-      h(
-        "ul",
-        footerLinks1.map((props) => h(FooterLink, props))
-      ),
-      h(
-        "ul",
-        footerLinks2.map((props) => h(FooterLink, props))
-      ),
-    ]),
-    h("div.dark-mode", [
-      h(DarkModeButton, { className: "dark-mode-button", showText: true }),
+    h(
+      "ul.footer-links",
+      footerLinks1.map((props) => h(FooterLink, props))
+    ),
+    h(
+      "ul.footer-links",
+      footerLinks2.map((props) => h(FooterLink, props))
+    ),
+    h("div.controls", [
+      h(DarkModeButton, {
+        className: "dark-mode-button",
+        showText: true,
+        minimal: true,
+      }),
     ]),
   ]);
 }
 
 function FooterLink({ href, icon, text }) {
-  const isDarkMode = useDarkMode().isEnabled;
-
-  return h(
-    "li",
-    {
-      onClick: (e) => {
-        e.preventDefault();
-        window.open(href, "_self");
-      },
-    },
-    [
-      h(Icon, {
-        className: "footer-icon",
-        icon,
-        style: { color: isDarkMode ? "black" : "white" },
-      }),
-      h("p", text),
-    ]
-  );
+  return h("li", h(AnchorButton, { href, icon, minimal: true }, text));
 }
 
 export function Image(props: ImageProps) {
@@ -162,38 +142,30 @@ export function getProfilePicUrl(person_id) {
   return apiURL + "/protected/gravatar/" + person_id;
 }
 
-export function pageCarousel({ page, setPage, nextData }) {
-  return h(
-    "div.pages",
-    h("div.page-container", [
-      h("div", { className: "page-btn" }, [
-        h(
-          "div",
-          {
-            className: page != 1 ? "btn-content" : "hide",
-            onClick: () => {
-              setPage(page - 1);
-            },
-          },
-          [h(Icon, { icon: "arrow-left" }), h("p", "Previous")]
-        ),
-      ]),
-      h("p", "Page " + page),
-      h("div", { className: "page-btn" }, [
-        h(
-          "div",
-          {
-            className:
-              nextData && nextData?.length > 0 ? "btn-content" : "hide",
-            onClick: () => {
-              setPage(page + 1);
-            },
-          },
-          [h("p", "Next"), h(Icon, { icon: "arrow-right" })]
-        ),
-      ]),
-    ])
-  );
+export function PageCarousel({ page, setPage, nextData }) {
+  return h("div.page-carousel", [
+    h(
+      Button,
+      {
+        icon: "arrow-left",
+        minimal: true,
+        className: page != 1 ? "page-btn" : "hide",
+        onClick: () => setPage(page - 1),
+      },
+      "Previous"
+    ),
+    h("span.page-number", "Page " + page),
+    h(
+      Button,
+      {
+        rightIcon: "arrow-right",
+        minimal: true,
+        className: nextData && nextData?.length > 0 ? "page-btn" : "hide",
+        onClick: () => setPage(page + 1),
+      },
+      "Next"
+    ),
+  ]);
 }
 
 export async function fetchAPIData(url) {

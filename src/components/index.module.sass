@@ -1,37 +1,19 @@
 .footer
   display: flex
-  background-color: var(--panel-background-color)
-  text-align: center
-  color: var(--text-emphasized-color)
-  padding: 25px 0
-  height: 25vh
-  border-top: 2px solid var(--text-emphasized-color)
-  padding: 0 20%
-
-  a
-    color: var(--text-emphasized-color) !important
-
+  padding: 2em 2em 4em
+  margin: 0 auto
+  max-width: calc(var(--page-content-width) + 4em)
+  gap: 2em
+  align-items: center
+  justify-content: space-between
 
   ul
     list-style-type: none
-    display: flex
-    gap: 10px
-    flex-direction: column
-
-    li
-      p
-        margin-bottom: 0
-
-  a
-    color: var(--panel-text)
-    font-weight: bold
-
-  a:hover
-    color: var(--panel-text)
+    padding-left: 0
 
   .footer-text
     font-size: 24px
-    font-weight: 500
+    font-weight: 400
 
     .upper
       margin-bottom: 0
@@ -46,29 +28,11 @@
     display: flex
     justify-content: center
     gap: 30px
-    height: 25vh
     flex-direction: column
     width: 100%
 
     h3
       margin: 0
-
-  .footer-links
-    display: flex
-    width: 100%
-    color: var(--text-emphasized-color)
-    margin: 0
-    justify-content: center
-    align-items: center
-    padding-inline-start: 0px
-
-    .footer-icon
-      filter: var(--anti-img-color)
-
-    li
-      display: flex
-      gap: 5px
-      cursor: pointer
 
 .row
   width: 100%
@@ -129,35 +93,12 @@
     left: 50%
     color: white
 
-.dark-mode
+.page-carousel
   display: flex
-  align-items: center
-
-.pages
-  margin: 10px 0
-  width: 100%
-  display: flex
-  text-align: center
   justify-content: center
-
-  .page-container
-    display: grid
-    grid-template-columns: 100px 50px 100px
-    color: var(--text-emphasized-color)
-
-    .btn-content
-      display: flex
-      gap: 5px
-      align-items: center
-      justify-content: center
-      cursor: pointer
-
-    p
-      margin: 0
-      text-align: center
-
-.icon-dark-mode
-  filter: invert(1)
+  gap: 10px
+  align-items: center
+  margin: 10px 0
 
 .hide
   display: none

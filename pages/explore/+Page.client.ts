@@ -14,7 +14,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { pageCarousel, RockdSiteIcon, useRockdAPI } from "~/components";
+import { PageCarousel, RockdSiteIcon, useRockdAPI } from "~/components";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
@@ -130,7 +130,7 @@ export function Page() {
     filteredData: filteredData?.current,
     setInspectPosition,
   });
-  const filteredPages = pageCarousel({
+  const filteredPages = PageCarousel({
     page: filteredData?.next.page,
     setPage: filteredData?.next.setPage,
     nextData: filteredData?.next.data,

@@ -2,7 +2,7 @@ import { useMapPosition, useMapRef } from "@macrostrat/mapbox-react";
 import { Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { pageCarousel, fetchRockdData } from "~/components";
+import { PageCarousel, fetchRockdData } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
 import { useAsyncMemo } from "@macrostrat/ui-components";
 
@@ -54,7 +54,7 @@ export function FeatureDetails({ setInspectPosition }) {
   if (result == null || result.length === 0)
     return h(Spinner, { className: "loading-spinner" });
 
-  const pages = pageCarousel({
+  const pages = PageCarousel({
     page,
     setPage,
     nextData,
