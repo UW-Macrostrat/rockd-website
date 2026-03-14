@@ -1,28 +1,28 @@
 
 .main-page
   --max-content-width: 1200px
+  --page-content-width: 1200px
+
+.contents
+  max-width: var(--max-content-width)
+  margin: 0 auto
 
 .full-height-container
   min-height: 100vh
   width: 100%
   display: flex
+  flex-flow: row wrap
   align-items: center
-  justify-content: center
+  justify-content: space-around
   padding: 2em
   position: relative
+  gap: 2em
 
   .down-indicator-container
     position: absolute
     bottom: 2em
     right: 2em
     z-index: 100
-
-// Headline Align
-.headline-aligner
-  display: flex
-  align-items: center
-  justify-content: center
-  height: 100%
 
 // Center Content
 .app-info
@@ -51,17 +51,14 @@
     a:hover
       color: white
 
-// Images
-img
-  width: 100%
 
 .dashboard-img-container
-  width: 100%
+  margin: 2em 0
   display: flex
   flex-flow: row wrap
+  max-width: calc(4 * 160px + 6em)
+  gap: 2em
   justify-content: center
-  margin-top: 40px
-
   img
     max-width: 160px
 
@@ -86,6 +83,12 @@ img
   height: 100%
   background-size: cover
   background-repeat: no-repeat
+
+.map-info
+  flex: 1
+  max-width: 50%
+  min-width: 200px
+  text-align: center
 
 .back-img
   opacity: 0.3
@@ -117,28 +120,6 @@ img
   overflow-x: hidden
   background-color: #363434
 
-.record-img
-  height: 500px
-  width: auto
-
-.record-img-caption
-  margin-top: 10px
-  font-size: 90%
-  background-color: rgba(100, 100, 100, 0.5)
-  padding: 10px
-  border-radius: 4px
-
-// Full Width/Height
-.full-width
-  width: 100%
-
-.full-height
-  height: 100%
-
-// Footer
-.footer
-  padding: 0 5%
-
 // Mask
 .mask
   height: 100%
@@ -152,36 +133,22 @@ img
 // Background Image
 .back-img
   position: absolute
+  object-fit: cover
+  height: 100vh
+  width: 100%
 
 .img-container
-  position: absolute
-  z-index: 2
-  display: grid
-  margin: auto
-  grid-template-columns: 50% 50%
-  padding: 30px
-
-.image-mask
-  position: absolute
-  z-index: 2
-  background-color: rgba(0, 0, 0, 0.6)
-  height: 100vh
-  width: 100%
-
-.start-img
-  height: 100vh
-  width: 100%
-  object-fit: cover
-
-.red-rock-img
-  object-fit: cover
-  height: 100vh
+  display: flex
+  flex-flow: row wrap
+  justify-content: center
+  align-items: center
+  gap: 1em
+  z-index: 1
+  &>*
+    max-width: 100%
 
 .profile-img
-  width: 300px
-
-.record-block-img
-  width: 300px
+  max-width: 300px
 
 .map-imgs
   display: grid
@@ -201,10 +168,14 @@ img
   justify-content: center
   align-items: center
   &>*
-    max-width: 600px
+    max-width: min(600px, 100%)
+    flex: 1
   //flex-direction: row
   //display: grid
   //grid-template-columns: 100%
+
+img
+  max-width: 100%
 
 // Center Me
 .center-me
@@ -219,12 +190,30 @@ img
 
 
 .image-grid
-  display: grid
-  margin: auto
-  grid-template-columns: 50% 50%
+  margin: 2em auto
+  display: flex
+  flex-flow: row wrap
+  //grid-template-columns: 50% 50%
+  gap: 2em
+  justify-content: center
+  max-width: var(--max-content-width)
 
-  .col-sm-6
-    padding: 30px
+.image-block
+  width: max(30vw, 160px)
+  position: relative
+  .image-container
+    display: grid
+    grid-template-rows: 1fr auto
+    grid-template-columns: 1fr
+    img
+      max-width: 100%
+      max-height: 40vh
+      object-fit: contain
+      margin: auto
+
+  .caption
+    text-align: center
+    min-width: 100px
 
 .download-buttons
   display: grid

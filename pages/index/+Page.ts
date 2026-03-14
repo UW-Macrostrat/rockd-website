@@ -116,15 +116,15 @@ export function Page() {
           className: "map-shot appalachia",
         }),
       ]),
-      h("div.center.map-info", [
+      h("div.map-info", [
         h("h1", [
-          "Instant access to more than 290 ",
+          "Instant access to hundreds of ",
           h(
             "a",
             { href: "https://macrostrat.org/map/sources" },
             "geologic maps"
           ),
-          " globally",
+          " from around the world.",
         ]),
         h("p", [
           "Includes direct links to ",
@@ -136,19 +136,13 @@ export function Page() {
       ]),
     ]),
     h(FullHeightContainer, { className: "dashboard-container" }, [
-      h("div.row", [
-        h("div.col-sm-6.col-sm-offset-3", [
-          h("div.headline-alligner", [
-            h("div.center.curious", [
-              h("h1", "Curious what you're standing on?"),
-              h(
-                "p",
-                "The Dashboard distills key facts about your location into a single, easy-to-read interface"
-              ),
-            ]),
-          ]),
-        ]),
-        h("div.col-xs-12.dashboard-img-container", [
+      h("div.contents", [
+        h("h1", "Curious what you're standing on?"),
+        h(
+          "p",
+          "The Dashboard distills key facts about your location into a single, easy-to-read interface"
+        ),
+        h("div.dashboard-img-container", [
           h(Image, { src: "main-page/pilbara-australia.png" }),
           h(Image, { src: "main-page/huronian-supergroup.png" }),
           h(Image, { src: "main-page/copper-harbor.png" }),
@@ -166,105 +160,67 @@ export function Page() {
       }),
 
       h("div.img-container.row.row-eq-height", [
-        h("div.col-sm-6.stats-container", [
-          h(Image, { src: "main-page/profile.png", className: "profile-img" }),
-        ]),
-
-        h("div.col-sm-6.center-me", [
-          h("div.headline-aligner", [
-            h("div.center", [
-              h(
-                "h1",
-                '"The best geologist is the one who has seen the most rocks"'
-              ),
-              h(
-                "p",
-                "Track your progress through the geologic rock record with summary statistics about your checkins"
-              ),
-            ]),
-          ]),
+        h(Image, { src: "main-page/profile.png", className: "profile-img" }),
+        h("div.map-info", [
+          h(
+            "h1",
+            '"The best geologist is the one who has seen the most rocks"'
+          ),
+          h(
+            "p",
+            "Track your progress through the geologic rock record with summary statistics about your checkins"
+          ),
         ]),
       ]),
     ]),
     h(FullHeightContainer, { showNextIndicator: false }, [
-      h("div.row", [
-        h("div.col-sm-6.col-sm-offset-3", [
-          h("div.headline-aligner", [
-            h("div.center", [
-              h("h1", "Record your observations"),
-              h(
-                "p",
-                "Rockd allows you to easily record your geological observations, using your location to provide spatially informed suggestions for nearby geologic units, time intervals, and fossils"
-              ),
-            ]),
-          ]),
-        ]),
+      h("div.contents", [
+        h("h1", "Record your observations"),
+        h(
+          "p",
+          "Rockd allows you to easily record your geological observations, using your location to provide spatially informed suggestions for nearby geologic units, time intervals, and fossils"
+        ),
 
         h("div.image-grid", [
-          h("div.col-sm-6", [
-            h("div.headline-aligner", [
-              h("div.center.left", [
-                h(Image, {
-                  src: "main-page/checkin.png",
-                  className: "record-block-img",
-                }),
-                h(
-                  "p.record-img-caption",
-                  h("span", "Take pictures of and rate features")
-                ),
-              ]),
-            ]),
-          ]),
+          h(
+            ImageBlock,
+            {
+              src: "main-page/checkin.png",
+            },
+            h("span", "Take pictures of and rate features")
+          ),
 
-          h("div.col-sm-6", [
-            h("div.headline-aligner", [
-              h("div.center.right", [
-                h(Image, {
-                  src: "main-page/strat-names.png",
-                  className: "record-block-img",
-                }),
-                h(
-                  "p.record-img-caption",
-                  h("span", "Tag stratigraphic names, even offline")
-                ),
-              ]),
-            ]),
-          ]),
+          h(
+            ImageBlock,
+            {
+              src: "main-page/strat-names.png",
+              className: "right",
+            },
+            h("span", "Tag stratigraphic names, even offline")
+          ),
 
-          h("div.col-sm-6", [
-            h("div.headline-aligner", [
-              h("div.center.left", [
-                h(Image, {
-                  src: "main-page/strike-dip.png",
-                  className: "record-block-img",
-                }),
-                h(
-                  "p.record-img-caption",
-                  h("span", "Use your phone's compass to record strike and dip")
-                ),
-              ]),
-            ]),
-          ]),
-
-          h("div.col-sm-6", [
-            h("div.headline-aligner", [
-              h("div.center.right", [
-                h(Image, {
-                  src: "main-page/taxa.png",
-                  className: "record-block-img",
-                }),
-                h("p.record-img-caption", [
-                  h("span", "Search for and tag "),
-                  h(
-                    "a",
-                    { href: "https://paleobiodb.org" },
-                    "Paleobiology Database"
-                  ),
-                  h("span", " taxa."),
-                ]),
-              ]),
-            ]),
-          ]),
+          h(
+            ImageBlock,
+            {
+              src: "main-page/strike-dip.png",
+            },
+            h("span", "Use your phone's compass to record strike and dip")
+          ),
+          h(
+            ImageBlock,
+            {
+              src: "main-page/taxa.png",
+            },
+            [
+              h("span", "Search for and tag "),
+              h(
+                "a",
+                { href: "https://paleobiodb.org" },
+                "Paleobiology Database"
+              ),
+              h("span", " taxa."),
+            ]
+          ),
         ]),
       ]),
     ]),
@@ -273,15 +229,13 @@ export function Page() {
 }
 
 function ImageBlock({ src, alt, className, children }) {
-  return h("div.col-sm-6", { className }, [
-    h("div.headline-aligner", [
-      h("div.center.left", [
-        h(Image, {
-          src,
-          className: "record-block-img",
-        }),
-        h("div.record-img-caption", children),
-      ]),
+  return h("div.image-block", { className }, [
+    h("div.image-container", [
+      h(Image, {
+        src,
+        className: "record-block-img",
+      }),
+      h("div.caption", children),
     ]),
   ]);
 }
