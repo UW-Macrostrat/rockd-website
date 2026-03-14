@@ -1,7 +1,7 @@
 import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
 import { AnchorButton, Button, Divider, Icon } from "@blueprintjs/core";
 import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import h from "./index.module.sass";
 
 export function Footer() {
@@ -19,18 +19,42 @@ export function Footer() {
 
   return h("div.footer", [
     h("div.titles", [
-      h("h3.footer-text.upper", [
-        "Produced by the ",
-        h("a", { href: "https://macrostrat.org" }, "UW Macrostrat Lab"),
+      h(
+        "a.footer-logo-link",
+        {
+          href: "/",
+          onClick: (e) => {
+            // If we're already on the homepage, scroll to top
+            console.log(window.location.pathname);
+            if (window.location.pathname == "/") {
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }
+          },
+        },
+        h(Image, {
+          src: "main-page/rockd_transparent.png",
+          className: "footer-logo",
+          alt: "Logo",
+        })
+      ),
+      h("p", [
+        "Produced by ",
+        h("a", { href: "https://macrostrat.org" }, "Macrostrat"),
       ]),
-      h("h3.footer-text.lower", [
+      h("p", [
         "Funded by ",
         h("a", { href: "https://nsf.gov" }, "NSF"),
-        " and ",
+        ", ",
+        "the ",
+        h("a", { href: "" }, "AAPG Foundation"),
+        " and the ",
         h(
           "a",
           { href: "http://geoscience.wisc.edu/geoscience/" },
-          "UW Geoscience"
+          "University of Wisconsin Department of Geoscience"
         ),
       ]),
     ]),

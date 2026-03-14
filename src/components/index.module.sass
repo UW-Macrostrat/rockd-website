@@ -24,16 +24,6 @@
       &:hover
         color: var(--panel-text)
 
-  .titles
-    display: flex
-    justify-content: center
-    gap: 30px
-    flex-direction: column
-    width: 100%
-
-    h3
-      margin: 0
-
 .row
   width: 100%
 
@@ -42,6 +32,19 @@
   display: grid
   margin: auto
   margin-right: 0
+
+.footer-logo-link
+  display: block
+  margin-bottom: 1em
+  .footer-logo
+    opacity: 0.5
+  &:hover
+    .footer-logo
+      opacity: 1
+
+
+.footer-logo
+  width: 200px
 
 .no-image
   color: var(--text-emphasized-color) !important

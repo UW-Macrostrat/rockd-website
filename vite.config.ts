@@ -45,7 +45,7 @@ export default defineConfig({
   },
   plugins: [react(), hyperStyles(), vike()],
   ssr: {
-    noExternal: macrostratPackages,
+    noExternal: [...macrostratPackages, "mapbox-gl"],
   },
   css: {
     preprocessorOptions: {

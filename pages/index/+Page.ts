@@ -19,7 +19,10 @@ export function Page() {
                   className: "not-huge",
                   alt: "Logo",
                 }),
-                h("p", "Learn, explore, and document your geologic world"),
+                h(
+                  "p.tagline",
+                  "Learn about, explore, and document the geologic world"
+                ),
                 h("div.download-buttons", [
                   h(
                     "a.ios-container",

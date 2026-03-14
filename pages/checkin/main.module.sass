@@ -1,29 +1,48 @@
-.main
-  background-color: var(--background-color)
-  padding: 0 20% 5vh 20%
-  margin: 0
-  min-height: 74vh
+.container
+  --page-content-width: 960px
 
-h1, p
-  padding: 0
-  margin: 0
+.content-area
+  min-height: 100vh
+  margin: 0 auto
+  max-width: var(--page-content-width)
+  display: flex
+  flex-direction: column
+  justify-content: space-between
+
+.checkin-header-content
+  display: flex
+  flex-direction: row
+  gap: 2em
+  align-items: start
+
+
+
+.location-img-container
+  flex: 1
+  height: 200px
+  position: relative
+  min-width: 200px
+
+.title-area
+  display: flex
+  flex-direction: row
+  gap: 1em
+  align-items: center
+
+.site-icon img
+  width: 45px
+  height: 45px
 
 .location-img
   position: absolute
-  z-index: 1
-  width: 60%
-  height: 25vh
   object-fit: cover
+  width: 100%
+  height: 100%
 
 .stop-header
   display: flex
-  margin: auto
-  position: absolute
-  z-index: 2
-  background-color: var(--translucent-background)
-  width: 60%
-  height: 25vh
-  align-items: center
+  gap: 2em
+  align-items: start
   cursor: pointer
 
 .profile-header
@@ -40,7 +59,6 @@ h1, p
   display: flex
   flex-direction: column
   text-align: left
-  color: black
 
   h3
     margin: 0
@@ -52,9 +70,6 @@ h1, p
 .marker
   height: 15px
 
-h4
-  padding: 0
-  margin: 0
 
 .checkin-head
   padding: 30px 0
@@ -86,7 +101,7 @@ h4
   font-style: italic
 
 .observations
-  margin-top: 27vh
+  margin-top: 4em
   display: flex
   flex-wrap: wrap
   width: 100%

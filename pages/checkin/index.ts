@@ -1,21 +1,23 @@
 import { LngLatCoords } from "@macrostrat/data-components";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import {
   BlankImage,
   Footer,
   getProfilePicUrl,
   getImageUrl,
   Comments,
+  RockdSiteIcon,
 } from "~/components";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
-import { rockdApiOldURL, SETTINGS } from "~/settings";
+import { SETTINGS } from "~/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
 import { macrostratApiURL } from "~/settings";
 import { ContentPage } from "~/layouts";
+import "@macrostrat/data-components/dist/data-components.css";
 
 function Map(props) {
   return h(
@@ -74,11 +76,7 @@ export function Checkins({ checkin, comments }) {
 
   // add checkin photo and notes
   const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
-  const headerBody = h(
-    "h4",
-    { className: "observation-header" },
-    checkin.notes
-  );
+  const headerBody = h("h4.observation-header", checkin.notes);
 
   observations.push(
     h.if(checkin.photo || checkin.notes)("div", { className: "observation" }, [
@@ -100,8 +98,6 @@ export function Checkins({ checkin, comments }) {
     // if photo exists
     const imageSrc = getImageUrl(checkin.person_id, observation.photo);
 
-    console.log("Observation data:", observation);
-
     observations.push(
       h.if(
         observation.photo ||
@@ -110,7 +106,7 @@ export function Checkins({ checkin, comments }) {
           !objectNull(observation.fossils) ||
           !objectNull(observation.minerals) ||
           !objectNull(observation.rocks)
-      )("div", { className: "observation" }, [
+      )("div.observation", [
         h.if(observation.photo)(
           "a",
           { href: "/photo/" + observation.photo },
@@ -130,40 +126,43 @@ export function Checkins({ checkin, comments }) {
     zoom: 10,
   };
 
-  let main = h("div", { className: "container" }, [
-    h("div", { className: "main" }, [
-      h("div", { className: "checkin-head" }, [
-        h("h1", checkin.notes),
-        checkin.spot_id != null &&
-          h(
-            "a",
-            {
-              className: "strabo-link",
-              href: "https://strabospot.org",
-              target: "_blank",
-              rel: "noopener noreferrer",
-            },
-            "via StraboSpot"
-          ),
+  return h("div.container", [
+    h("div.content-area", [
+      h("div", { className: "main" }, [
+        h("div", { className: "checkin-head" }, [
+          h("div.title-area", [
+            h(RockdSiteIcon, { className: "site-icon" }),
+            h("h1", checkin.notes),
+          ]),
+          checkin.spot_id != null &&
+            h(
+              "a",
+              {
+                className: "strabo-link",
+                href: "https://strabospot.org",
+                target: "_blank",
+                rel: "noopener noreferrer",
+              },
+              "via StraboSpot"
+            ),
+        ]),
+        h(Overlay, {
+          checkin,
+          center,
+          LngLatProps,
+          ratingArr,
+          profile_pic,
+        }),
+        h("div", { className: "observations" }, observations),
       ]),
-      h(Overlay, {
-        checkin,
-        center,
-        LngLatProps,
-        ratingArr,
-        profile_pic,
-      }),
-      h("div", { className: "observations" }, observations),
+      h.if(comments?.length > 0)("div.comments-container", [
+        h("h2", "Comments"),
+        h(Divider),
+        h(Comments, { comments }),
+      ]),
+      h(Footer),
     ]),
-    h.if(comments?.length > 0)("div.comments-container", [
-      h("h2", "Comments"),
-      h(Divider),
-      h(Comments, { comments }),
-    ]),
-    h(Footer),
   ]);
-
-  return main;
 }
 
 function Overlay({ checkin, center, LngLatProps, ratingArr, profile_pic }) {
@@ -171,44 +170,47 @@ function Overlay({ checkin, center, LngLatProps, ratingArr, profile_pic }) {
   const map = h(Map, { center, setOverlayOpen });
 
   return h("div.overlay", [
-    h.if(!overlayOpen)(BlankImage, {
-      className: "location-img",
-      src:
-        "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" +
-        checkin.lng +
-        "%2C" +
-        checkin.lat +
-        "%5D%7D)/" +
-        checkin.lng +
-        "," +
-        checkin.lat +
-        ",5,0/1200x400?access_token=" +
-        SETTINGS.mapboxAccessToken,
-    }),
-    h.if(!overlayOpen)(
-      "div",
-      {
-        className: "stop-header",
-        onClick: () => {
-          setOverlayOpen(true);
-          console.log("center", center);
+    h.if(!overlayOpen)("div.checkin-header-content", [
+      h(
+        "div.stop-header",
+        {
+          onClick: () => {
+            setOverlayOpen(true);
+          },
         },
-      },
-      [
-        profile_pic,
-        h("div", { className: "stop-main-info" }, [
-          h(
-            "h3",
-            { className: "name" },
-            checkin.first_name + " " + checkin.last_name
-          ),
-          h("h4", { className: "edited" }, checkin.created),
-          h("p", { className: "location" }, [h("p", "Near " + checkin.near)]),
-          LngLatCoords(LngLatProps),
-          h("h3", { className: "rating" }, ratingArr),
-        ]),
-      ]
-    ),
+        [
+          profile_pic,
+          h("div.stop-main-info", [
+            h(
+              "h3",
+              { className: "name" },
+              checkin.first_name + " " + checkin.last_name
+            ),
+            h("h4", { className: "edited" }, checkin.created),
+            h("p.location", "Near " + checkin.near),
+            LngLatCoords(LngLatProps),
+            h("h3", { className: "rating" }, ratingArr),
+          ]),
+        ]
+      ),
+      h(
+        "div.location-img-container",
+        h(BlankImage, {
+          className: "location-img",
+          src:
+            "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" +
+            checkin.lng +
+            "%2C" +
+            checkin.lat +
+            "%5D%7D)/" +
+            checkin.lng +
+            "," +
+            checkin.lat +
+            ",5,0/800x400?access_token=" +
+            SETTINGS.mapboxAccessToken,
+        })
+      ),
+    ]),
     h(
       Overlay2,
       {
@@ -288,19 +290,22 @@ export function ObservationFooter({ observation }) {
   if (rocks.strat_name?.strat_name_long) {
     lithologies.push({
       name: rocks.strat_name?.strat_name_long,
-      strat_id: rocks.strat_name?.strat_name_id,
+      strat_name_id: rocks.strat_name?.strat_name_id,
     });
   }
 
   if (rocks.map_unit?.unit_name) {
     lithologies.push({
       name: rocks.map_unit?.unit_name,
+      unit_id: rocks.map_unit?.unit_id,
     });
   }
 
   if (observation.orientation.feature?.name) {
     lithologies.push({
       name: observation.orientation.feature?.name,
+      // Add an arbitrary ID to allow rendering
+      int_id: -1,
     });
   }
 
@@ -314,9 +319,9 @@ export function ObservationFooter({ observation }) {
     if (data.int_id) {
       window.open(macrostratApiURL + `/lex/intervals/${data.int_id}`, "_blank");
     }
-    if (data.strat_id) {
+    if (data.strat_name_id) {
       window.open(
-        macrostratApiURL + `/lex/strat-names/${data.strat_id}`,
+        macrostratApiURL + `/lex/strat-names/${data.strat_name_id}`,
         "_blank"
       );
     }
