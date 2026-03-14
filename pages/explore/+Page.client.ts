@@ -5,7 +5,9 @@ import {
   buildInspectorStyle,
   MapMarker,
   MapView,
+  MapAreaContainer,
 } from "@macrostrat/map-interface";
+import "@macrostrat/map-interface/dist/map-interface.css";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
@@ -204,7 +206,12 @@ export function Page() {
   };
 
   return h(
-    MapboxMapProvider,
+    MapAreaContainer,
+    {
+      detailStackProps: {
+        className: h["map-controls"],
+      },
+    },
     h("div.map-page", [
       overlay,
       h("div.map-container", [

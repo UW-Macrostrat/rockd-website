@@ -1,39 +1,42 @@
-p
-  line-height: 20px
 
-a
-  color: #fff
-  font-weight: bold
-  &:hover
-    color: #fff
-    text-decoration: underline
+.main-page
+  --max-content-width: 1200px
 
-
-// New Container
-.new_container
-  height: 100vh
+.full-height-container
+  min-height: 100vh
   width: 100%
   display: flex
   align-items: center
   justify-content: center
+  padding: 2em
+  position: relative
+
+  .down-indicator-container
+    position: absolute
+    bottom: 2em
+    right: 2em
+    z-index: 100
 
 // Headline Align
-.headline-alligner
+.headline-aligner
   display: flex
   align-items: center
   justify-content: center
   height: 100%
 
 // Center Content
-.center
+.app-info
+  display: flex
+  flex-direction: column
+  gap: 1em
   text-align: center
-  line-height: 35px
-  margin: auto
+
+  p.tagline
+    font-size: 1.2em
 
   p
     color: white
     a
-      font-size: 17px
       color: #dddddd
 
     a:hover
@@ -62,9 +65,6 @@ img
   img
     max-width: 160px
 
-.not-huge
-  max-width: 500px
-
 .row-eq-height
   display: -webkit-box
   display: -webkit-flex
@@ -87,6 +87,9 @@ img
   background-size: cover
   background-repeat: no-repeat
 
+.back-img
+  opacity: 0.3
+
 // Half Height Row
 .half-height-row
   height: 50%
@@ -95,21 +98,8 @@ img
   padding: 0
 
 // White Container
-.white-container
-  background-color: #fff
-  color: #777
-
-  a
-    color: #000
-    font-weight: bold
-
-    &:hover
-      color: #000
-      text-decoration: underline
-
-// Red Rock
-.red_rock
-  height: 100vh
+.dashboard-container
+  background-color: var(--secondary-background)
 
 // Stats Container
 .stats-img
@@ -159,21 +149,9 @@ img
   padding: 0 20px
   background-color: rgba(0, 0, 0, 0.6)
 
-// Center Me
-.center-me
-  display: flex
-  align-items: center
-  justify-content: center
-
-// Explore Link
-.explore-link
-  font-weight: 400
-  color: #dddddd
-
 // Background Image
 .back-img
   position: absolute
-  z-index: 1
 
 .img-container
   position: absolute
@@ -183,7 +161,7 @@ img
   grid-template-columns: 50% 50%
   padding: 30px
 
-.main-content
+.image-mask
   position: absolute
   z-index: 2
   background-color: rgba(0, 0, 0, 0.6)
@@ -210,19 +188,35 @@ img
   grid-template-columns: 50% 50%
   grid-template-rows: 25vh 25vh
 
-.curious
-  h1
-    color: #363434
-  p
-    color: #363434
+.main-content
+  position: absolute
+  z-index: 2
+  width: 100%
+  padding: 2em
 
-.side
-  display: grid
-  grid-template-columns: 50% 50%
-  margin: auto
+.side-by-side
+  display: flex
+  flex-flow: row wrap
+  gap: 4em
+  justify-content: center
+  align-items: center
+  &>*
+    max-width: 600px
+  //flex-direction: row
+  //display: grid
+  //grid-template-columns: 100%
 
-.main-img
-  width: 70%
+// Center Me
+.center-me
+  display: flex
+  align-items: center
+  justify-content: center
+
+
+@media (min-width: 900px)
+  .side-by-side
+    grid-template-columns: 50% 50%
+
 
 .image-grid
   display: grid
@@ -243,12 +237,6 @@ img
 
 .main-page
   position: relative
-
-.left
-  margin-right: 5%
-
-.right
-  margin-left: 5%
 
 .maps-container
   padding: 0 10%

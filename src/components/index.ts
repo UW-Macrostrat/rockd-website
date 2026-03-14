@@ -234,10 +234,12 @@ export function Comments({ comments }) {
           src: getProfilePicUrl(person_id),
           alt: "profile picture",
         }),
-        h("p", { className: "comment-author" }, name),
+        h("div.comment-meta", [
+          h("h3", { className: "comment-author" }, name),
+          h("p", { className: "comment-date" }, created),
+        ]),
       ]),
       h("p", { className: "comment-text" }, comment),
-      h("p", { className: "comment-date" }, created),
       h("div.comment-likes", [
         h(Icon, { icon: "thumbs-up", className: "like-icon" }),
         h("p", { className: "comment-likes" }, String(likes)),

@@ -1,69 +1,106 @@
 import { Image, Footer } from "~/components";
 import h from "./main.module.sass";
+import { AnchorButton, Button } from "@blueprintjs/core";
+
+function FullHeightContainer({
+  children,
+  className,
+  showNextIndicator = true,
+}) {
+  return h("div.full-height-container", { className }, [
+    children,
+    h.if(showNextIndicator)("div.down-indicator-container", [
+      h(
+        Button,
+        {
+          className: "down-indicator",
+          icon: "chevron-down",
+          minimal: true,
+          onClick: () => {
+            const viewportHeight = window.innerHeight;
+            const scrollHeight = window.scrollY;
+
+            window.scrollTo({
+              top: scrollHeight + viewportHeight,
+              behavior: "smooth",
+            });
+          },
+        },
+        "Next page"
+      ),
+    ]),
+  ]);
+}
 
 export function Page() {
   return h("div.main-page", [
-    h("div.new_container.field", [
+    h(FullHeightContainer, [
       h("div.mask", [
         h(Image, {
           src: "main-page/field.jpg",
           className: "start-img back-img",
           alt: "Field",
         }),
-        h("div.main-content.row.row-eq-height", [
-          h("div.side", [
-            h("div.center-me", [
-              h("div.center", [
+      ]),
+      h("div.main-content.side-by-side", [
+        h("div.content-panel.app-info", [
+          h(Image, {
+            src: "main-page/rockd_transparent.png",
+            className: "not-huge",
+            alt: "Logo",
+          }),
+          h(
+            "p.tagline",
+            "Learn about, explore, and document the geologic world"
+          ),
+          h("div.download-buttons", [
+            h(
+              "a.ios-container",
+              { href: "https://itunes.apple.com/us/app/id1153056624" },
+              [
                 h(Image, {
-                  src: "main-page/rockd_transparent.png",
-                  className: "not-huge",
-                  alt: "Logo",
+                  src: "main-page/appstore.png",
+                  className: "download-badge ios",
+                  alt: "App Store",
                 }),
-                h(
-                  "p.tagline",
-                  "Learn about, explore, and document the geologic world"
-                ),
-                h("div.download-buttons", [
-                  h(
-                    "a.ios-container",
-                    { href: "https://itunes.apple.com/us/app/id1153056624" },
-                    [
-                      h(Image, {
-                        src: "main-page/appstore.png",
-                        className: "download-badge ios",
-                        alt: "App Store",
-                      }),
-                    ]
-                  ),
-                  h(
-                    "a.android-container",
-                    {
-                      href: "https://play.google.com/store/apps/details?id=org.macrostrat.rockd",
-                    },
-                    [
-                      h(Image, {
-                        src: "main-page/google-play-badge.png",
-                        className: "download-badge android",
-                        alt: "Google Play",
-                      }),
-                    ]
-                  ),
-                ]),
-                h("p", [
-                  h("a.explore-link", { href: "/explore" }, "Explore the data"),
-                ]),
-              ]),
-            ]),
-            h(Image, {
-              src: "main-page/main.png",
-              className: "main-img",
-              alt: "Main",
-            }),
+              ]
+            ),
+            h(
+              "a.android-container",
+              {
+                href: "https://play.google.com/store/apps/details?id=org.macrostrat.rockd",
+              },
+              [
+                h(Image, {
+                  src: "main-page/google-play-badge.png",
+                  className: "download-badge android",
+                  alt: "Google Play",
+                }),
+              ]
+            ),
+          ]),
+          h("p", [
+            h(
+              AnchorButton,
+              {
+                href: "/explore",
+                className: "explore-link",
+                large: true,
+                minimal: true,
+                icon: "geosearch",
+              },
+              "Explore the data"
+            ),
           ]),
         ]),
+        h(Image, {
+          src: "main-page/main.png",
+          className: "main-img",
+          alt: "Main",
+        }),
       ]),
     ]),
-    h("div.new_container.maps-container", [
+    h(FullHeightContainer, { className: "map-container" }, [
       h("div.map-imgs", [
         h(Image, {
           src: "main-page/grand_canyon.jpg",
@@ -98,8 +135,7 @@ export function Page() {
         ]),
       ]),
     ]),
-
-    h("div.new_container.white-container", [
+    h(FullHeightContainer, { className: "dashboard-container" }, [
       h("div.row", [
         h("div.col-sm-6.col-sm-offset-3", [
           h("div.headline-alligner", [
@@ -123,7 +159,7 @@ export function Page() {
         ]),
       ]),
     ]),
-    h("div.new_container.red_rock", [
+    h(FullHeightContainer, { className: "track-progress-container" }, [
       h(Image, {
         src: "main-page/red_rock.jpg",
         className: "back-img red-rock-img",
@@ -135,7 +171,7 @@ export function Page() {
         ]),
 
         h("div.col-sm-6.center-me", [
-          h("div.headline-alligner", [
+          h("div.headline-aligner", [
             h("div.center", [
               h(
                 "h1",
@@ -150,10 +186,10 @@ export function Page() {
         ]),
       ]),
     ]),
-    h("div.record-block", [
+    h(FullHeightContainer, { showNextIndicator: false }, [
       h("div.row", [
         h("div.col-sm-6.col-sm-offset-3", [
-          h("div.headline-alligner", [
+          h("div.headline-aligner", [
             h("div.center", [
               h("h1", "Record your observations"),
               h(
@@ -166,7 +202,7 @@ export function Page() {
 
         h("div.image-grid", [
           h("div.col-sm-6", [
-            h("div.headline-alligner", [
+            h("div.headline-aligner", [
               h("div.center.left", [
                 h(Image, {
                   src: "main-page/checkin.png",
@@ -181,7 +217,7 @@ export function Page() {
           ]),
 
           h("div.col-sm-6", [
-            h("div.headline-alligner", [
+            h("div.headline-aligner", [
               h("div.center.right", [
                 h(Image, {
                   src: "main-page/strat-names.png",
@@ -196,7 +232,7 @@ export function Page() {
           ]),
 
           h("div.col-sm-6", [
-            h("div.headline-alligner", [
+            h("div.headline-aligner", [
               h("div.center.left", [
                 h(Image, {
                   src: "main-page/strike-dip.png",
@@ -211,7 +247,7 @@ export function Page() {
           ]),
 
           h("div.col-sm-6", [
-            h("div.headline-alligner", [
+            h("div.headline-aligner", [
               h("div.center.right", [
                 h(Image, {
                   src: "main-page/taxa.png",
@@ -233,5 +269,19 @@ export function Page() {
       ]),
     ]),
     h(Footer),
+  ]);
+}
+
+function ImageBlock({ src, alt, className, children }) {
+  return h("div.col-sm-6", { className }, [
+    h("div.headline-aligner", [
+      h("div.center.left", [
+        h(Image, {
+          src,
+          className: "record-block-img",
+        }),
+        h("div.record-img-caption", children),
+      ]),
+    ]),
   ]);
 }

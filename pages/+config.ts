@@ -47,5 +47,11 @@ export default {
         server: true,
       },
     },
+    pageStyle: {
+      env: {
+        client: true,
+        server: true,
+      },
+    },
   },
 } satisfies Config;

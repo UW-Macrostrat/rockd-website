@@ -21,7 +21,3 @@ export default function Layout({ children }: { children: ReactNode }) {
     h("div.app-shell", { className: pageStyle + "-page" }, children)
   );
 }
-
-function NoOpDarkModeProvider(props) {
-  return props.children;
-}
