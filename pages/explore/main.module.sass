@@ -1,146 +1,93 @@
-@use "sass:color"
-@use "../colors" as *
-@use "@blueprintjs/colors/lib/scss/colors" as *
-
-*
-  box-sizing: border-box
-
-// Colors taken primarily from blueprintjs v4
-// See https://blueprintjs.com/docs/#core/colors
-:root
-  @each $name, $color in $colors
-    --#{$name}: #{$color}
-
-html, body
-  height: 100vh
-  height: -webkit-fill-available
-
-.bp5-input
-  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15), inset 0 1px 1px rgba(16, 22, 26, 0.2)
-
-.bp5-button
-  color: var(--text-color)
-
-.bp5-control
-  color: var(--text-subtle-color) !important
-
-body
-  color: var(--text-color)
-  margin: 0
-  padding: 0
-  font-family: 'Source Sans Pro', sans-serif
-
-  &.bp5-dark
-    color-scheme: dark
-    color: $dark-text
-    // each item in color map
-    @each $name, $color in $dark-colors
-      --#{$name}: #{$color}
-
-    .selected
-      background-color: var(--accent-secondary-color)
-
-    .bp5-input
-      &::placeholder
-        color: var(--secondary-color)
-        box-shadow: 0 0 0 0 color.change($light-gray3, $alpha: 0), 0 0 0 0 color.change($light-gray3, $alpha: 0), inset 0 0 0 1px color.change($light-gray1, $alpha: 0.15), inset 0 1px 1px color.change($light-gray1, $alpha: 0.2)
-
 .map-container
+  flex: 1
   position: relative
   padding: 0
+  max-width: 100vw
+  .map-view
+    position: absolute
+    top: 0
+    bottom: 0
+    // Correct for som sizing issues
+    left: 0
+    width: 100%
+    height: 100vh
+    :global #map
+      height: 100vh
+      width: 100%
+      position: absolute
+      top: 0
+      bottom: 0
 
-.overlay-div
+// A hacky way to position the map controls
+.map-controls
   position: absolute
-  top: 7vh
-  left: 0
-  z-index: 10
-  height: 93vh
-  width: 100%
+  top: 0.5em
+  right: 0.5em
+  bottom: 2em
+
+
+.map-page
+  display: flex
+  flex-direction: row
+  height: 100vh
+  width: 100vw
+  margin: -1em
+  --map-detail-stack-width: 100%
+
+.sidebar-content
   padding-top: 0
-  border-top: 2px solid var(--panel-text)
+  flex-grow: 1
+  margin-bottom: -1em
+  overflow-y: scroll
 
-._panel-subhead_z8iog_1
-  padding: 10px 20px
-  background-color: #333
-  color: white
-  border: none
-  cursor: pointer
-  border-radius: 4px
-  width: 100%
+.site-icon img
+  height: 45px
+  width: 45px
 
-.sidebox
-  position: absolute
-  z-index: 10
+.sidebar-header
+  border-radius: 0 !important
+  display: flex
+  flex-direction: row
+  box-shadow: unset !important
+  border-bottom: 1px solid var(--panel-rule-color)
+  background-color: var(--panel-background-color) !important
+  gap: 5px
+  align-items: center
+
+  .page-title
+    margin: 0
+    flex-grow: 1
+
+  .site-icon
+    display: block
+    margin-left: -1em
+
+
+.sidebar
   height: 100vh
   width: 30%
-  top: 0
-  left: 0
+  min-width: 420px
+  display: flex
+  flex-direction: column
+  border-right: 1px solid var(--panel-rule-color)
   background: var(--panel-background-color)
 
-  .title-header, .coordinates
-    display: flex
-    justify-content: center
 
-  .title
-    display: flex
-    width: 100%
-    color: black
-    position: fixed
-    width: 30%
-    background: rgba(255, 255, 255, 0.85)
-    height: 7vh
-    background-color: var(--panel-background-color)
-    color: var(--text-emphasized-color) !important
-    padding: 0
-    
-    h1
-      padding: 0
-      margin: auto
-      font-size: 24px
-      margin-left: 10px
-
-  .header-divider 
-    position: absolute
-    width: 100%
-    top: 10vh
-    z-index: 100
+.checkin-container
+  padding: 0 8px 8px 8px
 
 
-  .close-btn
-    position: absolute
-    top: 10px
-    right: 10px
-    background-color: var(--panel-background)
-    color: var(--panel-text)
-    border: none
-    border-radius: 50%
-    width: 30px
-    height: 30px
-    display: flex
-    justify-content: center
-    align-items: center
-    font-size: 15px
-    cursor: pointer
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
-    transition: background-color 0.3s, box-shadow 0.3s
-
-    &:hover
-      background-color: var(--panel-hover)
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3)
 
 .marker
   height: 7vh
   display: grid
   margin: auto
   margin-right: 0
-  
-.selcted-center
-  display: flex
 
 .details-image
   width: 40px
   margin-left: 10px
-  margin-top: 4px    
+  margin-top: 4px
 
 .checkin-info
   color: var(--text-emphasized-color)
@@ -148,30 +95,15 @@ body
   h3
     color: var(--text-emphasized-color)
 
-.checkin-container
-  padding: 0 8px 8px 8px
-  overflow: auto
-  height: 93vh
-
-body 
-  color: var(--text-emphasized-color)
-
 .observation-img
   background-color: rgba(var(--text-emphasized-color), 0.5)
 
-.star 
+.star
   filter: var(--anti-img-color)
 
 .checkin-footer
-  img 
+  img
     filter: var(--img-color)
-
-.close-btn 
-  background-color: var(--accent-secondary-color)
-  color: var(--text-emphasized-color)
-  
-  &:hover
-    background-color: var(--accent-secondary-hover-color)
 
 .sort-dropdown
   height: 3vh
@@ -196,7 +128,7 @@ body
     margin-left: 5px
     border: none
 
-.dark-button 
+.dark-button
   margin: 6px 15px
   background-color: green
 
@@ -204,7 +136,7 @@ body
   position: relative
   width: 300px
   padding-top: 10px
-  
+
   .search-icon
     top: 10px
     position: absolute
@@ -237,15 +169,15 @@ body
   flex-direction: column
   align-items: center
 
-  h1 
-    margin:0
+  h1
+    margin: 0
     text-align: center
 
   h2
     background-color: var(--accent-secondary-color)
     padding: 10px
     margin: 0
-  
+
   li
     list-style-type: none
     background-color: var(--panel-background-color)
@@ -256,7 +188,7 @@ body
 
   p
     padding-left: 10px
-  
+
   ul
     margin-top: 0
     padding-left: 0
@@ -273,7 +205,6 @@ body
     background-color: var(--accent-secondary-color)
     padding: 5px 10px
     margin: 0
-    border-top: solid var(--panel-background-color) 2px
 
   .filter-item
     display: flex
@@ -281,7 +212,7 @@ body
     justify-content: space-between
     padding: 2px 20px
 
-    li 
+    li
       &:hover
         background-color: var(--panel-background-color)
 
@@ -379,12 +310,6 @@ body
   display: none
   pointer-events: none
 
-#map
-  width: 70%
-  margin-left: 30%
-  position: absolute
-  z-index: 1
-
 .side-panel
   display: flex
   flex-direction: column
@@ -411,11 +336,6 @@ body
 
 .selected
   background-color: var(--accent-secondary-color) !important
-
-.bp5-card, .bp5-navbar, .bp5-button
-  border-radius: 4px
-  background-color: var(--panel-background-color)
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
 
 .settings-icon
   cursor: pointer

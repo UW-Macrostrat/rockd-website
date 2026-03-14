@@ -1,0 +1,118 @@
+.footer
+  display: flex
+  flex-flow: row wrap
+  padding: 2em 2em 4em
+  margin: 0 auto
+  max-width: calc(var(--page-content-width) + 4em)
+  gap: 2em
+  align-items: center
+  justify-content: space-between
+
+  ul
+    list-style-type: none
+    padding-left: 0
+
+  .footer-text
+    font-size: 24px
+    font-weight: 400
+
+    .upper
+      margin-bottom: 0
+
+    a
+      color: var(--panel-text)
+
+      &:hover
+        color: var(--panel-text)
+
+.row
+  width: 100%
+
+.marker
+  height: 7vh
+  display: grid
+  margin: auto
+  margin-right: 0
+
+.footer-logo-link
+  display: block
+  margin-bottom: 1em
+  .footer-logo
+    opacity: 0.5
+  &:hover
+    .footer-logo
+      opacity: 1
+
+
+.footer-logo
+  width: 200px
+
+.no-image
+  color: var(--text-emphasized-color) !important
+
+.details-image
+  width: 40px
+  margin-left: 10px
+  margin-top: 4px
+
+.checkin-info
+  display: grid
+  margin: auto
+  margin-left: 0
+
+.checkin-header
+  display: flex
+  .strabo-link
+    margin-left: auto
+    font-size: 0.8rem
+    color: #1a73e8
+    text-decoration: underline
+
+    &:hover
+      color: #b01594
+
+.description
+  margin-top: 10px
+
+.marker_container
+  position: relative
+  height: 7vh
+  margin-right: 10px
+
+  .marker-number
+    position: absolute
+    font-weight: bold
+    font-size: 16px
+    transform: translate(-50%, -50%)
+    top: 40%
+    left: 48%
+    color: white
+
+  .circle-number
+    position: absolute
+    font-weight: bold
+    font-size: 16px
+    transform: translate(-50%, -50%)
+    top: 50%
+    left: 50%
+    color: white
+
+.page-carousel
+  display: flex
+  justify-content: center
+  gap: 10px
+  align-items: center
+  margin: 10px 0
+
+.hide
+  display: none
+
+.comment-author
+  display: flex
+  flex-direction: row
+  gap: 10px
+
+.comment-pic
+  width: 100px
+  height: 100px
+  border-radius: 50%

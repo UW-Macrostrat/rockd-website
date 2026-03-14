@@ -1,35 +1,75 @@
-import { useMapRef } from "@macrostrat/mapbox-react";
-import { Spinner, Icon, Button } from "@blueprintjs/core";
-import { SETTINGS } from "~/settings";
-import {buildInspectorStyle } from "@macrostrat/map-interface";
-import { buildMacrostratStyle } from "@macrostrat/map-styles";
-import { mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode, DarkModeButton } from "@macrostrat/ui-components";
-import mapboxgl from "mapbox-gl";
-import { useCallback, useEffect, useState } from "react";
-import h from "./main.module.sass";
-import { useRockdAPI, Image, pageCarousel, createCheckins } from "~/components";
-import "@macrostrat/style-system";
-import { MapPosition } from "@macrostrat/mapbox-utils";
+import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
+import { Button, Icon, Navbar } from "@blueprintjs/core";
+import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
-  MapAreaContainer,
+  buildInspectorStyle,
   MapMarker,
   MapView,
+  MapAreaContainer,
 } from "@macrostrat/map-interface";
-import { mapboxAccessToken } from "~/settings";
+import "@macrostrat/map-interface/dist/map-interface.css";
+import { buildMacrostratStyle } from "@macrostrat/map-styles";
+import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
+import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+import { type ReactNode, useCallback, useEffect, useState } from "react";
+import h from "./main.module.sass";
+import { PageCarousel, RockdSiteIcon, useRockdAPI } from "~/components";
 
 import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
-import { FeatureDetails } from "./featuredcheckins";
+import { FeatureDetails } from "./featured-checkins";
+import { createCheckins } from "~/components/checkin.client";
+import { mapStyle } from "./map-style";
+import { atom, useAtom } from "jotai";
 
-export function Page() {
-  return h(
-    "div.weaver-page",
-    h(WeaverMap, { mapboxToken: SETTINGS.mapboxAccessToken })
-  );
+interface SidebarProps {
+  title: string;
+  onClose?: () => void;
+  children?: ReactNode;
+  showCloseButton?: boolean;
+  showSettings?: boolean;
+  setSettings?: (show: boolean) => void;
+  showFilter?: boolean;
+  setFilter?: (show: boolean) => void;
 }
 
-mapboxgl.accessToken = SETTINGS.mapboxAccessToken;
+function Sidebar({
+  title,
+  onClose,
+  children,
+  showCloseButton = true,
+}: SidebarProps) {
+  const _showCloseButton = showCloseButton && onClose != null;
+  const [showSettings, setShowSettings] = useAtom(showSettingsAtom);
+  const [showFilter, setShowFilter] = useAtom(showFilterAtom);
+  return h("div.sidebar", [
+    h(Navbar, { className: "sidebar-header" }, [
+      h(RockdSiteIcon, { className: "site-icon" }),
+      h("h1.page-title", title),
+      h("div.tools", [
+        h(ToolButton, {
+          icon: "filter",
+          onClick: () => {
+            setShowFilter(!showFilter);
+          },
+        }),
+        h(ToolButton, {
+          icon: "settings",
+          onClick: () => {
+            setShowSettings(!showSettings);
+          },
+        }),
+        h.if(_showCloseButton)(ToolButton, { icon: "cross", onClick: onClose }),
+      ]),
+    ]),
+    h("div.sidebar-content", children as any),
+  ]);
+}
+
+mapboxgl.accessToken = mapboxAccessToken;
 
 const _macrostratStyle = buildMacrostratStyle({
   tileserverDomain: SETTINGS.burwellTileDomain,
@@ -37,367 +77,240 @@ const _macrostratStyle = buildMacrostratStyle({
   strokeOpacity: 0.1,
 }) as mapboxgl.Style;
 
-const type =
-  {
-    id: "Sample",
-    name: "Sample",
-    color: "purple",
-  };
+const type = {
+  id: "Sample",
+  name: "Sample",
+  color: "purple",
+};
 
-function weaverStyle(type: object) {
-  const clusterThreshold = 1;
+const showSatelliteAtom = atom(false);
+const showOverlayAtom = atom(true);
+const showSettingsAtom = atom(false);
+const showFilterAtom = atom(false);
+const autocompleteOpenAtom = atom(false);
 
-  const baseColor = "#868aa2";
-  const endColor = "#212435";
-
-  return {
-    sources: {
-      weaver: {
-        type: "vector",
-        tiles: [ SETTINGS.rockdApiURL + "/checkin-tile/{z}/{x}/{y}?cluster=true"],
-      }
-    },
-    layers: [
-      {
-        id: "clusters",
-        type: "circle",
-        source: "weaver",
-        "source-layer": "default",
-        filter: ['>', ['get', 'n'], clusterThreshold],
-        paint: {
-          "circle-radius": [
-            'step',
-            ['get', 'n'],
-            7, 50,
-            9, 100,
-            11, 150,
-            13, 200,
-            15,
-          ],
-          "circle-color": [
-            'step',
-            ['get', 'n'],
-            "#7b7fa0", 50,
-            '#636b8d', 100,
-            '#4a546e', 150,
-            '#353b49', 200,
-            endColor
-          ],
-          "circle-stroke-color": [
-            'step',
-            ['get', 'n'],
-            "#8b8eab", 50,
-            '#7a7e96', 100,
-            '#5d5f7c', 150,
-            '#484b63',
-          ],
-          "circle-stroke-width": 3,
-          "circle-stroke-opacity": 1,
-        },
-      },
-      {
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'weaver',
-        "source-layer": "default",
-        filter: ['has', 'n'],
-        layout: {
-          'text-field': ['get', 'n'],
-          'text-size': 10,
-          'text-allow-overlap': true,
-          'text-ignore-placement': true,
-        },
-        paint: {
-          "text-color": "#fff"
-        },
-      },
-      {
-        id: 'unclustered-point',
-        type: 'circle',
-        source: 'weaver',
-        "source-layer": "default",
-        filter: ['<=', ['get', 'n'], clusterThreshold],
-        paint: {
-          'circle-color': baseColor,
-          'circle-radius': 4,
-          'circle-stroke-width': 1,
-          'circle-stroke-color': '#fff'
-        }
-      },
-    ],
-  };
-}
-
-function WeaverMap({
-  mapboxToken,
-}: {
-  headerElement?: React.ReactElement;
-  title?: string;
-  children?: React.ReactNode;
-  mapboxToken?: string;
-}) {
-  const [showSatelite, setSatelite] = useState(false);
-  const [showOverlay, setOverlay] = useState(true);
-  const style = useMapStyle(type, mapboxToken, showSatelite, showOverlay);
+export function Page() {
+  const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
+  const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
+  const style = useMapStyle(
+    type,
+    mapboxAccessToken,
+    showSatellite,
+    showOverlay
+  );
   const [selectedCheckin, setSelectedCheckin] = useState(null);
-  const [showSettings, setSettings] = useState(false);
-  const [showFilter, setFilter] = useState(false);
+  const [showSettings, setSettings] = useAtom(showSettingsAtom);
+  const [showFilter, setFilter] = useAtom(showFilterAtom);
   const [filteredData, setFilteredData] = useState(null);
-  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [autocompleteOpen, setAutocompleteOpen] = useAtom(autocompleteOpenAtom);
 
   // overlay
-  const [inspectPosition, setInspectPosition] = useState<mapboxgl.LngLat | null>(null);
+  const [inspectPosition, setInspectPosition] =
+    useState<mapboxgl.LngLat | null>(null);
 
   const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
     setInspectPosition(position);
-    deletePins('.selected_pin');
+    deletePins(".selected_pin");
   }, []);
 
-  const featuredCheckin = h(FeatureDetails, {setInspectPosition});
   let overlay;
 
   // handle selected checkins
   const checkinData = useRockdAPI(
-    selectedCheckin ? `/protected/checkins?checkin_id=${selectedCheckin}` :  `/protected/checkins?checkin_id=0`
+    selectedCheckin
+      ? `/protected/checkins?checkin_id=${selectedCheckin}`
+      : `/protected/checkins?checkin_id=0`
   );
 
-  const toolbar = h(Toolbar, {showSettings, setSettings, showFilter, setFilter});
-  const contextPanel = h(ContextPanel, {showSatelite, setSatelite, showOverlay, setOverlay});
-  const autoComplete = h(AutoComplete, {setFilteredData, autocompleteOpen, setAutocompleteOpen});
+  const autoComplete = h(AutoComplete, {
+    setFilteredData,
+    autocompleteOpen,
+    setAutocompleteOpen,
+  }) as ReactNode;
 
-  const filteredCheckinsComplete = h(createFilteredCheckins, {filteredData: filteredData?.current, setInspectPosition});
-  const filteredPages = pageCarousel({page: filteredData?.next.page, setPage: filteredData?.next.setPage, nextData: filteredData?.next.data});
+  const filteredCheckinsComplete = h(FilteredCheckins, {
+    filteredData: filteredData?.current,
+    setInspectPosition,
+  });
+  const filteredPages = PageCarousel({
+    page: filteredData?.next.page,
+    setPage: filteredData?.next.setPage,
+    nextData: filteredData?.next.data,
+  });
 
-  if(showFilter) {
-    overlay = h('div.sidebox', [
-      h('div.title', [
-        toolbar,
-        h("h1", "Filter Checkins"),
-      ]),
-      h("button", {
-        className: "close-btn",
-        onClick: () => {
-          setFilter(false);
-          setSettings(false);
-          setFilteredData(null);
-          deletePins('.filtered_pin');
-        }
-      }, "X"),
-      h("div.overlay-div", [
-        h('div.autocomplete-container', [
-          autoComplete,
-          filteredData && !autocompleteOpen ? h("div.filtered-checkins",filteredCheckinsComplete) : null,
-          filteredData && !autocompleteOpen ? filteredPages : null
-        ])
-      ]),
-    ])
-  } else if(showSettings) {
-    overlay = h('div.sidebox', [
-      h('div.title', [
-        toolbar,
-        h("h1", "Settings"),
-      ]),
-      h("button", {
-        className: "close-btn",
-        onClick: () => {
+  if (showFilter) {
+    overlay = h(Sidebar, {
+      title: "Filter checkins",
+      onClose: () => {
+        setFilter(false);
+        setSettings(false);
+        setFilteredData(null);
+        deletePins(".filtered_pin");
+      },
+      children: h("div.autocomplete-container", [
+        autoComplete,
+        filteredData && !autocompleteOpen
+          ? h("div.filtered-checkins", filteredCheckinsComplete)
+          : null,
+        filteredData && !autocompleteOpen ? filteredPages : null,
+      ]) as any,
+    });
+  } else if (showSettings) {
+    overlay = h(
+      Sidebar,
+      {
+        title: "Settings",
+        onClose: () => {
           setSettings(false);
           setFilter(false);
-        }
-      }, "X"),
-      h("div.overlay-div", contextPanel),
-    ])
+        },
+      },
+      h(ContextPanel)
+    );
   } else if (selectedCheckin && checkinData) {
-    const clickedCheckins = h(createSelectedCheckins, {data: checkinData?.success.data, setInspectPosition});
+    const clickedCheckins = h(createSelectedCheckins, {
+      data: checkinData?.success.data,
+      setInspectPosition,
+    });
 
-    overlay = h("div.sidebox", [
-      h('div.title', [
-        toolbar,
-        h("h1", "Selected Checkins"),
-      ]),
-      h("button", {
-        className: "close-btn",
-        onClick: () => {
+    overlay = h(
+      Sidebar,
+      {
+        title: "Selected checkins",
+        onClose: () => {
           setSelectedCheckin(null);
-          deletePins('.selected_pin');
-        }
-      }, "X"),
-      h("div.overlay-div",
-        h('div.checkin-container',clickedCheckins)
-      ),
-    ]);
+          deletePins(".selected_pin");
+        },
+      },
+      h("div.checkin-container", clickedCheckins)
+    );
   } else {
-    overlay = h("div.sidebox", [
-      h('div.sidebox-header', [
-        h('div.title', [
-          toolbar,
-          h("h1", "Featured Checkins"),
-        ]),
-      ]),
-      h("div.overlay-div", featuredCheckin),
-    ]);
+    overlay = h(
+      Sidebar,
+      {
+        title: "Featured checkins",
+        showCloseButton: false,
+      },
+      h(FeatureDetails, { setInspectPosition })
+    );
   }
 
-  if(style == null) return null;
+  if (style == null) return null;
 
   const mapPosition: MapPosition = {
-          camera: {
-            lat: 39,
-            lng: -98,
-            altitude: 6000000,
-          },
-        };
+    camera: {
+      lat: 39,
+      lng: -98,
+      altitude: 6000000,
+    },
+  };
 
-  return h(MapContainer, {style, mapPosition, onSelectPosition, setSelectedCheckin, overlay});
+  return h(
+    MapAreaContainer,
+    {
+      detailStackProps: {
+        className: h["map-controls"],
+      },
+    },
+    h("div.map-page", [
+      overlay,
+      h("div.map-container", [
+        h(
+          MapView,
+          {
+            style,
+            mapboxToken: mapboxAccessToken,
+            mapPosition,
+            standalone: false,
+            className: "map-view",
+          },
+          [
+            h(MapMarker, {
+              setPosition: onSelectPosition,
+            }),
+          ]
+        ),
+        // The Overlay Div
+        h(ClickedCheckins, { setSelectedCheckin }),
+      ]),
+    ])
+  );
 }
 
-function useMapStyle(type, mapboxToken, showSatelite, showOverlay) {
+function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
   const baseStyle = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/light-v10";
-  const sateliteStyle = 'mapbox://styles/mapbox/satellite-v9';
-  const finalStyle = showSatelite ? sateliteStyle : baseStyle;
+  const sateliteStyle = "mapbox://styles/mapbox/satellite-v9";
+  const finalStyle = showSatellite ? sateliteStyle : baseStyle;
 
   const [actualStyle, setActualStyle] = useState(null);
-  const overlayStyle = showOverlay ? mergeStyles(_macrostratStyle, weaverStyle(type)) : weaverStyle(type);
+  const overlayStyle = showOverlay
+    ? mergeStyles(_macrostratStyle, mapStyle(type))
+    : mapStyle(type);
 
   // Auto select sample type
   useEffect(() => {
-      buildInspectorStyle(finalStyle, overlayStyle, {
-        mapboxToken,
-        inDarkMode: isEnabled,
-      }).then((s) => {
-        setActualStyle(s);
-      });
-  }, [isEnabled, showSatelite, showOverlay]);
+    buildInspectorStyle(finalStyle, overlayStyle, {
+      mapboxToken,
+      inDarkMode: isEnabled,
+    }).then((s) => {
+      setActualStyle(s);
+    });
+  }, [isEnabled, showSatellite, showOverlay]);
 
   return actualStyle;
 }
 
-function getCheckins(lat1, lat2, lng1, lng2, page) {
-  // abitrary bounds around click point
-  let minLat = Math.floor(lat1 * 100) / 100;
-  let maxLat = Math.floor(lat2 * 100) / 100;
-  let minLng = Math.floor(lng1 * 100) / 100;
-  let maxLng = Math.floor(lng2 * 100) / 100;
-
-  // change use map coords
-  return useRockdAPI("/protected/checkins?minlat=" + minLat +
-    "&maxlat=" + maxLat +
-    "&minlng=" + minLng +
-    "&maxlng=" + maxLng +
-    "&page="  + page);
-}
-
-function FeatureDetails({setInspectPosition}) {
-  const [page, setPage] = useState(1);
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-  const [bounds, setBounds] = useState(map?.getBounds());
-  let checkins = [];
-  let result;
-  let nextData;
-
-  if (bounds) {
-    result = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page);
-    nextData = getCheckins(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast(), page + 1);
-  } else {
-    result = getCheckins(0, 0, 0, 0, 1);
-    nextData = getCheckins(0, 0, 0, 0, 2);
-  }
-
-  if (!bounds && map) {
-    setBounds(map.getBounds());
-  }
-
-  useEffect(() => {
-    if (!map) return;
-
-    const handleMapReady = () => {
-      const newBounds = map.getBounds();
-      setBounds(newBounds);
-      setPage(1);
-    };
-
-    if (map.isStyleLoaded()) {
-      handleMapReady();
-    } else {
-      map.once("load", handleMapReady);
-    }
-
-    const onMoveEnd = () => {
-      const newBounds = map.getBounds();
-      setBounds(newBounds);
-      setPage(1);
-    };
-
-    map.on("moveend", onMoveEnd);
-
-    return () => {
-      map.off("moveend", onMoveEnd);
-      map.off("load", handleMapReady);
-    };
-  }, [map]);
-
-
-  result = result?.success?.data;
-  if (result == null || result.length === 0) return h(Spinner, { className: "loading-spinner" });
-
-  const pages = pageCarousel({page, setPage, nextData: nextData?.success.data});
-
-  result.sort((a, b) => {
-    if (a.photo === null && b.photo !== null) return 1;
-    if (a.photo !== null && b.photo === null) return -1;
-    return 0;
+function ToolButton({ icon, onClick }) {
+  return h(Button, {
+    icon,
+    minimal: true,
+    onClick,
   });
-
-  checkins = createCheckins(result, mapRef, setInspectPosition);
-
-  return h("div", {className: 'checkin-container'}, [
-      checkins,
-      pages
-    ]);
 }
 
-function Toolbar({showSettings, setSettings, showFilter, setFilter}) {
-  return h("div", { className: "toolbar", style: {padding: "0"} }, [
-      h("div.toolbar-header", [
-        h("a", { href: "/" },
-          h(Image, { className: "home-icon", src: "favicon-32x32.png" }),
-        ),
-        h(Icon, { className: "settings-icon", icon: "filter", onClick: () => {
-            setFilter(!showFilter);
-          }
-        }),
-        h(Icon, { className: "settings-icon", icon: "settings", onClick: () => {
-            setSettings(!showSettings);
-          }
-        }),
-      ]),
-    ]);
-}
+function ContextPanel() {
+  const [showOverlay, setOverlay] = useAtom(showFilterAtom);
+  const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
 
-function ContextPanel({showSatelite, setSatelite, showOverlay, setOverlay}) {
   return h("div", { className: "settings-content" }, [
-    h(DarkModeButton, { className: "dark-btn", showText: true } ),
-    h(Button, {className: showSatelite ? "selected satellite-style" : "satellite-style", onClick: () => {
-      setSatelite(!showSatelite);
-    }}, [
-        h('div.btn-inside', [
-          h(Icon, { className: "satellite-icon", icon: "satellite"}),
+    h(DarkModeButton, { className: "dark-btn", showText: true }),
+    h(
+      Button,
+      {
+        className: showSatellite
+          ? "selected satellite-style"
+          : "satellite-style",
+        onClick: () => {
+          setSatellite(!showSatellite);
+        },
+      },
+      [
+        h("div.btn-inside", [
+          h(Icon, { className: "satellite-icon", icon: "satellite" }),
           h("p", "Satellite"),
-        ])
-    ]),
-    h(Button, {className: showOverlay ? "selected map-style" : "map-style", onClick: () => {
-      setOverlay(!showOverlay);
-    }}, [
-      h('div.btn-inside', [
-        h(Icon, { className: "overlay-icon", icon: "map"}),
-        h("p", "Overlay"),
-      ])
-    ]),
+        ]),
+      ]
+    ),
+    h(
+      Button,
+      {
+        className: showOverlay ? "selected map-style" : "map-style",
+        onClick: () => {
+          setOverlay(!showOverlay);
+        },
+      },
+      [
+        h("div.btn-inside", [
+          h(Icon, { className: "overlay-icon", icon: "map" }),
+          h("p", "Overlay"),
+        ]),
+      ]
+    ),
   ]);
 }
 
@@ -407,41 +320,13 @@ function createSelectedCheckins(result, setInspectPosition) {
   return createCheckins(result.data, mapRef, setInspectPosition);
 }
 
-function createFilteredCheckins(filteredData, setInspectPosition) {
+function FilteredCheckins({ filteredData, setInspectPosition }) {
   const mapRef = useMapRef();
-
+  console.log("Filtered checkins", filteredData);
   return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
-export function MapContainer({style, mapPosition, onSelectPosition, setSelectedCheckin, overlay}) {
-    return h(
-        "div.map-container",
-        [
-          // The Map Area Container
-          h(
-            MapAreaContainer,
-            {
-              className: "map-area-container",
-              style: { "paddingLeft": "calc(30% + 14px)",},
-            },
-            [
-              h(MapView, { style, mapboxToken: mapboxAccessToken, mapPosition }, [
-                h(MapMarker, {
-                  setPosition: onSelectPosition,
-                }),
-              ]),
-
-              // The Overlay Div
-              overlay,
-              h(ClickedCheckins, {setSelectedCheckin}),
-            ]
-          ),
-        ]
-      );
-}
-
-
-function ClickedCheckins({setSelectedCheckin}) {
+function ClickedCheckins({ setSelectedCheckin }) {
   const mapRef = useMapRef();
   const map = mapRef.current;
 
@@ -450,22 +335,22 @@ function ClickedCheckins({setSelectedCheckin}) {
 
     const handleClick = (e) => {
       const cluster = map.queryRenderedFeatures(e.point, {
-        layers: ['clusters']
+        layers: ["clusters"],
       });
 
-      if(cluster.length > 0) {
+      if (cluster.length > 0) {
         const zoom = cluster[0].properties.expansion_zoom;
 
         map.flyTo({
           center: cluster[0].geometry.coordinates,
           zoom: zoom + 2,
           speed: 10,
-          curve: .5,
+          curve: 0.5,
         });
       }
 
       const features = map.queryRenderedFeatures(e.point, {
-        layers: ['unclustered-point']
+        layers: ["unclustered-point"],
       });
 
       if (features.length > 0) {
@@ -474,18 +359,15 @@ function ClickedCheckins({setSelectedCheckin}) {
         // add marker
         const coord = features[0].geometry.coordinates.slice();
 
-        const el = document.createElement('div');
-        el.className = 'selected_pin';
-        el.style.backgroundColor = 'blue';
-        el.style.borderRadius = '50%';
-        el.style.border = '2px solid white';
-        el.style.width = '15px';
-        el.style.height = '15px';
+        const el = document.createElement("div");
+        el.className = "selected_pin";
+        el.style.backgroundColor = "blue";
+        el.style.borderRadius = "50%";
+        el.style.border = "2px solid white";
+        el.style.width = "15px";
+        el.style.height = "15px";
 
-
-        new mapboxgl.Marker(el)
-          .setLngLat(coord)
-          .addTo(map);
+        new mapboxgl.Marker(el).setLngLat(coord).addTo(map);
 
         console.log("data", features[0]);
         setSelectedCheckin(checkinId);
@@ -494,10 +376,10 @@ function ClickedCheckins({setSelectedCheckin}) {
       }
     };
 
-    map.on('click', handleClick);
+    map.on("click", handleClick);
 
     return () => {
-      map.off('click', handleClick);
+      map.off("click", handleClick);
     };
   }, [map]);
 

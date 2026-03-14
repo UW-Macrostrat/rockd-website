@@ -1,16 +1,8 @@
-import h from "./layout.module.sass";
-import { LngLatCoords } from "@macrostrat/map-interface";
-import {
-  DarkModeButton,
-  useAPIResult,
-  useDarkMode,
-} from "@macrostrat/ui-components";
-import { Icon, Divider } from "@blueprintjs/core";
-import mapboxgl from "mapbox-gl";
-import { SETTINGS } from "~/settings";
-import { rockdApiURL, rockdApiOldURL } from "~/settings";
-import { useState } from "react";
-import { navigate } from "vike/client/router";
+import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
+import { AnchorButton, Button, Divider, Icon } from "@blueprintjs/core";
+import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
+import { useRef, useState } from "react";
+import h from "./index.module.sass";
 
 export function Footer() {
   const footerLinks1 = [
@@ -25,59 +17,67 @@ export function Footer() {
     { href: "/privacy", icon: "lock", text: "Privacy" },
   ];
 
-  return h("div", { className: "footer" }, [
-    h("div", { className: "titles" }, [
-      h("h3", { className: "footer-text upper" }, [
-        "Produced by the ",
-        h("a", { href: "https://macrostrat.org" }, "UW Macrostrat Lab"),
+  return h("div.footer", [
+    h("div.titles", [
+      h(
+        "a.footer-logo-link",
+        {
+          href: "/",
+          onClick: (e) => {
+            // If we're already on the homepage, scroll to top
+            console.log(window.location.pathname);
+            if (window.location.pathname == "/") {
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }
+          },
+        },
+        h(Image, {
+          src: "main-page/rockd_transparent.png",
+          className: "footer-logo",
+          alt: "Logo",
+        })
+      ),
+      h("p", [
+        "Produced by ",
+        h("a", { href: "https://macrostrat.org" }, "Macrostrat"),
       ]),
-      h("h3", { className: "footer-text lower" }, [
+      h("p", [
         "Funded by ",
         h("a", { href: "https://nsf.gov" }, "NSF"),
-        " and ",
+        ", ",
+        "the ",
+        h("a", { href: "" }, "AAPG Foundation"),
+        " and the ",
         h(
           "a",
           { href: "http://geoscience.wisc.edu/geoscience/" },
-          "UW Geoscience"
+          "University of Wisconsin Department of Geoscience"
         ),
       ]),
     ]),
-    h("div", { className: "footer-links" }, [
-      h(
-        "ul",
-        footerLinks1.map((props) => h(FooterLink, props))
-      ),
-      h(
-        "ul",
-        footerLinks2.map((props) => h(FooterLink, props))
-      ),
-    ]),
-    h("div.dark-mode", [
-      h(DarkModeButton, { className: "dark-mode-button", showText: true }),
+    h(
+      "ul.footer-links",
+      footerLinks1.map((props) => h(FooterLink, props))
+    ),
+    h(
+      "ul.footer-links",
+      footerLinks2.map((props) => h(FooterLink, props))
+    ),
+    h("div.controls", [
+      h(DarkModeButton, {
+        className: "dark-mode-button",
+        showText: true,
+        minimal: true,
+      }),
     ]),
   ]);
 }
 
 function FooterLink({ href, icon, text }) {
-  const isDarkMode = useDarkMode().isEnabled;
-
-  return h(
-    "li",
-    {
-      onClick: (e) => {
-        e.preventDefault();
-        window.open(href, "_self");
-      },
-    },
-    [
-      h(Icon, {
-        className: "footer-icon",
-        icon,
-        style: { color: isDarkMode ? "black" : "white" },
-      }),
-      h("p", text),
-    ]
-  );
+  return h("li", h(AnchorButton, { href, icon, minimal: true }, text));
 }
 
 export function Image(props: ImageProps) {
@@ -141,6 +141,10 @@ export function BlankImage(props: ImageProps) {
 // remove when metrics works
 const apiURL = SETTINGS.rockdApiURL; // new route
 
+export async function fetchRockdData(url: string) {
+  return await fetch(apiURL + url);
+}
+
 export function useRockdAPI(src) {
   return useAPIResult(apiURL + src);
 }
@@ -162,38 +166,30 @@ export function getProfilePicUrl(person_id) {
   return apiURL + "/protected/gravatar/" + person_id;
 }
 
-export function pageCarousel({ page, setPage, nextData }) {
-  return h(
-    "div.pages",
-    h("div.page-container", [
-      h("div", { className: "page-btn" }, [
-        h(
-          "div",
-          {
-            className: page != 1 ? "btn-content" : "hide",
-            onClick: () => {
-              setPage(page - 1);
-            },
-          },
-          [h(Icon, { icon: "arrow-left" }), h("p", "Previous")]
-        ),
-      ]),
-      h("p", "Page " + page),
-      h("div", { className: "page-btn" }, [
-        h(
-          "div",
-          {
-            className:
-              nextData && nextData?.length > 0 ? "btn-content" : "hide",
-            onClick: () => {
-              setPage(page + 1);
-            },
-          },
-          [h("p", "Next"), h(Icon, { icon: "arrow-right" })]
-        ),
-      ]),
-    ])
-  );
+export function PageCarousel({ page, setPage, nextData }) {
+  return h("div.page-carousel", [
+    h(
+      Button,
+      {
+        icon: "arrow-left",
+        minimal: true,
+        className: page != 1 ? "page-btn" : "hide",
+        onClick: () => setPage(page - 1),
+      },
+      "Previous"
+    ),
+    h("span.page-number", "Page " + page),
+    h(
+      Button,
+      {
+        rightIcon: "arrow-right",
+        minimal: true,
+        className: nextData && nextData?.length > 0 ? "page-btn" : "hide",
+        onClick: () => setPage(page + 1),
+      },
+      "Next"
+    ),
+  ]);
 }
 
 export async function fetchAPIData(url) {
@@ -225,202 +221,6 @@ export function fetchAPIDataOld(url) {
     });
 }
 
-export function createCheckins(result, mapRef, setInspectPosition) {
-  const len = result.length;
-
-  return result.map((checkin, index) =>
-    h(Checkin, {
-      checkin,
-      mapRef,
-      setInspectPosition,
-      len,
-      key: checkin.checkin_id || index,
-    })
-  );
-}
-
-function Checkin({ checkin, mapRef, setInspectPosition, len }) {
-  const [hasError, setHasError] = useState(false);
-  const isDarkMode = useDarkMode().isEnabled;
-  const map = mapRef?.current;
-  // format rating
-  let ratingArr = [];
-  for (var i = 0; i < checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, { className: "star", icon: "star", style: { color: "white" } })
-    );
-  }
-
-  for (var i = 0; i < 5 - checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, {
-        className: "star",
-        icon: "star-empty",
-        style: { color: "white" },
-      })
-    );
-  }
-
-  let image;
-  const imgSrc = getImageUrl(checkin.person_id, checkin.photo);
-
-  const test = h(TestImage, {
-    src: imgSrc,
-    onError: () => setHasError(true),
-  });
-
-  const showImage = !hasError;
-
-  if (showImage) {
-    image = h(BlankImage, { className: "observation-img", src: imgSrc });
-  } else {
-    image = h("div", { className: "no-image" }, [
-      h("h1", "Details"),
-      h(Icon, {
-        className: "details-image",
-        icon: "arrow-right",
-        style: { color: "black" },
-      }),
-    ]);
-  }
-
-  // for trips
-  const stop_name = checkin?.name ?? null;
-  const LngLatProps = {
-    position: {
-      lat: checkin.lat,
-      lng: checkin.lng,
-    },
-    precision: 3,
-    zoom: 10,
-  };
-
-  let temp = h(
-    "div",
-    {
-      className: "checkin",
-      onClick: () => {
-        map.flyTo({ center: [checkin.lng, checkin.lat], zoom: 12 });
-        if (setInspectPosition)
-          setInspectPosition({ lat: checkin.lat, lng: checkin.lng });
-      },
-      onMouseEnter: () => {
-        if (len > 1) {
-          // marker
-          const el = document.createElement("div");
-          el.className = "marker_pin";
-
-          // Create marker
-          new mapboxgl.Marker(el)
-            .setLngLat([checkin.lng, checkin.lat])
-            .addTo(map);
-        }
-      },
-      onMouseLeave: () => {
-        let previous = document.querySelectorAll(".marker_pin");
-        previous.forEach((marker) => {
-          marker.remove();
-        });
-      },
-    },
-    [
-      h("div", { className: "hide" }, test),
-      h("h1", { className: "stop-name" }, stop_name),
-      h("div", { className: "checkin-header" }, [
-        !stop_name
-          ? h(
-              "h3",
-              { className: "profile-pic" },
-              h(BlankImage, {
-                src: getProfilePicUrl(checkin.person_id),
-                className: "profile-pic",
-              })
-            )
-          : null,
-        h("div", { className: "checkin-info" }, [
-          !stop_name
-            ? h(
-                "h3",
-                { className: "name" },
-                checkin.first_name + " " + checkin.last_name
-              )
-            : null,
-          h("h4", { className: "edited" }, checkin.created),
-          h("p", "Near " + checkin.near),
-          LngLatCoords(LngLatProps),
-          h("h3", { className: "rating" }, ratingArr),
-        ]),
-        checkin.spot_id != null &&
-          h(
-            "a",
-            {
-              className: "strabo-link",
-              href: "https://strabospot.org",
-              target: "_blank",
-              rel: "noopener noreferrer",
-            },
-            "via StraboSpot"
-          ),
-      ]),
-      h("p", { className: "description" }, checkin.notes),
-      h(
-        "a",
-        {
-          className: "checkin-link",
-          href: "/checkin/" + checkin.checkin_id,
-          target: "_blank",
-        },
-        [
-          image,
-          showImage
-            ? h("div", { className: "image-details" }, [
-                h("h1", "Details"),
-                h(Icon, {
-                  className: "details-image",
-                  icon: "arrow-right",
-                  style: { color: "white" },
-                }),
-              ])
-            : null,
-        ]
-      ),
-      h("div", { className: "checkin-footer" }, [
-        h("div", { className: "likes-container" }, [
-          h(Icon, {
-            className: "likes-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-            icon: "thumbs-up",
-            style: { color: "white" },
-          }),
-          h("h3", { className: "likes" }, checkin.likes),
-        ]),
-        h.if(checkin?.observations)(
-          "div",
-          { className: "observations-container" },
-          [
-            h(Icon, {
-              className:
-                "observations-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "camera",
-              style: { color: "white" },
-            }),
-            h("h3", { className: "likes" }, checkin.observations?.length),
-          ]
-        ),
-        h("div", { className: "comments-container" }, [
-          h(Icon, {
-            className: "comments-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-            icon: "comment",
-            style: { color: "white" },
-          }),
-          h("h3", { className: "comments" }, checkin.comments),
-        ]),
-      ]),
-    ]
-  );
-
-  return temp;
-}
-
 export function Comments({ comments }) {
   const commentArr = [];
 
@@ -434,10 +234,12 @@ export function Comments({ comments }) {
           src: getProfilePicUrl(person_id),
           alt: "profile picture",
         }),
-        h("p", { className: "comment-author" }, name),
+        h("div.comment-meta", [
+          h("h3", { className: "comment-author" }, name),
+          h("p", { className: "comment-date" }, created),
+        ]),
       ]),
       h("p", { className: "comment-text" }, comment),
-      h("p", { className: "comment-date" }, created),
       h("div.comment-likes", [
         h(Icon, { icon: "thumbs-up", className: "like-icon" }),
         h("p", { className: "comment-likes" }, String(likes)),
@@ -453,4 +255,12 @@ export function Comments({ comments }) {
   });
 
   return h("div.comments", [...commentArr]);
+}
+
+export function RockdSiteIcon({ className }) {
+  return h(
+    "a",
+    { href: "/", className },
+    h("img.rockd-icon", { src: "/rockd-icon-256.png" })
+  );
 }

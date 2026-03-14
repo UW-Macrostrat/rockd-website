@@ -1,9 +1,10 @@
 import h from "@macrostrat/hyper";
 import { usePageContext } from "vike-react/usePageContext";
+import { GoogleFonts } from "~/styles";
 
 export default function Head() {
   const ctx = usePageContext();
-  const { environment } = ctx;
+  const environment = ctx.globalContext.environment;
   const { scripts = [] } = ctx.config;
 
   return h([
@@ -22,24 +23,25 @@ export default function Head() {
       rel: "icon",
       type: "image/png",
       sizes: "32x32",
-      href: "https://storage.macrostrat.org/assets/rockd/favicon-32x32.png",
+      href: "/rockd-icon-32.png",
     }),
     h("link", {
       rel: "icon",
       type: "image/png",
       sizes: "16x16",
-      href: "https://storage.macrostrat.org/assets/rockd/favicon-16x16.png",
+      href: "/rockd-icon-16.png",
     }),
     h("link", {
       rel: "apple-touch-icon",
-      sizes: "180x180",
-      href: "https://storage.macrostrat.org/assets/rockd/apple-touch-icon.png",
+      sizes: "256x256",
+      href: "/rockd-icon-256.png",
     }),
     h("link", { rel: "manifest", href: "/site.webmanifest" }),
-    h("link", {
-      href: "https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro",
-      rel: "stylesheet",
-    }),
+    h(GoogleFonts),
+    // h("link", {
+    //   href: "https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro",
+    //   rel: "stylesheet",
+    // }),
     h("meta", { name: "description", content: "Rockd" }),
     h("script", {
       type: "text/javascript",
