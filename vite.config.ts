@@ -4,23 +4,8 @@ import hyperStyles from "@macrostrat/vite-plugin-hyperstyles";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import vike from "vike/plugin";
-import { defineConfig, Plugin } from "vite";
+import { defineConfig } from "vite";
 import pkg from "./package.json";
-
-const aliasedModules = [
-  "ui-components",
-  "column-components",
-  "api-types",
-  "api-views",
-  "column-views",
-  "timescale",
-  "map-interface",
-  "mapbox-utils",
-  "mapbox-react",
-  "map-styles",
-  "cesium-viewer",
-  "map-components",
-];
 
 const macrostratPackages = Object.keys(pkg.dependencies).filter(
   (name: string) => name.startsWith("@macrostrat/")

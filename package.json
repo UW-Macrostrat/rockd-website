@@ -9,10 +9,8 @@
     "build": "vike build",
     "preview": "vike build && vike preview",
     "clean": "rm -rf dist/*",
-    "server": "tsx __archive/index.old.ts",
-    "server:dev": "tsx --env-file=.env __archive/index.old.ts",
-    "format": "prettier --write src packages",
-    "start": "node ./dist/server/entry.mjs",
+    "format": "prettier --write .",
+    "start": "node --env-file .env ./dist/server/index.mjs",
     "test:runtime": "tsx tests/test-urls.ts"
   },
   "authors": [
@@ -32,7 +30,6 @@
     "@vitejs/plugin-react": "^5.1.4",
     "prettier": "^2.7.1",
     "sass": "^1.49.0",
-    "stylus": "^0.55.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },

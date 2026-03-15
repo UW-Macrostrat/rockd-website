@@ -1,12 +1,11 @@
-FROM node:22
+FROM node:22 AS builder
 
 # Install rsync
-RUN apt-get update && apt-get install -y rsync
+# RUN apt-get update && apt-get install -y rsync
 
 ENV NODE_ENV=production
 
-
-WORKDIR /usr/src/app
+WORKDIR /usr/src/build
 COPY .yarn/releases .yarn/releases
 COPY .yarnrc.yml yarn.lock package.json ./
 
@@ -19,7 +18,7 @@ RUN yarn install --immutable
 #  && rsync -a .yarn/cache/ /yarn-cache
 
 # # Remove rsync
-RUN apt-get remove -y rsync
+# RUN apt-get remove -y rsync
 
 # # Now we can run the full copy command
 
@@ -29,8 +28,14 @@ ENV NODE_ENV=production
 
 RUN yarn run build
 
+FROM node:22 AS runner
+
+WORKDIR /run
+
+COPY --from=builder /usr/src/build/dist /run
+
 EXPOSE 3000
 
 ENV NODE_NO_WARNINGS=1
 
-CMD ["yarn", "run", "server"]
+CMD ["node", "index.mjs"]

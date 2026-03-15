@@ -1,10 +1,8 @@
 .DS_STORE
 
 node_modules
-ai
-geologic-patterns
 .env
-docker-compose.yaml
+.idea
 
 # For yarn v2 with Plug'n'Play
 .pnp.*
@@ -17,8 +15,3 @@ docker-compose.yaml
 
 .vite
 dist
-
-deps/web-components/.yarn
-deps/web-components/storybook/node_modules
-
-

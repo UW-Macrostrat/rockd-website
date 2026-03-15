@@ -22,11 +22,6 @@ export const mapboxAccessToken = getRuntimeConfig("MAPBOX_API_TOKEN");
 
 export const baseURL = getRuntimeConfig("BASE_URL", "/");
 
-export const ingestPrefix = getRuntimeConfig(
-  "MACROSTRAT_INGEST_API",
-  apiDomain + "/api/ingest"
-);
-
 export const matomoApiURL = getRuntimeConfig("MATOMO_API_URL");
 
 export const matomoToken = getRuntimeConfig("MATOMO_API_TOKEN");
