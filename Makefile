@@ -16,7 +16,7 @@ release:
 debug:
 	docker build -t rockd_website:latest .
 	-docker kill rockd_website
-	docker run --rm -t \
+	docker run --rm -it \
 		-p 5500:5500 \
 		-p 9229:9229 \
 		-d \

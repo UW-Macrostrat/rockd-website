@@ -28,14 +28,11 @@ ENV NODE_ENV=production
 
 RUN yarn run build
 
-FROM node:22 AS runner
-
-WORKDIR /run
-
-COPY --from=builder /usr/src/build/dist /run
+# TODO: we could slim things down by removing
+# dev dependencies here...
 
 EXPOSE 3000
 
 ENV NODE_NO_WARNINGS=1
 
-CMD ["node", "index.mjs"]
+CMD ["yarn", "node", "dist/server/index.mjs"]

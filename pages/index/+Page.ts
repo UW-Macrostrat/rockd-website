@@ -101,17 +101,20 @@ export function Page() {
       ]),
     ]),
     h(FullHeightContainer, { className: "map-container" }, [
-      h("div.map-imgs", [
-        h(Image, {
+      h("div.map-images", [
+        h(MapImage, {
           src: "main-page/grand_canyon.jpg",
           className: "map-shot grand_canyon",
         }),
-        h(Image, {
+        h(MapImage, {
           src: "main-page/new_zealand.jpg",
           className: "map-shot new_zealand",
         }),
-        h(Image, { src: "main-page/world.jpg", className: "map-shot world" }),
-        h(Image, {
+        h(MapImage, {
+          src: "main-page/world.jpg",
+          className: "map-shot world",
+        }),
+        h(MapImage, {
           src: "main-page/appalachia.jpg",
           className: "map-shot appalachia",
         }),
@@ -225,6 +228,15 @@ export function Page() {
       ]),
     ]),
     h(Footer),
+  ]);
+}
+
+function MapImage({ src, className }) {
+  return h("div.map-image", [
+    h(Image, {
+      src,
+      className,
+    }),
   ]);
 }
 

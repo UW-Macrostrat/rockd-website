@@ -34,23 +34,6 @@
   p.tagline
     font-size: 1.2em
 
-  p
-    color: white
-    a
-      color: #dddddd
-
-    a:hover
-      color: white
-
-  h1
-    color: white
-    a
-      font-size: 40px
-      color: #dddddd
-
-    a:hover
-      color: white
-
 
 .dashboard-img-container
   margin: 2em 0
@@ -84,14 +67,12 @@
   background-size: cover
   background-repeat: no-repeat
 
-.map-info
-  flex: 1
-  max-width: 50%
-  min-width: 200px
-  text-align: center
-
 .back-img
-  opacity: 0.3
+  opacity: 0.5
+
+:global(.bp6-dark)
+  .back-img
+    opacity: 0.3
 
 // Half Height Row
 .half-height-row
@@ -150,10 +131,32 @@
 .profile-img
   max-width: 300px
 
-.map-imgs
+.map-info
+  flex: 1
+  max-width: 50%
+  min-width: 200px
+  text-align: center
+  max-height: 100%
+
+@media (min-width: 600px)
+  .map-images
+    grid-template-columns: 50% 50%
+
+
+.map-images
   display: grid
-  grid-template-columns: 50% 50%
-  grid-template-rows: 25vh 25vh
+  //grid-template-rows: 50% 50%
+  max-width: 900px
+  gap: 1em
+
+  .map-image
+    aspect-ratio: 1/1
+    overflow: hidden
+    border-radius: 1em
+    img
+      width: 100%
+      height: 100%
+      object-fit: cover
 
 .main-content
   position: absolute

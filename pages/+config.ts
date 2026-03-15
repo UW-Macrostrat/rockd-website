@@ -15,7 +15,6 @@ export default {
     "description",
     "title",
     "environment",
-    "urlPathname",
     "scripts",
   ],
   clientRouting: true,
