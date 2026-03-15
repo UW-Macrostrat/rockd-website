@@ -30,14 +30,11 @@ declare global {
   namespace Vike {
     interface Config {
       description?: string;
-      supportsDarkMode?: boolean;
       scripts?: string[];
     }
     interface PageContext {
       pageProps?: PageProps;
       urlPathname: string;
-      user?: User;
-      macrostratLogoFlavor?: string;
       mdxContent?: string;
       environment: Record<string, string>;
       exports: {
