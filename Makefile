@@ -8,8 +8,8 @@ VERSION := $(shell node -p "require('./package.json').version")
 
 release:
 	# Ensure that the repository is clean
-	git add .
-	git commit -m "deploying"
+	git diff-index --quiet HEAD --
+	# Add a version tag
 	git tag -a v$(VERSION) -m "Version $(VERSION)"
 	git push origin main --follow-tags
 
