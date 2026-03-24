@@ -17,7 +17,7 @@ export const burwellTileDomain = getRuntimeConfig(
 );
 export const apiDomain = getRuntimeConfig("MACROSTRAT_API_DOMAIN");
 export const tileserverDomain = burwellTileDomain;
-
+export const macrostratEnv = getRuntimeConfig("MACROSTRAT_ENV");
 export const mapboxAccessToken = getRuntimeConfig("MAPBOX_API_TOKEN");
 
 export const baseURL = getRuntimeConfig("BASE_URL", "/");
@@ -41,4 +41,5 @@ export const SETTINGS = {
   mapboxAccessToken,
   rockdApiOldURL,
   matomoToken,
+  macrostratEnv,
 };

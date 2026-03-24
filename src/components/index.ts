@@ -1,6 +1,11 @@
 import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
 import { AnchorButton, Button, Divider, Icon } from "@blueprintjs/core";
-import { rockdApiOldURL, rockdApiURL, SETTINGS } from "~/settings";
+import {
+  rockdApiOldURL,
+  rockdApiURL,
+  macrostratEnv,
+  SETTINGS,
+} from "~/settings";
 import { useRef, useState } from "react";
 import h from "./index.module.sass";
 
@@ -10,9 +15,10 @@ export function Footer() {
     { href: "/explore", icon: "geosearch", text: "Explore" },
     { href: "/heatmap", icon: "map", text: "Heatmap" },
   ];
-
   const footerLinks2 = [
-    { href: "/metrics", icon: "chart", text: "Metrics" },
+    ...(macrostratEnv !== "production"
+      ? [{ href: "/metrics", icon: "chart", text: "Metrics" }]
+      : []),
     { href: "/terms", icon: "manual", text: "Terms and Conditions" },
     { href: "/privacy", icon: "lock", text: "Privacy" },
   ];
