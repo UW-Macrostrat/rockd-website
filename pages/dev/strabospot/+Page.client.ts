@@ -22,19 +22,85 @@ import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "../../explore/map-style";
 import { atom, useAtom } from "jotai";
 import { FeatureDetails } from "./featured-checkins";
+import {
+  refreshStoredStrabospotAuth,
+  clearStoredStrabospotAuth,
+  SendToStrabospotButton,
+} from "./strabospot-integration";
+import { macrostratEnv } from "~/settings";
 
 interface SidebarProps {
   title: string;
   onClose?: () => void;
   children?: ReactNode;
   showCloseButton?: boolean;
+  isStrabospotSynced: boolean;
+  isCheckingStrabospotSync: boolean;
+  onToggleStrabospotSync: () => void;
 }
+const strabospotSyncButtonBaseStyle = {
+  borderRadius: "8px",
+  fontWeight: 600,
+  fontSize: "12px",
+  letterSpacing: "0.01em",
+  padding: "0 12px",
+  height: "34px",
+  border: "1px solid transparent",
+  transition: "all 120ms ease",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "8px",
+};
+
+const strabospotSyncButtonStyles = {
+  checking: {
+    ...strabospotSyncButtonBaseStyle,
+    background: "transparent",
+    color: "#6b7280",
+    border: "1px solid #d1d5db",
+    boxShadow: "none",
+    cursor: "default",
+  },
+  synced: {
+    ...strabospotSyncButtonBaseStyle,
+    background: "linear-gradient(180deg, #bfc6d2 0%, #a8b1bf 100%)",
+    color: "#364152",
+    border: "1px solid #8f99a8",
+    boxShadow:
+      "inset 0 2px 4px rgba(55,65,81,0.22), inset 0 -1px 0 rgba(255,255,255,0.35), 0 1px 0 rgba(255,255,255,0.2)",
+    transform: "translateY(1px)",
+  },
+  unsynced: {
+    ...strabospotSyncButtonBaseStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid currentColor",
+    boxShadow: "none",
+  },
+};
+
+const strabospotBadgeImageStyle = {
+  width: "22px",
+  height: "22px",
+  borderRadius: "4px",
+  objectFit: "cover" as const,
+  display: "block",
+};
+
+const strabospotSyncControlStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "8px",
+};
 
 function Sidebar({
   title,
   onClose,
   children,
   showCloseButton = true,
+  isStrabospotSynced,
+  isCheckingStrabospotSync,
+  onToggleStrabospotSync,
 }: SidebarProps) {
   const _showCloseButton = showCloseButton && onClose != null;
   const [showSettings, setShowSettings] = useAtom(showSettingsAtom);
@@ -44,6 +110,32 @@ function Sidebar({
       h(RockdSiteIcon, { className: "site-icon" }),
       h("h1.page-title", title),
       h("div.tools", [
+        h("div", { style: strabospotSyncControlStyle }, [
+          h("img", {
+            src: "https://strabospot.org/includes/mimages/pic01.jpg",
+            alt: "StraboSpot",
+            style: strabospotBadgeImageStyle,
+          }),
+          h(
+            Button,
+            {
+              minimal: false,
+              outlined: false,
+              onClick: onToggleStrabospotSync,
+              disabled: isCheckingStrabospotSync,
+              style: isCheckingStrabospotSync
+                ? strabospotSyncButtonStyles.checking
+                : isStrabospotSynced
+                ? strabospotSyncButtonStyles.synced
+                : strabospotSyncButtonStyles.unsynced,
+            },
+            isCheckingStrabospotSync
+              ? "Checking..."
+              : isStrabospotSynced
+              ? "Linked to Strabospot"
+              : "Link to Strabospot"
+          ),
+        ]),
         h(ToolButton, {
           icon: "settings",
           onClick: () => setShowSettings(!showSettings),
@@ -77,6 +169,32 @@ export function Page() {
   const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
   const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSettings, setSettings] = useAtom(showSettingsAtom);
+  const [isStrabospotSynced, setIsStrabospotSynced] = useState(false);
+  const [isCheckingStrabospotSync, setIsCheckingStrabospotSync] =
+    useState(true);
+  useEffect(() => {
+    let cancelled = false;
+    async function checkStrabospotSync() {
+      const ok = await refreshStoredStrabospotAuth();
+      if (cancelled) return;
+      setIsStrabospotSynced(ok);
+      setIsCheckingStrabospotSync(false);
+    }
+    checkStrabospotSync();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleToggleStrabospotSync() {
+    if (isStrabospotSynced) {
+      clearStoredStrabospotAuth();
+      setIsStrabospotSynced(false);
+      return;
+    }
+
+    window.location.href = "/dev/strabospot/login";
+  }
 
   const style = useMapStyle(
     type,
@@ -108,6 +226,9 @@ export function Page() {
       {
         title: "Settings",
         onClose: () => setSettings(false),
+        isStrabospotSynced,
+        isCheckingStrabospotSync,
+        onToggleStrabospotSync: handleToggleStrabospotSync,
       },
       h(ContextPanel)
     );
@@ -125,6 +246,9 @@ export function Page() {
           setSelectedCheckin(null);
           deletePins(".selected_pin");
         },
+        isStrabospotSynced,
+        isCheckingStrabospotSync,
+        onToggleStrabospotSync: handleToggleStrabospotSync,
       },
       h("div.checkin-container", clickedCheckins)
     );
@@ -134,8 +258,11 @@ export function Page() {
       {
         title: "My checkins",
         showCloseButton: false,
+        isStrabospotSynced,
+        isCheckingStrabospotSync,
+        onToggleStrabospotSync: handleToggleStrabospotSync,
       },
-      h(FeatureDetails, { setInspectPosition })
+      h(FeatureDetails, { setInspectPosition, isStrabospotSynced })
     );
   }
 

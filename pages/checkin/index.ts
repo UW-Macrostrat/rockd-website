@@ -10,14 +10,13 @@ import {
 } from "~/components";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
-import { SETTINGS, macrostratEnv, macrostratApiURL } from "~/settings";
+import { SETTINGS, macrostratApiURL } from "~/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
 import { ContentPage } from "~/layouts";
 import "@macrostrat/data-components/dist/data-components.css";
-import { SendToStrabospotButton } from "../dev/strabospot/strabospot-integration";
 
 function Map(props) {
   return h(
@@ -194,10 +193,6 @@ function Overlay({ checkin, center, LngLatProps, ratingArr, profile_pic }) {
             ]),
           ]
         ),
-        macrostratEnv === "development" &&
-          h("div", { style: { marginTop: "0.75rem" } }, [
-            h(SendToStrabospotButton, { checkin }),
-          ]),
       ]),
       h(
         "div.location-img-container",

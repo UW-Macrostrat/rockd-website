@@ -5,10 +5,11 @@ import { PageCarousel, fetchRockdData } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
 import { useAsyncMemo } from "@macrostrat/ui-components";
 import { useMapRef } from "@macrostrat/mapbox-react";
+import { SendToStrabospotButton } from "./strabospot-integration";
 
 const PERSON_ID = 127426;
 
-export function FeatureDetails({ setInspectPosition }) {
+export function FeatureDetails({ setInspectPosition, isStrabospotSynced }) {
   const [page, setPage] = useState(1);
   const mapRef = useMapRef();
 
@@ -36,9 +37,27 @@ export function FeatureDetails({ setInspectPosition }) {
     return 0;
   });
 
-  const checkins = createCheckins(sorted, mapRef, setInspectPosition);
+  const checkinCards = sorted.map((checkin) => {
+    const tile = createCheckins([checkin], mapRef, setInspectPosition);
 
-  return h("div.checkin-container", [checkins, pages]);
+    return h(
+      "div",
+      {
+        key: checkin.checkin_id ?? checkin.id,
+        style: { marginBottom: "1rem" },
+      },
+      [
+        tile,
+        h.if(isStrabospotSynced)(
+          "div",
+          { style: { marginTop: "0.5rem" } },
+          h(SendToStrabospotButton, { checkin })
+        ),
+      ]
+    );
+  });
+
+  return h("div.checkin-container", [checkinCards, pages]);
 }
 
 function useRockdCheckins(page: number) {
