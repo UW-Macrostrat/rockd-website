@@ -7,13 +7,19 @@ import { useAsyncMemo } from "@macrostrat/ui-components";
 import { useMapRef } from "@macrostrat/mapbox-react";
 import { SendToStrabospotButton } from "./strabospot-integration";
 
-const PERSON_ID = 127426;
-
-export function FeatureDetails({ setInspectPosition, isStrabospotSynced }) {
+export function FeatureDetails({
+  setInspectPosition,
+  isStrabospotSynced,
+  personId,
+}) {
   const [page, setPage] = useState(1);
   const mapRef = useMapRef();
 
-  const [result, nextData] = useRockdCheckins(page);
+  const [result, nextData] = useRockdCheckins(page, personId);
+
+  if (personId == null) {
+    return null;
+  }
 
   if (result == null) {
     return h(Spinner, { className: "loading-spinner" });
@@ -21,7 +27,7 @@ export function FeatureDetails({ setInspectPosition, isStrabospotSynced }) {
 
   if (result.length === 0) {
     return h("div.checkin-container", [
-      h("p", `No checkins found for person_id=${PERSON_ID}`),
+      h("p", `No checkins found for person_id=${personId}`),
     ]);
   }
 
@@ -60,21 +66,21 @@ export function FeatureDetails({ setInspectPosition, isStrabospotSynced }) {
   return h("div.checkin-container", [checkinCards, pages]);
 }
 
-function useRockdCheckins(page: number) {
+function useRockdCheckins(page: number, personId: number) {
   const result = useAsyncMemo(async () => {
-    return await fetchRockdCheckins(page);
-  }, [page]);
+    return await fetchRockdCheckins(page, personId);
+  }, [page, personId]);
 
   const next = useAsyncMemo(async () => {
-    return await fetchRockdCheckins(page + 1);
-  }, [page]);
+    return await fetchRockdCheckins(page + 1, personId);
+  }, [page, personId]);
 
   return [result, next];
 }
 
-async function fetchRockdCheckins(page: number) {
+async function fetchRockdCheckins(page: number, personId: number) {
   const res = await fetchRockdData(
-    `/protected/checkins?person_id=${PERSON_ID}&page=${page}`
+    `/protected/checkins?person_id=${personId}&page=${page}`
   );
   const json = await res.json();
   return json?.success?.data ?? [];

@@ -226,6 +226,7 @@ export function SendToStrabospotButton({
       }
 
       setResponseBody(parsed);
+      setWasSent(true);
     } catch (err: any) {
       setError(err?.message ?? "Request failed");
     } finally {
@@ -237,13 +238,14 @@ export function SendToStrabospotButton({
     h(
       Button,
       {
-        intent: "primary",
         fill: true,
         loading: isLoading,
         onClick: handleSend,
-        style: { marginTop: "0.5rem" },
+        style: wasSent
+          ? sendToStrabospotButtonStyles.sent
+          : sendToStrabospotButtonStyles.default,
       },
-      "Send to Strabospot"
+      wasSent ? "Sent to Strabospot" : "Send to Strabospot"
     ),
 
     h.if(isLoading)(

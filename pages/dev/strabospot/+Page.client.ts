@@ -28,6 +28,7 @@ import {
   SendToStrabospotButton,
 } from "./strabospot-integration";
 import { macrostratEnv } from "~/settings";
+import { getStoredRockdPersonId } from "../../login/rockd-auth";
 
 interface SidebarProps {
   title: string;
@@ -172,6 +173,19 @@ export function Page() {
   const [isStrabospotSynced, setIsStrabospotSynced] = useState(false);
   const [isCheckingStrabospotSync, setIsCheckingStrabospotSync] =
     useState(true);
+  const [rockdPersonId, setRockdPersonId] = useState<number | null>(null);
+  const [rockdChecked, setRockdChecked] = useState(false);
+
+  useEffect(() => {
+    const personId = getStoredRockdPersonId();
+    if (personId == null) {
+      window.location.href = "/login";
+      return;
+    }
+    setRockdPersonId(personId);
+    setRockdChecked(true);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     async function checkStrabospotSync() {
@@ -200,7 +214,8 @@ export function Page() {
     type,
     mapboxAccessToken,
     showSatellite,
-    showOverlay
+    showOverlay,
+    rockdPersonId
   );
 
   const [selectedCheckin, setSelectedCheckin] = useState<number | null>(null);
@@ -262,11 +277,15 @@ export function Page() {
         isCheckingStrabospotSync,
         onToggleStrabospotSync: handleToggleStrabospotSync,
       },
-      h(FeatureDetails, { setInspectPosition, isStrabospotSynced })
+      h(FeatureDetails, {
+        setInspectPosition,
+        isStrabospotSynced,
+        personId: rockdPersonId,
+      })
     );
   }
 
-  if (style == null) return null;
+  if (!rockdChecked || rockdPersonId == null || style == null) return null;
 
   const mapPosition: MapPosition = {
     camera: {
@@ -307,7 +326,7 @@ export function Page() {
   );
 }
 
-function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
+function useMapStyle(type, mapboxToken, showSatellite, showOverlay, personId) {
   const dark = useDarkMode();
   const isEnabled = dark?.isEnabled;
 
@@ -319,8 +338,6 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
 
   const [actualStyle, setActualStyle] = useState(null);
 
-  const PERSON_ID = 127426;
-
   const baseOverlayStyle = mapStyle(type);
 
   const strabospotOverlayStyle = {
@@ -330,7 +347,7 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
       weaver: {
         ...baseOverlayStyle.sources.weaver,
         tiles: [
-          `${SETTINGS.rockdApiURL}/checkin-tile/{z}/{x}/{y}?cluster=true&person_id=${PERSON_ID}`,
+          `${SETTINGS.rockdApiURL}/checkin-tile/{z}/{x}/{y}?cluster=true&person_id=${personId}`,
         ],
       },
     },
@@ -341,13 +358,18 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
     : strabospotOverlayStyle;
 
   useEffect(() => {
+    if (personId == null) {
+      setActualStyle(null);
+      return;
+    }
+
     buildInspectorStyle(finalStyle, overlayStyle, {
       mapboxToken,
       inDarkMode: isEnabled,
     }).then((s) => {
       setActualStyle(s);
     });
-  }, [isEnabled, showSatellite, showOverlay]);
+  }, [isEnabled, showSatellite, showOverlay, personId, mapboxToken]);
 
   return actualStyle;
 }
