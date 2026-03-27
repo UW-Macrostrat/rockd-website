@@ -381,61 +381,102 @@ function ToolButton({ icon, onClick }) {
     onClick,
   });
 }
-
 function ContextPanel() {
   const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
 
   function handleLogout() {
     clearRockdAuth();
-    clearStoredStrabospotAuth(); // optional
+    clearStoredStrabospotAuth();
     window.location.href = "/login";
   }
 
-  return h("div", { className: "settings-content" }, [
-    h(DarkModeButton, { className: "dark-btn", showText: true }),
-
-    h(
-      Button,
-      {
-        className: showSatellite
-          ? "selected satellite-style"
-          : "satellite-style",
-        onClick: () => setSatellite(!showSatellite),
+  return h(
+    "div",
+    {
+      className: "settings-content",
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
       },
-      [
-        h("div.btn-inside", [
-          h(Icon, { className: "satellite-icon", icon: "satellite" }),
-          h("p", "Satellite"),
-        ]),
-      ]
-    ),
+    },
+    [
+      h(DarkModeButton, { className: "dark-btn", showText: true }),
 
-    h(
-      Button,
-      {
-        className: showOverlay ? "selected map-style" : "map-style",
-        onClick: () => setOverlay(!showOverlay),
-      },
-      [
-        h("div.btn-inside", [
-          h(Icon, { className: "overlay-icon", icon: "map" }),
-          h("p", "Overlay"),
-        ]),
-      ]
-    ),
+      h(
+        "div",
+        {
+          style: {
+            display: "flex",
+            gap: "0.75rem",
+            flexWrap: "wrap",
+          },
+        },
+        [
+          h(
+            Button,
+            {
+              className: showSatellite
+                ? "selected satellite-style"
+                : "satellite-style",
+              onClick: () => setSatellite(!showSatellite),
+            },
+            [
+              h("div.btn-inside", [
+                h(Icon, { className: "satellite-icon", icon: "satellite" }),
+                h("p", "Satellite"),
+              ]),
+            ]
+          ),
 
-    h(
-      Button,
-      {
-        intent: "danger",
-        outlined: true,
-        onClick: handleLogout,
-        style: { marginTop: "0.75rem" },
-      },
-      [h("div.btn-inside", [h(Icon, { icon: "log-out" }), h("p", "Logout")])]
-    ),
-  ]);
+          h(
+            Button,
+            {
+              className: showOverlay ? "selected map-style" : "map-style",
+              onClick: () => setOverlay(!showOverlay),
+            },
+            [
+              h("div.btn-inside", [
+                h(Icon, { className: "overlay-icon", icon: "map" }),
+                h("p", "Overlay"),
+              ]),
+            ]
+          ),
+        ]
+      ),
+
+      h(
+        "div",
+        {
+          style: {
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          },
+        },
+        [
+          h(
+            Button,
+            {
+              intent: "danger",
+              outlined: true,
+              onClick: handleLogout,
+              style: {
+                minWidth: "160px",
+              },
+            },
+            [
+              h("div.btn-inside", [
+                h(Icon, { icon: "log-out" }),
+                h("p", "Logout"),
+              ]),
+            ]
+          ),
+        ]
+      ),
+    ]
+  );
 }
 
 function createSelectedCheckins(result, setInspectPosition) {
