@@ -10,12 +10,11 @@ import {
 } from "~/components";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
-import { SETTINGS } from "~/settings";
+import { SETTINGS, macrostratApiURL } from "~/settings";
 import "@macrostrat/style-system";
 import { Overlay2 } from "@blueprintjs/core";
 import { LithologyList } from "@macrostrat/data-components";
 import { ClientOnly } from "vike-react/ClientOnly";
-import { macrostratApiURL } from "~/settings";
 import { ContentPage } from "~/layouts";
 import "@macrostrat/data-components/dist/data-components.css";
 
@@ -171,28 +170,30 @@ function Overlay({ checkin, center, LngLatProps, ratingArr, profile_pic }) {
 
   return h("div.overlay", [
     h.if(!overlayOpen)("div.checkin-header-content", [
-      h(
-        "div.stop-header",
-        {
-          onClick: () => {
-            setOverlayOpen(true);
+      h("div", [
+        h(
+          "div.stop-header",
+          {
+            onClick: () => {
+              setOverlayOpen(true);
+            },
           },
-        },
-        [
-          profile_pic,
-          h("div.stop-main-info", [
-            h(
-              "h3",
-              { className: "name" },
-              checkin.first_name + " " + checkin.last_name
-            ),
-            h("h4", { className: "edited" }, checkin.created),
-            h("p.location", "Near " + checkin.near),
-            LngLatCoords(LngLatProps),
-            h("h3", { className: "rating" }, ratingArr),
-          ]),
-        ]
-      ),
+          [
+            profile_pic,
+            h("div.stop-main-info", [
+              h(
+                "h3",
+                { className: "name" },
+                checkin.first_name + " " + checkin.last_name
+              ),
+              h("h4", { className: "edited" }, checkin.created),
+              h("p.location", "Near " + checkin.near),
+              LngLatCoords(LngLatProps),
+              h("h3", { className: "rating" }, ratingArr),
+            ]),
+          ]
+        ),
+      ]),
       h(
         "div.location-img-container",
         h(BlankImage, {

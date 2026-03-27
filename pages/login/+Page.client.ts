@@ -1,203 +1,146 @@
-import React, { useState, useEffect } from "react";
-import { Button, Callout, Intent, Classes } from "@blueprintjs/core";
-import classNames from "classnames";
-import "./main.sass";
 import h from "@macrostrat/hyper";
+import { Button, Callout } from "@blueprintjs/core";
+import { useState } from "react";
+import { saveRockdAuth } from "./rockd-auth";
+import s from "../index/main.module.sass";
+import { Image } from "~/components";
 
-type LoginFormState = {
-  username: string;
-  password: string;
-};
-
-function isValid({ username, password }: LoginFormState): boolean {
-  return (
-    username != null &&
-    password != null &&
-    username.length >= 4 &&
-    password.length >= 4
-  );
-}
-
-function LoginForm() {
-  const [state, setState] = useState<LoginFormState>({
-    username: "",
-    password: "",
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
-  const [linkStraboResponse, setLinkStraboResponse] = useState<any>(null);
-  const [jParam, setJParam] = useState<string | null>(null);
-  const addLog = (msg) => setLogs((prev) => [...prev, msg]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const j = params.get("j");
-    if (j) {
-      setJParam(j);
-    }
-  }, []);
-
-  const submitForm = async () => {
-    try {
-      const login = await fetch("https://dev.rockd.org/api/v2/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: state.username,
-          password: state.password,
-        }),
-      });
-      const loginBody = await login.json();
-      console.log(loginBody);
-      if (login.status === 502) {
-        setError("The server is not available");
-        return;
-      }
-      if (login.ok) {
-        if (jParam) {
-          const mergedBody = {
-            ...loginBody,
-            strabo_jwt: jParam,
-          };
-          const linkStrabo = await fetch(
-            "https://dev.rockd.org/api/v2/link-strabospot",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(mergedBody),
-            }
-          );
-          const linkStraboBody = await linkStrabo.json();
-          addLog(`Saving to Rockd database: ${JSON.stringify(linkStraboBody)}`);
-          setLinkStraboResponse(linkStraboBody);
-        }
-        setLoggedIn(true);
-        setError(null);
-        return;
-      }
-    } catch (err) {
-      setError("Something went wrong");
-    }
-  };
-
-  const onChange = (e) => {
-    if (!e.target) return;
-    setState({ ...state, [e.target.name]: e.target.value });
-  };
-
-  const className = classNames(Classes.INPUT, "bp4-large");
-
-  useEffect(() => {
-    const sendRockdJWTToStrabo = async () => {
-      if (loggedIn && linkStraboResponse && jParam) {
-        try {
-          const rockdJWTToStrabo = await fetch(
-            "https://strabospot.org/jwtdb/macroJWT",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${jParam}`,
-              },
-              body: JSON.stringify(linkStraboResponse),
-            }
-          );
-          const straboResponse = await rockdJWTToStrabo.json();
-          addLog(
-            `Rockd token sent to Strabospot: ${JSON.stringify(straboResponse)}`
-          );
-        } catch (err) {
-          console.error("Failed to send Rockd JWT to Strabo:", err);
-        }
-      }
-    };
-    sendRockdJWTToStrabo();
-  }, [loggedIn, linkStraboResponse, jParam]);
-
-  if (loggedIn) {
-    return h("div", { className: "login-page" }, [
-      h("img", {
-        src: "https://storage.macrostrat.org/assets/rockd/main-page/rockd_transparent.png",
-        alt: "Rockd logo",
-        className: "rockd-logo",
-      }),
-      h(Callout, {
-        title: "Login Successful",
-        intent: Intent.SUCCESS,
-        className: "login-info",
-      }),
-      h("div", { className: "login-logs" }, [
-        h("h4", "Debug logs"),
-        h("pre", logs.map((l) => `${l}\n`).join("")),
-      ]),
-      h(
-        Button,
-        { intent: Intent.DANGER, onClick: () => setLoggedIn(false) },
-        "Logout"
-      ),
-    ]);
-  } else {
-    return h("div", { className: "login-page" }, [
-      h("img", {
-        src: "https://storage.macrostrat.org/assets/rockd/main-page/rockd_transparent.png",
-        alt: "Rockd logo",
-        className: "rockd-logo",
-      }),
-      h("h2", "Login"),
-      error &&
-        h(Callout, {
-          className: "login-info",
-          title: "Login Error",
-          intent: Intent.DANGER,
-          children: error,
-        }),
-      h(
-        "form.login-form",
-        {
-          onSubmit: (e) => {
-            e.preventDefault(); // Prevent form reload
-            submitForm();
-          },
-        },
-        [
-          h("input", {
-            type: "text",
-            name: "username",
-            value: state.username,
-            onChange,
-            className,
-            placeholder: "Username",
-          }),
-          h("input", {
-            type: "password",
-            name: "password",
-            value: state.password,
-            onChange,
-            className,
-            placeholder: "Password",
-          }),
-          h(
-            Button,
-            {
-              intent: Intent.PRIMARY,
-              large: true,
-              type: "submit",
-              disabled: !isValid(state),
-            },
-            "Login"
-          ),
-        ]
-      ),
-    ]);
-  }
-}
-function InnerPage() {
-  return h("div", { className: "container" }, [
-    h("div", { className: "login-wrapper" }, [h(LoginForm)]),
-  ]);
-}
+const ROCKD_LOGIN_ENDPOINT = "https://dev.rockd.org/api/v2/login";
 
 export function Page() {
-  return h(InnerPage);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e?: Event) {
+    e?.preventDefault?.();
+    setError(null);
+
+    try {
+      const res = await fetch(ROCKD_LOGIN_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const body = await res.json();
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(body, null, 2));
+      }
+
+      saveRockdAuth(body);
+      window.location.href = "/dev/strabospot";
+    } catch (err: any) {
+      setError(err?.message ?? "Login failed");
+    } finally {
+    }
+  }
+
+  return s("div.full-height-container", [
+    s("div.mask", [
+      s(Image, {
+        src: "main-page/field.jpg",
+        className: "start-img back-img",
+        alt: "Field",
+      }),
+    ]),
+
+    s("div.main-content.side-by-side", [
+      s("div.content-panel.app-info", [
+        s(Image, {
+          src: "main-page/rockd_transparent.png",
+          className: "not-huge",
+          alt: "Rockd logo",
+        }),
+
+        s("p.tagline", "Learn about, explore, and document the geologic world"),
+
+        h(
+          "div",
+          {
+            style: {
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "1.5rem",
+            },
+          },
+          [
+            h(
+              "form",
+              {
+                onSubmit: handleSubmit,
+                style: {
+                  width: "100%",
+                  maxWidth: "420px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                },
+              },
+              [
+                h("input", {
+                  type: "email",
+                  value: email,
+                  onChange: (e) => setEmail(e.target.value),
+                  placeholder: "Email",
+                  style: {
+                    padding: "0.85rem 1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    fontSize: "1rem",
+                  },
+                }),
+
+                h("input", {
+                  type: "password",
+                  value: password,
+                  onChange: (e) => setPassword(e.target.value),
+                  placeholder: "Password",
+                  style: {
+                    padding: "0.85rem 1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    fontSize: "1rem",
+                  },
+                }),
+
+                h(
+                  Button,
+                  {
+                    type: "submit",
+                    background: "var(--panel-background-color, white)",
+                    style: {
+                      width: "fit-content",
+                      alignSelf: "center",
+                    },
+                  },
+                  "Login"
+                ),
+
+                h.if(error != null)(
+                  Callout,
+                  { intent: "danger", title: "Login failed" },
+                  error
+                ),
+              ]
+            ),
+          ]
+        ),
+      ]),
+
+      s(Image, {
+        src: "main-page/main.png",
+        className: "main-img",
+        alt: "Rockd app preview",
+      }),
+    ]),
+  ]);
 }
