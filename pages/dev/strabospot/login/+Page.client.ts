@@ -299,19 +299,7 @@ export function Page() {
             )
           ),
 
-          h.if(result != null)(
-            "div",
-            { style: styles.status },
-            h(
-              Callout,
-              { intent: "success", title: "Authenticated" },
-              h(
-                "pre",
-                { style: styles.resultPre },
-                JSON.stringify(result, null, 2)
-              )
-            )
-          ),
+          h.if(result != null)("div", { style: styles.status }),
         ]),
       ]),
     ]),

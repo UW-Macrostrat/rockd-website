@@ -25,10 +25,8 @@ import { FeatureDetails } from "./featured-checkins";
 import {
   refreshStoredStrabospotAuth,
   clearStoredStrabospotAuth,
-  SendToStrabospotButton,
 } from "./strabospot-integration";
-import { macrostratEnv } from "~/settings";
-import { getStoredRockdPersonId } from "../../login/rockd-auth";
+import { getStoredRockdPersonId, clearRockdAuth } from "../../login/rockd-auth";
 
 interface SidebarProps {
   title: string;
@@ -44,13 +42,15 @@ const strabospotSyncButtonBaseStyle = {
   fontWeight: 600,
   fontSize: "12px",
   letterSpacing: "0.01em",
-  padding: "0 12px",
-  height: "34px",
+  padding: "0 6px",
+  height: "23px",
+  minHeight: "23px",
+  lineHeight: "1",
   border: "1px solid transparent",
   transition: "all 120ms ease",
   display: "inline-flex",
   alignItems: "center",
-  gap: "8px",
+  gap: "3px",
 };
 
 const strabospotSyncButtonStyles = {
@@ -64,11 +64,11 @@ const strabospotSyncButtonStyles = {
   },
   synced: {
     ...strabospotSyncButtonBaseStyle,
-    background: "linear-gradient(180deg, #bfc6d2 0%, #a8b1bf 100%)",
-    color: "#364152",
-    border: "1px solid #8f99a8",
+    background: "linear-gradient(180deg, #7ee08f 0%, #43b864 100%)",
+    color: "#2f6a41",
+    border: "1px solid #379654",
     boxShadow:
-      "inset 0 2px 4px rgba(55,65,81,0.22), inset 0 -1px 0 rgba(255,255,255,0.35), 0 1px 0 rgba(255,255,255,0.2)",
+      "inset 0 2px 4px rgba(16,53,29,0.2), inset 0 -1px 0 rgba(255,255,255,0.35), 0 1px 0 rgba(255,255,255,0.2)",
     transform: "translateY(1px)",
   },
   unsynced: {
@@ -133,7 +133,7 @@ function Sidebar({
             isCheckingStrabospotSync
               ? "Checking..."
               : isStrabospotSynced
-              ? "Linked to Strabospot"
+              ? "Synced"
               : "Link to Strabospot"
           ),
         ]),
@@ -386,8 +386,15 @@ function ContextPanel() {
   const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
 
+  function handleLogout() {
+    clearRockdAuth();
+    clearStoredStrabospotAuth(); // optional
+    window.location.href = "/login";
+  }
+
   return h("div", { className: "settings-content" }, [
     h(DarkModeButton, { className: "dark-btn", showText: true }),
+
     h(
       Button,
       {
@@ -403,6 +410,7 @@ function ContextPanel() {
         ]),
       ]
     ),
+
     h(
       Button,
       {
@@ -415,6 +423,17 @@ function ContextPanel() {
           h("p", "Overlay"),
         ]),
       ]
+    ),
+
+    h(
+      Button,
+      {
+        intent: "danger",
+        outlined: true,
+        onClick: handleLogout,
+        style: { marginTop: "0.75rem" },
+      },
+      [h("div.btn-inside", [h(Icon, { icon: "log-out" }), h("p", "Logout")])]
     ),
   ]);
 }
