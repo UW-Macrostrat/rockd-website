@@ -160,13 +160,11 @@ const styles = {
 export function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(getStoredStrabospotAuth());
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault?.();
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -177,7 +175,6 @@ export function Page() {
       setError(err?.message ?? "Login failed");
       setResult(null);
     } finally {
-      setIsLoading(false);
     }
   }
 
@@ -255,7 +252,6 @@ export function Page() {
                   Button,
                   {
                     type: "submit",
-                    loading: isLoading,
                     style: styles.loginButton,
                   },
                   "Login"
@@ -270,18 +266,12 @@ export function Page() {
               {
                 type: "button",
                 onClick: handleClear,
-                disabled: isLoading,
+
                 style: styles.clearButton,
               },
               "Clear saved auth"
             ),
           ]),
-
-          h.if(isLoading)(
-            "div",
-            { style: styles.spinnerWrap },
-            h(Spinner, { size: 18 })
-          ),
 
           h("div", { style: styles.helperText }, [
             h("div", { style: styles.helperLine }, "Sign up for new account."),

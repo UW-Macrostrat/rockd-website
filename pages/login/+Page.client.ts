@@ -10,12 +10,10 @@ const ROCKD_LOGIN_ENDPOINT = "https://dev.rockd.org/api/v2/login";
 export function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e?: Event) {
     e?.preventDefault?.();
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -42,7 +40,6 @@ export function Page() {
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
     } finally {
-      setIsLoading(false);
     }
   }
 
@@ -119,8 +116,7 @@ export function Page() {
                   Button,
                   {
                     type: "submit",
-                    loading: isLoading,
-                    intent: "primary",
+                    background: "var(--panel-background-color, white)",
                     style: {
                       width: "fit-content",
                       alignSelf: "center",
