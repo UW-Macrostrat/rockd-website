@@ -66,6 +66,83 @@ const selectionFooterStyle = {
   marginTop: "0.5rem",
 };
 
+const successDialogStyle = {
+  background: "#101923",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "14px",
+  boxShadow: "0 18px 50px rgba(0,0,0,0.45)",
+  color: "#f3f6fb",
+  overflow: "hidden",
+};
+
+const successDialogHeaderStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  fontWeight: 700,
+  fontSize: "18px",
+  color: "#f3f6fb",
+};
+
+const successDialogIconStyle = {
+  width: "30px",
+  height: "30px",
+  borderRadius: "999px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "linear-gradient(180deg, #7ee08f 0%, #43b864 100%)",
+  color: "#1d4d2d",
+  fontWeight: 800,
+  fontSize: "16px",
+  boxShadow:
+    "inset 0 1px 2px rgba(255,255,255,0.35), 0 2px 8px rgba(0,0,0,0.25)",
+};
+
+const successDialogBodyStyle = {
+  padding: "20px 24px 16px 24px",
+  background: "#101923",
+};
+
+const successDialogTitleStyle = {
+  margin: "0 0 10px 0",
+  fontSize: "20px",
+  fontWeight: 700,
+  color: "#f3f6fb",
+};
+
+const successDialogTextStyle = {
+  margin: 0,
+  fontSize: "15px",
+  lineHeight: 1.55,
+  color: "rgba(243,246,251,0.88)",
+};
+
+const successDialogLinkCardStyle = {
+  marginTop: "18px",
+  padding: "14px 16px",
+  borderRadius: "12px",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.07)",
+};
+
+const successDialogLinkStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "8px",
+  marginTop: "8px",
+  color: "#7fb3ff",
+  fontWeight: 700,
+  fontSize: "15px",
+  textDecoration: "none",
+};
+
+const successDialogFooterStyle = {
+  padding: "14px 24px 20px 24px",
+  background: "#101923",
+  borderTop: "1px solid rgba(255,255,255,0.06)",
+};
+
 export function FeatureDetails({
   setInspectPosition,
   isStrabospotSynced,
@@ -283,40 +360,61 @@ export function FeatureDetails({
         {
           isOpen: showSuccessDialog,
           onClose: () => setShowSuccessDialog(false),
-          title: "Checkins sent to StraboSpot",
+          title: h("div", { style: successDialogHeaderStyle }, [
+            h("span", { style: successDialogIconStyle }, "✓"),
+            h("span", "Checkins sent to StraboSpot"),
+          ]),
           canOutsideClickClose: true,
+          style: successDialogStyle,
         },
         [
-          h(DialogBody, [
+          h(DialogBody, { style: successDialogBodyStyle }, [
             h(
               "p",
-              { style: { marginTop: 0 } },
+              { style: successDialogTitleStyle },
               `${lastSentCount ?? 0} checkin${
                 lastSentCount === 1 ? "" : "s"
-              } successfully sent.`
+              } successfully sent`
             ),
-            h("p", "You can view your spots here:"),
             h(
-              "a",
-              {
-                href: "https://strabospot.org/my_field_data",
-                target: "_blank",
-                rel: "noopener noreferrer",
-                style: {
-                  color: "#2d6cdf",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                },
-              },
-              "Open My Field Data"
+              "p",
+              { style: successDialogTextStyle },
+              "Your selected checkins were synced to StraboSpot and should now be available in your field data."
             ),
+            h("div", { style: successDialogLinkCardStyle }, [
+              h(
+                "div",
+                {
+                  style: {
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "rgba(243,246,251,0.65)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                  },
+                },
+                "Next step"
+              ),
+              h(
+                "a",
+                {
+                  href: "https://strabospot.org/my_field_data",
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  style: successDialogLinkStyle,
+                },
+                ["Open My Field Data", h("span", "↗")]
+              ),
+            ]),
           ]),
           h(DialogFooter, {
+            style: successDialogFooterStyle,
             actions: [
               h(
                 Button,
                 {
                   intent: "success",
+                  large: true,
                   onClick: () => setShowSuccessDialog(false),
                 },
                 "Done"

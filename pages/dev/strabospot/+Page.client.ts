@@ -92,7 +92,7 @@ const strabospotSyncControlStyle = {
   display: "inline-flex",
   alignItems: "center",
   gap: "8px",
-  transform: "translateY(7px)",
+  transform: "translateY(6px)",
 };
 
 function Sidebar({
