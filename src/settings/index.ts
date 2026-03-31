@@ -42,4 +42,5 @@ export const SETTINGS = {
   rockdApiOldURL,
   matomoToken,
   macrostratEnv,
+  macrostratApiURL,
 };

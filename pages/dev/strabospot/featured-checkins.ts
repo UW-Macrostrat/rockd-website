@@ -13,7 +13,7 @@ import { createCheckins } from "~/components/checkin.client";
 import { useAsyncMemo } from "@macrostrat/ui-components";
 import { useMapRef } from "@macrostrat/mapbox-react";
 import {
-  getDatasetSpotIds,
+  getSentToStrabospotIds,
   sendCheckinsToStrabospotDataset,
 } from "./strabospot-integration";
 
@@ -154,24 +154,18 @@ export function FeatureDetails({
   const [sentIdsState, setSentIdsState] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
-  const [sendResponse, setSendResponse] = useState<any>(null);
   const mapRef = useMapRef();
   const [lastSentCount, setLastSentCount] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [result, nextData] = useRockdCheckins(page, personId);
 
-  const fetchedSentIds = useAsyncMemo(async () => {
-    if (!isStrabospotSynced) return new Set<number>();
-    return await getDatasetSpotIds();
-  }, [isStrabospotSynced]);
-
   useEffect(() => {
-    if (fetchedSentIds != null) {
-      setSentIdsState(new Set(fetchedSentIds));
-    } else if (!isStrabospotSynced) {
+    if (!isStrabospotSynced) {
       setSentIdsState(new Set());
+      return;
     }
-  }, [fetchedSentIds, isStrabospotSynced]);
+    setSentIdsState(new Set(getSentToStrabospotIds()));
+  }, [isStrabospotSynced]);
 
   const safeResult = result ?? [];
 
@@ -220,7 +214,6 @@ export function FeatureDetails({
 
   function startSelectionMode() {
     setSendError(null);
-    setSendResponse(null);
     setSelectionMode(true);
   }
 
@@ -233,7 +226,6 @@ export function FeatureDetails({
   async function handleBulkSend() {
     setIsSending(true);
     setSendError(null);
-    setSendResponse(null);
     setLastSentCount(null);
 
     try {
@@ -242,11 +234,14 @@ export function FeatureDetails({
       );
       const sentCount = selectedCheckins.length;
       const response = await sendCheckinsToStrabospotDataset(selectedCheckins);
-      setSendResponse(response);
-      setLastSentCount(sentCount);
-
-      const refreshedSentIds = await getDatasetSpotIds();
-      setSentIdsState(new Set(refreshedSentIds));
+      setLastSentCount(response?.sentCheckinIds?.length ?? sentCount);
+      setSentIdsState((prev) => {
+        const next = new Set(prev);
+        for (const id of response?.sentCheckinIds ?? []) {
+          next.add(Number(id));
+        }
+        return next;
+      });
 
       setSelectedIds(new Set());
       setSelectionMode(false);

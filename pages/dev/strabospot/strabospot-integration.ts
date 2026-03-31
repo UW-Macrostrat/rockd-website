@@ -1,8 +1,6 @@
-import { useState } from "react";
-import h from "@macrostrat/hyper";
+import { macrostratApiURL } from "~/settings";
 
-const CONVERT_ENDPOINT =
-  "https://dev.macrostrat.org/api/v3/dev/convert/field-site?in=checkin&out=spot";
+const CONVERT_ENDPOINT = `${macrostratApiURL}/api/v3/dev/convert/field-site?in=checkin&out=spot&bulk=false`;
 
 const STRABOSPOT_LOGIN_ENDPOINT = "https://strabospot.org/jwtauth/login";
 const STRABOSPOT_REFRESH_ENDPOINT = "https://strabospot.org/jwtauth/refresh";
@@ -14,6 +12,9 @@ const STRABOSPOT_CREATE_DATASET_ENDPOINT =
   "https://strabospot.org/jwtdb/dataset";
 const STRABOSPOT_CREATE_PROJECT_ENDPOINT =
   "https://strabospot.org/jwtdb/project";
+
+const STORAGE_KEY = "strabospot-auth";
+const SENT_TO_STRABOSPOT_KEY = "sent-to-strabospot";
 
 export interface StrabospotLoginResponse {
   access_token: string;
@@ -46,8 +47,6 @@ export interface StoredStrabospotAuth {
   datasetId?: number;
   projectId?: number;
 }
-
-const STORAGE_KEY = "strabospot-auth";
 
 async function parseJsonResponse(res: Response) {
   const text = await res.text();
@@ -166,6 +165,32 @@ async function getMyDatasets(accessToken: string) {
 async function getMyProjects(accessToken: string) {
   const body = await jwtFetch(STRABOSPOT_MY_PROJECTS_ENDPOINT, accessToken);
   return body?.projects ?? [];
+}
+
+async function getDatasetSpots(accessToken: string, datasetId: number) {
+  return await jwtFetch(
+    `https://strabospot.org/jwtdb/datasetSpots/${datasetId}`,
+    accessToken
+  );
+}
+
+function setSentToStrabospotIds(ids: number[]) {
+  localStorage.setItem(
+    SENT_TO_STRABOSPOT_KEY,
+    JSON.stringify(ids.filter((id) => Number.isFinite(id)))
+  );
+}
+
+export async function hydrateSentToStrabospotIds(auth: StoredStrabospotAuth) {
+  if (auth.accessToken == null || auth.datasetId == null) return;
+  const datasetBody = await getDatasetSpots(auth.accessToken, auth.datasetId);
+  const features = Array.isArray(datasetBody?.features)
+    ? datasetBody.features
+    : [];
+  const ids = features
+    .map((feature) => Number(feature?.properties?.id))
+    .filter((id) => Number.isFinite(id));
+  setSentToStrabospotIds(ids);
 }
 
 async function createDataset(
@@ -294,7 +319,6 @@ export async function loginAndRefreshStrabospot(
 ) {
   const login = await loginToStrabospot(email, password);
   const refresh = await refreshStrabospotToken(login.refresh_token);
-
   const auth: StoredStrabospotAuth = {
     accessToken: refresh.access_token,
     refreshToken: login.refresh_token,
@@ -302,10 +326,13 @@ export async function loginAndRefreshStrabospot(
     expiresIn: refresh.expires_in ?? login.expires_in,
     user: login.user,
   };
-
   saveStoredStrabospotAuth(auth);
-
   const enrichedAuth = await ensureRockdIntegrationResources(auth);
+  try {
+    await hydrateSentToStrabospotIds(enrichedAuth);
+  } catch (err) {
+    console.warn("Failed to hydrate sent-to-strabospot ids", err);
+  }
   return enrichedAuth;
 }
 
@@ -322,6 +349,7 @@ export function getStoredStrabospotAuth(): StoredStrabospotAuth | null {
 
 export function clearStoredStrabospotAuth() {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(SENT_TO_STRABOSPOT_KEY);
 }
 
 export async function refreshStoredStrabospotAuth(): Promise<boolean> {
@@ -354,41 +382,84 @@ export function getStrabospotAccessToken(): string | null {
   return auth?.accessToken ?? null;
 }
 
-export async function getDatasetSpots(accessToken: string, datasetId: number) {
-  return await jwtFetch(
-    `https://strabospot.org/jwtdb/datasetSpots/${datasetId}`,
-    accessToken
+export function getSentToStrabospotIds(): Set<number> {
+  const raw = localStorage.getItem(SENT_TO_STRABOSPOT_KEY);
+  if (raw == null) return new Set<number>();
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Set<number>();
+    return new Set(
+      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id))
+    );
+  } catch {
+    return new Set<number>();
+  }
+}
+
+export function addSentToStrabospotId(checkinId: number) {
+  const current = getSentToStrabospotIds();
+  current.add(Number(checkinId));
+  localStorage.setItem(
+    SENT_TO_STRABOSPOT_KEY,
+    JSON.stringify(Array.from(current))
   );
 }
 
-export async function getDatasetSpotIds(): Promise<Set<number>> {
-  const auth = getStoredStrabospotAuth();
-  if (auth == null || auth.accessToken == null || auth.datasetId == null) {
-    return new Set();
-  }
-  const datasetBody = await getDatasetSpots(auth.accessToken, auth.datasetId);
-  const features = Array.isArray(datasetBody?.features)
-    ? datasetBody.features
-    : [];
-  const ids = features
-    .map((feature) => Number(feature?.properties?.id))
-    .filter((id) => Number.isFinite(id));
-  return new Set(ids);
-}
-
-async function postConvertedSpotToDataset(
+async function postConvertedSpotToDatasetSingle(
   accessToken: string,
   datasetId: number,
   convertedBody: any
 ) {
-  return await jwtFetch(
-    `https://strabospot.org/jwtdb/datasetspots/${datasetId}`,
-    accessToken,
+  const res = await fetch(
+    `https://strabospot.org/jwtdb/datasetsinglespot/${datasetId}`,
     {
       method: "POST",
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(convertedBody),
     }
   );
+
+  const body = await parseJsonResponse(res);
+
+  if (!res.ok) {
+    throw new Error(
+      typeof body === "string" ? body : JSON.stringify(body, null, 2)
+    );
+  }
+
+  return { status: res.status, body };
+}
+
+async function convertSingleCheckinToSpot(checkin: any) {
+  const convertRes = await fetch(CONVERT_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(checkin),
+  });
+
+  const convertText = await convertRes.text();
+
+  let convertedBody: any = convertText;
+  try {
+    convertedBody = JSON.parse(convertText);
+  } catch {}
+
+  if (!convertRes.ok) {
+    throw new Error(
+      typeof convertedBody === "string"
+        ? convertedBody
+        : JSON.stringify(convertedBody, null, 2)
+    );
+  }
+
+  return convertedBody;
 }
 
 export async function sendCheckinsToStrabospotDataset(checkins: any[]) {
@@ -404,77 +475,31 @@ export async function sendCheckinsToStrabospotDataset(checkins: any[]) {
     throw new Error("No checkins selected.");
   }
 
-  const convertedCollections = [];
+  const successes: number[] = [];
 
   for (const checkin of checkins) {
-    const convertRes = await fetch(CONVERT_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(checkin),
-    });
+    const checkinId = Number(checkin?.checkin_id ?? checkin?.id);
 
-    const convertText = await convertRes.text();
-
-    let convertedBody: any = convertText;
-    try {
-      convertedBody = JSON.parse(convertText);
-    } catch {}
-
-    if (!convertRes.ok) {
-      throw new Error(
-        typeof convertedBody === "string"
-          ? convertedBody
-          : JSON.stringify(convertedBody, null, 2)
-      );
+    if (!Number.isFinite(checkinId)) {
+      throw new Error("Encountered a checkin without a valid checkin_id.");
     }
 
-    if (
-      convertedBody == null ||
-      convertedBody.type !== "FeatureCollection" ||
-      !Array.isArray(convertedBody.features)
-    ) {
-      throw new Error(
-        "Converted checkin was not returned as a valid FeatureCollection."
-      );
-    }
+    const convertedBody = await convertSingleCheckinToSpot(checkin);
 
-    convertedCollections.push(convertedBody);
+    const postResult = await postConvertedSpotToDatasetSingle(
+      auth.accessToken,
+      auth.datasetId,
+      convertedBody
+    );
+
+    if (postResult.status === 200) {
+      addSentToStrabospotId(checkinId);
+      successes.push(checkinId);
+    }
   }
 
-  const existingDatasetBody = await getDatasetSpots(
-    auth.accessToken,
-    auth.datasetId
-  );
-
-  const mergedNewFeatures = convertedCollections.flatMap((fc) =>
-    Array.isArray(fc.features) ? fc.features : []
-  );
-
-  const existingFeatures = Array.isArray(existingDatasetBody?.features)
-    ? existingDatasetBody.features
-    : [];
-
-  const existingIds = new Set(
-    existingFeatures
-      .map((feature) => Number(feature?.properties?.id))
-      .filter((id) => Number.isFinite(id))
-  );
-
-  const dedupedNewFeatures = mergedNewFeatures.filter((feature) => {
-    const id = Number(feature?.properties?.id);
-    return !Number.isFinite(id) || !existingIds.has(id);
-  });
-
-  const mergedDatasetBody = {
-    type: "FeatureCollection",
-    features: [...existingFeatures, ...dedupedNewFeatures],
+  return {
+    success: true,
+    sentCheckinIds: successes,
   };
-
-  return await postConvertedSpotToDataset(
-    auth.accessToken,
-    auth.datasetId,
-    mergedDatasetBody
-  );
 }
