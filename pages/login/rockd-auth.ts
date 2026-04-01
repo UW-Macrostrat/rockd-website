@@ -43,3 +43,8 @@ export function getStoredRockdPersonId(): number | null {
   const auth = getStoredRockdAuth();
   return auth?.person?.person_id ?? null;
 }
+
+export function getStoredRockdToken(): string | null {
+  const auth = getStoredRockdAuth();
+  return auth?.token ?? auth?.person?.token ?? null;
+}

@@ -1,6 +1,11 @@
 import { useState } from "react";
 import h from "./checkin.client.module.sass";
-import { BlankImage, getImageUrl, getProfilePicUrl, TestImage } from "~/components/index";
+import {
+  BlankImage,
+  getImageUrl,
+  getProfilePicUrl,
+  TestImage,
+} from "~/components/index";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { LngLatCoords } from "@macrostrat/data-components";
 import { Icon } from "@blueprintjs/core";
@@ -95,35 +100,22 @@ export function Checkin({ checkin, mapRef, setInspectPosition, len }) {
       h("div.checkin-header", [
         !stop_name
           ? h(
-            "h3.profile-pic",
-            h(BlankImage, {
-              src: getProfilePicUrl(checkin.person_id),
-              className: "profile-pic",
-            })
-          )
+              "h3.profile-pic",
+              h(BlankImage, {
+                src: getProfilePicUrl(checkin.person_id),
+                className: "profile-pic",
+              })
+            )
           : null,
         h("div.checkin-info", [
           !stop_name
-            ? h(
-              "h3.name",
-              checkin.first_name + " " + checkin.last_name
-            )
+            ? h("h3.name", checkin.first_name + " " + checkin.last_name)
             : null,
           h("h4.edited", checkin.created),
           h("p", "Near " + checkin.near),
           LngLatCoords(LngLatProps),
           h("h3.rating", ratingArr),
         ]),
-        checkin.spot_id != null &&
-        h(
-          "a.strabo-link",
-          {
-            href: "https://strabospot.org",
-            target: "_blank",
-            rel: "noopener noreferrer",
-          },
-          "via StraboSpot"
-        ),
       ]),
       h("p.description", checkin.notes),
       h(
@@ -136,13 +128,13 @@ export function Checkin({ checkin, mapRef, setInspectPosition, len }) {
           image,
           showImage
             ? h("div.image-details", [
-              h("h1", "Details"),
-              h(Icon, {
-                className: "details-image",
-                icon: "arrow-right",
-                style: { color: "white" },
-              }),
-            ])
+                h("h1", "Details"),
+                h(Icon, {
+                  className: "details-image",
+                  icon: "arrow-right",
+                  style: { color: "white" },
+                }),
+              ])
             : null,
         ]
       ),
@@ -155,18 +147,15 @@ export function Checkin({ checkin, mapRef, setInspectPosition, len }) {
           }),
           h("h3.likes", checkin.likes),
         ]),
-        h.if(checkin?.observations)(
-          "div.observations-container",
-          [
-            h(Icon, {
-              className:
-                "observations-icon " + (isDarkMode ? "icon-dark-mode" : ""),
-              icon: "camera",
-              style: { color: "white" },
-            }),
-            h("h3.likes", checkin.observations?.length),
-          ]
-        ),
+        h.if(checkin?.observations)("div.observations-container", [
+          h(Icon, {
+            className:
+              "observations-icon " + (isDarkMode ? "icon-dark-mode" : ""),
+            icon: "camera",
+            style: { color: "white" },
+          }),
+          h("h3.likes", checkin.observations?.length),
+        ]),
         h("div.comments-container", [
           h(Icon, {
             className: "comments-icon " + (isDarkMode ? "icon-dark-mode" : ""),

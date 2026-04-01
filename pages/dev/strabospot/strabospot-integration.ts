@@ -1,4 +1,4 @@
-import { macrostratApiURL } from "~/settings";
+import { macrostratApiURL, SETTINGS } from "~/settings";
 
 const CONVERT_ENDPOINT = `${macrostratApiURL}/api/v3/dev/convert/field-site?in=checkin&out=spot&bulk=false`;
 
@@ -14,7 +14,6 @@ const STRABOSPOT_CREATE_PROJECT_ENDPOINT =
   "https://strabospot.org/jwtdb/project";
 
 const STORAGE_KEY = "strabospot-auth";
-const SENT_TO_STRABOSPOT_KEY = "sent-to-strabospot";
 
 export interface StrabospotLoginResponse {
   access_token: string;
@@ -99,11 +98,7 @@ async function jwtFetch(
     ...(init.headers ?? {}),
   };
 
-  const res = await fetch(url, {
-    ...init,
-    headers,
-  });
-
+  const res = await fetch(url, { ...init, headers });
   const body = await parseJsonResponse(res);
 
   if (!res.ok) {
@@ -118,10 +113,7 @@ async function jwtFetch(
 export async function loginToStrabospot(email: string, password: string) {
   const res = await fetch(STRABOSPOT_LOGIN_ENDPOINT, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "*/*",
-    },
+    headers: { "Content-Type": "application/json", Accept: "*/*" },
     body: JSON.stringify({ email, password }),
   });
 
@@ -139,10 +131,7 @@ export async function loginToStrabospot(email: string, password: string) {
 export async function refreshStrabospotToken(refreshToken: string) {
   const res = await fetch(STRABOSPOT_REFRESH_ENDPOINT, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "*/*",
-    },
+    headers: { "Content-Type": "application/json", Accept: "*/*" },
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
 
@@ -165,32 +154,6 @@ async function getMyDatasets(accessToken: string) {
 async function getMyProjects(accessToken: string) {
   const body = await jwtFetch(STRABOSPOT_MY_PROJECTS_ENDPOINT, accessToken);
   return body?.projects ?? [];
-}
-
-async function getDatasetSpots(accessToken: string, datasetId: number) {
-  return await jwtFetch(
-    `https://strabospot.org/jwtdb/datasetSpots/${datasetId}`,
-    accessToken
-  );
-}
-
-function setSentToStrabospotIds(ids: number[]) {
-  localStorage.setItem(
-    SENT_TO_STRABOSPOT_KEY,
-    JSON.stringify(ids.filter((id) => Number.isFinite(id)))
-  );
-}
-
-export async function hydrateSentToStrabospotIds(auth: StoredStrabospotAuth) {
-  if (auth.accessToken == null || auth.datasetId == null) return;
-  const datasetBody = await getDatasetSpots(auth.accessToken, auth.datasetId);
-  const features = Array.isArray(datasetBody?.features)
-    ? datasetBody.features
-    : [];
-  const ids = features
-    .map((feature) => Number(feature?.properties?.id))
-    .filter((id) => Number.isFinite(id));
-  setSentToStrabospotIds(ids);
 }
 
 async function createDataset(
@@ -327,13 +290,9 @@ export async function loginAndRefreshStrabospot(
     user: login.user,
   };
   saveStoredStrabospotAuth(auth);
-  const enrichedAuth = await ensureRockdIntegrationResources(auth);
-  try {
-    await hydrateSentToStrabospotIds(enrichedAuth);
-  } catch (err) {
-    console.warn("Failed to hydrate sent-to-strabospot ids", err);
-  }
-  return enrichedAuth;
+  // Ensure dataset/project exist in StraboSpot — no longer hydrates sent IDs
+  // from StraboSpot; sent status is now read from spot_id on the checkin record.
+  return await ensureRockdIntegrationResources(auth);
 }
 
 export function getStoredStrabospotAuth(): StoredStrabospotAuth | null {
@@ -349,7 +308,6 @@ export function getStoredStrabospotAuth(): StoredStrabospotAuth | null {
 
 export function clearStoredStrabospotAuth() {
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(SENT_TO_STRABOSPOT_KEY);
 }
 
 export async function refreshStoredStrabospotAuth(): Promise<boolean> {
@@ -380,30 +338,6 @@ export async function refreshStoredStrabospotAuth(): Promise<boolean> {
 export function getStrabospotAccessToken(): string | null {
   const auth = getStoredStrabospotAuth();
   return auth?.accessToken ?? null;
-}
-
-export function getSentToStrabospotIds(): Set<number> {
-  const raw = localStorage.getItem(SENT_TO_STRABOSPOT_KEY);
-  if (raw == null) return new Set<number>();
-
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return new Set<number>();
-    return new Set(
-      parsed.map((id) => Number(id)).filter((id) => Number.isFinite(id))
-    );
-  } catch {
-    return new Set<number>();
-  }
-}
-
-export function addSentToStrabospotId(checkinId: number) {
-  const current = getSentToStrabospotIds();
-  current.add(Number(checkinId));
-  localStorage.setItem(
-    SENT_TO_STRABOSPOT_KEY,
-    JSON.stringify(Array.from(current))
-  );
 }
 
 async function postConvertedSpotToDatasetSingle(
@@ -438,9 +372,7 @@ async function postConvertedSpotToDatasetSingle(
 async function convertSingleCheckinToSpot(checkin: any) {
   const convertRes = await fetch(CONVERT_ENDPOINT, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(checkin),
   });
 
@@ -462,7 +394,18 @@ async function convertSingleCheckinToSpot(checkin: any) {
   return convertedBody;
 }
 
-export async function sendCheckinsToStrabospotDataset(checkins: any[]) {
+/**
+ * Sends checkins to the user's StraboSpot dataset and, for each successful
+ * post (HTTP 200), persists spot_id to the Rockd database via
+ * post /protected/checkin-spot. Requires the caller to supply the Rockd
+ * auth token so the protected route accepts the request.
+ *
+ * spot_id == checkin_id for now; both sides can evolve this independently.
+ */
+export async function sendCheckinsToStrabospotDataset(
+  checkins: any[],
+  rockdToken: string
+) {
   const auth = getStoredStrabospotAuth();
 
   if (auth == null || auth.accessToken == null || auth.datasetId == null) {
@@ -493,7 +436,28 @@ export async function sendCheckinsToStrabospotDataset(checkins: any[]) {
     );
 
     if (postResult.status === 200) {
-      addSentToStrabospotId(checkinId);
+      // Persist spot_id to the Rockd DB. Token is sent in the JSON body
+      // because the middleware checks req.body.token for protected routes.
+      const postResp = await fetch(
+        `${SETTINGS.rockdApiURL}/protected/checkin-spot`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            checkin_id: checkinId,
+            spot_id: checkinId,
+            token: rockdToken,
+          }),
+        }
+      );
+
+      if (!postResp.ok) {
+        const errText = await postResp.text().catch(() => "");
+        throw new Error(
+          `StraboSpot post succeeded but failed to save spot_id for checkin ${checkinId}: ${errText}`
+        );
+      }
+
       successes.push(checkinId);
     }
   }

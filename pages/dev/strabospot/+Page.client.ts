@@ -134,7 +134,7 @@ function Sidebar({
             isCheckingStrabospotSync
               ? "Checking..."
               : isStrabospotSynced
-              ? "Synced"
+              ? "Linked"
               : "Link to Strabospot"
           ),
         ]),

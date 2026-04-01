@@ -12,11 +12,8 @@ import { PageCarousel, fetchRockdData } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
 import { useAsyncMemo } from "@macrostrat/ui-components";
 import { useMapRef } from "@macrostrat/mapbox-react";
-import {
-  getSentToStrabospotIds,
-  sendCheckinsToStrabospotDataset,
-} from "./strabospot-integration";
-
+import { sendCheckinsToStrabospotDataset } from "./strabospot-integration";
+import { getStoredRockdToken } from "../../login/rockd-auth";
 const selectionCardStyle = {
   position: "relative" as const,
   marginBottom: "1rem",
@@ -151,21 +148,15 @@ export function FeatureDetails({
   const [page, setPage] = useState(1);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [sentIdsState, setSentIdsState] = useState<Set<number>>(new Set());
+  //Tracks checkin IDs that were sent to StraboSpot in this session so the
+  // badge appears immediately without waiting for the next API refetch.
+  const [localSentIds, setLocalSentIds] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const mapRef = useMapRef();
   const [lastSentCount, setLastSentCount] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [result, nextData] = useRockdCheckins(page, personId);
-
-  useEffect(() => {
-    if (!isStrabospotSynced) {
-      setSentIdsState(new Set());
-      return;
-    }
-    setSentIdsState(new Set(getSentToStrabospotIds()));
-  }, [isStrabospotSynced]);
 
   const safeResult = result ?? [];
 
@@ -175,9 +166,11 @@ export function FeatureDetails({
     return 0;
   });
 
+  // A checkin is considered sent if the DB already has a spot_id for it
+  //checkin.spot_id != null or if we sent it during this session.
   const selectableCheckins = sorted.filter((checkin) => {
     const checkinId = Number(checkin.checkin_id ?? checkin.id);
-    return !sentIdsState.has(checkinId);
+    return checkin.spot_id == null && !localSentIds.has(checkinId);
   });
 
   if (personId == null) {
@@ -232,14 +225,24 @@ export function FeatureDetails({
       const selectedCheckins = selectableCheckins.filter((checkin) =>
         selectedIds.has(Number(checkin.checkin_id ?? checkin.id))
       );
-      const sentCount = selectedCheckins.length;
-      const response = await sendCheckinsToStrabospotDataset(selectedCheckins);
-      setLastSentCount(response?.sentCheckinIds?.length ?? sentCount);
-      setSentIdsState((prev) => {
+
+      const rockdToken = getStoredRockdToken();
+      if (!rockdToken) {
+        throw new Error("Not logged in to Rockd. Please log in and try again.");
+      }
+
+      // Sends to StraboSpot and persists spot_id to the Rockd DB in one step.
+      const response = await sendCheckinsToStrabospotDataset(
+        selectedCheckins,
+        rockdToken
+      );
+      const sentIds = response?.sentCheckinIds ?? [];
+
+      // Update local state so badges appear immediately without a refetch.
+      setLastSentCount(sentIds.length);
+      setLocalSentIds((prev) => {
         const next = new Set(prev);
-        for (const id of response?.sentCheckinIds ?? []) {
-          next.add(Number(id));
-        }
+        for (const id of sentIds) next.add(Number(id));
         return next;
       });
 
@@ -256,7 +259,9 @@ export function FeatureDetails({
   const checkinCards = sorted.map((checkin) => {
     const tile = createCheckins([checkin], mapRef, setInspectPosition);
     const checkinId = Number(checkin.checkin_id ?? checkin.id);
-    const alreadySent = sentIdsState.has(checkinId);
+    const alreadySent =
+      isStrabospotSynced &&
+      (checkin.spot_id != null || localSentIds.has(checkinId));
     const selected = selectedIds.has(checkinId);
     const selectable = selectionMode && !alreadySent;
 

@@ -133,17 +133,6 @@ export function Checkins({ checkin, comments }) {
             h(RockdSiteIcon, { className: "site-icon" }),
             h("h1", checkin.notes),
           ]),
-          checkin.spot_id != null &&
-            h(
-              "a",
-              {
-                className: "strabo-link",
-                href: "https://strabospot.org",
-                target: "_blank",
-                rel: "noopener noreferrer",
-              },
-              "via StraboSpot"
-            ),
         ]),
         h(Overlay, {
           checkin,
