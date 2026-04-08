@@ -79,9 +79,15 @@ function formatDateYYYYMMDD(date = new Date()) {
 }
 
 function generateUniqueNumericId(existingIds: number[]) {
-  let candidate = Date.now();
+  let candidate = parseInt(
+    `${Math.floor(Date.now() / 1000)}${Math.floor(1000 + Math.random() * 9000)}`
+  );
   while (existingIds.includes(candidate)) {
-    candidate += 1;
+    candidate = parseInt(
+      `${Math.floor(Date.now() / 1000)}${Math.floor(
+        1000 + Math.random() * 9000
+      )}`
+    );
   }
   return candidate;
 }
@@ -304,6 +310,16 @@ export function getStoredStrabospotAuth(): StoredStrabospotAuth | null {
   } catch {
     return null;
   }
+}
+
+export function getStrabospotDatasetId(): number | null {
+  const auth = getStoredStrabospotAuth();
+  return auth?.datasetId ?? null;
+}
+
+export function getStrabospotProjectId(): number | null {
+  const auth = getStoredStrabospotAuth();
+  return auth?.projectId ?? null;
 }
 
 export function clearStoredStrabospotAuth() {

@@ -12,7 +12,11 @@ import { PageCarousel, fetchRockdData } from "~/components";
 import { createCheckins } from "~/components/checkin.client";
 import { useAsyncMemo } from "@macrostrat/ui-components";
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { sendCheckinsToStrabospotDataset } from "./strabospot-integration";
+import {
+  sendCheckinsToStrabospotDataset,
+  getStrabospotDatasetId,
+  getStrabospotProjectId,
+} from "./strabospot-integration";
 import { getStoredRockdToken } from "../../login/rockd-auth";
 const selectionCardStyle = {
   position: "relative" as const,
@@ -286,6 +290,7 @@ export function FeatureDetails({
       ]
     );
   });
+  const datasetId = getStrabospotDatasetId();
 
   return h("div.checkin-container", [
     checkinCards,
@@ -398,7 +403,10 @@ export function FeatureDetails({
               h(
                 "a",
                 {
-                  href: "https://strabospot.org/my_field_data",
+                  href:
+                    datasetId != null
+                      ? `https://strabospot.org/fieldland/?datasetid=${datasetId}`
+                      : "https://strabospot.org/fieldland/",
                   target: "_blank",
                   rel: "noopener noreferrer",
                   style: successDialogLinkStyle,
