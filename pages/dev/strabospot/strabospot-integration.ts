@@ -12,7 +12,7 @@ const STRABOSPOT_CREATE_DATASET_ENDPOINT =
   "https://strabospot.org/jwtdb/dataset";
 const STRABOSPOT_CREATE_PROJECT_ENDPOINT =
   "https://strabospot.org/jwtdb/project";
-
+const STRABOSPOT_IMAGE_ENDPOINT = "https://strabospot.org/jwtdb/image";
 const STORAGE_KEY = "strabospot-auth";
 
 export interface StrabospotLoginResponse {
@@ -410,6 +410,56 @@ async function convertSingleCheckinToSpot(checkin: any) {
   return convertedBody;
 }
 
+async function fetchRockdPhotoBlob(
+  rockdToken: string,
+  personId: number,
+  photoId: number
+) {
+  const res = await fetch(
+    `${SETTINGS.rockdApiURL}/protected/image/${personId}/banner/${photoId}`,
+    {
+      headers: {
+        Accept: "*/*",
+        Authorization: `Bearer ${rockdToken}`,
+      },
+      redirect: "follow",
+    }
+  );
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(
+      `Failed to fetch Rockd photo ${photoId} for person ${personId}: ${errText}`
+    );
+  }
+  return await res.blob();
+}
+
+async function uploadPhotoToStrabospot(
+  accessToken: string,
+  photoId: number,
+  imageBlob: Blob
+) {
+  const formData = new FormData();
+  formData.append("id", String(photoId));
+  formData.append("modified_timestamp", String(Math.floor(Date.now() / 1000)));
+  formData.append("image_file", imageBlob, `${photoId}.jpg`);
+  const res = await fetch(STRABOSPOT_IMAGE_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Accept: "*/*",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: formData,
+  });
+  const body = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new Error(
+      typeof body === "string" ? body : JSON.stringify(body, null, 2)
+    );
+  }
+  return body;
+}
+
 /**
  * Sends checkins to the user's StraboSpot dataset and, for each successful
  * post (HTTP 200), persists spot_id to the Rockd database via
@@ -423,63 +473,87 @@ export async function sendCheckinsToStrabospotDataset(
   rockdToken: string
 ) {
   const auth = getStoredStrabospotAuth();
-
   if (auth == null || auth.accessToken == null || auth.datasetId == null) {
     throw new Error(
       "StraboSpot is not fully linked. Missing access token or dataset id."
     );
   }
-
   if (checkins.length === 0) {
     throw new Error("No checkins selected.");
   }
-
   const successes: number[] = [];
-
+  const imageFailedCheckinIds: number[] = [];
+  const failedCheckins: Array<{ checkinId: number; message: string }> = [];
   for (const checkin of checkins) {
     const checkinId = Number(checkin?.checkin_id ?? checkin?.id);
-
+    const personId = Number(checkin?.person_id);
+    const photoId = checkin?.photo == null ? null : Number(checkin.photo);
     if (!Number.isFinite(checkinId)) {
-      throw new Error("Encountered a checkin without a valid checkin_id.");
+      failedCheckins.push({
+        checkinId: -1,
+        message: "Encountered a checkin without a valid checkin_id.",
+      });
+      continue;
     }
-
-    const convertedBody = await convertSingleCheckinToSpot(checkin);
-
-    const postResult = await postConvertedSpotToDatasetSingle(
-      auth.accessToken,
-      auth.datasetId,
-      convertedBody
-    );
-
-    if (postResult.status === 200) {
-      // Persist spot_id to the Rockd DB. Token is sent in the JSON body
-      // because the middleware checks req.body.token for protected routes.
-      const postResp = await fetch(
-        `${SETTINGS.rockdApiURL}/protected/checkin-spot`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            checkin_id: checkinId,
-            spot_id: checkinId,
-            token: rockdToken,
-          }),
-        }
+    try {
+      const convertedBody = await convertSingleCheckinToSpot(checkin);
+      const postResult = await postConvertedSpotToDatasetSingle(
+        auth.accessToken,
+        auth.datasetId,
+        convertedBody
       );
-
-      if (!postResp.ok) {
-        const errText = await postResp.text().catch(() => "");
-        throw new Error(
-          `StraboSpot post succeeded but failed to save spot_id for checkin ${checkinId}: ${errText}`
+      if (postResult.status === 200) {
+        if (
+          photoId != null &&
+          Number.isFinite(photoId) &&
+          Number.isFinite(personId)
+        ) {
+          try {
+            const imageBlob = await fetchRockdPhotoBlob(
+              rockdToken,
+              personId,
+              photoId
+            );
+            await uploadPhotoToStrabospot(auth.accessToken, photoId, imageBlob);
+          } catch (err: any) {
+            console.error(
+              `Photo upload failed for checkin ${checkinId}, photo ${photoId}:`,
+              err
+            );
+            imageFailedCheckinIds.push(checkinId);
+          }
+        }
+        const postResp = await fetch(
+          `${SETTINGS.rockdApiURL}/protected/checkin-spot`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              checkin_id: checkinId,
+              spot_id: checkinId,
+              token: rockdToken,
+            }),
+          }
         );
+        if (!postResp.ok) {
+          const errText = await postResp.text().catch(() => "");
+          throw new Error(
+            `StraboSpot post succeeded but failed to save spot_id for checkin ${checkinId}: ${errText}`
+          );
+        }
+        successes.push(checkinId);
       }
-
-      successes.push(checkinId);
+    } catch (err: any) {
+      failedCheckins.push({
+        checkinId,
+        message: err?.message ?? `Failed to sync checkin ${checkinId}.`,
+      });
     }
   }
-
   return {
-    success: true,
+    success: failedCheckins.length === 0,
     sentCheckinIds: successes,
+    imageFailedCheckinIds,
+    failedCheckins,
   };
 }

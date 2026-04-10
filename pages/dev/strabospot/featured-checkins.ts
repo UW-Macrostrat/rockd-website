@@ -161,6 +161,10 @@ export function FeatureDetails({
   const [lastSentCount, setLastSentCount] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [result, nextData] = useRockdCheckins(page, personId);
+  const [lastImageFailedIds, setLastImageFailedIds] = useState<number[]>([]);
+  const [lastFailedCheckins, setLastFailedCheckins] = useState<
+    Array<{ checkinId: number; message: string }>
+  >([]);
 
   const safeResult = result ?? [];
 
@@ -224,7 +228,8 @@ export function FeatureDetails({
     setIsSending(true);
     setSendError(null);
     setLastSentCount(null);
-
+    setLastImageFailedIds([]);
+    setLastFailedCheckins([]);
     try {
       const selectedCheckins = selectableCheckins.filter((checkin) =>
         selectedIds.has(Number(checkin.checkin_id ?? checkin.id))
@@ -240,10 +245,21 @@ export function FeatureDetails({
         selectedCheckins,
         rockdToken
       );
-      const sentIds = response?.sentCheckinIds ?? [];
 
-      // Update local state so badges appear immediately without a refetch.
+      const sentIds = response?.sentCheckinIds ?? [];
+      const imageFailedIds = response?.imageFailedCheckinIds ?? [];
+      const failedCheckins = response?.failedCheckins ?? [];
+      if (sentIds.length === 0 && failedCheckins.length > 0) {
+        throw new Error(
+          failedCheckins
+            .map((f) => `Checkin ${f.checkinId}: ${f.message}`)
+            .join("\n")
+        );
+      }
       setLastSentCount(sentIds.length);
+      setLastImageFailedIds(imageFailedIds);
+      setLastFailedCheckins(failedCheckins);
+
       setLocalSentIds((prev) => {
         const next = new Set(prev);
         for (const id of sentIds) next.add(Number(id));
@@ -384,7 +400,66 @@ export function FeatureDetails({
             h(
               "p",
               { style: successDialogTextStyle },
-              "Your selected checkins were synced to StraboSpot and should now be available in your field data."
+              lastFailedCheckins.length > 0 || lastImageFailedIds.length > 0
+                ? "Some selected checkins were synced to StraboSpot. Review the details below for any issues."
+                : "Your selected checkins were synced to StraboSpot and should now be available in your field data."
+            ),
+            h.if(lastImageFailedIds.length > 0)(
+              "div",
+              {
+                style: {
+                  marginTop: "14px",
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  background: "rgba(245, 158, 11, 0.12)",
+                  border: "1px solid rgba(245, 158, 11, 0.35)",
+                  color: "rgba(255, 236, 204, 0.95)",
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                },
+              },
+              [
+                h(
+                  "div",
+                  { style: { fontWeight: 700, marginBottom: "6px" } },
+                  "Some photos could not be uploaded"
+                ),
+                h(
+                  "div",
+                  `Spot sync succeeded, but image upload failed for checkin${
+                    lastImageFailedIds.length === 1 ? "" : "s"
+                  }: ${lastImageFailedIds.join(", ")}`
+                ),
+              ]
+            ),
+            h.if(lastFailedCheckins.length > 0)(
+              "div",
+              {
+                style: {
+                  marginTop: "14px",
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  background: "rgba(239, 68, 68, 0.12)",
+                  border: "1px solid rgba(239, 68, 68, 0.35)",
+                  color: "rgba(255, 221, 221, 0.96)",
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                },
+              },
+              [
+                h(
+                  "div",
+                  { style: { fontWeight: 700, marginBottom: "6px" } },
+                  "Some checkins failed to sync"
+                ),
+                ...lastFailedCheckins.map((item) =>
+                  h(
+                    "div",
+                    { style: { marginTop: "6px" } },
+                    `Checkin ${item.checkinId}: ${item.message}`
+                  )
+                ),
+              ]
             ),
             h("div", { style: successDialogLinkCardStyle }, [
               h(
