@@ -480,7 +480,7 @@ export function FeatureDetails({
                 {
                   href:
                     datasetId != null
-                      ? `https://strabospot.org/fieldland/?datasetid=${datasetId}`
+                      ? `https://strabospot.org/StraboFieldDatasetDetail/?dataset_id=${datasetId}`
                       : "https://strabospot.org/fieldland/",
                   target: "_blank",
                   rel: "noopener noreferrer",
