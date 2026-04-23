@@ -4,8 +4,9 @@ import { useState } from "react";
 import { saveRockdAuth } from "./rockd-auth";
 import s from "../index/main.module.sass";
 import { Image } from "~/components";
+import { SETTINGS } from "~/settings";
 
-const ROCKD_LOGIN_ENDPOINT = "https://dev.rockd.org/api/v2/login";
+const ROCKD_LOGIN_ENDPOINT = `${SETTINGS.rockdApiURL}/login`;
 
 export function Page() {
   const [email, setEmail] = useState("");

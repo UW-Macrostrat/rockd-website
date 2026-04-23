@@ -3,6 +3,7 @@ import { Button, Callout, Intent, Classes } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./main.sass";
 import h from "@macrostrat/hyper";
+import { SETTINGS } from "~/settings";
 
 type LoginFormState = {
   username: string;
@@ -40,7 +41,7 @@ function LoginForm() {
 
   const submitForm = async () => {
     try {
-      const login = await fetch("https://dev.rockd.org/api/v2/login", {
+      const login = await fetch(`${SETTINGS.rockdApiURL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +62,7 @@ function LoginForm() {
             strabo_jwt: jParam,
           };
           const linkStrabo = await fetch(
-            "https://dev.rockd.org/api/v2/link-strabospot",
+            `${SETTINGS.rockdApiURL}/link-strabospot`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
