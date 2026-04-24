@@ -37,6 +37,17 @@ export function Page() {
       }
 
       saveRockdAuth(body);
+      const redirectURI = new URLSearchParams(window.location.search).get(
+        "redirect_uri"
+      );
+      const token = body?.token ?? body?.person?.token;
+
+      if (redirectURI != null && token != null) {
+        const callbackURL = new URL(redirectURI);
+        callbackURL.searchParams.set("token", token);
+        window.location.href = callbackURL.toString();
+        return;
+      }
       window.location.href = "/dev/strabospot";
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
