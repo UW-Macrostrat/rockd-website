@@ -238,9 +238,7 @@ export function Page() {
       setIsStrabospotSynced(false);
       return;
     }
-    const callbackURL = `${window.location.origin}/dev/strabospot`;
     const strabospotLoginURL = new URL("https://strabospot.org/rockd_login");
-    strabospotLoginURL.searchParams.set("redirect_uri", callbackURL);
     window.location.href = strabospotLoginURL.toString();
   }
 

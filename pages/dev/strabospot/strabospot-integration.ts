@@ -248,10 +248,8 @@ export async function ensureRockdIntegrationResources(
   const accessToken = auth.accessToken;
 
   const datasets = await getMyDatasets(accessToken);
-  console.log("StraboSpot datasets response:", datasets);
 
   let dataset = datasets.find((d) => d?.name === "Rockd Checkins");
-  console.log("Existing Rockd Checkins dataset:", dataset);
 
   if (dataset == null) {
     dataset = await createDataset(
@@ -261,7 +259,6 @@ export async function ensureRockdIntegrationResources(
   }
 
   const projects = await getMyProjects(accessToken);
-  console.log("StraboSpot projects response:", projects);
 
   let project = projects.find((p) => p?.name === "Rockd Integration");
 
@@ -310,13 +307,11 @@ export async function loginAndRefreshStrabospot(
 export async function loginToStrabospotWithUUID(uuid: string) {
   const url = new URL(STRABOSPOT_ROCKD_LOGIN_ENDPOINT);
   url.searchParams.set("u", uuid);
-  console.log("UUID token exchange using Accept */*", url.toString());
   const res = await fetch(url.toString(), {
     method: "GET",
     headers: { Accept: "*/*" },
   });
   const body = await parseJsonResponse(res);
-  console.log("response from u strabo login", body);
 
   if (!res.ok) {
     throw new Error(
@@ -328,7 +323,6 @@ export async function loginToStrabospotWithUUID(uuid: string) {
 
 export async function loginAndRefreshStrabospotFromUUID(uuid: string) {
   const login = await loginToStrabospotWithUUID(uuid);
-  console.log("Strabo login response ", login);
   const auth: StoredStrabospotAuth = {
     accessToken: login.access_token,
     refreshToken: login.refresh_token,
