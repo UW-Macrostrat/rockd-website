@@ -14,6 +14,7 @@ const STRABOSPOT_CREATE_PROJECT_ENDPOINT =
   "https://strabospot.org/jwtdb/project";
 const STRABOSPOT_IMAGE_ENDPOINT = "https://strabospot.org/jwtdb/image";
 const STORAGE_KEY = "strabospot-auth";
+const STRABOSPOT_ROCKD_LOGIN_ENDPOINT = "https://strabospot.org/rockd_login";
 
 export interface StrabospotLoginResponse {
   access_token: string;
@@ -298,6 +299,37 @@ export async function loginAndRefreshStrabospot(
   saveStoredStrabospotAuth(auth);
   // Ensure dataset/project exist in StraboSpot — no longer hydrates sent IDs
   // from StraboSpot; sent status is now read from spot_id on the checkin record.
+  return await ensureRockdIntegrationResources(auth);
+}
+
+export async function loginToStrabospotWithUUID(uuid: string) {
+  const url = new URL(STRABOSPOT_ROCKD_LOGIN_ENDPOINT);
+  url.searchParams.set("u", uuid);
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  const body = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new Error(
+      typeof body === "string" ? body : JSON.stringify(body, null, 2)
+    );
+  }
+  return body as StrabospotLoginResponse;
+}
+
+export async function loginAndRefreshStrabospotFromUUID(uuid: string) {
+  const login = await loginToStrabospotWithUUID(uuid);
+
+  const auth: StoredStrabospotAuth = {
+    accessToken: login.access_token,
+    refreshToken: login.refresh_token,
+    tokenType: login.token_type,
+    expiresIn: login.expires_in,
+    user: login.user,
+  };
+
+  saveStoredStrabospotAuth(auth);
   return await ensureRockdIntegrationResources(auth);
 }
 

@@ -25,6 +25,7 @@ import { FeatureDetails } from "./featured-checkins";
 import {
   refreshStoredStrabospotAuth,
   clearStoredStrabospotAuth,
+  loginAndRefreshStrabospotFromUUID,
 } from "./strabospot-integration";
 import { getStoredRockdPersonId, clearRockdAuth } from "../../login/rockd-auth";
 
@@ -190,10 +191,40 @@ export function Page() {
   useEffect(() => {
     let cancelled = false;
     async function checkStrabospotSync() {
-      const ok = await refreshStoredStrabospotAuth();
-      if (cancelled) return;
-      setIsStrabospotSynced(ok);
-      setIsCheckingStrabospotSync(false);
+      try {
+        const uuid = new URLSearchParams(window.location.search).get("u");
+        if (uuid != null) {
+          const auth = await loginAndRefreshStrabospotFromUUID(uuid);
+          if (cancelled) return;
+
+          const isFullyLinked =
+            auth.accessToken != null &&
+            auth.refreshToken != null &&
+            auth.datasetId != null &&
+            auth.projectId != null;
+
+          setIsStrabospotSynced(isFullyLinked);
+
+          const cleanURL = `${window.location.origin}${window.location.pathname}`;
+          window.history.replaceState({}, "", cleanURL);
+
+          return;
+        }
+        const ok = await refreshStoredStrabospotAuth();
+        if (cancelled) return;
+        setIsStrabospotSynced(ok);
+      } catch (err: any) {
+        console.error("Failed to complete StraboSpot login:", err);
+        console.error("Message:", err?.message);
+
+        if (cancelled) return;
+
+        setIsStrabospotSynced(false);
+      } finally {
+        if (!cancelled) {
+          setIsCheckingStrabospotSync(false);
+        }
+      }
     }
     checkStrabospotSync();
     return () => {
@@ -207,8 +238,10 @@ export function Page() {
       setIsStrabospotSynced(false);
       return;
     }
-
-    window.location.href = "/dev/strabospot/login";
+    const callbackURL = `${window.location.origin}/dev/strabospot`;
+    const strabospotLoginURL = new URL("https://strabospot.org/rockd_login");
+    strabospotLoginURL.searchParams.set("redirect_uri", callbackURL);
+    window.location.href = strabospotLoginURL.toString();
   }
 
   const style = useMapStyle(
