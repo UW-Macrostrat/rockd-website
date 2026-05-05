@@ -1,12 +1,13 @@
-import { fetchAPIDataOld } from "~/components";
 import { rockdApiOldURL } from "~/settings";
 
-
 export async function data() {
-    const userData = await fetch(
-        `${rockdApiOldURL}/metrics`
-    ).then((res) => res.json()
-    );
+  const res = await fetch(`${rockdApiOldURL}/metrics`);
 
-    return { data: userData.success.data };
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Rockd metrics: ${res.status}`);
+  }
+
+  const userData = await res.json();
+
+  return { data: userData.success.data };
 }

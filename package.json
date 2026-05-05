@@ -1,7 +1,7 @@
 {
   "name": "@macrostrat/rockd-website",
   "private": true,
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "Macrostrat map interface",
   "type": "module",
   "scripts": {
@@ -53,12 +53,13 @@
     "@vitejs/plugin-react": "^4.0.4",
     "classnames": "^2.2.6",
     "compression": "^1.7.4",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "jotai": "^2.18.1",
     "mapbox-gl": "^3.20.0",
     "react": "^19.2.4",
     "react-datepicker": "^7.5.0",
     "react-dom": "^19.2.4",
-    "recharts": "^2.13.0",
     "transition-hook": "^1.5.2",
     "tsx": "^4.11.2",
     "vike": "^0.4.255",
