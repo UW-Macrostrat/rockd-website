@@ -3,8 +3,6 @@ FROM node:22 AS builder
 # Install rsync
 # RUN apt-get update && apt-get install -y rsync
 
-ENV NODE_ENV=production
-
 WORKDIR /usr/src/build
 COPY .yarn/releases .yarn/releases
 COPY .yarnrc.yml yarn.lock package.json ./
@@ -24,15 +22,15 @@ RUN yarn install --immutable
 
 COPY . ./
 
-ENV NODE_ENV=production
 
 RUN yarn run build
 
 # TODO: we could slim things down by removing
 # dev dependencies here...
 
-EXPOSE 3000
+ENV NODE_ENV=production
 
 ENV NODE_NO_WARNINGS=1
+EXPOSE 3000
 
 CMD ["yarn", "node", "dist/server/index.mjs"]
