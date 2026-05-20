@@ -15,7 +15,6 @@ import { useMapRef } from "@macrostrat/mapbox-react";
 import {
   sendCheckinsToStrabospotDataset,
   getStrabospotDatasetId,
-  getStrabospotProjectId,
 } from "./strabospot-integration";
 import { getStoredRockdToken } from "../../login/rockd-auth";
 const selectionCardStyle = {
