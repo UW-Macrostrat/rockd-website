@@ -1,0 +1,74 @@
+// Provider sign-in buttons.
+//
+// Colors, logos and label wording follow each provider's brand guidelines, so
+// users recognize what they're handing credentials to:
+//   Google   — light theme: white surface, #dadce0 border, #1f1f1f label, Roboto
+//   Facebook — #1877f2 surface, white "f" mark and label
+// Both providers require their own mark and an unmodified "Continue with …"
+// label, so avoid restyling these to match site chrome.
+
+.oauth-buttons
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+
+.oauth-button
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 0.75rem
+  width: 100%
+  // 40px minimum height is part of both providers' specs
+  min-height: 44px
+  padding: 0.65rem 1rem
+  border-radius: 8px
+  font-size: 1rem
+  font-weight: 500
+  text-decoration: none
+  cursor: pointer
+  transition: background-color 0.15s ease, box-shadow 0.15s ease
+
+  &:hover,
+  &:focus
+    text-decoration: none
+
+  svg
+    flex-shrink: 0
+
+.google
+  background-color: #fff
+  border: 1px solid #dadce0
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+
+  // Blueprint styles bare anchors, so the label color is pinned in every state
+  &,
+  &:hover,
+  &:focus,
+  &:active
+    color: #1f1f1f
+
+  &:hover
+    background-color: #f8f9fa
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3)
+
+  &:active
+    background-color: #f1f3f4
+
+.facebook
+  background-color: #1877f2
+  border: 1px solid #1877f2
+  font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, sans-serif
+
+  &,
+  &:hover,
+  &:focus,
+  &:active
+    color: #fff
+
+  &:hover
+    background-color: #166fe5
+    border-color: #166fe5
+
+  &:active
+    background-color: #1464cf
+    border-color: #1464cf
