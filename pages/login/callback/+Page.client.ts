@@ -53,7 +53,7 @@ export function Page() {
       person: { person_id: claims.person_id },
     } as any);
 
-    window.location.replace("/");
+    window.location.replace("/my_checkins");
   }, []);
 
   if (error != null) {

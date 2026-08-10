@@ -9,12 +9,8 @@ import { SETTINGS } from "~/settings";
 
 const ROCKD_LOGIN_ENDPOINT = `${SETTINGS.rockdApiURL}/login`;
 
-// Passport routes on the Rockd API (v2/web_oauth.ts). These are full-page
-// navigations, not fetches — the provider redirects back to /login/callback.
 const ROCKD_AUTH_BASE = `${SETTINGS.rockdApiURL.replace(/\/$/, "")}/auth`;
 
-// Marks are inlined rather than loaded as assets so they can't fail to render
-// on the one page where the user is deciding whether to trust us.
 const GoogleMark = h(
   "svg",
   { width: 18, height: 18, viewBox: "0 0 48 48", "aria-hidden": true },
@@ -108,7 +104,7 @@ export function Page() {
         window.location.href = callbackURL.toString();
         return;
       }
-      window.location.href = "/dev/strabospot";
+      window.location.href = "/my_checkins";
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
     } finally {
