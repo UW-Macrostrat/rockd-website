@@ -1,16 +1,73 @@
-.heatmap-page
-    margin: 2em 20%
+// Full-bleed map app, following the Macrostrat dev map routes
+// (/dev/map/topology, /heatmap). The page fills the viewport; the navbar and
+// context panel float above it, so there is no page-level content layout here.
 
-#map
-    height: 100%
-    width: 100%
-    aspect-ratio: 3/2
-    cursor: pointer
-    z-index: 100
+// Floating-navbar header tweaks, mirroring the Macrostrat pages so the two read
+// consistently. Ideally these knobs live upstream in map-interface.
+.heatmap-navbar
+  :global(.bp6-navbar)
+    height: auto
+    --navbar-padding: 5px 9px 7px
 
-.map-area-container
-  width: 100% !important
-  height: 50vh !important
+.navbar-header
+  display: flex
+  flex-direction: column
+  gap: 2px
+  width: 100%
+  min-width: 0
 
-.loading
-    padding-top: 100px
+  .nav-row
+    display: flex
+    align-items: center
+    font-size: 12px
+    line-height: 1.2
+    opacity: 0.7
+
+  .home-link
+    color: inherit
+    text-decoration: none
+
+    &:hover
+      text-decoration: underline
+
+  .title-row
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 0.5em
+
+    .page-title
+      font-size: 1.3rem
+      line-height: 1.2
+      margin: 0
+
+.layer-panel
+  display: flex
+  flex-direction: column
+  gap: 10px
+
+  .intro
+    margin: 0
+    font-size: 12px
+    line-height: 1.4
+    opacity: 0.7
+
+  :global(.bp6-form-group)
+    margin-bottom: 0
+
+// Qualitative colour ramp: exact counts come from the click inspector, since
+// the scale shifts with zoom to keep density comparable across zoom levels.
+.density-legend
+  display: flex
+  flex-direction: column
+  gap: 0.25em
+
+  .legend-bar
+    height: 0.6em
+    border-radius: 2px
+
+  .legend-labels
+    display: flex
+    justify-content: space-between
+    font-size: 11px
+    opacity: 0.7
