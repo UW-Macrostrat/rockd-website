@@ -30,8 +30,8 @@ const OPACITY_MAX = 0.85;
  * z0–z5 share one resolution deliberately: the globe projection shows several
  * zoom levels at once, and varying resolution across them makes hexagons visibly
  * change size mid-globe. */
-const ZOOM_RESOLUTION = [4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 8, 9, 9];
-const MAX_RESOLUTION = 9;
+const ZOOM_RESOLUTION = [4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 8];
+const MAX_RESOLUTION = 8;
 
 /** Colour-scale anchors per H3 resolution: [median, 99th percentile] loads per
  * cell, indexed by resolution.
@@ -147,9 +147,9 @@ export function dashboardDensityStyle(
           `${tileserverDomain}/stats/rockd/dashboard/{z}/{x}/{y}` +
             (query ? `?${query}` : ""),
         ],
-        // The route caps binning at H3 resolution 9, so there is no more detail
-        // past z13 — overzoom instead of fetching tiles that add nothing.
-        maxzoom: 13,
+        // The route caps binning at H3 resolution 8 (privacy floor), reached at
+        // z11 — overzoom past it rather than fetching tiles that add no detail.
+        maxzoom: 11,
       },
     },
     layers: [
