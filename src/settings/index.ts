@@ -31,6 +31,29 @@ export const postgrestPrefix = getRuntimeConfig(
   apiDomain + "/api/pg"
 );
 
+export enum Environment {
+  production = "production",
+  staging = "staging",
+  development = "development",
+}
+
+/** Get the environment */
+export function getEnvironment(): Environment {
+  let macrostratEnv = getRuntimeConfig("MACROSTRAT_ENV");
+  console.log(macrostratEnv, import.meta.env.DEV);
+  if (macrostratEnv === Environment.production) {
+    return Environment.production;
+  } else if (macrostratEnv === Environment.staging) {
+    return Environment.staging;
+  } else if (macrostratEnv === Environment.development) {
+    return Environment.development;
+  }
+  if (import.meta.env.DEV) {
+    return Environment.development;
+  }
+  return Environment.production;
+}
+
 /** Legacy settings object */
 export const SETTINGS = {
   rockdApiURL,

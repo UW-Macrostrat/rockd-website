@@ -30,6 +30,7 @@ export function Page() {
 
   let msg: string; // Message shown to the user
   const { abortReason, abortStatusCode } = pageContext;
+  console.log(abortReason, abortStatusCode);
   if (typeof abortReason === "string") {
     // Handle `throw render(abortStatusCode, `You cannot access ${someCustomMessage}`)`
     msg = abortReason;
