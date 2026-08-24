@@ -55,12 +55,12 @@ export function Footer() {
         h("a", { href: "https://nsf.gov" }, "NSF"),
         ", ",
         "the ",
-        h("a", { href: "" }, "AAPG Foundation"),
+        h("a", { href: "https://aapgfoundation.org" }, "AAPG Foundation"),
         " and the ",
         h(
           "a",
-          { href: "http://geoscience.wisc.edu/geoscience/" },
-          "University of Wisconsin Department of Geoscience"
+          { href: "https://geoscience.wisc.edu" },
+          "University of Wisconsin – Madison Department of Geoscience"
         ),
       ]),
     ]),
