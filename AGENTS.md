@@ -12,6 +12,7 @@ The development workflow here is closely tied to that of the Macrostrat web inte
 - **Where it's served.** The Vike dev server is directly available at `http://localhost:3005` (**http**, not https).
   This port is used to avoid overlapping with Macrostrat's web dev server on `3000`.
 - If you do need to check a server-side failure (an SSR 500, a module-resolution error), curl the running server rather than starting your own — `yarn dev` will just fail with `EADDRINUSE` against the one the user already has open.
+- Write changes you've made _tersely_ to the `CHANGELOG.md` file. Do not include description of internal iteration, only the final state of a derived feature.
 
 ## UI authoring
 
