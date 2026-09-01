@@ -32,6 +32,9 @@ export default defineConfig({
   ssr: {
     noExternal: [...macrostratPackages, "mapbox-gl"],
   },
+  server: {
+    port: 3005,
+  },
   css: {
     preprocessorOptions: {
       sass: {
