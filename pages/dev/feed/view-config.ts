@@ -15,13 +15,6 @@
  * `{ [facetId]: number[] }`, and the three loops at the bottom of this file turn
  * that into query params and URL params.
  */
-import h from "@macrostrat/hyper";
-import { InputGroup } from "@blueprintjs/core";
-import {
-  isSemanticEmpty,
-  SemanticFilterControl,
-  type SemanticState,
-} from "./semantic/controls";
 import { SEMANTIC_FACETS } from "./semantic/facets";
 import type { ColumnSpec, FetchDataFilter, TableFilter } from "@macrostrat/data-sheet";
 import type { FilterURLBinding } from "~/_utils/data-view-url-state";
@@ -38,35 +31,12 @@ interface NotesState {
   text: string;
 }
 
-function NotesFilterForm({
-  state,
-  setState,
-}: {
-  state: NotesState;
-  setState: (s: NotesState | null) => void;
-}) {
-  return h(InputGroup, {
-    className: "checkin-search",
-    leftIcon: "search",
-    placeholder: "Search checkin notes…",
-    value: state?.text ?? "",
-    onValueChange: (text: string) => {
-      if (text === "") {
-        setState(null);
-        return;
-      }
-      setState({ text });
-    },
-  });
-}
-
 export const notesFilter: TableFilter<Checkin, NotesState> = {
   id: NOTES_FILTER_ID,
   name: "Notes",
   icon: "search",
   columnKey: "notes",
   defaultState: { text: "" },
-  presentation: "inline",
   describeState: (s) => {
     const text = (s?.text ?? "").trim();
     if (text === "") return null;
@@ -76,7 +46,6 @@ export const notesFilter: TableFilter<Checkin, NotesState> = {
   // runtime contract accepts `null` to clear the filter — which is how a filter
   // goes empty, and what every consumer does. The cast is the type gap, not a
   // behavior change (`@macrostrat/data-sheet` tracks it as `TableFilter.isEmpty`).
-  filterForm: NotesFilterForm as TableFilter<Checkin, NotesState>["filterForm"],
   // Server-side via `translateCheckinFilter`; this is the in-memory equivalent,
   // for a local provider (a story, a fixture).
   predicate: (row, s) => {
@@ -88,6 +57,18 @@ export const notesFilter: TableFilter<Checkin, NotesState> = {
 
 // ---- Semantic facets, as one filter ----
 
+/** Ids selected per facet, keyed by facet id. The filter's whole state. */
+export type SemanticState = Record<string, number[]>;
+
+/** True when no facet holds anything — the filter should then go inactive
+ * rather than linger as an "active" filter with nothing in it. (The library
+ * hard-codes emptiness to `state.value === ""`; `TableFilter.isEmpty` is the
+ * open item that would let a non-scalar filter answer for itself.) */
+export function isSemanticEmpty(state: SemanticState | null): boolean {
+  if (state == null) return true;
+  return SEMANTIC_FACETS.every((f) => (state[f.id] ?? []).length === 0);
+}
+
 export const SEMANTIC_FILTER_ID = "checkin-semantics";
 
 export const semanticFilter: TableFilter<Checkin, SemanticState> = {
@@ -95,7 +76,6 @@ export const semanticFilter: TableFilter<Checkin, SemanticState> = {
   name: "Filters",
   icon: "filter-list",
   defaultState: {},
-  presentation: "menu-inline",
   describeState: (s) => {
     const parts = SEMANTIC_FACETS.map((f) => (s?.[f.id] ?? []).length).filter(
       (n) => n > 0
@@ -107,19 +87,15 @@ export const semanticFilter: TableFilter<Checkin, SemanticState> = {
   // Server-side only: these select on joined observation data that the loaded
   // row doesn't carry, so there is nothing to test in memory.
   predicate: () => true,
-  filterForm: (({ state, setState }) =>
-    h(SemanticFilterControl, {
-      state: state ?? {},
-      onChange: (next: SemanticState | null) => setState(next as any),
-    })) as TableFilter<Checkin, SemanticState>["filterForm"],
 };
 
-/** Filters spanning more than one column, or none — passed as the panel's
- * `filters`. Per-column facets are declared on `columnSpec` instead. */
-export const tableFilters: TableFilter<Checkin>[] = [
-  notesFilter,
-  semanticFilter,
-];
+/** Filters offered by the panel's own menu. */
+// Deliberately empty: `OmniFilter` is the whole filter surface, and it drives
+// these filters through the store directly. Passing them here as well would
+// duplicate them into the panel's built-in Filter menu. The definitions still
+// matter — the loader reads whatever is in `activeFilters`, and `initialFilters`
+// re-activates them from the URL.
+export const tableFilters: TableFilter<Checkin>[] = [];
 
 // ---- Columns ----
 // Only the sortable set and the search's subject matter here: the panel builds
@@ -165,7 +141,8 @@ export function translateCheckinFilter(
 
 // ---- URL bindings ----
 
-/** One binding owning every facet's param (`?age=`, `?lith=`, `?person=`).
+/** One binding owning every facet's param (`?int_id=`, `?lith_id=`,
+ * `?person_id=`) — the same names the API uses.
  *
  * Ids only — never names. The ids are what the query *is*; a name in the URL
  * would be a second copy of the truth, able to go stale, and resolving it later
@@ -173,18 +150,18 @@ export function translateCheckinFilter(
  * `semantic/label-cache.ts`). */
 const semanticBinding: FilterURLBinding<SemanticState> = {
   filter: semanticFilter,
-  params: SEMANTIC_FACETS.map((f) => f.urlParam),
+  params: SEMANTIC_FACETS.map((f) => f.param),
   toParams: (state) => {
     const out: Record<string, string | null> = {};
     for (const facet of SEMANTIC_FACETS) {
-      out[facet.urlParam] = (state?.[facet.id] ?? []).join(",") || null;
+      out[facet.param] = (state?.[facet.id] ?? []).join(",") || null;
     }
     return out;
   },
   fromParams: (values) => {
     const state: SemanticState = {};
     for (const facet of SEMANTIC_FACETS) {
-      const raw = values[facet.urlParam];
+      const raw = values[facet.param];
       if (raw == null || raw === "") continue;
       const ids = raw
         .split(",")

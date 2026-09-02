@@ -5,7 +5,11 @@
 
 .map-holder
   position: relative
-  height: 180px
+  // An explicit height: the map fills its container absolutely, so it
+  // contributes no intrinsic height of its own and a container sized by content
+  // would collapse to zero.
+  height: 260px
+  flex: 0 0 260px
   border-radius: 4px
   overflow: hidden
 

@@ -23,20 +23,22 @@ import {
   AnchorButton,
   Button,
   ButtonGroup,
-  Callout,
+  NonIdealState,
   Spinner,
 } from "@blueprintjs/core";
 import {
+  createMasonryScrollBody,
   DataPanel,
   DataPanelToolbarStyle,
   LoadProgressIndicator,
+  SelectionInteractionStyle,
   useLoadControls,
 } from "@macrostrat/data-sheet";
 import "@macrostrat/data-sheet/dist/data-sheet.css";
 import hyper from "@macrostrat/hyper";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { RockdSiteIcon } from "~/components";
+import { Footer, RockdSiteIcon } from "~/components";
 import {
   initialViewStateFromURL,
   ViewStateURLSync,
@@ -47,10 +49,8 @@ import { type Center, NearbyMap } from "./nearby-map";
 import { createCheckinProvider, type FeedType } from "./checkin-provider";
 import { CheckinCard } from "./checkin-card";
 import { columnSpec, tableFilters, urlBindings } from "./view-config";
-import { AppliedFilters } from "./semantic/applied-filters";
-import styles from "./feed-page.module.sass";
-
-const h = hyper.styled(styles);
+import { omniFilterAction } from "./semantic/omni-filter";
+import h from "./feed-page.module.sass";
 
 /** Rows per window. Each costs `PAGE_SIZE / 5` requests, since the API pages by
  * fives — so this trades requests for scrolling feel. */
@@ -59,6 +59,22 @@ const PAGE_SIZE = 20;
  * small: scrolling forever is how you lose your place, and narrowing the search
  * is the better way to reach something deep. The checkpoint is the point. */
 const AUTO_LOAD_PAGES = 3;
+
+/**
+ * Checkin cards are variable-height — a photo, a long note, or neither — so the
+ * library's masonry body (data-sheet 4.6.0) suits them better than the CSS grid
+ * it replaces: a grid leaves ragged gaps under short cards, and CSS `columns`
+ * re-flows the whole list on every appended page, moving cards under the
+ * cursor. The masonry measures each card and freezes its column, so paging only
+ * ever adds to the bottom.
+ *
+ * Responsive: three columns, dropping to fewer when the body is too narrow to
+ * give each one a readable width (matching the old grid's `21em` track).
+ */
+const CardMasonry = createMasonryScrollBody({
+  columns: 3,
+  minColumnWidth: 320,
+});
 
 const FEEDS: { type: FeedType; label: string; href: string }[] = [
   { type: "all", label: "All", href: "/dev/feed" },
@@ -111,17 +127,20 @@ function NearbyFeed() {
   const [center, setCenter] = useAtom(centerAtom);
   return h(Feed, {
     feedType: "nearby",
-    // The map rides in the panel's own sidebar, so it stays put beside the list
-    // (and scrolls independently) rather than being pushed off the top.
-    sidebar: h(NearbyMap, { center, setCenter }),
+    // A page-level column, NOT the panel's `sidebar` slot: the map has to render
+    // whether or not the feed can load, and until a center is picked there is no
+    // feed to put a sidebar on. (That was the bug — the map lived inside the
+    // panel, and the panel was replaced by the "pick a center" prompt, so a
+    // fresh visit had no map to click.)
+    aside: h(NearbyMap, { center, setCenter }),
     center,
     // Without a center the route would fall back to the unfiltered feed, which
     // is not what "nearby" means — so ask for one first.
-    placeholder: h.if(center == null)(
-      Callout,
-      { intent: "primary", icon: "map-marker" },
-      "Choose a center point to see checkins near it."
-    ),
+    placeholder: h.if(center == null)(NonIdealState, {
+      icon: "map-marker",
+      title: "Pick a center point",
+      description: "Choose a spot on the map to see checkins near it.",
+    }),
   });
 }
 
@@ -132,10 +151,16 @@ function MineFeed() {
 
   let placeholder = null;
   if (auth.personId == null) {
-    placeholder = h(Callout, { intent: "primary", icon: "user" }, [
-      "Sign in to see your checkins. ",
-      h("a", { href: "/login" }, "Log in"),
-    ]);
+    placeholder = h(NonIdealState, {
+      icon: "user",
+      title: "Not signed in",
+      description: "Sign in to see the checkins you've recorded.",
+      action: h(
+        AnchorButton,
+        { href: "/login", intent: "primary", icon: "log-in" },
+        "Log in"
+      ),
+    });
   }
 
   return h(Feed, {
@@ -174,8 +199,9 @@ interface FeedProps {
   center?: Center | null;
   personId?: number | null;
   token?: string | null;
-  /** Rendered beside the list, in the panel's sidebar (the nearby map). */
-  sidebar?: ReactNode;
+  /** A page-level column beside the feed (the nearby map). Rendered whether or
+   * not the feed itself can load. */
+  aside?: ReactNode;
   /** Rendered instead of the list, when the feed can't be fetched yet. */
   placeholder?: ReactNode;
 }
@@ -185,7 +211,7 @@ function Feed({
   center = null,
   personId = null,
   token = null,
-  sidebar = null,
+  aside = null,
   placeholder = null,
 }: FeedProps) {
   const provider = useMemo(
@@ -195,15 +221,14 @@ function Feed({
 
   // The panel resets on a view-state change or a `refreshToken` change, not on
   // a provider swap — so the provider's own inputs have to be announced here.
-  const refreshToken = `${feedType}:${center?.lng ?? ""},${
-    center?.lat ?? ""
-  }:${personId ?? ""}`;
+  const refreshToken = `${feedType}:${center?.lng ?? ""},${center?.lat ?? ""}:${
+    personId ?? ""
+  }`;
 
   // A linked view (`?q=…&sort=…`) is applied when the store is created, so the
   // first request is the right one rather than an unfiltered one immediately
   // superseded. `ViewStateURLSync` keeps the two in step from there.
-  const { initialFilters, initialSorts } =
-    initialViewStateFromURL(urlBindings);
+  const { initialFilters, initialSorts } = initialViewStateFromURL(urlBindings);
 
   let body = placeholder;
   if (body == null) {
@@ -213,12 +238,17 @@ function Feed({
         provider,
         refreshToken,
         itemComponent: CheckinCard,
-        sidebar,
-        // Cards are small; several fit a row once the page is wide.
-        scrollBody: CardGrid,
-        // Sits beside the Filter/Sort controls (it's passed as the actions
-        // toolbar's children), showing the active filter *values*.
-        toolbar: h(AppliedFilters),
+        // Cards are small and of uneven height; several fit a row once the page
+        // is wide.
+        scrollBody: CardMasonry,
+        // The entire filter surface: search, facets and the applied tags in one
+        // control. Passed as an action so it sits left of Sort; `filters: []`
+        // keeps the built-in Filter menu out of the way.
+        actions: [omniFilterAction],
+        // A checkin card is a link to its own page, nothing more — the cards
+        // renderer enables selection by default, which added a selectable
+        // affordance with no action behind it.
+        enableSelection: SelectionInteractionStyle.NEVER,
         columnSpec,
         filters: tableFilters,
         initialFilters,
@@ -245,7 +275,13 @@ function Feed({
       h(RockdSiteIcon, { className: "site-icon" }),
       h("h1.page-title", "Checkins"),
     ]),
-    h("div.feed-content", [h(FeedTabs, { feedType }), body]),
+    h("div.feed-content", [
+      h(FeedTabs, { feedType }),
+      h("div.feed-body", [
+        h.if(aside != null)("aside.feed-aside", aside),
+        body,
+      ]),
+    ]),
   ]);
 }
 
@@ -278,12 +314,13 @@ function FeedTabs({ feedType }: { feedType: FeedType }) {
   );
 }
 
-/** The card layout. The panel still owns the scroll container and the loading
- * sentinel, so paging and selection keep working over any arrangement. */
-function CardGrid({ children }: { children?: ReactNode }) {
-  return h("div.card-grid", children);
-}
-
+/** The end-of-scroll region: load state, then the site footer.
+ *
+ * It sits in the panel's `contentFooter`, i.e. *inside* the scroll flow, so it
+ * is only reached at the bottom of what's loaded — which is what makes it a
+ * sensible home for the site footer on an infinite list. With `autoLoadPages`
+ * set low, the auto-load checkpoint is reached early enough that the footer is
+ * actually reachable rather than theoretical. */
 function FeedFooter() {
   const controls = useLoadControls();
 
@@ -296,5 +333,8 @@ function FeedFooter() {
     );
   }
 
-  return h("div.feed-footer", [h(LoadProgressIndicator), more]);
+  return h("div.feed-footer", [
+    h("div.load-progress", [h(LoadProgressIndicator), more]),
+    h(Footer, { className: "page-footer" }),
+  ]);
 }

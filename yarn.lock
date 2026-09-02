@@ -1181,16 +1181,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@macrostrat/data-sheet@npm:^4.5.2":
-  version: 4.5.2
-  resolution: "@macrostrat/data-sheet@npm:4.5.2"
+"@macrostrat/data-sheet@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "@macrostrat/data-sheet@npm:4.6.0"
   dependencies:
     "@blueprintjs/core": "npm:^6.14.0"
     "@blueprintjs/table": "npm:^6.1.0"
     "@macrostrat/color-utils": "npm:^1.2.2"
     "@macrostrat/data-components": "npm:^1.5.1"
     "@macrostrat/hyper": "npm:^3.1.1"
-    "@macrostrat/scoped-store": "npm:^1.0.1"
+    "@macrostrat/scoped-store": "npm:^1.1.0"
     "@macrostrat/ui-components": "npm:^5.2.0"
     "@supabase/postgrest-js": "npm:^1.17.7"
     "@types/underscore": "npm:^1.13.0"
@@ -1200,7 +1200,7 @@ __metadata:
     underscore: "npm:^1.13.7"
   peerDependencies:
     react: ^18.0.0||^19.0.0
-  checksum: 10c0/77c1ff62cecb018b5cd78d88a424e46604293dd4004c6e13da20ef478c567e5b87824e7fe084fad1624dcddadec58b50ff91031ac1bcfcb0e0952bc8e4b4f959
+  checksum: 10c0/274402c231e9fc36b45fb56e6947b7743b1f88559b806537b3509fcd67ba3233f0f0643ede6c5c2e2839c93269effc4f833a3c0c03d5039ce859dd4961429e0f
   languageName: node
   linkType: hard
 
@@ -1343,7 +1343,7 @@ __metadata:
     "@loadable/component": "npm:^5.14.1"
     "@macrostrat/color-utils": "npm:^1.2.2"
     "@macrostrat/data-components": "npm:^1.5.1"
-    "@macrostrat/data-sheet": "npm:^4.5.2"
+    "@macrostrat/data-sheet": "npm:^4.6.0"
     "@macrostrat/form-components": "npm:^1.0.10"
     "@macrostrat/hyper": "npm:^3.1.1"
     "@macrostrat/map-interface": "npm:^2.4.0"

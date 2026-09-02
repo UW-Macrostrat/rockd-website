@@ -8,7 +8,7 @@
  * it's the candidate to promote back into the library (converging with that
  * component and `CheckinListing`, which already carries a TODO to dedupe).
  */
-import { type MouseEvent, useState } from "react";
+import { useState } from "react";
 import { Icon } from "@blueprintjs/core";
 import { LngLatCoords } from "@macrostrat/data-components";
 import { createDataCard, type ItemComponentProps } from "@macrostrat/data-sheet";
@@ -85,16 +85,9 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
     observationCount = h(Stat, { icon: "camera", value: observations.length });
   }
 
-  // Cmd/ctrl-click enters select mode (the panel handles that itself); all the
-  // card owes it is not navigating, since a cmd-click on a link opens a tab.
-  const onClick = (event: MouseEvent) => {
-    if (!(event.metaKey || event.ctrlKey)) return;
-    event.preventDefault();
-  };
-
   return h(
     "a.checkin-card-content",
-    { href: `/checkin/${checkin_id}`, onClick },
+    { href: `/checkin/${checkin_id}` },
     [
       h("div.checkin-header", [
         h(SelfHidingImage, {

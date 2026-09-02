@@ -1,0 +1,175 @@
+// The toolbar group sizes to its content, so the width is declared here rather
+// than won by flex-growing a library-owned container.
+.omni-popover-target
+  flex: 1 1 auto
+  display: block
+  width: 34em
+  min-width: 14em
+  max-width: 100%
+
+// A tag field, hand-rolled so the values can be the shared Macrostrat tags
+// themselves rather than tags nested inside Blueprint tags.
+.omni-control
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  align-items: center
+  gap: 4px
+  width: 100%
+  min-height: 30px
+  padding: 3px 8px
+  border-radius: 2px
+  background-color: var(--input-background-color, rgba(255, 255, 255, 0.06))
+  box-shadow: inset 0 0 0 1px rgba(17, 20, 24, 0.2)
+  cursor: text
+
+  &:focus-within
+    box-shadow: inset 0 0 0 1px var(--blue3, #2d72d2), 0 0 0 2px rgba(45, 114, 210, 0.25)
+
+.omni-icon
+  flex: 0 0 auto
+  opacity: 0.6
+
+.omni-tag
+  display: inline-flex
+  align-items: center
+  max-width: 100%
+
+.omni-text
+  flex: 1 1 6em
+  min-width: 6em
+  border: none
+  outline: none
+  background: none
+  color: inherit
+  font: inherit
+  padding: 2px 0
+
+.notes-tag
+  display: inline-flex
+  align-items: center
+  gap: 0.25em
+  padding: 1px 6px
+  border-radius: 2px
+  font-size: 12px
+  font-style: italic
+  background-color: rgba(143, 153, 168, 0.2)
+
+.tag-remove
+  display: inline-flex
+  align-items: center
+  border: none
+  background: none
+  padding: 0
+  cursor: pointer
+  color: inherit
+  opacity: 0.6
+
+  &:hover
+    opacity: 1
+
+// ---- Dropdown ----
+
+.omni-popover
+  // Wider than the control: the option lists are the substance of this UI, and
+  // inline tags want room to wrap.
+  width: 46em
+  max-width: 92vw
+
+// Width belongs to `.omni-popover`, but this is the element the panel content
+// actually lives in — giving it a floor means a class that fails to resolve
+// can never collapse the dropdown to nothing again.
+.omni-panel
+  display: flex
+  flex-direction: column
+  width: 100%
+  min-width: 22em
+
+.omni-stack
+  // Generous by default — the panel exists to show the vocabulary.
+  height: min(60vh, 34em)
+
+.omni-root, .all-options
+  display: flex
+  flex-direction: column
+  height: 100%
+  min-height: 0
+
+// The one scroll container the sticky headers stick within.
+.omni-scroll
+  flex: 1 1 auto
+  min-height: 0
+  overflow-y: auto
+  padding-bottom: 0.5em
+
+.notes-row
+  flex: 0 0 auto
+  margin: 0.25em
+
+.panel-hint
+  flex: 0 0 auto
+  padding: 0.4em 0.75em
+  font-size: 0.8em
+  color: var(--text-subtle-color)
+
+.hint-quiet
+  opacity: 0.7
+
+// Two levels of sticky header, so neither the facet nor its current category
+// scrolls out of sight while its options are still on screen. The offsets have
+// to agree with the heights below.
+.facet-header
+  position: sticky
+  top: 0
+  z-index: 2
+  display: flex
+  flex-direction: row
+  align-items: center
+  justify-content: space-between
+  gap: 0.5em
+  height: 2em
+  padding: 0 0.75em
+  background-color: var(--panel-background-color, #fff)
+  border-bottom: 1px solid var(--card-shadow-color, rgba(128, 128, 128, 0.2))
+
+.facet-name
+  font-family: var(--header-font-family)
+  font-weight: 600
+  font-size: 0.85em
+  text-transform: uppercase
+  letter-spacing: 0.05em
+
+.section-more
+  font-size: 0.8em
+
+.group-header
+  top: 2em
+  z-index: 1
+  padding: 0.3em 0.75em 0.15em
+  font-size: 0.7em
+  text-transform: uppercase
+  letter-spacing: 0.06em
+  color: var(--text-subtle-color)
+  background-color: var(--panel-background-color, #fff)
+
+.option-groups
+  display: flex
+  flex-direction: column
+
+.option-inline
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  gap: 4px
+  align-items: center
+  padding: 0.25em 0.75em 0.5em
+
+.option-rows
+  display: flex
+  flex-direction: column
+  padding: 0 0.25em 0.4em
+
+.section-status
+  padding: 0.5em 0.75em
+  font-size: 0.85em
+  color: var(--text-subtle-color)

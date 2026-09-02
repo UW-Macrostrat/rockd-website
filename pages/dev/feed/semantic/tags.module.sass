@@ -1,0 +1,23 @@
+// The shared tags own their own look; these are only the additions the filter
+// control needs — a remove affordance and a selected state.
+
+.facet-tag
+  cursor: pointer
+
+  &.selected
+    outline: 1.5px solid var(--text-color)
+    outline-offset: -1px
+
+.tag-remove
+  display: inline-flex
+  align-items: center
+  border: none
+  background: none
+  padding: 0
+  margin: 0
+  cursor: pointer
+  color: inherit
+  opacity: 0.6
+
+  &:hover
+    opacity: 1
