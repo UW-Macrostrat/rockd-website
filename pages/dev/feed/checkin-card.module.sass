@@ -25,6 +25,9 @@
   border-radius: 50%
   flex: 0 0 auto
   object-fit: cover
+  // Also the placeholder, when the gravatar 404s — `ReservedImage` keeps the
+  // box, so it should read as a missing avatar rather than a hole in the row.
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
 
 .checkin-byline
   display: flex
@@ -61,9 +64,15 @@
 .checkin-photo
   display: block
   width: 100%
-  max-height: 20em
+  // The box has to have its final height *before* the image loads: the masonry
+  // measures each card once, in a layout effect, and freezes its column — a
+  // photo that arrives later and pushes the card taller has already been
+  // balanced against a wrong height. `thumb_large` assets are square (600×600),
+  // so the ratio reserves exactly the right space rather than an estimate.
+  aspect-ratio: 1 / 1
   object-fit: cover
   border-radius: 3px
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
 
 .checkin-footer
   display: flex

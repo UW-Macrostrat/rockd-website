@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Checkin photos and avatars reserve their space before loading (square aspect
+  ratio) and keep it as an empty placeholder if the image fails, so the masonry
+  balances columns against a height the card actually keeps.
+
 - Facet option lists distinguish a failed vocabulary request from an empty one,
   showing an error with a retry instead of spinning; a failed request is no
   longer re-fired on every remount.

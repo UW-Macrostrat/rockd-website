@@ -31,18 +31,33 @@ function Rating({ value }: { value: number }) {
   return h("div.rating", { title: `${filled} of ${MAX_RATING}` }, stars);
 }
 
-/** A checkin's `photo` id can point at a file that isn't there, and a broken
- * `<img>` still occupies a box. Collapse on error, as `BlankImage` does
- * elsewhere in the app. */
-function SelfHidingImage(props: {
+/**
+ * A checkin's `photo` id can point at a file that isn't there. On error the
+ * element **keeps its reserved box** rather than collapsing: the masonry
+ * measures each card once and freezes its column, so an image that disappears
+ * afterwards leaves the layout balanced against a height the card no longer
+ * has. An empty placeholder is the honest, stable option — the box was already
+ * reserved by `aspect-ratio` before the request resolved either way.
+ *
+ * (Contrast `BlankImage` elsewhere in the app, which hides on error. That's
+ * right in a flow layout, where collapsing is free.)
+ */
+function ReservedImage(props: {
   src: string;
   className: string;
   alt: string;
 }) {
+  const { src, className, alt } = props;
   const [failed, setFailed] = useState(false);
-  if (failed) return null;
+
+  if (failed) {
+    return h("div", { className, role: "presentation" });
+  }
+
   return h("img", {
-    ...props,
+    src,
+    className,
+    alt,
     loading: "lazy",
     onError: () => setFailed(true),
   });
@@ -73,7 +88,7 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
 
   let image = null;
   if (photo != null) {
-    image = h(SelfHidingImage, {
+    image = h(ReservedImage, {
       className: "checkin-photo",
       src: getImageUrl(person_id, photo),
       alt: notes ?? "Checkin photo",
@@ -90,7 +105,7 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
     { href: `/checkin/${checkin_id}` },
     [
       h("div.checkin-header", [
-        h(SelfHidingImage, {
+        h(ReservedImage, {
           className: "profile-pic",
           src: getProfilePicUrl(person_id),
           alt: "",
