@@ -410,7 +410,7 @@ function SummaryPanel({ openPanel }: any) {
 
 function FacetSection({ facet, openPanel }: any) {
   const { query } = useOmni();
-  const { items, loading, complete } = useFacetOptions(
+  const { items, loading, error, retry, complete } = useFacetOptions(
     facet,
     query,
     facet.summaryLimit
@@ -440,7 +440,7 @@ function FacetSection({ facet, openPanel }: any) {
 
   return h("section.facet-section", [
     h("header.facet-header", [h("span.facet-name", facet.name), viewAll]),
-    h(OptionGroups, { facet, items, loading }),
+    h(OptionGroups, { facet, items, loading, error, retry }),
   ]);
 }
 
@@ -450,7 +450,7 @@ function AllOptionsPanel({ facetId }: any) {
   // No search field of its own: this panel is for browsing and picking, seeded
   // by whatever is in the control above it — which stays focused and editable
   // while the panel is open, so typing there narrows this list.
-  const { items, loading } = useFacetOptions(facet, query);
+  const { items, loading, error, retry } = useFacetOptions(facet, query);
 
   let hint = null;
   if (query !== "") {
@@ -462,18 +462,47 @@ function AllOptionsPanel({ facetId }: any) {
 
   return h("div.all-options", [
     hint,
-    h("div.omni-scroll", h(OptionGroups, { facet, items, loading, all: true })),
+    h(
+      "div.omni-scroll",
+      h(OptionGroups, { facet, items, loading, error, retry, all: true })
+    ),
   ]);
 }
 
 /** A facet's options, split into its own categories under sticky headers. */
-function OptionGroups({ facet, items, loading, all = false }: any) {
+function OptionGroups({
+  facet,
+  items,
+  loading,
+  error,
+  retry,
+  all = false,
+}: any) {
   const { semantic, toggle } = useOmni();
   const selected = semantic[facet.id] ?? [];
   const groups = useMemo(() => groupOptions(facet, items), [facet, items]);
 
   if (loading && items.length === 0) {
     return h("div.section-status", h(Spinner, { size: 16 }));
+  }
+
+  // An upstream failure is not an empty vocabulary. Saying "no matching
+  // lithologies" when nothing could be fetched sends people looking for a
+  // filter bug that isn't theirs.
+  if (error != null && items.length === 0) {
+    const message = h([
+      h("span.status-error", `Couldn't load ${facet.pluralName}.`),
+      h(Button, { minimal: true, small: true, onClick: retry }, "Retry"),
+    ]);
+    if (all) {
+      return h(NonIdealState, {
+        icon: "error",
+        title: `Couldn't load ${facet.pluralName}`,
+        description: error.message,
+        action: h(Button, { onClick: retry }, "Retry"),
+      });
+    }
+    return h("div.section-status", message);
   }
 
   if (items.length === 0) {

@@ -9,7 +9,7 @@
  * The vocabulary is cached as a *promise* at module scope, so several panels
  * mounting at once share one request rather than racing.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FacetItem, SemanticFacet } from "./facets";
 import { useRecordItems } from "./label-cache";
 
@@ -17,26 +17,44 @@ const SEARCH_DEBOUNCE = 250;
 
 const vocabularies = new Map<string, Promise<FacetItem[]>>();
 
+/**
+ * The shared vocabulary request for a facet.
+ *
+ * A *rejected* promise stays cached on purpose. The upstream failure mode here
+ * is a 10-second connect timeout (a Macrostrat API with no database), and
+ * dropping the cache entry on failure meant every remount of the panel fired
+ * another 10-second request — an endless spinner that also hammers a service
+ * that is already struggling. A failure is sticky until `retryVocabulary`.
+ */
 export function loadVocabulary(
-  facet: SemanticFacet,
-  signal: AbortSignal
+  facet: SemanticFacet
 ): Promise<FacetItem[]> | null {
   if (facet.vocabulary == null) return null;
   let pending = vocabularies.get(facet.id);
   if (pending == null) {
-    // Deliberately not passed the caller's signal: the result is shared, so one
-    // consumer unmounting must not cancel it for the others.
+    // No caller signal: the result is shared, so one consumer unmounting must
+    // not cancel it for the others.
     pending = facet.vocabulary(new AbortController().signal);
-    // A failure shouldn't be cached forever.
-    pending.catch(() => vocabularies.delete(facet.id));
     vocabularies.set(facet.id, pending);
   }
   return pending;
 }
 
+/** Forget a cached vocabulary (including a failed one) so the next read
+ * re-requests it. */
+export function retryVocabulary(facet: SemanticFacet) {
+  vocabularies.delete(facet.id);
+}
+
 export interface FacetOptions {
   items: FacetItem[];
   loading: boolean;
+  /** The vocabulary or search request failed. Shown as an error with a retry
+   * rather than an empty list — "no matching lithologies" would be a lie when
+   * the truth is that nothing could be fetched. */
+  error: Error | null;
+  /** Re-request after a failure. */
+  retry(): void;
   /** The facet holds its whole vocabulary, so `items` is everything that
    * matches rather than a remote page of guesses. */
   complete: boolean;
@@ -52,33 +70,42 @@ export function useFacetOptions(
   const [vocabulary, setVocabulary] = useState<FacetItem[] | null>(null);
   const [remote, setRemote] = useState<FacetItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const record = useRecordItems();
   const hasVocabulary = facet.vocabulary != null;
+
+  const retry = useCallback(() => {
+    retryVocabulary(facet);
+    setError(null);
+    setAttempt((n) => n + 1);
+  }, [facet]);
 
   useEffect(() => {
     if (!hasVocabulary) return;
     let live = true;
-    const pending = loadVocabulary(facet, new AbortController().signal);
+    const pending = loadVocabulary(facet);
     setLoading(true);
     pending
       ?.then((items) => {
         if (!live) return;
         setVocabulary(items);
+        setError(null);
         setLoading(false);
         // Every id this facet can hold is now labelled, so no chip that comes
         // from a URL ever needs a resolve request.
         record(facet, items);
       })
-      .catch(() => {
-        if (live) {
-          setVocabulary([]);
-          setLoading(false);
-        }
+      .catch((err) => {
+        if (!live) return;
+        setVocabulary([]);
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setLoading(false);
       });
     return () => {
       live = false;
     };
-  }, [facet, hasVocabulary, record]);
+  }, [facet, hasVocabulary, record, attempt]);
 
   // Remote search, for a facet with no vocabulary.
   const term = query.trim();
@@ -93,6 +120,7 @@ export function useFacetOptions(
       return;
     }
     setLoading(true);
+    setError(null);
     const controller = new AbortController();
     const timer = setTimeout(() => {
       facet
@@ -103,15 +131,17 @@ export function useFacetOptions(
           setLoading(false);
           recordRef.current(facet, items);
         })
-        .catch(() => {
-          if (!controller.signal.aborted) setLoading(false);
+        .catch((err) => {
+          if (controller.signal.aborted) return;
+          setError(err instanceof Error ? err : new Error(String(err)));
+          setLoading(false);
         });
     }, SEARCH_DEBOUNCE);
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [facet, hasVocabulary, term]);
+  }, [facet, hasVocabulary, term, attempt]);
 
   const items = useMemo(() => {
     if (!hasVocabulary) return limit == null ? remote : remote.slice(0, limit);
@@ -136,7 +166,7 @@ export function useFacetOptions(
     return matched.slice(0, limit);
   }, [hasVocabulary, vocabulary, remote, term, facet, limit]);
 
-  return { items, loading, complete: hasVocabulary };
+  return { items, loading, error, retry, complete: hasVocabulary };
 }
 
 /** The same options, split into the facet's sections, for the "all" panel. */

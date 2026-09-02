@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Facet option lists distinguish a failed vocabulary request from an empty one,
+  showing an error with a retry instead of spinning; a failed request is no
+  longer re-fired on every remount.
+
 - Wrapped the app in Blueprint's `BlueprintProvider`, so overlays render inside
   an `OverlaysProvider` instead of Blueprint's legacy fallback.
 
