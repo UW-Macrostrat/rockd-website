@@ -1,0 +1,95 @@
+.checkin-card
+  --data-panel-card-padding: 0
+
+.checkin-card-content
+  display: flex
+  flex-direction: column
+  gap: 0.5em
+  padding: 0.75em 1em 0.6em
+  color: var(--text-color)
+  text-decoration: none
+
+  &:hover
+    color: var(--text-color)
+    text-decoration: none
+
+.checkin-header
+  display: flex
+  flex-direction: row
+  align-items: center
+  gap: 0.6em
+
+.profile-pic
+  width: 2em
+  height: 2em
+  border-radius: 50%
+  flex: 0 0 auto
+  object-fit: cover
+
+.checkin-byline
+  display: flex
+  flex-direction: column
+  min-width: 0
+  flex: 1 1 auto
+
+.person-name
+  font-family: var(--header-font-family)
+  font-weight: 600
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.checkin-date
+  font-size: 0.8em
+  color: var(--text-subtle-color)
+
+.rating
+  display: flex
+  flex-direction: row
+  flex: 0 0 auto
+  color: var(--text-subtle-color)
+
+.checkin-notes
+  margin: 0
+  font-family: var(--main-font-family)
+  // The notes field carries both title and description, and some are long.
+  display: -webkit-box
+  -webkit-line-clamp: 4
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.checkin-photo
+  display: block
+  width: 100%
+  max-height: 20em
+  object-fit: cover
+  border-radius: 3px
+
+.checkin-footer
+  display: flex
+  flex-direction: row
+  align-items: baseline
+  justify-content: space-between
+  gap: 1em
+  font-size: 0.85em
+  color: var(--text-subtle-color)
+
+.checkin-place
+  display: flex
+  flex-direction: row
+  align-items: baseline
+  gap: 0.5em
+  flex-wrap: wrap
+  min-width: 0
+
+.checkin-stats
+  display: flex
+  flex-direction: row
+  gap: 0.75em
+  flex: 0 0 auto
+
+.stat
+  display: flex
+  flex-direction: row
+  align-items: center
+  gap: 0.25em

@@ -1181,6 +1181,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@macrostrat/data-sheet@npm:^4.5.2":
+  version: 4.5.2
+  resolution: "@macrostrat/data-sheet@npm:4.5.2"
+  dependencies:
+    "@blueprintjs/core": "npm:^6.14.0"
+    "@blueprintjs/table": "npm:^6.1.0"
+    "@macrostrat/color-utils": "npm:^1.2.2"
+    "@macrostrat/data-components": "npm:^1.5.1"
+    "@macrostrat/hyper": "npm:^3.1.1"
+    "@macrostrat/scoped-store": "npm:^1.0.1"
+    "@macrostrat/ui-components": "npm:^5.2.0"
+    "@supabase/postgrest-js": "npm:^1.17.7"
+    "@types/underscore": "npm:^1.13.0"
+    classnames: "npm:^2.5.1"
+    immutability-helper: "npm:^3.1.1"
+    jotai: "npm:^2.20.0"
+    underscore: "npm:^1.13.7"
+  peerDependencies:
+    react: ^18.0.0||^19.0.0
+  checksum: 10c0/77c1ff62cecb018b5cd78d88a424e46604293dd4004c6e13da20ef478c567e5b87824e7fe084fad1624dcddadec58b50ff91031ac1bcfcb0e0952bc8e4b4f959
+  languageName: node
+  linkType: hard
+
 "@macrostrat/form-components@npm:^1.0.10":
   version: 1.0.10
   resolution: "@macrostrat/form-components@npm:1.0.10"
@@ -1320,6 +1343,7 @@ __metadata:
     "@loadable/component": "npm:^5.14.1"
     "@macrostrat/color-utils": "npm:^1.2.2"
     "@macrostrat/data-components": "npm:^1.5.1"
+    "@macrostrat/data-sheet": "npm:^4.5.2"
     "@macrostrat/form-components": "npm:^1.0.10"
     "@macrostrat/hyper": "npm:^3.1.1"
     "@macrostrat/map-interface": "npm:^2.4.0"
@@ -1344,6 +1368,7 @@ __metadata:
     echarts: "npm:^6.0.0"
     echarts-for-react: "npm:^3.0.6"
     jotai: "npm:^2.18.1"
+    jotai-location: "npm:^0.6.2"
     mapbox-gl: "npm:^3.20.0"
     prettier: "npm:^2.7.1"
     react: "npm:^19.2.4"
@@ -2548,6 +2573,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@supabase/postgrest-js@npm:^1.17.7":
+  version: 1.21.4
+  resolution: "@supabase/postgrest-js@npm:1.21.4"
+  dependencies:
+    "@supabase/node-fetch": "npm:^2.6.14"
+  checksum: 10c0/9efa19a3b56c780c63b7caebca084f8c67750349f882c3221c5547153baaa4010b736d4fdd9a024ebdf117eab7de17770fecb698b39210f9903777522d9a7bff
+  languageName: node
+  linkType: hard
+
 "@turf/bbox@npm:^7.3.2":
   version: 7.3.4
   resolution: "@turf/bbox@npm:7.3.4"
@@ -2982,6 +3016,13 @@ __metadata:
   version: 1.11.15
   resolution: "@types/underscore@npm:1.11.15"
   checksum: 10c0/f1bbe78337a8b800b6cb96435c54c9428d00c64eabcb8ba690302cb76c4c068d69e663a048c6b05bc9154ba723b1bcb6bcf39f753f6a0eb8c477accde7bd6056
+  languageName: node
+  linkType: hard
+
+"@types/underscore@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "@types/underscore@npm:1.13.0"
+  checksum: 10c0/240d3f36f694e177b1896c464b1254249e64b51a2afc703a1dda61f0c544d6e3b081ac4d955fb057e873982a62a7ba78e3a0aaa252c9d766f6cbe5e85283bc04
   languageName: node
   linkType: hard
 
@@ -5617,6 +5658,15 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 10c0/6acc10d139eaefdbe04d2f679e6191b3abf073f111edf10b1de5302c97ec93fffeb2fdd8681ed17f16268aa9dd4f8c588ed9d1d3bffbbfa6e8bf897cbb3149b9
+  languageName: node
+  linkType: hard
+
+"jotai-location@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "jotai-location@npm:0.6.2"
+  peerDependencies:
+    jotai: ">=1.11.0"
+  checksum: 10c0/eb2694081956651b9123f92afe9763e2a34d7e354b000ae7dcaf85294af711d4596d5824c4289be25f35c601b344fd7daa508e911bc0645909b2a2470f86ca57
   languageName: node
   linkType: hard
 
