@@ -1,0 +1,32 @@
+.nearby-map
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+
+.map-holder
+  position: relative
+  // An explicit height: the map fills its container absolutely, so it
+  // contributes no intrinsic height of its own and a container sized by content
+  // would collapse to zero.
+  height: 260px
+  flex: 0 0 260px
+  border-radius: 4px
+  overflow: hidden
+
+  .helper-map
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+
+.map-controls
+  display: flex
+  flex-direction: row
+  align-items: center
+  justify-content: space-between
+  gap: 1em
+
+.center-label
+  font-size: 0.85em
+  color: var(--text-subtle-color)

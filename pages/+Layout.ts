@@ -1,3 +1,4 @@
+import { BlueprintProvider } from "@blueprintjs/core";
 import { DarkModeProvider } from "@macrostrat/ui-components";
 import { ReactNode } from "react";
 import "@macrostrat/style-system";
@@ -15,9 +16,17 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { exports = {} } = pageContext;
   const pageStyle = exports?.pageStyle ?? "fullscreen";
 
+  // Blueprint's composite provider (overlays + portals + hotkeys). Every
+  // `Popover`/`Dialog` here renders through `Overlay2`, which warns
+  // ("<Overlay2> was used outside of a <OverlaysProvider> context") and loses
+  // its managed overlay stack without it — so escape/outside-click and focus
+  // ordering were being handled by the legacy fallback.
   return h(
-    DarkModeProvider,
-    { followSystem: true },
-    h("div.app-shell", { className: pageStyle + "-page" }, children)
+    BlueprintProvider,
+    h(
+      DarkModeProvider,
+      { followSystem: true },
+      h("div.app-shell", { className: pageStyle + "-page" }, children)
+    )
   );
 }

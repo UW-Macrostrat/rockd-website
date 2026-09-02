@@ -16,9 +16,6 @@ export function Footer() {
     { href: "/heatmap", icon: "map", text: "Heatmap" },
   ];
   const footerLinks2 = [
-    ...(macrostratEnv !== "production"
-      ? [{ href: "/metrics", icon: "chart", text: "Metrics" }]
-      : []),
     { href: "/terms", icon: "manual", text: "Terms and Conditions" },
     { href: "/privacy", icon: "lock", text: "Privacy" },
   ];
