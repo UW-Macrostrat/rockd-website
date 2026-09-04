@@ -4,7 +4,8 @@
 // users recognize what they're handing credentials to:
 //   Google   — light theme: white surface, #dadce0 border, #1f1f1f label, Roboto
 //   Facebook — #1877f2 surface, white "f" mark and label
-// Both providers require their own mark and an unmodified "Continue with …"
+//   Apple    — black surface, white  mark and label, system font
+// All three providers require their own mark and an unmodified "Continue with …"
 // label, so avoid restyling these to match site chrome.
 
 .oauth-buttons
@@ -53,6 +54,25 @@
 
   &:active
     background-color: #f1f3f4
+
+.apple
+  background-color: #000
+  border: 1px solid #000
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif
+
+  &,
+  &:hover,
+  &:focus,
+  &:active
+    color: #fff
+
+  &:hover
+    background-color: #1a1a1a
+    border-color: #1a1a1a
+
+  &:active
+    background-color: #262626
+    border-color: #262626
 
 .facebook
   background-color: #1877f2
