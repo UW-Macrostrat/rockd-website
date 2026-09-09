@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added a "Continue with Apple" option to `/login`, alongside Google and
+  Facebook. Requires the matching API support in UW-Macrostrat/rockd; the
+  button routes to `/auth/apple` and returns through the existing
+  `/login/callback` handler, so no changes to session storage or the
+  post-login redirect.
+
 - Checkin photos and avatars reserve their space before loading (square aspect
   ratio) and keep it as an empty placeholder if the image fails, so the masonry
   balances columns against a height the card actually keeps.
