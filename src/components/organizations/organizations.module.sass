@@ -1,0 +1,238 @@
+.organizations-page
+  min-height: 100vh
+  display: flex
+  flex-direction: column
+
+.organizations-header
+  width: min(72em, 100%)
+  margin: 0 auto
+  padding: 1.25em 1.5em
+  display: flex
+  align-items: center
+  gap: 1em
+
+  .site-icon img
+    display: block
+    height: 2.5em
+
+  .header-title
+    flex: 1
+    min-width: 0
+
+    h1
+      margin: 0
+      font-size: 1.7em
+
+    p
+      margin: 0.2em 0 0
+      color: var(--text-subtle-color)
+
+.organizations-main
+  width: min(72em, 100%)
+  margin: 0 auto
+  padding: 0 1.5em 2em
+  flex: 1
+
+.directory-controls
+  display: grid
+  grid-template-columns: minmax(16em, 1fr) minmax(12em, auto) minmax(10em, auto)
+  gap: 1em
+  align-items: end
+  padding: 1em
+  margin: 1em 0 0.5em
+  border: 1px solid var(--card-shadow-color)
+  border-radius: 4px
+  background: var(--panel-background-color)
+
+.search-control, .select-control
+  display: flex
+  flex-direction: column
+  gap: 0.35em
+
+.control-label
+  color: var(--text-subtle-color)
+  font-size: 0.85em
+  font-weight: 600
+
+.result-count
+  min-height: 1.5em
+  margin: 0.75em 0
+  color: var(--text-subtle-color)
+
+.organization-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(min(20em, 100%), 1fr))
+  gap: 1em
+
+.organization-card
+  display: flex
+  flex-direction: column
+  gap: 1em
+  min-height: 13em
+
+.card-heading
+  display: flex
+  align-items: center
+  gap: 0.9em
+
+.organization-logo
+  width: 3.5em
+  height: 3.5em
+  flex: 0 0 3.5em
+  object-fit: contain
+  border-radius: 4px
+
+.logo-fallback
+  display: flex
+  align-items: center
+  justify-content: center
+  color: var(--text-subtle-color)
+  background: var(--secondary-background)
+
+.card-title
+  min-width: 0
+
+.organization-title-row
+  display: flex
+  align-items: center
+  gap: 0.45em
+
+.organization-title
+  margin: 0
+  font-size: 1.15em
+  overflow-wrap: anywhere
+
+.organization-slug
+  color: var(--text-subtle-color)
+  font-size: 0.85em
+
+.organization-color
+  width: 1em
+  height: 1em
+  flex: 0 0 1em
+  border: 1px solid var(--card-shadow-color)
+  border-radius: 50%
+
+.organization-description
+  margin: 0
+  flex: 1
+  overflow-wrap: anywhere
+
+.muted
+  color: var(--text-subtle-color)
+  font-style: italic
+
+.organization-meta
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: 0.6em 0.9em
+  font-size: 0.9em
+
+.member-count, .organization-website
+  display: inline-flex
+  align-items: center
+  gap: 0.35em
+
+.directory-state
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 1em
+  padding: 4em 1em
+
+.create-page
+  min-height: 100vh
+  display: flex
+  flex-direction: column
+
+.create-main
+  width: min(44em, 100%)
+  margin: 0 auto
+  padding: 1em 1.5em 3em
+  flex: 1
+
+.breadcrumb
+  display: inline-flex
+  align-items: center
+  gap: 0.35em
+  margin-bottom: 1.5em
+
+.create-heading
+  margin-bottom: 1.5em
+
+  h1
+    margin-bottom: 0.35em
+
+  p
+    color: var(--text-subtle-color)
+
+.organization-form
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+
+.form-row
+  display: flex
+  gap: 1em
+
+.form-field
+  flex: 1
+
+.field-error
+  color: var(--intent-danger-text-color, #c23030)
+
+.color-input
+  display: grid
+  grid-template-columns: 1fr auto
+  align-items: center
+  gap: 0.6em
+
+.color-actions
+  align-items: center
+
+.color-picker
+  width: 2.25em
+  height: 2.25em
+  padding: 0.15em
+  border: 1px solid var(--card-shadow-color)
+  border-radius: 4px
+  background: var(--panel-background-color)
+  cursor: pointer
+
+  &:disabled
+    cursor: not-allowed
+    opacity: 0.6
+
+.logo-preview
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 0.5em
+  margin-bottom: 1em
+
+  img
+    max-width: 12em
+    max-height: 7em
+    object-fit: contain
+
+.form-actions
+  display: flex
+  justify-content: flex-end
+  gap: 0.75em
+  margin-top: 1em
+
+@media only screen and (max-width: 700px)
+  .organizations-header
+    align-items: flex-start
+    flex-wrap: wrap
+
+    .header-title
+      flex-basis: calc(100% - 4em)
+
+  .directory-controls
+    grid-template-columns: 1fr
+
+  .form-row
+    flex-direction: column
+    gap: 0
