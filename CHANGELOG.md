@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added development-only organization directory and creation pages, with a typed
+  Rockd organization API client, URL-backed directory search and filters,
+  accessible organization cards, and validated organization setup fields. The
+  brand-color field includes a synchronized picker, and external organization
+  URLs are protocol-checked again when rendered with safer link and image
+  privacy attributes.
+
 - Added a "Continue with Apple" option to `/login`, alongside Google and
   Facebook. Requires the matching API support in UW-Macrostrat/rockd; the
   button routes to `/auth/apple` and returns through the existing
