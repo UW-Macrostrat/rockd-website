@@ -157,7 +157,7 @@ export function Page() {
                 onSubmit: handleSubmit,
                 style: {
                   width: "100%",
-                  maxWidth: "420px",
+                  maxWidth: "336px",
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.75rem",
@@ -190,11 +190,14 @@ export function Page() {
                   },
                 }),
 
+                // Styled as the homepage's Login link
                 h(
                   Button,
                   {
                     type: "submit",
-                    background: "var(--panel-background-color, white)",
+                    icon: "log-in",
+                    large: true,
+                    minimal: true,
                     style: {
                       width: "fit-content",
                       alignSelf: "center",

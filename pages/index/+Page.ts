@@ -79,7 +79,7 @@ export function Page() {
               ]
             ),
           ]),
-          h("p", [
+          h("div.hero-links", [
             h(
               AnchorButton,
               {
@@ -90,6 +90,17 @@ export function Page() {
                 icon: "geosearch",
               },
               "Explore the data"
+            ),
+            h(
+              AnchorButton,
+              {
+                href: "/login",
+                className: "explore-link",
+                large: true,
+                minimal: true,
+                icon: "log-in",
+              },
+              "Login"
             ),
           ]),
         ]),
