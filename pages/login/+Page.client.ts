@@ -157,7 +157,11 @@ export function Page() {
                 onSubmit: handleSubmit,
                 style: {
                   width: "100%",
-                  maxWidth: "336px",
+                  maxWidth: "302px",
+                  // One font, size and weight for every field and button
+                  fontFamily: "var(--pz-body-font)",
+                  fontSize: "0.9rem",
+                  fontWeight: 400,
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.75rem",
@@ -170,10 +174,10 @@ export function Page() {
                   onChange: (e) => setEmail(e.target.value),
                   placeholder: "Email",
                   style: {
-                    padding: "0.85rem 1rem",
+                    padding: "0.7rem 0.9rem",
                     borderRadius: "8px",
                     border: "1px solid #ccc",
-                    fontSize: "1rem",
+                    font: "inherit",
                   },
                 }),
 
@@ -183,10 +187,10 @@ export function Page() {
                   onChange: (e) => setPassword(e.target.value),
                   placeholder: "Password",
                   style: {
-                    padding: "0.85rem 1rem",
+                    padding: "0.7rem 0.9rem",
                     borderRadius: "8px",
                     border: "1px solid #ccc",
-                    fontSize: "1rem",
+                    font: "inherit",
                   },
                 }),
 
@@ -201,6 +205,9 @@ export function Page() {
                     style: {
                       width: "fit-content",
                       alignSelf: "center",
+                      // 10% under Blueprint's large button
+                      minHeight: "36px",
+                      font: "inherit",
                     },
                   },
                   "Login"
