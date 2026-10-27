@@ -1,6 +1,5 @@
 import { AnchorButton } from "@blueprintjs/core";
 import { isValidElement, ReactNode } from "react";
-import { Image } from "./image";
 import { ThemeButton } from "./theme-button";
 import h from "./footer.module.sass";
 
@@ -73,11 +72,11 @@ function HomepageLink() {
   return h(
     "a.homepage-link",
     { href: "/", onClick: scrollToTopOnHomepage, "aria-label": "Rockd home" },
-    h(Image, {
-      src: "main-page/rockd_transparent.png",
-      className: "footer-logo",
-      alt: "Rockd",
-    })
+    [
+      h("h3", "Rockd"),
+      // The same icon as the page header's logo
+      h("img.footer-logo", { src: "/rockd-icon-256.png", alt: "" }),
+    ]
   );
 }
 

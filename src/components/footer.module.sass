@@ -48,14 +48,26 @@
   display: flex
   flex-direction: column
   align-items: center
-  flex: 0 0 auto
+  gap: 0.5em
+  flex: 0
+  h3
+    margin: 0
+    color: var(--pz-secondary-color)
 
-  &:hover .footer-logo
-    filter: unset
-    opacity: 1
+  &:hover
+    h3
+      color: var(--pz-text-color)
+    .footer-logo
+      filter: unset
+      opacity: 1
 
   .footer-logo
-    width: clamp(96px, 20cqi, 180px)
+    --logo-size: clamp(48px, 12cqi, 100px)
+    width: var(--logo-size)
+    aspect-ratio: 1/1
+    // The icon file has a transparent border (25px of its 256px at the top);
+    // pull it up so the artwork sits right under the name, as Macrostrat's does
+    margin-top: calc(var(--logo-size) * -25 / 256)
     filter: var(--filter)
     opacity: 0.5
 
@@ -82,8 +94,8 @@
     color: inherit
     text-decoration: underline
 
-// Narrow footers: the logo spans a row of its own and the lists sit two to a
-// row beneath, set smaller and closer
+// Narrow footers: the name and logo (name still above) span a row of their own
+// and the lists sit two to a row beneath, set smaller and closer
 @container (max-width: 48rem)
   .footer .footer-inner
     display: grid
@@ -95,6 +107,9 @@
 
   .homepage-link
     grid-column: 1 / -1
+
+    .footer-logo
+      --logo-size: 40px
 
   .footer .nav-link-list
     margin: 0.2em 0 0.5em
