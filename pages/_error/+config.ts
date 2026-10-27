@@ -1,3 +1,4 @@
 export default {
-  pageStyle: "content",
+  // The 404 page is a full-bleed image, without the site chrome
+  pageStyle: "fullscreen",
 };

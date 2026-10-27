@@ -31,13 +31,8 @@ function Map(props) {
 
 export function Checkins({ checkin, comments }) {
   if (checkin === undefined) {
-    return h("div", [
-      h(ContentPage, [
-        h("h2", "Checkin not found"),
-        h(Divider),
-        h("p", "This checkin does not exist or has been deleted."),
-      ]),
-      h(Footer),
+    return h(ContentPage, { title: "Checkin not found" }, [
+      h("p", "This checkin does not exist or has been deleted."),
     ]);
   }
   const center = {

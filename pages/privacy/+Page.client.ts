@@ -1,14 +1,9 @@
-import { Footer } from "~/components";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 
 export function Page() {
     return h("div", { className: "main-page" }, [
         h("div", {className: "content"}, [
-            h("div", { className: 'header' }, [
-                h("h1", "Privacy Policy"),
-            ]),
-
             // Scope Section
             h("div", {className: "section"}, [
               h("h3", {className: "header"}, "Scope"),
@@ -110,8 +105,7 @@ export function Page() {
               h("h3", {className: "header"}, "Privacy statement changes"),
               h("p", {}, "If our information practices change in a significant way, we will post the policy changes here and in the Rockd App Privacy information page. This Privacy Statement was last updated on June 15, 2016."),
             ]),
-          ]),
-        h(Footer)
+          ])
     ]);
 };
 

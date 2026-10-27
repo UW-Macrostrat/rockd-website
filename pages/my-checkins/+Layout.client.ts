@@ -1,5 +1,5 @@
-// pages/my_checkins/+Layout.client.ts
-// Applied automatically by Vike to every page under pages/my_checkins/
+// pages/my-checkins/+Layout.client.ts
+// Applied automatically by Vike to every page under pages/my-checkins/
 //
 // Gated for the same reason pages/login/ is: this page is only reachable after
 // a login, and /login itself 404s in production. Remove both guards together

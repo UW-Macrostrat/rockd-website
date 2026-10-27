@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Standard page chrome shared with the Macrostrat website. A page's
+  `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,
+  `fullscreen`). `content` pages get `SitePageHeader` — `PageHeader` from
+  `@macrostrat/ui-components` with the Rockd logo, a breadcrumb trail and the
+  page's `title`, collapsing into a sticky bar on scroll; a page's
+  `headerActions` config adds header controls — and the new Macrostrat-style
+  `Footer` (link lists, credits and a hydration-safe `ThemeButton`). Terms,
+  Privacy, Metrics and Organizations use the `content` layout and the homepage
+  the `home` layout, replacing their hand-built headers and footers. Upgraded
+  `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
+
 - Added development-only organization directory and creation pages, with a typed
   Rockd organization API client, URL-backed directory search and filters,
   accessible organization cards, and validated organization setup fields. The

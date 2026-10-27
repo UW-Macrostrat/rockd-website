@@ -1,0 +1,36 @@
+// Content pages centre the header on the column (`width: "constrained"`), so
+// it adds no gutter of its own. Element-qualified so it outranks the
+// library's own default on the same element.
+header.site-page-header
+  --page-header-padding-x: 0px
+  --page-header-logo-size: 1.75rem
+  --page-header-crumb-font-size: var(--pz-font-size-lg)
+  --page-header-title-font: var(--header-font-family)
+  --page-header-title-spacing: var(--pz-space-4)
+  // Rockd's own page background, so the sticky bar matches the page
+  --page-header-background: var(--background)
+
+  // The wordmark crumb is in the heading font and the rest in the body font;
+  // align on baselines. The chevrons and "…" menu have no text, so they stay
+  // centred.
+  ol,
+  li
+    align-items: baseline
+
+  li::after,
+  :global(.bp6-breadcrumbs-collapsed)
+    align-self: center
+
+.rockd-wordmark
+  font-family: var(--header-font-family)
+  font-weight: 600
+
+.site-logo
+  display: flex
+  width: 100%
+  height: 100%
+
+  img
+    width: 100%
+    height: 100%
+    border-radius: 22%

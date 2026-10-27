@@ -1,118 +1,20 @@
-import { DarkModeButton, useAPIResult } from "@macrostrat/ui-components";
-import { AnchorButton, Button, Divider, Icon } from "@blueprintjs/core";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { Button, Divider, Icon } from "@blueprintjs/core";
 import {
   rockdApiOldURL,
   rockdApiURL,
   macrostratEnv,
   SETTINGS,
 } from "~/settings";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import h from "./index.module.sass";
+import { Image, type ImageProps } from "./image";
 
-export function Footer() {
-  const footerLinks1 = [
-    { href: "/", icon: "home", text: "Home" },
-    { href: "/explore", icon: "geosearch", text: "Explore" },
-    { href: "/heatmap", icon: "map", text: "Heatmap" },
-  ];
-  const footerLinks2 = [
-    { href: "/terms", icon: "manual", text: "Terms and Conditions" },
-    { href: "/privacy", icon: "lock", text: "Privacy" },
-  ];
-
-  return h("div.footer", [
-    h("div.titles", [
-      h(
-        "a.footer-logo-link",
-        {
-          href: "/",
-          onClick: (e) => {
-            // If we're already on the homepage, scroll to top
-            console.log(window.location.pathname);
-            if (window.location.pathname == "/") {
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }
-          },
-        },
-        h(Image, {
-          src: "main-page/rockd_transparent.png",
-          className: "footer-logo",
-          alt: "Logo",
-        })
-      ),
-      h("p", [
-        "Produced by ",
-        h("a", { href: "https://macrostrat.org" }, "Macrostrat"),
-      ]),
-      h("p", [
-        "Funded by ",
-        h("a", { href: "https://nsf.gov" }, "NSF"),
-        ", ",
-        "the ",
-        h("a", { href: "https://aapgfoundation.org" }, "AAPG Foundation"),
-        " and the ",
-        h(
-          "a",
-          { href: "https://geoscience.wisc.edu" },
-          "University of Wisconsin – Madison Department of Geoscience"
-        ),
-      ]),
-    ]),
-    h(
-      "ul.footer-links",
-      footerLinks1.map((props) => h(FooterLink, props))
-    ),
-    h(
-      "ul.footer-links",
-      footerLinks2.map((props) => h(FooterLink, props))
-    ),
-    h("div.controls", [
-      h(DarkModeButton, {
-        className: "dark-mode-button",
-        showText: true,
-        minimal: true,
-      }),
-    ]),
-  ]);
-}
-
-function FooterLink({ href, icon, text }) {
-  return h("li", h(AnchorButton, { href, icon, minimal: true }, text));
-}
-
-export function Image(props: ImageProps) {
-  const { src, className, width, height, onClick, alt } = props;
-  const [hasError, setHasError] = useState(false);
-  const srcWithAddedPrefix =
-    "https://storage.macrostrat.org/assets/rockd/" + src;
-
-  if (!src || hasError) {
-    return null;
-  }
-
-  return h("img", {
-    src: srcWithAddedPrefix,
-    className,
-    width,
-    height,
-    onClick,
-    onError: () => setHasError(true),
-    alt,
-  });
-}
-
-interface ImageProps {
-  src: string;
-  className?: string;
-  width?: number | string;
-  height?: number | string;
-  onClick?: () => void;
-  alt?: string;
-  onError?: () => void;
-}
+export { Image };
+export type { ImageProps };
+export * from "./footer";
+export * from "./theme-button";
+export * from "./navigation";
 
 export function TestImage({ src, onError, onLoad }) {
   return h("img", {

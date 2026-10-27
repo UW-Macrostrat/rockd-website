@@ -1,7 +1,6 @@
 import { AnchorButton, NonIdealState, Spinner } from "@blueprintjs/core";
 import hyper from "@macrostrat/hyper";
 import { useEffect, useState, type ReactNode } from "react";
-import { Footer, RockdSiteIcon } from "~/components";
 import { OrganizationForm } from "~/components/organizations";
 import {
   createOrganization,
@@ -62,24 +61,13 @@ export function Page() {
     });
   } else if (auth.token != null) {
     body = h("div", [
-      h("a.breadcrumb", { href: "/organizations" }, "← All organizations"),
-      h("div.create-heading", [
-        h("h1", "Create an organization"),
-        h(
-          "p",
-          "Set up a group for people who will share geological checkins in Rockd. You will become its first administrator."
-        ),
-      ]),
+      h(
+        "p.create-intro",
+        "Set up a group for people who will share geological checkins in Rockd. You will become its first administrator."
+      ),
       h(OrganizationForm, { onSubmit: submit, submitting, submitError }),
     ]);
   }
 
-  return h("div.create-page", [
-    h("header.organizations-header", [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("div.header-title", h("h1", "Organizations")),
-    ]),
-    h("main.create-main", body),
-    h(Footer),
-  ]);
+  return h("main.create-main", body);
 }

@@ -2,7 +2,6 @@ import { useState, createElement } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ReactECharts from "echarts-for-react";
-import { Footer } from "~/components";
 import styles from "./main.module.sass";
 import { useData } from "vike-react/useData";
 import { Switch } from "@blueprintjs/core";
@@ -258,7 +257,6 @@ export function Page() {
       onChange: () => setShowBar(!showBar),
     }),
     h("div", { className: styles.metrics }, [
-      h("div", null, [h("h1", "Metrics")]),
       h("div", { className: styles.summary }, [
         h("div", null, [
           h("h2", "Total Users"),
@@ -354,7 +352,6 @@ export function Page() {
         ]),
       ]),
     ]),
-    h(Footer),
   ]);
 }
 

@@ -1,4 +1,4 @@
-import { Image, Footer } from "~/components";
+import { Image } from "~/components";
 import h from "./main.module.sass";
 import { AnchorButton, Button } from "@blueprintjs/core";
 
@@ -227,7 +227,6 @@ export function Page() {
         ]),
       ]),
     ]),
-    h(Footer),
   ]);
 }
 

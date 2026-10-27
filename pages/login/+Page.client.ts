@@ -114,7 +114,7 @@ export function Page() {
         window.location.href = callbackURL.toString();
         return;
       }
-      window.location.href = "/my_checkins";
+      window.location.href = "/my-checkins";
     } catch (err: any) {
       setError(err?.message ?? "Login failed");
     } finally {

@@ -1,13 +1,9 @@
-import { Footer } from "~/components";
 import h from "./main.module.sass";
 import "@macrostrat/style-system";
 
 export function Page() {
     return h("div", { className: "main-page" }, [
         h("div", { className: "content" }, [
-            h("div", { className: 'header' }, [
-                h("h1", "Rockd Terms and Conditions"),
-            ]),
             h("div", { className: "section" }, [
               h("h3", { className: "header" }, "Overview"),
               "Rockd is designed to facilitate the collection and use of field-based geological observations of all types. The Rockd Application (Application) and the data it contains are provided freely and on an as-is basis to users. All Users are expected to follow these terms of use outlined in this Terms of Use document."
@@ -69,7 +65,6 @@ export function Page() {
                 "Some jurisdictions provide for certain warranties, like the implied warranty of merchantability, fitness for a particular purpose and non-infringement. To the extent permitted by law, we exclude all warranties."
               ])
             ])
-          ]),
-          h(Footer)
+          ])
     ]);
 }
