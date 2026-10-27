@@ -3,8 +3,10 @@
 // library's own default on the same element.
 header.site-page-header
   --page-header-padding-x: 0px
-  --page-header-logo-size: 1.75rem
-  --page-header-crumb-font-size: var(--pz-font-size-lg)
+  // Macrostrat's trail proportions: a smaller mark beside larger crumbs
+  --page-header-logo-size: 1.5rem
+  // Macrostrat's crumb size; Rockd's own `--pz-font-size-lg` resolves larger
+  --page-header-crumb-font-size: 1.05rem
   --page-header-title-font: var(--header-font-family)
   --page-header-title-spacing: var(--pz-space-4)
   // Rockd's own page background, so the sticky bar matches the page
@@ -21,9 +23,11 @@ header.site-page-header
   :global(.bp6-breadcrumbs-collapsed)
     align-self: center
 
+// Set like Macrostrat's wordmark crumb: the heading font at the crumbs' weight
 .rockd-wordmark
   font-family: var(--header-font-family)
-  font-weight: 600
+  font-weight: 400
+  font-size: 1.05em
 
 .site-logo
   display: flex
@@ -33,4 +37,7 @@ header.site-page-header
   img
     width: 100%
     height: 100%
-    border-radius: 22%
+    // The icon file has a transparent border (about 210px of artwork on its
+    // 256px canvas); enlarge it so the artwork fills the logo box, as
+    // Macrostrat's mark does
+    scale: calc(256 / 210)

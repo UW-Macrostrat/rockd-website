@@ -5,8 +5,8 @@
 - Standard page chrome shared with the Macrostrat website. A page's
   `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,
   `fullscreen`). `content` pages get `SitePageHeader` — `PageHeader` from
-  `@macrostrat/ui-components` with the Rockd logo, a breadcrumb trail and the
-  page's `title`, collapsing into a sticky bar on scroll; a page's
+  `@macrostrat/ui-components` with the Rockd logo and a breadcrumb trail
+  ending in the page's `title` (`Rockd › Section › Page`) on one row; a page's
   `headerActions` config adds header controls — and the new Macrostrat-style
   `Footer` (link lists, credits and a hydration-safe `ThemeButton`). Terms,
   Privacy, Metrics and Organizations use the `content` layout and the homepage

@@ -83,7 +83,7 @@ function HomepageLink() {
 function FooterCredits() {
   return h("div.footer-credits", [
     h("p", [
-      "Produced by ",
+      "© Produced by ",
       h("a", { href: "https://macrostrat.org" }, "Macrostrat"),
       ". Funded by ",
       h("a", { href: "https://nsf.gov" }, "NSF"),

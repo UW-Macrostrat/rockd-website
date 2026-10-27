@@ -53,11 +53,13 @@ export function BaseContentPage({ children, className, header = null }) {
   ]);
 }
 
-/** The site header for a content page, spanning the page (see `BaseContentPage`). */
+/** The site header for a content page, spanning the page (see `BaseContentPage`).
+ * Compact, as Macrostrat's index pages are: the trail and the page's title
+ * share one row (`Rockd › Section › Page`). */
 export function ContentPageHeader(props: SitePageHeaderProps) {
   return h(SitePageHeader, {
     width: "constrained",
-    variant: "hybrid",
+    variant: "compact",
     ...props,
     className: classNames("content-page-header", props.className),
   });
