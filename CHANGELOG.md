@@ -10,7 +10,8 @@
   `headerActions` config adds header controls — and the new Macrostrat-style
   `Footer` (link lists, credits and a hydration-safe `ThemeButton`). Terms,
   Privacy, Metrics and Organizations use the `content` layout and the homepage
-  the `home` layout, replacing their hand-built headers and footers. Upgraded
+  the `home` layout, replacing their hand-built headers and footers; the
+  Metrics "Show bar charts" switch sits in its header. Upgraded
   `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
 
 - Added development-only organization directory and creation pages, with a typed
