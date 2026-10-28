@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Explore, My checkins and StraboSpot share one map sidebar, `MapSidebarLayout`
+  (`~/components/map-sidebar`), built on `@macrostrat/map-interface`'s
+  `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages are: a
+  floating panel with the Rockd icon, the view's title, Settings and close
+  buttons and each page's own controls (Explore's filter, StraboSpot's link
+  button), over a scrolling body. It replaces three copies of the sidebar.
+
 - Standard page chrome shared with the Macrostrat website. A page's
   `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,
   `fullscreen`). `content` pages get `SitePageHeader` — `PageHeader` from

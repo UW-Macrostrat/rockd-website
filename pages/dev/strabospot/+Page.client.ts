@@ -1,13 +1,12 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon, Navbar } from "@blueprintjs/core";
+import { Button, Icon } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
   MapMarker,
   MapView,
-  MapAreaContainer,
 } from "@macrostrat/map-interface";
-import "@macrostrat/map-interface/dist/map-interface.css";
+import { MapSidebarLayout } from "~/components/map-sidebar";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
@@ -16,7 +15,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import h from "../../explore/main.module.sass";
-import { RockdSiteIcon, useRockdAPI } from "~/components";
+import { useRockdAPI } from "~/components";
 import { deletePins } from "../../explore/utils";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "../../explore/map-style";
@@ -29,15 +28,6 @@ import {
 } from "./strabospot-integration";
 import { getStoredRockdPersonId, clearRockdAuth } from "../../login/rockd-auth";
 
-interface SidebarProps {
-  title: string;
-  onClose?: () => void;
-  children?: ReactNode;
-  showCloseButton?: boolean;
-  isStrabospotSynced: boolean;
-  isCheckingStrabospotSync: boolean;
-  onToggleStrabospotSync: () => void;
-}
 const strabospotSyncButtonBaseStyle = {
   borderRadius: "8px",
   fontWeight: 600,
@@ -93,60 +83,45 @@ const strabospotSyncControlStyle = {
   display: "inline-flex",
   alignItems: "center",
   gap: "8px",
-  transform: "translateY(6px)",
 };
 
-function Sidebar({
-  title,
-  onClose,
-  children,
-  showCloseButton = true,
-  isStrabospotSynced,
-  isCheckingStrabospotSync,
-  onToggleStrabospotSync,
-}: SidebarProps) {
-  const _showCloseButton = showCloseButton && onClose != null;
-  const [showSettings, setShowSettings] = useAtom(showSettingsAtom);
+/** The StraboSpot icon and its link/unlink button, in the sidebar header. */
+function StrabospotLinkControl({
+  isSynced,
+  isChecking,
+  onToggle,
+}: {
+  isSynced: boolean;
+  isChecking: boolean;
+  onToggle: () => void;
+}) {
+  let style = strabospotSyncButtonStyles.unsynced;
+  let label = "Link to Strabospot";
+  if (isChecking) {
+    style = strabospotSyncButtonStyles.checking;
+    label = "Checking...";
+  } else if (isSynced) {
+    style = strabospotSyncButtonStyles.synced;
+    label = "Linked";
+  }
 
-  return h("div.sidebar", [
-    h(Navbar, { className: "sidebar-header" }, [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("h1.page-title", title),
-      h("div.tools", [
-        h("div", { style: strabospotSyncControlStyle }, [
-          h("img", {
-            src: "https://strabospot.org/includes/mimages/pic01.jpg",
-            alt: "StraboSpot",
-            style: strabospotBadgeImageStyle,
-          }),
-          h(
-            Button,
-            {
-              minimal: false,
-              outlined: false,
-              onClick: onToggleStrabospotSync,
-              disabled: isCheckingStrabospotSync,
-              style: isCheckingStrabospotSync
-                ? strabospotSyncButtonStyles.checking
-                : isStrabospotSynced
-                ? strabospotSyncButtonStyles.synced
-                : strabospotSyncButtonStyles.unsynced,
-            },
-            isCheckingStrabospotSync
-              ? "Checking..."
-              : isStrabospotSynced
-              ? "Linked"
-              : "Link to Strabospot"
-          ),
-        ]),
-        h(ToolButton, {
-          icon: "settings",
-          onClick: () => setShowSettings(!showSettings),
-        }),
-        h.if(_showCloseButton)(ToolButton, { icon: "cross", onClick: onClose }),
-      ]),
-    ]),
-    h("div.sidebar-content", children as any),
+  return h("div", { style: strabospotSyncControlStyle }, [
+    h("img", {
+      src: "https://strabospot.org/includes/mimages/pic01.jpg",
+      alt: "StraboSpot",
+      style: strabospotBadgeImageStyle,
+    }),
+    h(
+      Button,
+      {
+        minimal: false,
+        outlined: false,
+        onClick: onToggle,
+        disabled: isChecking,
+        style,
+      },
+      label
+    ),
   ]);
 }
 
@@ -265,56 +240,34 @@ export function Page() {
       : `/protected/checkins?checkin_id=0`
   );
 
-  let overlay: ReactNode;
+  // The sidebar shows one view at a time: settings, the selected checkins, or
+  // (by default) the user's checkins
+  let title: string;
+  let sidebar: ReactNode;
+  let onClose: (() => void) | undefined;
 
   if (showSettings) {
-    overlay = h(
-      Sidebar,
-      {
-        title: "Settings",
-        onClose: () => setSettings(false),
-        isStrabospotSynced,
-        isCheckingStrabospotSync,
-        onToggleStrabospotSync: handleToggleStrabospotSync,
-      },
-      h(ContextPanel)
-    );
+    title = "Settings";
+    onClose = () => setSettings(false);
+    sidebar = h(ContextPanel);
   } else if (selectedCheckin != null && checkinData?.success?.data) {
     const clickedCheckins = h(createSelectedCheckins, {
       data: checkinData.success.data,
       setInspectPosition,
     });
-
-    overlay = h(
-      Sidebar,
-      {
-        title: "Selected checkins",
-        onClose: () => {
-          setSelectedCheckin(null);
-          deletePins(".selected_pin");
-        },
-        isStrabospotSynced,
-        isCheckingStrabospotSync,
-        onToggleStrabospotSync: handleToggleStrabospotSync,
-      },
-      h("div.checkin-container", clickedCheckins)
-    );
+    title = "Selected checkins";
+    onClose = () => {
+      setSelectedCheckin(null);
+      deletePins(".selected_pin");
+    };
+    sidebar = h("div.checkin-container", clickedCheckins);
   } else {
-    overlay = h(
-      Sidebar,
-      {
-        title: "My checkins",
-        showCloseButton: false,
-        isStrabospotSynced,
-        isCheckingStrabospotSync,
-        onToggleStrabospotSync: handleToggleStrabospotSync,
-      },
-      h(FeatureDetails, {
-        setInspectPosition,
-        isStrabospotSynced,
-        personId: rockdPersonId,
-      })
-    );
+    title = "My checkins";
+    sidebar = h(FeatureDetails, {
+      setInspectPosition,
+      isStrabospotSynced,
+      personId: rockdPersonId,
+    });
   }
 
   if (!rockdChecked || rockdPersonId == null || style == null) return null;
@@ -328,33 +281,33 @@ export function Page() {
   };
 
   return h(
-    MapAreaContainer,
+    MapSidebarLayout,
     {
-      detailStackProps: {
-        className: h["map-controls"],
-      },
+      title,
+      sidebar,
+      onClose,
+      onToggleSettings: () => setSettings(!showSettings),
+      tools: h(StrabospotLinkControl, {
+        isSynced: isStrabospotSynced,
+        isChecking: isCheckingStrabospotSync,
+        onToggle: handleToggleStrabospotSync,
+      }),
     },
-    h("div.map-page", [
-      overlay,
-      h("div.map-container", [
-        h(
-          MapView,
-          {
-            style,
-            mapboxToken: mapboxAccessToken,
-            mapPosition,
-            standalone: false,
-            className: "map-view",
-          },
-          [
-            h(MapMarker, {
-              setPosition: onSelectPosition,
-            }),
-          ]
-        ),
+    h(
+      MapView,
+      {
+        style,
+        mapboxToken: mapboxAccessToken,
+        mapPosition,
+        standalone: false,
+      },
+      [
+        h(MapMarker, {
+          setPosition: onSelectPosition,
+        }),
         h(ClickedCheckins, { setSelectedCheckin }),
-      ]),
-    ])
+      ]
+    )
   );
 }
 
@@ -406,13 +359,6 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay, personId) {
   return actualStyle;
 }
 
-function ToolButton({ icon, onClick }) {
-  return h(Button, {
-    icon,
-    minimal: true,
-    onClick,
-  });
-}
 function ContextPanel() {
   const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);

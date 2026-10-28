@@ -15,6 +15,9 @@ export type { ImageProps };
 export * from "./footer";
 export * from "./theme-button";
 export * from "./navigation";
+export * from "./site-icon";
+// `./map-sidebar` loads Mapbox through map-interface, so map pages import it
+// directly rather than every server-rendered page pulling it in from here
 
 export function TestImage({ src, onError, onLoad }) {
   return h("img", {
@@ -160,12 +163,4 @@ export function Comments({ comments }) {
   });
 
   return h("div.comments", [...commentArr]);
-}
-
-export function RockdSiteIcon({ className }) {
-  return h(
-    "a",
-    { href: "/", className },
-    h("img.rockd-icon", { src: "/rockd-icon-256.png" })
-  );
 }

@@ -1,0 +1,41 @@
+// map-interface sizes its sidebar from these variables (its own classes are
+// scoped to the package, so they're the supported way in)
+.map-sidebar-layout
+  --map-context-stack-width: max(30vw, 420px)
+  --map-context-stack-max-width: none
+
+.map-sidebar-header
+  .sidebar-title
+    display: flex
+    align-items: center
+    gap: 0.5em
+    min-width: 0
+
+  .site-icon
+    display: flex
+    flex-shrink: 0
+
+    img
+      width: 36px
+      height: 36px
+
+  .page-title
+    margin: 0
+    font-size: var(--pz-font-size-xl, 1.25rem)
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+  .tools
+    display: flex
+    align-items: center
+    gap: 0.25em
+
+// The body fills the sidebar's width and scrolls within the height the map
+// leaves it. Qualified to outrank map-interface's `.panel-card`, which hides
+// overflow.
+.map-sidebar-layout .map-sidebar-panel
+  flex: 1
+  min-width: 0
+  overflow-y: auto
+  max-height: 100%

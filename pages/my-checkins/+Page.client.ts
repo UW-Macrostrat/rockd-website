@@ -1,13 +1,12 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon, Navbar } from "@blueprintjs/core";
+import { Button, Icon } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
   MapMarker,
   MapView,
-  MapAreaContainer,
 } from "@macrostrat/map-interface";
-import "@macrostrat/map-interface/dist/map-interface.css";
+import { MapSidebarLayout } from "~/components/map-sidebar";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
@@ -16,45 +15,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import h from "../explore/main.module.sass";
-import { RockdSiteIcon, useRockdAPI } from "~/components";
+import { useRockdAPI } from "~/components";
 import { deletePins } from "../explore/utils";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "../explore/map-style";
 import { atom, useAtom } from "jotai";
 import { CheckinList } from "./checkin-list";
 import { getStoredRockdPersonId, clearRockdAuth } from "../login/rockd-auth";
-
-interface SidebarProps {
-  title: string;
-  onClose?: () => void;
-  children?: ReactNode;
-  showCloseButton?: boolean;
-}
-
-function Sidebar({
-  title,
-  onClose,
-  children,
-  showCloseButton = true,
-}: SidebarProps) {
-  const _showCloseButton = showCloseButton && onClose != null;
-  const [showSettings, setShowSettings] = useAtom(showSettingsAtom);
-
-  return h("div.sidebar", [
-    h(Navbar, { className: "sidebar-header" }, [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("h1.page-title", title),
-      h("div.tools", [
-        h(ToolButton, {
-          icon: "settings",
-          onClick: () => setShowSettings(!showSettings),
-        }),
-        h.if(_showCloseButton)(ToolButton, { icon: "cross", onClick: onClose }),
-      ]),
-    ]),
-    h("div.sidebar-content", children as any),
-  ]);
-}
 
 mapboxgl.accessToken = mapboxAccessToken;
 
@@ -114,37 +81,30 @@ export function Page() {
       : `/protected/checkins?checkin_id=0`
   );
 
-  let overlay: ReactNode;
+  // The sidebar shows one view at a time: settings, the selected checkins, or
+  // (by default) the user's own checkins
+  let title: string;
+  let sidebar: ReactNode;
+  let onClose: (() => void) | undefined;
 
   if (showSettings) {
-    overlay = h(
-      Sidebar,
-      { title: "Settings", onClose: () => setSettings(false) },
-      h(ContextPanel)
-    );
+    title = "Settings";
+    onClose = () => setSettings(false);
+    sidebar = h(ContextPanel);
   } else if (selectedCheckin != null && checkinData?.success?.data) {
     const clickedCheckins = h(createSelectedCheckins, {
       data: checkinData.success.data,
       setInspectPosition,
     });
-
-    overlay = h(
-      Sidebar,
-      {
-        title: "Selected checkins",
-        onClose: () => {
-          setSelectedCheckin(null);
-          deletePins(".selected_pin");
-        },
-      },
-      h("div.checkin-container", clickedCheckins)
-    );
+    title = "Selected checkins";
+    onClose = () => {
+      setSelectedCheckin(null);
+      deletePins(".selected_pin");
+    };
+    sidebar = h("div.checkin-container", clickedCheckins);
   } else {
-    overlay = h(
-      Sidebar,
-      { title: "My checkins", showCloseButton: false },
-      h(CheckinList, { setInspectPosition, personId: rockdPersonId })
-    );
+    title = "My checkins";
+    sidebar = h(CheckinList, { setInspectPosition, personId: rockdPersonId });
   }
 
   if (!rockdChecked || rockdPersonId == null || style == null) return null;
@@ -158,33 +118,28 @@ export function Page() {
   };
 
   return h(
-    MapAreaContainer,
+    MapSidebarLayout,
     {
-      detailStackProps: {
-        className: h["map-controls"],
-      },
+      title,
+      sidebar,
+      onClose,
+      onToggleSettings: () => setSettings(!showSettings),
     },
-    h("div.map-page", [
-      overlay,
-      h("div.map-container", [
-        h(
-          MapView,
-          {
-            style,
-            mapboxToken: mapboxAccessToken,
-            mapPosition,
-            standalone: false,
-            className: "map-view",
-          },
-          [
-            h(MapMarker, {
-              setPosition: onSelectPosition,
-            }),
-          ]
-        ),
+    h(
+      MapView,
+      {
+        style,
+        mapboxToken: mapboxAccessToken,
+        mapPosition,
+        standalone: false,
+      },
+      [
+        h(MapMarker, {
+          setPosition: onSelectPosition,
+        }),
         h(ClickedCheckins, { setSelectedCheckin }),
-      ]),
-    ])
+      ]
+    )
   );
 }
 
@@ -235,14 +190,6 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay, personId) {
   }, [isEnabled, showSatellite, showOverlay, personId, mapboxToken]);
 
   return actualStyle;
-}
-
-function ToolButton({ icon, onClick }) {
-  return h(Button, {
-    icon,
-    minimal: true,
-    onClick,
-  });
 }
 
 function ContextPanel() {
