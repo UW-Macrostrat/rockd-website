@@ -6,8 +6,21 @@
   (`~/components/map-sidebar`), built on `@macrostrat/map-interface`'s
   `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages are: a
   floating panel with the Rockd icon, the view's title, Settings and close
-  buttons and each page's own controls (Explore's filter, StraboSpot's link
-  button), over a scrolling body. It replaces three copies of the sidebar.
+  buttons and each page's own controls (StraboSpot's link button), over a
+  scrolling body. It replaces three copies of the sidebar.
+
+- Explore's and My checkins' sidebar lists are the `/dev/feed` checkin list:
+  `CheckinFeedPanel` (`~/components/checkin-feed`, moved from
+  `pages/dev/feed` with its provider, cards and search) in one column, scrolling
+  infinitely, with the notes/age/lithology/person search at the top. Explore's
+  list follows the map's visible area; a card flies the map to its checkin,
+  with "Details" opening the checkin page. The search replaces Explore's filter
+  button and panel. A notes, age or lithology search covers every checkin, since
+  the Rockd API errors when those are combined with a region. Explore's Overlay
+  setting toggles the map overlay again (it was wired to the old filter).
+  A `mine` feed (My checkins) only ever searches the signed-in user's own
+  checkins: its `person_id` outranks any filter, and its search has no Person
+  facet.
 
 - Standard page chrome shared with the Macrostrat website. A page's
   `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,

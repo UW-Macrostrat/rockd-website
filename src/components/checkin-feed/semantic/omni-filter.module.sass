@@ -1,9 +1,12 @@
 // The toolbar group sizes to its content, so the width is declared here rather
-// than won by flex-growing a library-owned container.
+// than won by flex-growing a library-owned container. Capped by the feed
+// panel's own width (it's a size container), less the toolbar's padding and
+// the Sort button beside it, so it fits a narrow panel such as a map page's
+// sidebar.
 .omni-popover-target
   flex: 1 1 auto
   display: block
-  width: 34em
+  width: min(34em, calc(100cqi - 8.5em))
   min-width: 14em
   max-width: 100%
 

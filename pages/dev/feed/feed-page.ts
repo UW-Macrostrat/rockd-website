@@ -21,44 +21,23 @@
  */
 import {
   AnchorButton,
-  Button,
   ButtonGroup,
   NonIdealState,
   Spinner,
 } from "@blueprintjs/core";
-import {
-  createMasonryScrollBody,
-  DataPanel,
-  DataPanelToolbarStyle,
-  LoadProgressIndicator,
-  SelectionInteractionStyle,
-  useLoadControls,
-} from "@macrostrat/data-sheet";
-import "@macrostrat/data-sheet/dist/data-sheet.css";
-import hyper from "@macrostrat/hyper";
+import { createMasonryScrollBody } from "@macrostrat/data-sheet";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Footer, RockdSiteIcon } from "~/components";
 import {
-  initialViewStateFromURL,
-  ViewStateURLSync,
-} from "~/_utils/data-view-url-state";
+  CheckinFeedPanel,
+  FeedLoadProgress,
+  type FeedType,
+} from "~/components/checkin-feed";
 import { locationAtom } from "~/_utils/url-atoms";
 import { getStoredRockdAuth } from "../../login/rockd-auth";
 import { type Center, NearbyMap } from "./nearby-map";
-import { createCheckinProvider, type FeedType } from "./checkin-provider";
-import { CheckinCard } from "./checkin-card";
-import { columnSpec, tableFilters, urlBindings } from "./view-config";
-import { omniFilterAction } from "./semantic/omni-filter";
 import h from "./feed-page.module.sass";
-
-/** Rows per window. Each costs `PAGE_SIZE / 5` requests, since the API pages by
- * fives — so this trades requests for scrolling feel. */
-const PAGE_SIZE = 20;
-/** Windows auto-loaded before the footer's "Load more" takes over. Deliberately
- * small: scrolling forever is how you lose your place, and narrowing the search
- * is the better way to reach something deep. The checkpoint is the point. */
-const AUTO_LOAD_PAGES = 3;
 
 /**
  * Checkin cards are variable-height — a photo, a long note, or neither — so the
@@ -214,60 +193,18 @@ function Feed({
   aside = null,
   placeholder = null,
 }: FeedProps) {
-  const provider = useMemo(
-    () => createCheckinProvider({ feedType, center, personId, token }),
-    [feedType, center?.lng, center?.lat, personId, token]
-  );
-
-  // The panel resets on a view-state change or a `refreshToken` change, not on
-  // a provider swap — so the provider's own inputs have to be announced here.
-  const refreshToken = `${feedType}:${center?.lng ?? ""},${center?.lat ?? ""}:${
-    personId ?? ""
-  }`;
-
-  // A linked view (`?q=…&sort=…`) is applied when the store is created, so the
-  // first request is the right one rather than an unfiltered one immediately
-  // superseded. `ViewStateURLSync` keeps the two in step from there.
-  const { initialFilters, initialSorts } = initialViewStateFromURL(urlBindings);
-
   let body = placeholder;
   if (body == null) {
-    body = h(
-      "div.data-panel-container",
-      h(DataPanel, {
-        provider,
-        refreshToken,
-        itemComponent: CheckinCard,
-        // Cards are small and of uneven height; several fit a row once the page
-        // is wide.
-        scrollBody: CardMasonry,
-        // The entire filter surface: search, facets and the applied tags in one
-        // control. Passed as an action so it sits left of Sort; `filters: []`
-        // keeps the built-in Filter menu out of the way.
-        actions: [omniFilterAction],
-        // A checkin card is a link to its own page, nothing more — the cards
-        // renderer enables selection by default, which added a selectable
-        // affordance with no action behind it.
-        enableSelection: SelectionInteractionStyle.NEVER,
-        columnSpec,
-        filters: tableFilters,
-        initialFilters,
-        initialSorts,
-        pageSize: PAGE_SIZE,
-        autoLoadPages: AUTO_LOAD_PAGES,
-        className: "feed-panel",
-        // The counter is folded into the inline footer.
-        statusBar: false,
-        toolbarStyle: DataPanelToolbarStyle.FLOATING,
-        contentFooter: h(FeedFooter),
-        // Typing shouldn't fire a request per keystroke; the input stays
-        // instant, only the fetch waits for the view to settle.
-        filterDebounce: 300,
-        itemLabel: "checkin",
-        name: "Checkins",
-        children: h(ViewStateURLSync, { bindings: urlBindings }),
-      })
-    );
+    body = h(CheckinFeedPanel, {
+      feed: { feedType, center, personId, token },
+      // Cards are small and of uneven height; several fit a row once the page
+      // is wide.
+      scrollBody: CardMasonry,
+      contentFooter: h(FeedFooter),
+      // The feed is the page, so a search is a link
+      syncURL: true,
+      className: "feed-panel",
+    });
   }
 
   return h("div.feed-page", [
@@ -322,19 +259,8 @@ function FeedTabs({ feedType }: { feedType: FeedType }) {
  * set low, the auto-load checkpoint is reached early enough that the footer is
  * actually reachable rather than theoretical. */
 function FeedFooter() {
-  const controls = useLoadControls();
-
-  let more = null;
-  if (controls.paused) {
-    more = h(
-      Button,
-      { minimal: true, intent: "primary", onClick: controls.loadMore },
-      "Load more"
-    );
-  }
-
   return h("div.feed-footer", [
-    h("div.load-progress", [h(LoadProgressIndicator), more]),
+    h(FeedLoadProgress),
     h(Footer, { className: "page-footer" }),
   ]);
 }

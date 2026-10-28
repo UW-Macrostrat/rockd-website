@@ -80,6 +80,8 @@ const h = hyper.styled(styles);
  */
 interface OmniCtx {
   query: string;
+  /** The facets the dropdown offers */
+  facets: SemanticFacet[];
   semantic: SemanticState;
   toggle(facet: SemanticFacet, item: FacetItem): void;
   searchNotes(): void;
@@ -103,16 +105,29 @@ const ROOT_PANEL = { renderPanel: SummaryPanel, title: "Filter" };
  * merged ahead of them — `[...actions, ...coreActions]` — and keep that order in
  * the toolbar. This is the search box's rightful place: first, and wide.
  */
-export const omniFilterAction: TableAction<any> = {
-  id: "omni-filter",
-  name: "Search",
-  icon: "search",
-  targets: ALL_CARDINALITIES,
-  requiresEditable: false,
-  render: () => h(OmniFilter),
-};
+export function createOmniFilterAction({
+  facets = SEMANTIC_FACETS,
+}: {
+  /** The facets the dropdown offers; all of them by default */
+  facets?: SemanticFacet[];
+} = {}): TableAction<any> {
+  return {
+    id: "omni-filter",
+    name: "Search",
+    icon: "search",
+    targets: ALL_CARDINALITIES,
+    requiresEditable: false,
+    render: () => h(OmniFilter, { facets }),
+  };
+}
 
-export function OmniFilter() {
+export const omniFilterAction = createOmniFilterAction();
+
+export function OmniFilter({
+  facets = SEMANTIC_FACETS,
+}: {
+  facets?: SemanticFacet[];
+}) {
   const store = useStoreAPI();
   const activeFilters = useSelector((s: any) => s.activeFilters);
   const [query, setQuery] = useState("");
@@ -221,6 +236,7 @@ export function OmniFilter() {
   const ctxValue = useMemo<OmniCtx>(
     () => ({
       query: query.trim(),
+      facets,
       semantic,
       toggle,
       searchNotes: () => {
@@ -228,7 +244,7 @@ export function OmniFilter() {
         setQuery("");
       },
     }),
-    [query, semantic, toggle, setNotes]
+    [query, facets, semantic, toggle, setNotes]
   );
 
   return h(
@@ -379,7 +395,7 @@ function useTagDescriptors(
 // ---- Dropdown panels ----
 
 function SummaryPanel({ openPanel }: any) {
-  const { query, searchNotes } = useOmni();
+  const { query, facets, searchNotes } = useOmni();
 
   let notesRow = null;
   if (query !== "") {
@@ -401,7 +417,7 @@ function SummaryPanel({ openPanel }: any) {
     notesRow,
     h(
       "div.omni-scroll",
-      SEMANTIC_FACETS.map((facet) =>
+      facets.map((facet) =>
         h(FacetSection, { key: facet.id, facet, openPanel })
       )
     ),

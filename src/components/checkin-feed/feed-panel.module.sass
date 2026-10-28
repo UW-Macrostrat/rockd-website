@@ -1,0 +1,28 @@
+// Fills whatever holds it; the panel scrolls within that height. A size
+// container, so the search field can fit a narrow panel.
+.checkin-feed-panel
+  container-type: inline-size
+  position: relative
+  display: flex
+  flex-direction: column
+  flex: 1 1 auto
+  min-height: 0
+  width: 100%
+
+.feed-data-panel
+  --data-panel-item-gap: 12px
+
+// In a map page's sidebar: the column is narrow, so no content cap
+.map-feed
+  --data-panel-content-width: 100%
+
+.feed-spinner
+  margin: 4em auto
+
+.load-progress
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 0.75em
+  min-height: 80px

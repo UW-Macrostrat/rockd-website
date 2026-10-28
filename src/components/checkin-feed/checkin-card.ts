@@ -1,5 +1,6 @@
 /**
- * A checkin summary card with no map attached.
+ * A checkin summary card with no map attached. The map pages' sidebar card,
+ * which flies the map to the checkin instead, is `./map-checkin-card`.
  *
  * The published `RockdWebsiteCheckinList` in `@macrostrat/data-components` is
  * the same content, but built around a map: it calls `map.flyTo` on click and
@@ -70,9 +71,24 @@ function Stat({ icon, value }: { icon: any; value: number | string }) {
   ]);
 }
 
+/** The card as a link to the checkin's own page (the `/dev/feed` lists). */
 function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
+  return h(
+    "a.checkin-card-content",
+    { href: `/checkin/${data.checkin_id}` },
+    checkinSummary(data)
+  );
+}
+
+export const CheckinCard = createDataCard<Checkin>(CheckinCardContent, {
+  className: styles["checkin-card"],
+});
+
+/** A checkin's summary — byline, notes, photo, place and stats — for a card
+ * to wrap. Shared by the link card here and the map pages' card
+ * (`./map-checkin-card`), which differ only in what a click does. */
+export function checkinSummary(data: Checkin) {
   const {
-    checkin_id,
     person_id,
     first_name,
     last_name,
@@ -100,43 +116,35 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
     observationCount = h(Stat, { icon: "camera", value: observations.length });
   }
 
-  return h(
-    "a.checkin-card-content",
-    { href: `/checkin/${checkin_id}` },
-    [
-      h("div.checkin-header", [
-        h(ReservedImage, {
-          className: "profile-pic",
-          src: getProfilePicUrl(person_id),
-          alt: "",
+  return [
+    h("div.checkin-header", [
+      h(ReservedImage, {
+        className: "profile-pic",
+        src: getProfilePicUrl(person_id),
+        alt: "",
+      }),
+      h("div.checkin-byline", [
+        h("span.person-name", `${first_name} ${last_name}`),
+        h("span.checkin-date", created),
+      ]),
+      h(Rating, { value: rating }),
+    ]),
+    h.if(notes != null && notes !== "")("p.checkin-notes", notes),
+    image,
+    h("div.checkin-footer", [
+      h("div.checkin-place", [
+        h.if(near != null)("span.near", `Near ${near}`),
+        h(LngLatCoords, {
+          position: { lat: data.lat, lng: data.lng },
+          precision: 3,
+          zoom: 10,
         }),
-        h("div.checkin-byline", [
-          h("span.person-name", `${first_name} ${last_name}`),
-          h("span.checkin-date", created),
-        ]),
-        h(Rating, { value: rating }),
       ]),
-      h.if(notes != null && notes !== "")("p.checkin-notes", notes),
-      image,
-      h("div.checkin-footer", [
-        h("div.checkin-place", [
-          h.if(near != null)("span.near", `Near ${near}`),
-          h(LngLatCoords, {
-            position: { lat: data.lat, lng: data.lng },
-            precision: 3,
-            zoom: 10,
-          }),
-        ]),
-        h("div.checkin-stats", [
-          h(Stat, { icon: "thumbs-up", value: likes }),
-          observationCount,
-          h(Stat, { icon: "comment", value: comments }),
-        ]),
+      h("div.checkin-stats", [
+        h(Stat, { icon: "thumbs-up", value: likes }),
+        observationCount,
+        h(Stat, { icon: "comment", value: comments }),
       ]),
-    ]
-  );
+    ]),
+  ];
 }
-
-export const CheckinCard = createDataCard<Checkin>(CheckinCardContent, {
-  className: styles["checkin-card"],
-});

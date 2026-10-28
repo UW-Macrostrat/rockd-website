@@ -15,11 +15,10 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import h from "./main.module.sass";
-import { PageCarousel, useRockdAPI } from "~/components";
+import { useRockdAPI } from "~/components";
+import { MapCheckinFeed } from "~/components/checkin-feed";
 
-import { AutoComplete } from "./autocomplete";
 import { deletePins } from "./utils";
-import { FeatureDetails } from "./featured-checkins";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "./map-style";
 import { atom, useAtom } from "jotai";
@@ -41,8 +40,6 @@ const type = {
 const showSatelliteAtom = atom(false);
 const showOverlayAtom = atom(true);
 const showSettingsAtom = atom(false);
-const showFilterAtom = atom(false);
-const autocompleteOpenAtom = atom(false);
 
 export function Page() {
   const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
@@ -55,9 +52,6 @@ export function Page() {
   );
   const [selectedCheckin, setSelectedCheckin] = useState(null);
   const [showSettings, setSettings] = useAtom(showSettingsAtom);
-  const [showFilter, setFilter] = useAtom(showFilterAtom);
-  const [filteredData, setFilteredData] = useState(null);
-  const [autocompleteOpen, setAutocompleteOpen] = useAtom(autocompleteOpenAtom);
 
   // overlay
   const [inspectPosition, setInspectPosition] =
@@ -68,8 +62,8 @@ export function Page() {
     deletePins(".selected_pin");
   }, []);
 
-  // The sidebar shows one view at a time: filter, settings, the selected
-  // checkins, or (by default) the featured checkins
+  // The sidebar shows one view at a time: settings, the selected checkins, or
+  // (by default) the checkins in the map's view, searchable at the top
   let title: string;
   let sidebar: ReactNode;
   let onClose: (() => void) | undefined;
@@ -81,43 +75,9 @@ export function Page() {
       : `/protected/checkins?checkin_id=0`
   );
 
-  const autoComplete = h(AutoComplete, {
-    setFilteredData,
-    autocompleteOpen,
-    setAutocompleteOpen,
-  }) as ReactNode;
-
-  const filteredCheckinsComplete = h(FilteredCheckins, {
-    filteredData: filteredData?.current,
-    setInspectPosition,
-  });
-  const filteredPages = PageCarousel({
-    page: filteredData?.next.page,
-    setPage: filteredData?.next.setPage,
-    nextData: filteredData?.next.data,
-  });
-
-  if (showFilter) {
-    title = "Filter checkins";
-    onClose = () => {
-      setFilter(false);
-      setSettings(false);
-      setFilteredData(null);
-      deletePins(".filtered_pin");
-    };
-    sidebar = h("div.autocomplete-container", [
-      autoComplete,
-      filteredData && !autocompleteOpen
-        ? h("div.filtered-checkins", filteredCheckinsComplete)
-        : null,
-      filteredData && !autocompleteOpen ? filteredPages : null,
-    ]);
-  } else if (showSettings) {
+  if (showSettings) {
     title = "Settings";
-    onClose = () => {
-      setSettings(false);
-      setFilter(false);
-    };
+    onClose = () => setSettings(false);
     sidebar = h(ContextPanel);
   } else if (selectedCheckin && checkinData) {
     const clickedCheckins = h(createSelectedCheckins, {
@@ -132,7 +92,7 @@ export function Page() {
     sidebar = h("div.checkin-container", clickedCheckins);
   } else {
     title = "Featured checkins";
-    sidebar = h(FeatureDetails, { setInspectPosition });
+    sidebar = h(MapCheckinFeed, { feed: { feedType: "all" }, followMap: true });
   }
 
   if (style == null) return null;
@@ -152,10 +112,6 @@ export function Page() {
       sidebar,
       onClose,
       onToggleSettings: () => setSettings(!showSettings),
-      tools: h(ToolButton, {
-        icon: "filter",
-        onClick: () => setFilter(!showFilter),
-      }),
     },
     h(
       MapView,
@@ -203,16 +159,8 @@ function useMapStyle(type, mapboxToken, showSatellite, showOverlay) {
   return actualStyle;
 }
 
-function ToolButton({ icon, onClick }) {
-  return h(Button, {
-    icon,
-    minimal: true,
-    onClick,
-  });
-}
-
 function ContextPanel() {
-  const [showOverlay, setOverlay] = useAtom(showFilterAtom);
+  const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
 
   return h("div", { className: "settings-content" }, [
@@ -256,12 +204,6 @@ function createSelectedCheckins(result, setInspectPosition) {
   const mapRef = useMapRef();
 
   return createCheckins(result.data, mapRef, setInspectPosition);
-}
-
-function FilteredCheckins({ filteredData, setInspectPosition }) {
-  const mapRef = useMapRef();
-  console.log("Filtered checkins", filteredData);
-  return createCheckins(filteredData?.filteredData, mapRef, setInspectPosition);
 }
 
 function ClickedCheckins({ setSelectedCheckin }) {

@@ -46,6 +46,15 @@ export interface FeedContext {
    * an unauthenticated request. Travels in the query string, which is how the
    * app does it and what the route accepts. */
   token?: string | null;
+  /** Limits any feed to a region — the map's visible area, on a map page. */
+  bounds?: CheckinBounds | null;
+}
+
+export interface CheckinBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
 }
 
 /** One checkin as the route returns it (the fields this feed reads). */
@@ -89,6 +98,14 @@ function feedParams(feed: FeedContext): Record<string, string> {
     params.person_id = String(feed.personId);
     if (feed.token != null) params.token = feed.token;
   }
+  if (feed.bounds != null) {
+    // Two decimals (~1 km) is past what a map view resolves, and keeps a
+    // barely-moved map from changing the request
+    params.minlat = feed.bounds.minLat.toFixed(2);
+    params.maxlat = feed.bounds.maxLat.toFixed(2);
+    params.minlng = feed.bounds.minLng.toFixed(2);
+    params.maxlng = feed.bounds.maxLng.toFixed(2);
+  }
   return params;
 }
 
@@ -111,6 +128,12 @@ function orderParams(
   }
   return {};
 }
+
+/** Filters the route can't combine with a region: with `minlat`/… present it
+ * returns a 500 for these (a server-side bug; `person_id` and the sort are
+ * fine). While one is active the search covers every checkin instead — which
+ * is also how Explore's search always behaved. */
+const REGION_INCOMPATIBLE_PARAMS = ["notes", "int_id", "lith_id"];
 
 function filterParams(filters: FetchDataFilter[]): Record<string, string> {
   const params: Record<string, string> = {};
@@ -162,10 +185,17 @@ export function createCheckinProvider(
         return { rows: [], totalCount: 0 };
       }
 
+      const filtered = filterParams(filters);
+      let region = feed;
+      if (REGION_INCOMPATIBLE_PARAMS.some((p) => filtered[p] != null)) {
+        region = { ...feed, bounds: null };
+      }
+      // The feed's own params go last, so a search can narrow a feed but never
+      // widen it: a `mine` feed's `person_id` outranks a Person filter's
       const params = {
-        ...feedParams(feed),
         ...orderParams(feed, sorts),
-        ...filterParams(filters),
+        ...filtered,
+        ...feedParams(region),
       };
 
       // The window may start mid-page, since the API's pages are five rows and

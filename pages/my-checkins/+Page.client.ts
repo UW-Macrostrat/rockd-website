@@ -20,8 +20,12 @@ import { deletePins } from "../explore/utils";
 import { createCheckins } from "~/components/checkin.client";
 import { mapStyle } from "../explore/map-style";
 import { atom, useAtom } from "jotai";
-import { CheckinList } from "./checkin-list";
-import { getStoredRockdPersonId, clearRockdAuth } from "../login/rockd-auth";
+import { MapCheckinFeed } from "~/components/checkin-feed";
+import {
+  getStoredRockdPersonId,
+  getStoredRockdToken,
+  clearRockdAuth,
+} from "../login/rockd-auth";
 
 mapboxgl.accessToken = mapboxAccessToken;
 
@@ -104,7 +108,14 @@ export function Page() {
     sidebar = h("div.checkin-container", clickedCheckins);
   } else {
     title = "My checkins";
-    sidebar = h(CheckinList, { setInspectPosition, personId: rockdPersonId });
+    // The token lets a non-public profile see its own checkins
+    sidebar = h(MapCheckinFeed, {
+      feed: {
+        feedType: "mine",
+        personId: rockdPersonId,
+        token: getStoredRockdToken(),
+      },
+    });
   }
 
   if (!rockdChecked || rockdPersonId == null || style == null) return null;
