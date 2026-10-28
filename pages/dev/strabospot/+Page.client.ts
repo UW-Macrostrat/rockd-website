@@ -264,7 +264,6 @@ export function Page() {
   } else {
     title = "My checkins";
     sidebar = h(FeatureDetails, {
-      setInspectPosition,
       isStrabospotSynced,
       personId: rockdPersonId,
     });

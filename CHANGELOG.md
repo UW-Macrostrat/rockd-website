@@ -9,7 +9,9 @@
   buttons and each page's own controls (StraboSpot's link button), over a
   scrolling body. It replaces three copies of the sidebar.
 
-- Explore's and My checkins' sidebar lists are the `/dev/feed` checkin list:
+- Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
+  checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
+  sent badges and results dialog around it):
   `CheckinFeedPanel` (`~/components/checkin-feed`, moved from
   `pages/dev/feed` with its provider, cards and search) in one column, scrolling
   infinitely, with the notes/age/lithology/person search at the top. Explore's
@@ -20,7 +22,8 @@
   setting toggles the map overlay again (it was wired to the old filter).
   A `mine` feed (My checkins) only ever searches the signed-in user's own
   checkins: its `person_id` outranks any filter, and its search has no Person
-  facet.
+  facet. The search's age and lithology chips are styled on every page that
+  shows the list; they had relied on the checkin page's stylesheet.
 
 - Standard page chrome shared with the Macrostrat website. A page's
   `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,

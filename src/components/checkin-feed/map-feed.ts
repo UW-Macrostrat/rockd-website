@@ -8,7 +8,7 @@ import { createMasonryScrollBody } from "@macrostrat/data-sheet";
 import { useMap } from "@macrostrat/mapbox-react";
 import type { LngLatBounds } from "mapbox-gl";
 import { useEffect, useState } from "react";
-import { CheckinFeedPanel } from "./feed-panel";
+import { CheckinFeedPanel, type CheckinFeedPanelProps } from "./feed-panel";
 import type { CheckinBounds, FeedContext } from "./checkin-provider";
 import { MapCheckinCard } from "./map-checkin-card";
 import h from "./feed-panel.module.sass";
@@ -22,9 +22,15 @@ export interface MapCheckinFeedProps {
   /** Lists only the checkins in the map's visible area, following the map as
    * it moves */
   followMap?: boolean;
+  /** A page's own card (see `createMapCheckinCard`); the map card by default */
+  itemComponent?: CheckinFeedPanelProps["itemComponent"];
 }
 
-export function MapCheckinFeed({ feed, followMap = false }: MapCheckinFeedProps) {
+export function MapCheckinFeed({
+  feed,
+  followMap = false,
+  itemComponent = MapCheckinCard,
+}: MapCheckinFeedProps) {
   const bounds = useMapBounds(followMap);
 
   // Until the map has a view there's no region to list, and the unbounded
@@ -40,7 +46,7 @@ export function MapCheckinFeed({ feed, followMap = false }: MapCheckinFeedProps)
 
   return h(CheckinFeedPanel, {
     feed: context,
-    itemComponent: MapCheckinCard,
+    itemComponent,
     scrollBody: SingleColumn,
     className: "map-feed",
   });

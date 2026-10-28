@@ -14,6 +14,10 @@ import {
   type ItemComponentProps,
 } from "@macrostrat/data-sheet";
 import "@macrostrat/data-sheet/dist/data-sheet.css";
+// The search's age and lithology chips (`IntervalTag`, `LithologyTag`) and the
+// cards' coordinates. Loaded here rather than relied on from the checkin page,
+// whose stylesheet otherwise only arrived after visiting one.
+import "@macrostrat/data-components/dist/data-components.css";
 import classNames from "classnames";
 import { type ComponentType, type ReactNode, useMemo } from "react";
 import {
