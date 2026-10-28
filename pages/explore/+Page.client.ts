@@ -1,15 +1,14 @@
 import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
   MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
-import { MapSidebarLayout } from "~/components/map-sidebar";
+import { MapSettingsPanel, MapSidebarLayout } from "~/components/map-sidebar";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
-import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
+import { useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -163,41 +162,12 @@ function ContextPanel() {
   const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
   const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
 
-  return h("div", { className: "settings-content" }, [
-    h(DarkModeButton, { className: "dark-btn", showText: true }),
-    h(
-      Button,
-      {
-        className: showSatellite
-          ? "selected satellite-style"
-          : "satellite-style",
-        onClick: () => {
-          setSatellite(!showSatellite);
-        },
-      },
-      [
-        h("div.btn-inside", [
-          h(Icon, { className: "satellite-icon", icon: "satellite" }),
-          h("p", "Satellite"),
-        ]),
-      ]
-    ),
-    h(
-      Button,
-      {
-        className: showOverlay ? "selected map-style" : "map-style",
-        onClick: () => {
-          setOverlay(!showOverlay);
-        },
-      },
-      [
-        h("div.btn-inside", [
-          h(Icon, { className: "overlay-icon", icon: "map" }),
-          h("p", "Overlay"),
-        ]),
-      ]
-    ),
-  ]);
+  return h(MapSettingsPanel, {
+    showSatellite,
+    onToggleSatellite: () => setSatellite(!showSatellite),
+    showOverlay,
+    onToggleOverlay: () => setOverlay(!showOverlay),
+  });
 }
 
 function createSelectedCheckins(result, setInspectPosition) {

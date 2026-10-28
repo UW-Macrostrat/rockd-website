@@ -1,15 +1,14 @@
 import { useMapRef } from "@macrostrat/mapbox-react";
-import { Button, Icon } from "@blueprintjs/core";
 import { mapboxAccessToken, SETTINGS } from "~/settings";
 import {
   buildInspectorStyle,
   MapMarker,
   MapView,
 } from "@macrostrat/map-interface";
-import { MapSidebarLayout } from "~/components/map-sidebar";
+import { MapSettingsPanel, MapSidebarLayout } from "~/components/map-sidebar";
 import { buildMacrostratStyle } from "@macrostrat/map-styles";
 import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
-import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
+import { useDarkMode } from "@macrostrat/ui-components";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -212,92 +211,13 @@ function ContextPanel() {
     window.location.href = "/login";
   }
 
-  return h(
-    "div",
-    {
-      className: "settings-content",
-      style: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-      },
-    },
-    [
-      h(DarkModeButton, { className: "dark-btn", showText: true }),
-
-      h(
-        "div",
-        {
-          style: {
-            display: "flex",
-            gap: "0.75rem",
-            flexWrap: "wrap",
-          },
-        },
-        [
-          h(
-            Button,
-            {
-              className: showSatellite
-                ? "selected satellite-style"
-                : "satellite-style",
-              onClick: () => setSatellite(!showSatellite),
-            },
-            [
-              h("div.btn-inside", [
-                h(Icon, { className: "satellite-icon", icon: "satellite" }),
-                h("p", "Satellite"),
-              ]),
-            ]
-          ),
-
-          h(
-            Button,
-            {
-              className: showOverlay ? "selected map-style" : "map-style",
-              onClick: () => setOverlay(!showOverlay),
-            },
-            [
-              h("div.btn-inside", [
-                h(Icon, { className: "overlay-icon", icon: "map" }),
-                h("p", "Overlay"),
-              ]),
-            ]
-          ),
-        ]
-      ),
-
-      h(
-        "div",
-        {
-          style: {
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-          },
-        },
-        [
-          h(
-            Button,
-            {
-              intent: "danger",
-              outlined: true,
-              onClick: handleLogout,
-              style: {
-                minWidth: "160px",
-              },
-            },
-            [
-              h("div.btn-inside", [
-                h(Icon, { icon: "log-out" }),
-                h("p", "Logout"),
-              ]),
-            ]
-          ),
-        ]
-      ),
-    ]
-  );
+  return h(MapSettingsPanel, {
+    showSatellite,
+    onToggleSatellite: () => setSatellite(!showSatellite),
+    showOverlay,
+    onToggleOverlay: () => setOverlay(!showOverlay),
+    onLogout: handleLogout,
+  });
 }
 
 function createSelectedCheckins(result, setInspectPosition) {

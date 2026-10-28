@@ -9,6 +9,8 @@ import { ReactNode } from "react";
 import { RockdSiteIcon } from "../site-icon";
 import h from "./map-sidebar.module.sass";
 
+export * from "./settings-panel";
+
 export interface MapSidebarLayoutProps {
   /** The sidebar's heading */
   title: string;
@@ -64,7 +66,7 @@ function MapSidebarHeader({
     rightElement: h("div.tools", [
       tools,
       h.if(onToggleSettings != null)(ToolButton, {
-        icon: "settings",
+        icon: "cog",
         onClick: onToggleSettings,
       }),
       h.if(onClose != null)(ToolButton, { icon: "cross", onClick: onClose }),

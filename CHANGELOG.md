@@ -7,7 +7,10 @@
   `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages are: a
   floating panel with the Rockd icon, the view's title, Settings and close
   buttons and each page's own controls (StraboSpot's link button), over a
-  scrolling body. It replaces three copies of the sidebar.
+  scrolling body. It replaces three copies of the sidebar. Settings (a gear in
+  the header) is one shared `MapSettingsPanel`: Dark/Light, Satellite, Overlay
+  and, on the signed-in pages, Logout, as a centered column of the same
+  outlined grey button.
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
