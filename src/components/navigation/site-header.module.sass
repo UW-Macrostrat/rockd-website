@@ -12,31 +12,10 @@ header.site-page-header
   // Rockd's own page background, so the sticky bar matches the page
   --page-header-background: var(--background)
 
-  // The wordmark crumb is in the heading font and the rest in the body font;
-  // align on baselines. The chevrons and "…" menu have no text, so they stay
-  // centred.
-  ol,
-  li
-    align-items: baseline
-
-  li::after,
-  :global(.bp6-breadcrumbs-collapsed)
-    align-self: center
-
-// Set like Macrostrat's wordmark crumb: the heading font at the crumbs' weight
-.rockd-wordmark
-  font-family: var(--header-font-family)
-  font-weight: 400
-  font-size: 1.05em
-
 .site-logo
   display: flex
   width: 100%
   height: 100%
-  // The header centres the logo box below the wordmark's letters (the
-  // artwork also sits a little low on its canvas); raise it so the icon's
-  // middle lines up with the middle of "Rockd"
-  translate: 0 -0.28rem
 
   img
     width: 100%

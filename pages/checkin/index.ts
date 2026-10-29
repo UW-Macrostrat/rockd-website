@@ -2,11 +2,9 @@ import { LngLatCoords } from "@macrostrat/data-components";
 import { useState } from "react";
 import {
   BlankImage,
-  Footer,
   getProfilePicUrl,
   getImageUrl,
   Comments,
-  RockdSiteIcon,
 } from "~/components";
 import { Icon, Divider, H2 } from "@blueprintjs/core";
 import h from "./main.module.sass";
@@ -120,30 +118,21 @@ export function Checkins({ checkin, comments }) {
     zoom: 10,
   };
 
-  return h("div.container", [
-    h("div.content-area", [
-      h("div", { className: "main" }, [
-        h("div", { className: "checkin-head" }, [
-          h("div.title-area", [
-            h(RockdSiteIcon, { className: "site-icon" }),
-            h("h1", checkin.notes),
-          ]),
-        ]),
-        h(Overlay, {
-          checkin,
-          center,
-          LngLatProps,
-          ratingArr,
-          profile_pic,
-        }),
-        h("div", { className: "observations" }, observations),
-      ]),
-      h.if(comments?.length > 0)("div.comments-container", [
-        h("h2", "Comments"),
-        h(Divider),
-        h(Comments, { comments }),
-      ]),
-      h(Footer),
+  // The site's standard page: header (its title the checkin's notes), content
+  // column and footer
+  return h(ContentPage, { title: checkin.notes || "Checkin" }, [
+    h(Overlay, {
+      checkin,
+      center,
+      LngLatProps,
+      ratingArr,
+      profile_pic,
+    }),
+    h("div", { className: "observations" }, observations),
+    h.if(comments?.length > 0)("div.comments-container", [
+      h("h2", "Comments"),
+      h(Divider),
+      h(Comments, { comments }),
     ]),
   ]);
 }

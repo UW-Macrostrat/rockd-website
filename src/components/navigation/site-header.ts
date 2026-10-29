@@ -50,11 +50,12 @@ export function SitePageHeader(props: SitePageHeaderProps) {
   });
 }
 
-/** The trail ahead of the current page: the site root (as the wordmark),
- * then each enclosing section listed in `siteSections`. */
+/** The trail ahead of the current page: the site root, then each enclosing
+ * section listed in `siteSections`. Set like the other crumbs, so only the
+ * current page's title stands out. */
 export function usePageBreadcrumbs(): Crumb[] {
   const { urlPathname } = usePageContext();
-  const root: Crumb = { text: h("span.rockd-wordmark", "Rockd"), href: "/" };
+  const root: Crumb = { text: "Rockd", href: "/" };
   return [root, ...sectionCrumbs(urlPathname)];
 }
 

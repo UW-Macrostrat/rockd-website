@@ -37,7 +37,8 @@
   ending in the page's `title` (`Rockd › Section › Page`) on one row; a page's
   `headerActions` config adds header controls — and the new Macrostrat-style
   `Footer` (link lists, credits and a hydration-safe `ThemeButton`). Terms,
-  Privacy, Metrics and Organizations use the `content` layout and the homepage
+  Privacy, Metrics, Organizations and the checkin page (titled by its notes)
+  use the `content` layout and the homepage
   the `home` layout, replacing their hand-built headers and footers; the
   Metrics "Show bar charts" switch sits in its header. Upgraded
   `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
@@ -95,8 +96,9 @@
 - The nearby helper map sits in a page-level column beside the feed, and renders
   before a center is chosen.
 - `/dev/feed/mine` shows a non-ideal state with a login link when signed out.
-- The site footer is part of the feed's end-of-scroll region, below the load
-  progress and "Load more" checkpoint.
+- The feed pages use the site header (`Rockd › Development › Checkin feed`) over
+  their own scrolling list; the site footer is part of the feed's end-of-scroll
+  region, below the load progress and "Load more" checkpoint.
 - Fixed server-rendered pages that import `@macrostrat/data-components`
   (`/checkin/@id`) failing with "Cannot require() ES Module ... in a cycle":
   `ssr.noExternal` now covers transitive `@macrostrat/*` packages, not only

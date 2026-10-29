@@ -10,23 +10,13 @@
   --feed-card-width: 21em
   --feed-header-width: 68em
 
-.feed-header
-  display: flex
-  flex-direction: row
-  align-items: center
-  gap: 0.75em
-  padding: 0.75em 1em
-  width: 100%
-  max-width: var(--feed-header-width)
-  margin: 0 auto
-
-  .site-icon img
-    height: 2em
-    display: block
-
-  .page-title
-    margin: 0
-    font-size: 1.4em
+// The site's content-page header, spaced as a content page spaces it (the
+// layout is fullscreen, so the list can scroll on its own)
+.feed-page header.feed-header
+  margin-top: 2em
+  flex-shrink: 0
+  @media only screen and (max-width: 900px)
+    --page-header-padding-x: 1em
 
 .feed-content
   display: flex

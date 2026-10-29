@@ -28,7 +28,8 @@ import {
 import { createMasonryScrollBody } from "@macrostrat/data-sheet";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { type ReactNode, useEffect, useState } from "react";
-import { Footer, RockdSiteIcon } from "~/components";
+import { Footer } from "~/components";
+import { ContentPageHeader } from "~/layouts";
 import {
   CheckinFeedPanel,
   FeedLoadProgress,
@@ -208,10 +209,7 @@ function Feed({
   }
 
   return h("div.feed-page", [
-    h("header.feed-header", [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("h1.page-title", "Checkins"),
-    ]),
+    h(ContentPageHeader, { className: "feed-header" }),
     h("div.feed-content", [
       h(FeedTabs, { feedType }),
       h("div.feed-body", [
