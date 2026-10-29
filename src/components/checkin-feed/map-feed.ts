@@ -9,7 +9,11 @@ import { useMap } from "@macrostrat/mapbox-react";
 import type { LngLatBounds } from "mapbox-gl";
 import { useEffect, useState } from "react";
 import { CheckinFeedPanel, type CheckinFeedPanelProps } from "./feed-panel";
-import type { CheckinBounds, FeedContext } from "./checkin-provider";
+import {
+  API_PAGE_SIZE,
+  type CheckinBounds,
+  type FeedContext,
+} from "./checkin-provider";
 import { MapCheckinCard } from "./map-checkin-card";
 import h from "./feed-panel.module.sass";
 
@@ -48,6 +52,10 @@ export function MapCheckinFeed({
     feed: context,
     itemComponent,
     scrollBody: SingleColumn,
+    // One API page per window: the list reloads whenever the map moves, so
+    // each reload is a single request, and more pages come only as the
+    // sidebar is scrolled toward its end
+    pageSize: API_PAGE_SIZE,
     className: "map-feed",
   });
 }

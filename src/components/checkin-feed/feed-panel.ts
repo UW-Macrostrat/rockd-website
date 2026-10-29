@@ -38,13 +38,14 @@ import { personFacet, SEMANTIC_FACETS } from "./semantic/facets";
 import { columnSpec, tableFilters, urlBindings } from "./view-config";
 import h from "./feed-panel.module.sass";
 
-/** Rows per window. Each costs `PAGE_SIZE / 5` requests, since the API pages by
- * fives — so this trades requests for scrolling feel. */
+/** Rows per window, by default. Each window costs `pageSize / 5` requests,
+ * since the API pages by fives — so this trades requests for scrolling feel. */
 const PAGE_SIZE = 20;
-/** Windows auto-loaded before the footer's "Load more" takes over. Deliberately
- * small: scrolling forever is how you lose your place, and narrowing the search
- * is the better way to reach something deep. The checkpoint is the point. */
-const AUTO_LOAD_PAGES = 3;
+/** Rows auto-loaded before the footer's "Load more" takes over, whatever the
+ * window size. Deliberately few: scrolling forever is how you lose your place,
+ * and narrowing the search is the better way to reach something deep. The
+ * checkpoint is the point. */
+const AUTO_LOAD_ROWS = 60;
 
 /** A `mine` feed is one person's checkins (and the provider keeps it so), so
  * its search has no Person facet to offer. */
@@ -63,6 +64,9 @@ export interface CheckinFeedPanelProps {
   /** Keeps the search and sort in the page's query string, so a search is a
    * link. For pages whose URL is the list's own. */
   syncURL?: boolean;
+  /** Rows per window: the first load, and each one scrolling to the end of the
+   * list asks for. `API_PAGE_SIZE` makes every window a single request. */
+  pageSize?: number;
   /** For the `DataPanel`, e.g. to set its `--data-panel-content-width` */
   className?: string;
 }
@@ -73,6 +77,7 @@ export function CheckinFeedPanel({
   scrollBody,
   contentFooter = h(FeedLoadProgress),
   syncURL = false,
+  pageSize = PAGE_SIZE,
   className,
 }: CheckinFeedPanelProps) {
   const { feedType, center, personId, token, bounds } = feed;
@@ -117,8 +122,8 @@ export function CheckinFeedPanel({
       columnSpec,
       filters: tableFilters,
       ...initialView,
-      pageSize: PAGE_SIZE,
-      autoLoadPages: AUTO_LOAD_PAGES,
+      pageSize,
+      autoLoadPages: Math.max(1, Math.round(AUTO_LOAD_ROWS / pageSize)),
       // On the panel itself, since it sets its own `--data-panel-*` defaults
       className: classNames("feed-data-panel", className),
       // The counter is folded into the inline footer.

@@ -17,7 +17,9 @@
   sent badges and results dialog around it):
   `CheckinFeedPanel` (`~/components/checkin-feed`, moved from
   `pages/dev/feed` with its provider, cards and search) in one column, scrolling
-  infinitely, with the notes/age/lithology/person search at the top. Explore's
+  infinitely (one API page of 5 at a time, so a reload is a single request and
+  more load only as the sidebar is scrolled), with the notes/age/lithology/person
+  search at the top. Explore's
   list follows the map's visible area; a card flies the map to its checkin,
   with "Details" opening the checkin page. The search replaces Explore's filter
   button and panel. A notes, age or lithology search covers every checkin, since
