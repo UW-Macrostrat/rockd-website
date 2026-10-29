@@ -1,5 +1,6 @@
 import { Button, type IconName } from "@blueprintjs/core";
 import { DarkModeButton } from "@macrostrat/ui-components";
+import classNames from "classnames";
 import h from "./settings-panel.module.sass";
 
 export interface MapSettingsPanelProps {
@@ -46,6 +47,7 @@ export function MapSettingsPanel({
       icon: "log-out",
       text: "Logout",
       onClick: onLogout,
+      className: "logout-button",
     }),
   ]);
 }
@@ -55,15 +57,23 @@ function SettingsButton({
   text,
   active = false,
   onClick,
+  className,
 }: {
   icon: IconName;
   text: string;
   active?: boolean;
   onClick: () => void;
+  className?: string;
 }) {
   return h(
     Button,
-    { className: "settings-button", outlined: true, icon, active, onClick },
+    {
+      className: classNames("settings-button", className),
+      outlined: true,
+      icon,
+      active,
+      onClick,
+    },
     text
   );
 }

@@ -195,10 +195,11 @@ export function Page() {
                 }),
 
                 // Styled as the homepage's Login link
-                h(
+                s(
                   Button,
                   {
                     type: "submit",
+                    className: "login-link",
                     icon: "log-in",
                     large: true,
                     minimal: true,

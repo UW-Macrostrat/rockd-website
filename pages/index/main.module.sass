@@ -1,4 +1,3 @@
-
 .main-page
   --max-content-width: 1200px
   --page-content-width: 1200px
@@ -34,11 +33,38 @@
   p.tagline
     font-size: 1.2em
 
-  // Explore and Login, stacked close under the app badges
+  // Explore and Login, stacked close under the app badges, each as wide as its
+  // own label
   .hero-links
     display: flex
     flex-direction: column
     align-items: center
+    gap: 0.5rem
+
+  // Minimal buttons in a band of the Rockd wordmark (Explore its blue, Login
+  // its green) so they read as clickable: a solid border of the color around an
+  // 80%-opacity fill that turns solid on hover, keeping Blueprint's text and
+  // icon colors. Dark mode keeps the hue as a fainter tint. Shared with
+  // /login's Login button. Qualified to outrank
+  // `.bp6-dark .bp6-button.bp6-minimal:hover`.
+  .explore-link:global(.bp6-button), .login-link:global(.bp6-button)
+    border: 1px solid var(--hero-link-color)
+    background-color: color-mix(in srgb, var(--hero-link-color) 80%, transparent)
+
+    &:hover
+      background-color: var(--hero-link-color)
+
+    :global(.bp6-dark) &, :global([data-bp-color-scheme=dark]) &
+      background-color: color-mix(in srgb, var(--hero-link-color) 15%, transparent)
+
+      &:hover
+        background-color: color-mix(in srgb, var(--hero-link-color) 30%, transparent)
+
+  .explore-link
+    --hero-link-color: #c1d2d6
+
+  .login-link
+    --hero-link-color: #91b197
 
 
 .dashboard-img-container

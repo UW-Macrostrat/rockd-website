@@ -95,7 +95,7 @@ export function Page() {
               AnchorButton,
               {
                 href: "/login",
-                className: "explore-link",
+                className: "login-link",
                 large: true,
                 minimal: true,
                 icon: "log-in",

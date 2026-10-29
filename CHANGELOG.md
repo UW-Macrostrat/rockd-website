@@ -10,7 +10,7 @@
   scrolling body. It replaces three copies of the sidebar. Settings (a gear in
   the header) is one shared `MapSettingsPanel`: Dark/Light, Satellite, Overlay
   and, on the signed-in pages, Logout, as a centered column of the same
-  outlined grey button.
+  outlined grey button (Logout is red: outline, text, icon and hover).
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
@@ -41,6 +41,11 @@
   the `home` layout, replacing their hand-built headers and footers; the
   Metrics "Show bar charts" switch sits in its header. Upgraded
   `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
+
+- The homepage's "Explore the data" and "Login" buttons are minimal buttons in
+  the Rockd wordmark's blue and green (a solid border and an
+  80%-opacity fill that turns solid on hover),
+  so they read as clickable; `/login`'s Login button is the same green.
 
 - Added development-only organization directory and creation pages, with a typed
   Rockd organization API client, URL-backed directory search and filters,
