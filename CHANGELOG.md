@@ -11,6 +11,11 @@
   the header) is one shared `MapSettingsPanel`: Dark/Light, Satellite, Overlay
   and, on the signed-in pages, Logout, as a centered column of the same
   outlined grey button (Logout is red: outline, text, icon and hover).
+  The trip page uses the same layout: a "Trips" sidebar with a header card
+  (the trip's name, edited date and stop count, description, KMZ download and
+  a Comments view) over its stops (the
+  map pages' checkin cards, each under its stop's name), with
+  numbered stop markers on the map; its Settings have no Overlay, as before.
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",

@@ -6,16 +6,17 @@ import h from "./settings-panel.module.sass";
 export interface MapSettingsPanelProps {
   showSatellite: boolean;
   onToggleSatellite: () => void;
-  showOverlay: boolean;
-  onToggleOverlay: () => void;
+  /** Shows an Overlay button, for maps with the Macrostrat overlay */
+  showOverlay?: boolean;
+  onToggleOverlay?: () => void;
   /** Shows a Logout button, for pages behind a sign-in */
   onLogout?: () => void;
 }
 
 /**
- * The map pages' Settings view: theme, base map and overlay toggles, and
- * Logout where the page has a signed-in user — one centered column of the
- * same outlined button.
+ * The map pages' Settings view: theme, base map and (where the map has one)
+ * overlay toggles, and Logout where the page has a signed-in user — one
+ * centered column of the same outlined button.
  */
 export function MapSettingsPanel({
   showSatellite,
@@ -37,7 +38,7 @@ export function MapSettingsPanel({
       active: showSatellite,
       onClick: onToggleSatellite,
     }),
-    h(SettingsButton, {
+    h.if(onToggleOverlay != null)(SettingsButton, {
       icon: "map",
       text: "Overlay",
       active: showOverlay,

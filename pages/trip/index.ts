@@ -1,272 +1,214 @@
 import h from "./main.module.sass";
-import { useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import "@macrostrat/map-interface/dist/map-interface.css";
-import {
-  BlankImage,
-  getProfilePicUrl,
-  Image,
-  Comments,
-  RockdSiteIcon,
-} from "~/components";
+import { Comments } from "~/components";
+import { MapSettingsPanel, MapSidebarLayout } from "~/components/map-sidebar";
 import "@macrostrat/style-system";
 import { rockdApiURL, SETTINGS } from "~/settings";
-import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import {
-  Button,
-  ButtonGroup,
-  Divider,
-  Icon,
-  Overlay2,
-  Spinner,
-} from "@blueprintjs/core";
-import { MapView, PanelCard } from "@macrostrat/map-interface";
-import { MapboxMapProvider, useMapRef } from "@macrostrat/mapbox-react";
-import { createCheckins } from "~/components/checkin.client";
+import { useDarkMode } from "@macrostrat/ui-components";
+import { AnchorButton, Button, Card } from "@blueprintjs/core";
+import { MapView } from "@macrostrat/map-interface";
+import type { MapPosition } from "@macrostrat/mapbox-utils";
+import { useMapRef } from "@macrostrat/mapbox-react";
+import { MapCheckinCard } from "~/components/checkin-feed";
+import { atom, useAtom } from "jotai";
 
+const showSatelliteAtom = atom(false);
+
+type SidebarView = "trip" | "settings" | "comments";
+
+/**
+ * A trip: its stops on the map, numbered in order, and the trip's details and
+ * stops in the map pages' standard sidebar (`MapSidebarLayout`).
+ */
 export function Trips({ data, commentsData }) {
-  const [showSatellite, setShowSatellite] = useState(false);
+  const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [view, setView] = useState<SidebarView>("trip");
+  const style = useMapStyle(showSatellite);
 
-  const style = useMapStyle({ showSatellite });
+  // The sidebar shows one view at a time: settings, the trip's comments, or
+  // (by default) the trip and its stops
+  let title = "Trips";
+  let sidebar: ReactNode;
+  let onClose: (() => void) | undefined;
 
-  // format date
-  const trip = data.trip_id;
-  let date = new Date(data.updated);
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-  data.updated = date.toLocaleDateString("en-US", options);
-
-  const toolbar = h(Toolbar, {
-    showSatellite,
-    setShowSatellite,
-  });
-  const sidebar = h(Sidebar, { data, commentsData, mapLoaded });
-
-  if (!sidebar) {
-    return h("div", { className: "loading" }, [h("h1", "Loading trip...")]);
+  if (view === "settings") {
+    title = "Settings";
+    onClose = () => setView("trip");
+    sidebar = h(MapSettingsPanel, {
+      showSatellite,
+      onToggleSatellite: () => setShowSatellite(!showSatellite),
+    });
+  } else if (view === "comments") {
+    title = "Comments";
+    onClose = () => setView("trip");
+    sidebar = h("div.trip-comments", h(Comments, { comments: commentsData }));
+  } else {
+    sidebar = h(TripDetails, {
+      data,
+      commentsData,
+      onShowComments: () => setView("comments"),
+    });
   }
 
-  let start = [data.stops[0].checkin.lng, data.stops[0].checkin.lat];
-  const newMapPosition = {
+  let onToggleSettings = () => setView("settings");
+  if (view === "settings") {
+    onToggleSettings = () => setView("trip");
+  }
+
+  const start = data.stops[0].checkin;
+  const mapPosition: MapPosition = {
     camera: {
-      lat: start[1],
-      lng: start[0],
+      lat: start.lat,
+      lng: start.lng,
       altitude: 300000,
     },
   };
 
-  return h(MapboxMapProvider, [
-    h("div.trips-page", [
-      h("div.map-area", [
-        h(MapView, {
-          className: "map-view",
-          style: style,
-          mapboxToken: SETTINGS.mapboxAccessToken,
-          mapPosition: newMapPosition,
-          onMapLoaded: () => {
-            setMapLoaded(true);
-          },
-        }),
-        toolbar,
-      ]),
-      h("div.sidebar-area", [sidebar]),
-    ]),
+  return h(
+    MapSidebarLayout,
+    { title, sidebar, onClose, onToggleSettings },
+    h(
+      MapView,
+      {
+        style,
+        mapboxToken: SETTINGS.mapboxAccessToken,
+        mapPosition,
+        standalone: false,
+        onMapLoaded: () => setMapLoaded(true),
+      },
+      h(TripMarkers, { stops: data.stops, mapLoaded })
+    )
+  );
+}
+
+/** The trip's header, then its stops as the map pages' checkin cards, each
+ * under its stop's name. */
+function TripDetails({ data, commentsData, onShowComments }) {
+  const stops = data.stops.map((stop, index) =>
+    h("div.stop", { key: stop.checkin.checkin_id ?? index }, [
+      h("h4.stop-name", stop.name),
+      h(MapCheckinCard, { data: stop.checkin }),
+    ])
+  );
+
+  return h("div.trip-details", [
+    h(TripHeader, { data, commentsData, onShowComments }),
+    h("div.stop-list", stops),
   ]);
 }
 
-function Toolbar({ showSatellite, setShowSatellite }) {
-  const [showSettings, setSettings] = useState(false);
+/** The trip's name, edited date and stop count, description, and its KMZ
+ * download and comments, as one card over the stops. */
+function TripHeader({ data, commentsData, onShowComments }) {
+  const stopCount = data.stops.length;
+  let stopLabel = `${stopCount} stops`;
+  if (stopCount === 1) stopLabel = "1 stop";
 
-  return h(PanelCard, { className: "toolbar" }, [
-    h("div.toolbar-header", [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h(Button, {
-        className: "settings-icon",
-        icon: "settings",
-        minimal: true,
-        onClick: () => {
-          setSettings(!showSettings);
+  return h(Card, { className: "trip-header" }, [
+    h("h2.trip-name", data.name),
+    h("p.trip-meta", `Edited ${formatDate(data.updated)} · ${stopLabel}`),
+    h.if(data.description)("p.description", data.description),
+    h("div.trip-actions", [
+      h(
+        AnchorButton,
+        {
+          href: rockdApiURL + "/trips/" + data.trip_id + "?format=kmz",
+          icon: "download",
+          outlined: true,
+          small: true,
         },
-      }),
-    ]),
-    h("div", { className: showSettings ? "settings-content" : "hide" }, [
-      h(Divider, { className: "divider" }),
-      h("div", { className: "settings" }, [
-        h(ButtonGroup, { vertical: true }, [
-          h(DarkModeButton, { className: "dark-btn", showText: true }),
-          h(
-            Button,
-            {
-              onClick: () => {
-                setShowSatellite(!showSatellite);
-              },
-              icon: "satellite",
-            },
-            "Satellite"
-          ),
-        ]),
-      ]),
+        "Download KMZ"
+      ),
+      h.if(commentsData?.length > 0)(
+        Button,
+        {
+          icon: "comment",
+          outlined: true,
+          small: true,
+          onClick: onShowComments,
+        },
+        `Comments (${commentsData?.length})`
+      ),
     ]),
   ]);
 }
 
-function useMapStyle({ showSatellite }) {
-  return showSatellite
-    ? SETTINGS.satelliteMapURL
-    : useDarkMode()?.isEnabled
-    ? SETTINGS.darkMapURL
-    : SETTINGS.whiteMapURL;
-}
-
-function Sidebar({ data, commentsData, mapLoaded }) {
+/** Numbered markers for the trip's stops, which fly the map to their stop,
+ * with the map framed around them all. */
+function TripMarkers({ stops, mapLoaded }) {
   const mapRef = useMapRef();
-  const map = mapRef.current;
-  const profile_pic = h(BlankImage, {
-    src: getProfilePicUrl(data.person_id),
-    className: "profile-pic-header",
-  });
-  const stops = data.stops;
-  const [commentsOpen, setCommentsOpen] = useState(false);
 
-  if (!mapLoaded)
-    return h("div", { className: "stop-container loading2" }, [
-      h("h1", "Loading trip " + data.trip_id + "..."),
-      h(Spinner, { style: { marginTop: "30px" } }),
-    ]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapLoaded || map == null) return;
 
-  let arr = [];
-  let lats = [];
-  let lngs = [];
-  stops.forEach((stop, index) => {
-    let temp = stop.checkin;
-    temp.name = stop.name;
-    arr.push(stop.checkin);
-
-    const count = index + 1;
-    const el = document.createElement("div");
-    el.style.backgroundImage =
-      'url("https://storage.macrostrat.org/assets/rockd/marker_red.png")';
-    el.style.width = "60px";
-    el.style.height = "60px";
-    el.style.backgroundSize = "50%";
-    el.style.display = "block";
-    el.style.border = "none";
-    el.style.cursor = "pointer";
-    el.style.backgroundRepeat = "no-repeat";
-    el.style.backgroundPosition = "center";
-
-    const number = document.createElement("span");
-    number.innerText = count;
-    number.style.position = "absolute";
-    number.style.top = "45%";
-    number.style.left = "49%";
-    number.style.transform = "translate(-50%, -50%)";
-    number.style.color = "white";
-    number.style.fontSize = "12px";
-    number.style.fontWeight = "bold";
-
-    // Append the number to the marker
-    el.appendChild(number);
-
-    // Create marker
-    new mapboxgl.Marker(el)
-      .setLngLat([stop.checkin.lng, stop.checkin.lat])
-      .addTo(map);
-
-    el.addEventListener("click", () => {
-      map.flyTo({
-        center: [stop.checkin.lng, stop.checkin.lat],
-        zoom: 12,
+    const markers = stops.map((stop, index) => {
+      const { lng, lat } = stop.checkin;
+      const el = createStopMarker(index + 1);
+      el.addEventListener("click", () => {
+        map.flyTo({ center: [lng, lat], zoom: 12 });
       });
+      return new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map);
     });
 
-    // add to array
-    lats.push(stop.checkin.lat);
-    lngs.push(stop.checkin.lng);
+    const lngs = stops.map((stop) => stop.checkin.lng);
+    const lats = stops.map((stop) => stop.checkin.lat);
+    map.fitBounds(
+      [
+        [Math.max(...lngs), Math.max(...lats)],
+        [Math.min(...lngs), Math.min(...lats)],
+      ],
+      { padding: 40, maxZoom: 12, animate: false }
+    );
+
+    return () => markers.forEach((marker) => marker.remove());
+  }, [mapLoaded, stops]);
+
+  return null;
+}
+
+function useMapStyle(showSatellite: boolean) {
+  const inDarkMode = useDarkMode()?.isEnabled;
+  if (showSatellite) return SETTINGS.satelliteMapURL;
+  if (inDarkMode) return SETTINGS.darkMapURL;
+  return SETTINGS.whiteMapURL;
+}
+
+/** A red pin numbered with the stop's place in the trip */
+function createStopMarker(count: number): HTMLElement {
+  const el = document.createElement("div");
+  el.style.backgroundImage =
+    'url("https://storage.macrostrat.org/assets/rockd/marker_red.png")';
+  el.style.width = "60px";
+  el.style.height = "60px";
+  el.style.backgroundSize = "50%";
+  el.style.display = "block";
+  el.style.border = "none";
+  el.style.cursor = "pointer";
+  el.style.backgroundRepeat = "no-repeat";
+  el.style.backgroundPosition = "center";
+
+  const number = document.createElement("span");
+  number.innerText = String(count);
+  number.style.position = "absolute";
+  number.style.top = "45%";
+  number.style.left = "49%";
+  number.style.transform = "translate(-50%, -50%)";
+  number.style.color = "white";
+  number.style.fontSize = "12px";
+  number.style.fontWeight = "bold";
+  el.appendChild(number);
+
+  return el;
+}
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
-
-  const bounds = [
-    [Math.max(...lngs), Math.max(...lats)],
-    [Math.min(...lngs), Math.min(...lats)],
-  ];
-
-  map.fitBounds(bounds, {
-    padding: {
-      top: 20,
-      bottom: 20,
-      left: 200,
-      right: 20,
-    },
-    animate: false,
-  });
-  const stopCheckins = createCheckins(arr, mapRef, null);
-
-  return h("div", { className: "stop-container" }, [
-    h("div", { className: "top" }, [
-      h("div", { className: "trip-header" }, [
-        profile_pic,
-        h("div", { className: "stop-info" }, [
-          h(
-            "h3",
-            { className: "name" },
-            data.first_name + " " + data.last_name
-          ),
-          h("h4", { className: "edited" }, "Edited " + data.updated),
-        ]),
-        h("div", { className: "download-button" }, [
-          h(
-            "a",
-            {
-              className: "kmz",
-              href: rockdApiURL + "/trips/" + data.trip_id + "?format=kmz",
-            },
-            "DOWNLOAD KMZ"
-          ),
-        ]),
-      ]),
-      h("div.details", [
-        h("h1", { className: "park" }, data.name),
-        h("p", { className: "description" }, data.description),
-        h.if(commentsData?.length > 0)(
-          "div",
-          {
-            className: "download-button",
-            onClick: () => setCommentsOpen(true),
-          },
-          [h("div", { className: "kmz" }, "View comments")]
-        ),
-        h.if(commentsData?.length > 0)(
-          Overlay2,
-          { className: "overlay", isOpen: commentsOpen, usePortal: true },
-          [
-            h("div", { className: "overlay-content" }, [
-              h("div.comments-container", [
-                h("div.comments-header", [
-                  h("h2", { className: "comments-title" }, "Comments"),
-                  h(Icon, {
-                    icon: "cross",
-                    className: "close-icon",
-                    onClick: () => {
-                      setCommentsOpen(false);
-                    },
-                    style: { cursor: "pointer", color: "red" },
-                  }),
-                ]),
-                h(Divider),
-                h(Comments, { comments: commentsData }),
-              ]),
-            ]),
-          ]
-        ),
-      ]),
-    ]),
-    h("div", { className: "stop-bottom" }, [
-      h("div", { className: "stop-list" }, stopCheckins),
-    ]),
-  ]);
 }

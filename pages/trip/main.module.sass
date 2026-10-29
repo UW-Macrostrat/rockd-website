@@ -1,402 +1,53 @@
-html, body, .wrapper, #react, .app, #map
-  color: #333
-  min-height: 100%
-  height: 100vh
-  width: 100%
-  padding: 0
-  margin: 0
+// The map page's layout and sidebar come from `MapSidebarLayout`
+// (`~/components/map-sidebar`); this is the trip's own sidebar content.
 
-.trips-page
-  position: fixed
-  width: 100vw
-  height: 100vh
-  top: 0
-  left: 0
-  display: flex
-  flex-direction: row
-
-.map-area
-  flex: 1
-  position: relative
-  .map-view
-    position: absolute
-    top: 0
-    bottom: 0
-    height: 100%
-    width: 100%
-    :global #map
-      width: 100%
-      height: 100%
-      position: absolute
-      top: 0
-      bottom: 0
-
-.sidebar-area
-  width: 30%
-  min-width: 380px
-  max-width: 450px
-
-.hidden
-  display: none
-
-.error
-  height: 100vh
-  width: 100%
-  text-align: center
-  font-size: 2em
-  font-weight: 200
-  background-color: var(--panel-background-color)
-  color: var(--panel-text)
-  padding-top: 5vh
-
-.error-img
-  width: 50%
-  text-align: center
-
-.info-container
-  padding-left: 15px
-  padding-right: 15px
-  overflow-y: scroll
-  height: 100%
-
-.trip-title
-  font-weight: 300
-  text-align: center
-
-.profile-pic-header
-  height: 70px
-  width: 70px
-  border-radius: 50%
-  display: inline-block
-  margin: auto
-
-.profile-pic-checkin
-  height: 7vh
-  border-radius: 50%
-  display: inline-block
-
-.info-grid
-  box-shadow: -4px 0px 7px var(--panel-background-color)
-  z-index: 9
-
-.trip-meta
-  padding-top: 10px
-  display: flex
-  justify-content: left
-  align-items: center
-
-.trip-meta-text
-  display: inline-block
-  margin-left: 15px
-
-.person-name
-  font-size: 18px
-  font-weight: bold
-
-.stop
-  margin-bottom: 15px
-
-.stop-content
-  padding: 10px
-
-.stop-name
-  font-size: 20px
-  font-weight: 600
-  color: var(--text-emphasized-color)
-  padding: 10px 0
-  text-align: left
-
-.stop-description
-  font-size: 14px
-  color: #666
-  margin-top: 10px
-
-  a
-    color: black
-    text-decoration: none
-
-  a:hover
-    color: black
-
-.trip-search
-  height: 20vh
-  background-color: black
-  color: white
-  display: grid
-  margin: auto
-
-  .trip-input
-    padding-left: 5px
-
-  .search-btn
-    margin-left: 20px
-
-.trip-q
-  margin-top: 0
-  padding-top: 30px
-  text-align: center
-
-.map
-  display: grid
-  grid-template-columns: 70% 30%
-
-.stop-container
-  position: absolute
+.trip-details
   display: flex
   flex-direction: column
-  background-color: var(--panel-background-color)
-  color: var(--text-emphasized-color)
-  text-align: center
-  top:0
-  height: 100vh
+  gap: 0.75rem
+  padding: 0 8px 8px
 
-.trip-input-container
-  width: 40%
-  display: grid
-  grid-template-columns: 80% 20%
-  margin: auto
-  padding-bottom: 30px
-
-.stop-header
+// The trip's header card over its stops. Qualified to outrank Blueprint's own
+// `.bp6-card` padding.
+.trip-details .trip-header
   display: flex
-  height: 15vh
+  flex-direction: column
+  gap: 0.5rem
+  padding: 0.75rem 1rem
 
-.stop-description
-  color: black
-  text-align: left
-  box-shadow: -4px 0px 7px #aaa
-  width: 95%
-  margin-left: 2.5%
-  padding: 15px
-  border-radius: 2%
+  .trip-name
+    margin: 0
+    color: var(--text-emphasized-color)
 
+  .trip-meta
+    margin: 0
+    font-size: 0.85em
+    color: var(--bp-typography-color-muted)
+
+  .description
+    margin: 0
+
+  .trip-actions
+    display: flex
+    flex-wrap: wrap
+    gap: 0.5rem
+    margin-top: 0.25rem
+
+// The stops: the map pages' checkin cards, spaced as in their feed
 .stop-list
-  padding: 20px 10px
-  padding-top: 0
-
-.map
-  height: 100vh
-
-.box-header
-  display: grid
-  grid-template-columns: 20% 60% 20%
-  padding: 10px
-
-  .checkin-details
-    display: grid
-    margin: auto
-    margin-left: 0
-    text-align: left
-    h4
-      padding: 0
-      margin: 0
-      font-weight: 30
-
-.pin
-  background-color: green
-
-.marker
-  height: 7vh
-  display: grid
-  margin: auto
-
-.loading, .loading2
-  height: 100vh
-  padding-top: 20vh
-  text-align: center
-  background-color: var(--panel-background-color)
-  color: var(--text-emphasized-color)
-  font-style: italic
-  z-index: 10
-
-.loading2
-  padding-top: 20px
-
-.stop-link
-  position: relative
-
-  .image-details
-    position: absolute
-    top: -250px
-    left: 0
-    right: 0
-    bottom: 0
-    display: flex
-    justify-content: center
-    align-items: center
-    display: none
-    color: white
-
-  .checkin-card-img
-    margin-top: 10px
-    width: 100%
-    height: 250px
-    object-fit: cover
-    border-radius: 2%
-
-.stop-link:hover
-  .checkin-card-img
-    -webkit-filter: brightness(70%)
-  .image-details
-    display: flex
-
-.details-image
-  width: 40px
-  margin-left: 10px
-  margin-top: 4px
-
-.star
-  height: 15px
-  filter: var(--anti-img-color)
-
-.rock
-  margin: 0
-
-.trip-header
   display: flex
-  gap: 0px
-  padding: 10px
+  flex-direction: column
+  gap: 12px
 
-.stop-bottom
-  flex: 1
-  overflow: auto
-  text-align: left
-  min-height: 0
+.stop
+  display: flex
+  flex-direction: column
+  gap: 0.25rem
 
-.details
+.stop-name
   margin: 0
-  padding: 15px
-  padding-top: 0
-
-  .park
-    margin: 0
-
-.stop-main-info
-  text-align: left
-
-.pin
-  span
-    position: absolute
-    top: 45%
-    left: 49%
-    transform: translate(-50%, -50%)
-    color: white
-    font-size: 12px
-    font-weight: bold
-
-.dark-mode-button
-  height: 10px
-
-.checkin
-  background-color: var(--panel-background-color)
-  box-shadow: 0 0 0 1px var(--card-shadow-color)
+  padding: 0 4px
   color: var(--text-emphasized-color)
 
-  h3, h1
-    color: var(--text-emphasized-color)
-
-.checkin-footer
-  img
-    filter: var(--img-color)
-
-.download-button
-  display: flex
-  justify-content: center
-  align-items: center
-  cursor: pointer
-
-  .kmz
-    color: var(--text-emphasized-color)
-
-  .kmz:hover
-    color: var(--text-emphasized-color)
-    background-color: var(--scrollbar-thumb)
-    text-decoration: none
-
-.kmz
-  border: 2px solid var(--text-emphasized-color)
-  border-radius: 4px
-  padding: 7px
-
-.stop-info
-  text-align: left
-  display: grid
-  margin: auto
-  h3, h4
-    margin: 0
-
-.site-icon img
-  height: 36px
-  width: 36px
-
-.toolbar
-  --panel-padding: 0
-  padding: 0
-  position: absolute
-  top: 1em
-  left: 1em
-  padding: 0
-  border-radius: 4px
-
-  .home-icon
-    height: 16px
-
-  .toolbar-header
-    display: flex
-    align-items: center
-    justify-conter: center
-    gap: 10px
-    padding: 4px
-
-    a
-      display: flex
-      align-items: center
-
-  .settings-content
-    width: 125px
-
-    .divider
-      margin: 0
-
-    .settings
-      padding: 10px
-
-  .dark-btn
-    margin-bottom: 10px
-
-  .map-style
-    display: flex
-    gap: 5px
-    cursor: pointer
-
-  .clicked
-    background-color: red
-
-  .unclicked
-    background-color: green
-
-.hide
-  display: none
-
-#map
-  width: 70%
-  height: 100%
-
-.overlay-content
-  width: 70%
-  height: 80vh
-  display: flex
-  justify-content: center
-  align-items: center
-
-  h2
-    margin: 0
-
-  .comments-container
-    background-color: var(--background-color)
-    width: 80%
-    padding: 1em
-
-    .comments-header
-      display: flex
-      justify-content: space-between
+.trip-comments
+  padding: 0 12px 12px
