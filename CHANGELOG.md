@@ -14,8 +14,9 @@
   The trip page uses the same layout: a "Trips" sidebar with a header card
   (the trip's name, edited date and stop count, description, KMZ download and
   a Comments view) over its stops (the
-  map pages' checkin cards, each under its stop's name), with
-  numbered stop markers on the map; its Settings have no Overlay, as before.
+  map pages' checkin cards, each under its stop's name). Its map has the
+  standard Settings and Macrostrat overlay, with the stops clustered and drawn
+  as My checkins draws its checkins.
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
