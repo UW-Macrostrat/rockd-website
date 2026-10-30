@@ -1,0 +1,24 @@
+// The last word shown and the "…", kept on one line
+.truncation-end
+  white-space: nowrap
+
+// The "…" ending cut-short text: a quiet link-colored button, in the text's
+// own font and size
+.truncation-toggle
+  display: inline
+  margin: 0 0 0 0.1em
+  padding: 0 0.15em
+  border: none
+  border-radius: 3px
+  background: none
+  font: inherit
+  line-height: inherit
+  color: var(--bp-typography-color-primary-rest)
+  cursor: pointer
+
+  &:hover
+    color: var(--bp-typography-color-primary-hover)
+    background-color: color-mix(in srgb, currentColor 12%, transparent)
+
+  &:focus-visible
+    outline: 2px solid var(--bp-intent-primary-rest)

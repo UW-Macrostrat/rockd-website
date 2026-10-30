@@ -107,7 +107,7 @@ function NearbyFeed() {
   const [center, setCenter] = useAtom(centerAtom);
   return h(Feed, {
     feedType: "nearby",
-    // A page-level column, NOT the panel's `sidebar` slot: the map has to render
+    // A page-level row, NOT the panel's `sidebar` slot: the map has to render
     // whether or not the feed can load, and until a center is picked there is no
     // feed to put a sidebar on. (That was the bug — the map lived inside the
     // panel, and the panel was replaced by the "pick a center" prompt, so a
@@ -168,8 +168,8 @@ interface FeedProps {
   center?: Center | null;
   personId?: number | null;
   token?: string | null;
-  /** A page-level column beside the feed (the nearby map). Rendered whether or
-   * not the feed itself can load. */
+  /** A page-level row above the feed (the nearby map), as wide as the cards.
+   * Rendered whether or not the feed itself can load. */
   aside?: ReactNode;
   /** Rendered instead of the list, when the feed can't be fetched yet. */
   placeholder?: ReactNode;
@@ -207,11 +207,10 @@ function Feed({
   return h("div.feed-page", [
     h(ContentPageHeader, { className: "feed-header" }),
     h("div.feed-content", [
+      // Above the search, as wide as the cards' row
+      h.if(aside != null)("div.feed-aside-row", h("aside.feed-aside", aside)),
       tabsRow,
-      h("div.feed-body", [
-        h.if(aside != null)("aside.feed-aside", aside),
-        body,
-      ]),
+      h("div.feed-body", body),
     ]),
   ]);
 }

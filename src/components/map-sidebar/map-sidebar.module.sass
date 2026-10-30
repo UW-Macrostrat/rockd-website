@@ -43,6 +43,22 @@
   display: flex
   flex-direction: column
 
+// A small map of one place (`LocationMap`). The map fills it absolutely, so
+// the container sets the height.
+.location-map
+  position: relative
+  min-height: 240px
+  border-radius: 4px
+  overflow: hidden
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
+
+  .location-map-view
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+
 // Checkins picked on the map, spaced as the feed's cards are
 .selected-checkins
   display: flex

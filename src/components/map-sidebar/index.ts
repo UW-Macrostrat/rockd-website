@@ -7,3 +7,4 @@ export * from "./map-style";
 export * from "./map-points";
 export * from "./map-page";
 export * from "./checkin-map-page";
+export * from "./location-map";

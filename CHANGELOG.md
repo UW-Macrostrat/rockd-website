@@ -62,6 +62,30 @@
   facet. The search's age and lithology chips are styled on every page that
   shows the list; they had relied on the checkin page's stylesheet.
 
+- The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
+  under the header "Rockd › Checkin": the checkin's title (its notes' first
+  line) as the page heading, a long one cut short at a sentence or word with
+  a clickable "…" that shows it all (`TruncatedText`); the checkin as its
+  card shows it (byline and
+  rating, description, photo, place and counts; `checkin-card-parts`) beside
+  a "Location" card whose map of where it is matches the photo's size and
+  place (`LocationMap`: the map pages' base map, Macrostrat overlay and blue
+  pin, scrolling with the page); its observations as a grid
+  of cards (photo, then, centered, a small table of strike, dip and dip
+  direction with its compass point, Macrostrat tags, notes and location;
+  the photo page shows the same details); and its comments. Photos open the
+  photo page. It replaces the static map image and full-screen map overlay.
+
+- The photo page (`/photo/{id}`) uses the content layout ("Rockd › Photo"):
+  a "← Checkin" link back to its checkin, the checkin's title as the heading
+  (cut short if long, as on the checkin page), the photo as large
+  as fits, then previous (left), a dot per photo of the checkin — each a link,
+  the current one filled, with "3 of 11" — and next (right); the arrow keys
+  step through them too. Below, a card of what the photo shows: an
+  observation's details as on the checkin page, or, for the checkin's own
+  photo, the checkin's byline, notes, place and counts. The photo list no
+  longer test-loads every image first.
+
 - Standard page chrome shared with the Macrostrat website. A page's
   `pageStyle` config picks a layout from `~/layouts` (`home`, `content`,
   `fullscreen`). `content` pages get `SitePageHeader` — `PageHeader` from
@@ -69,8 +93,8 @@
   ending in the page's `title` (`Rockd › Section › Page`) on one row; a page's
   `headerActions` config adds header controls — and the new Macrostrat-style
   `Footer` (link lists, credits and a hydration-safe `ThemeButton`). Terms,
-  Privacy, Metrics, Organizations and the checkin page (titled by its notes)
-  use the `content` layout and the homepage
+  Privacy, Metrics, Organizations and the checkin page use the `content`
+  layout and the homepage
   the `home` layout, replacing their hand-built headers and footers; the
   Metrics "Show bar charts" switch sits in its header. Upgraded
   `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
@@ -127,8 +151,12 @@
 - Feed cards use the data-sheet masonry scroll body (responsive, up to three
   columns), so uneven card heights pack without gaps and paging doesn't reflow
   what's on screen. Cards are plain links to the checkin page; selection is off.
-- The nearby helper map sits in a page-level column beside the feed, and renders
-  before a center is chosen.
+- The nearby helper map is the site's `LocationMap` (the checkin page's: the
+  standard base map, Macrostrat overlay and blue pin), in a page-level row
+  above the search, as wide as the cards' row. A click picks the center, a
+  located center is brought into view, and it renders before a center is
+  chosen. The feed takes the page's width rather than its content's, so it
+  no longer runs off a narrow page.
 - `/dev/feed/mine` shows a non-ideal state with a login link when signed out.
 - The feed pages use the site header (`Rockd › Development › Checkin feed`) over
   their own scrolling list; the site footer is part of the feed's end-of-scroll

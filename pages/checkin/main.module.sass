@@ -1,185 +1,171 @@
-.checkin-header-content
-  display: flex
-  flex-direction: row
-  gap: 2em
-  align-items: start
+// A checkin's page, in the content layout (`ContentPage`). The summary,
+// observation and photo boxes are the checkin cards' (`checkin-card`).
 
-
-
-.location-img-container
-  flex: 1
-  height: 200px
-  position: relative
-  min-width: 200px
-
-.location-img
-  position: absolute
-  object-fit: cover
-  width: 100%
-  height: 100%
-
-.stop-header
-  display: flex
-  gap: 2em
-  align-items: start
-  cursor: pointer
-
-.profile-header
-  flex: 1
-  text-align: center
-
-  img
-    height: 100px
-    width: 100px
-    border-radius: 50%
-
-.stop-main-info
-  flex: 3
+.checkin-page
   display: flex
   flex-direction: column
-  text-align: left
+  gap: 1.5em
+  padding-bottom: 2em
 
-  h3
-    margin: 0
-
-.star
-  height: 15px
-  filter: var(--anti-img-color)
-
-.marker
-  height: 15px
-
-
-.loading
-  height: 75vh
-  padding-top: 20vh
-  text-align: center
-  background-color: var(--background-color)
+// The checkin's title, lifted out of the header
+.checkin-title
+  margin: 0
   color: var(--text-emphasized-color)
-  font-style: italic
 
-.observations
-  margin-top: 4em
-  display: flex
-  flex-wrap: wrap
-  width: 100%
+// The checkin's card beside its location card. The two share four rows —
+// header, description, photo/map, footer — so the map takes the photo's exact
+// size and place. One column, simply stacked, on a narrow screen.
+.checkin-overview
+  display: grid
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+  grid-template-rows: repeat(4, auto)
+  column-gap: 1em
 
-  .observation
-    flex: 0 0 calc(33.33% - 10px)
-    margin: 5px
-    text-align: center
-    box-shadow: 0 0 0 1px var(--card-shadow-color)
+  @media only screen and (max-width: 800px)
+    display: flex
+    flex-direction: column
+    gap: 1em
 
-    .observation-image
-      width: 100%
-      cursor: pointer
-      font-size: 0
+// Qualified to outrank Blueprint's own `.bp6-card` padding. Spacing is each
+// row's own bottom padding, so a missing description leaves no gap.
+.checkin-overview .checkin-summary, .checkin-overview .checkin-location
+  grid-row: 1 / span 4
+  display: grid
+  grid-template-rows: subgrid
+  row-gap: 0
+  padding: 0.75em 1em
 
-.close
-  position: absolute
-  top: 10px
-  left: 10px
-  z-index: 100
+  @media only screen and (max-width: 800px)
+    display: flex
+    flex-direction: column
 
-  background-color: white
+.summary-header, .location-header
+  grid-row: 1
+  padding-bottom: 0.6em
 
-  &:hover
-    background-color: grey
+.checkin-description
+  grid-row: 2
+  margin: 0
+  padding-bottom: 0.6em
+  white-space: pre-line
 
-.banner
-  position: absolute
-  top: 0
-  left: 0
-  z-index: 100
-  width: 100%
-  background-color: var(--panel-text)
-  height: 7vh
+.summary-media, .location-media
+  grid-row: 3
+  padding-bottom: 0.6em
+
+.summary-footer
+  grid-row: 4
+
+// The location card's header, level with the byline beside it
+.location-header
   display: flex
   align-items: center
+  gap: 0.4em
+  align-self: center
+  font-family: var(--header-font-family)
+  font-weight: 600
+  color: var(--text-subtle-color)
 
+.observation-grid .observation-card
+  display: flex
+  flex-direction: column
+  gap: 0.6em
+  padding: 0.75em 1em
 
-  .banner-arrow
-    margin-left: 10px
-    cursor: pointer
-    svg
-      height: 7vh
+// The photos open the photo page
+.summary-photo-link, .observation-photo-link
+  display: block
 
-  .banner-button
-    width: 100px
-    cursor: pointer
-    text-align: center
-    margin: 10px 0
-    background-color: var(--panel-background)
-    position: absolute
-    right: 15px
+// The map is square, as the photo beside it is (in the same row, at the same
+// width)
+.checkin-map, .location-map-placeholder
+  aspect-ratio: 1 / 1
+  width: 100%
+  min-height: 0
 
-.hide
-  display: none
+.location-map-placeholder
+  border-radius: 4px
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
 
-.left-arrow
-  filter: var(--anti-img-color)
-  cursor: pointer
+.checkin-section
+  display: flex
+  flex-direction: column
+  gap: 0.75em
 
-.overlay
-  .banner
-    position: sticky
-
-.observation-details
-  text-align: left
-  margin: 10px
-
-  .observation-detail
-    padding: 4px
-    border: 1px solid var(--text-emphasized-color)
-    margin: 4px
-    border-radius: 4px
-    display: inline-block
-
-  .interval
-    background-color: var(--interval-background)
-
-  .liths
-    background-color: var(--liths-background)
-
-  .notes
-    padding-top: 5px
-    padding-left: 5px
-
-.observation-header
-  padding: 10px
+.section-title
+  margin: 0
   color: var(--text-emphasized-color)
 
-.lnglat-container
-  color: var(--text-emphasized-color) !important
+// Observations: photo cards of an even width, as many as fit a row
+.observation-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr))
+  gap: 1em
+  align-items: start
 
-.back-arrow
-  filter: var(--img-color)
-  position: fixed
-  svg
-    height: 10vh
-
-.overlay-header
-  position: absolute
-  height: 10vh
-  margin-left: 20%
-
-.dark-mode-button
-  height: 5vh
-
-.error
-  height: 100vh
-  width: 100%
-  text-align: center
-  font-size: 2em
-  font-weight: 200
-  background-color: var(--panel-background-color)
-  color: var(--panel-text)
-  padding-top: 5vh
-
-.error-img
-  width: 50%
+// An observation's details (also under the photo page's photo)
+.observation-details
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 0.6em
   text-align: center
 
-.comments-container
-  width: 60%
-  margin: 0 0 2em 20%
+  // `LithologyList` right-aligns its tags; they're centered here.
+  // (data-components' class names are hashed, hence the attribute match.)
+  > [class*="tag-field"]
+    justify-content: center
+
+    // Its label slot, unused here, would still offset the first row
+    > [class*="label"]:empty
+      display: none
+
+// Strike, dip and the like: a small rounded table of captions over values
+.orientation
+  border-collapse: separate
+  border-spacing: 0
+  border: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+  border-radius: 4px
+  overflow: hidden
+  background-color: var(--panel-secondary-background-color, rgba(128, 128, 128, 0.08))
+
+  // The tags' spacing (about 3px by 7px): the caption row takes the top, the
+  // value row the bottom
+  .measure-label
+    padding: 3px 7px 0
+    text-align: center
+
+  .measure-value
+    padding: 0 7px 3px
+    text-align: center
+
+  // A hairline between the columns
+  th + th, td + td
+    border-left: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+
+.measure-label
+  font-size: 0.65em
+  font-weight: 600
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  white-space: nowrap
+  color: var(--text-subtle-color)
+
+// The card's own font, size and text color, as its tags and notes are (white
+// read heavier than the tags beside it)
+.measure-value
+  font-family: inherit
+  font-size: 1em
+  white-space: nowrap
+  color: inherit
+
+.observation-notes
+  margin: 0
+  white-space: pre-line
+
+.observation-location
+  font-size: 0.85em
+  color: var(--text-subtle-color)
+
+.comments-card
+  padding: 1em

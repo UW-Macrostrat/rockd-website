@@ -16,6 +16,7 @@ export * from "./footer";
 export * from "./theme-button";
 export * from "./navigation";
 export * from "./site-icon";
+export * from "./truncated-text";
 // `./map-sidebar` loads Mapbox through map-interface, so map pages import it
 // directly rather than every server-rendered page pulling it in from here
 
