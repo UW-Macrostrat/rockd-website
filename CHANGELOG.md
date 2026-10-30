@@ -10,7 +10,8 @@
   scrolling body. It replaces three copies of the sidebar. Settings (a gear in
   the header) is one shared `MapSettingsPanel`: Dark/Light, Satellite, Overlay
   and, on the signed-in pages, Logout, as a centered column of the same
-  outlined grey button (Logout is red: outline, text, icon and hover).
+  outlined grey button (Logout is red: outline, text, icon and hover). A
+  toggle is shaded only while it's on: Dark only in dark mode.
   The trip page uses the same layout: a "Trips" sidebar with a header card
   (the trip's name, edited date and stop count, description, KMZ download and
   a Comments view) over its stops (the

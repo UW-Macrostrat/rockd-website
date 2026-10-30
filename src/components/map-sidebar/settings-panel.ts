@@ -1,5 +1,5 @@
 import { Button, type IconName } from "@blueprintjs/core";
-import { DarkModeButton } from "@macrostrat/ui-components";
+import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
 import classNames from "classnames";
 import h from "./settings-panel.module.sass";
 
@@ -24,9 +24,14 @@ export function MapSettingsPanel({
   onToggleOverlay,
   onLogout,
 }: MapSettingsPanelProps) {
+  // `DarkModeButton` stays active whenever a theme was picked by hand, Light
+  // included; like the other toggles, it's active only while dark mode is on
+  const inDarkMode = useDarkMode()?.isEnabled ?? false;
+
   return h("div.map-settings", [
     h(DarkModeButton, {
       className: "settings-button",
+      active: inDarkMode,
       outlined: true,
       showText: true,
       allowReset: true,
