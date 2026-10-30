@@ -1,345 +1,164 @@
-import { LngLatCoords } from "@macrostrat/data-components";
-import { useState } from "react";
+import { Card, Icon } from "@blueprintjs/core";
+import hyper from "@macrostrat/hyper";
+import { type ComponentType, useEffect, useState } from "react";
+import { Comments, getImageUrl, TruncatedText } from "~/components";
 import {
-  BlankImage,
-  Footer,
-  getProfilePicUrl,
-  getImageUrl,
-  Comments,
-  RockdSiteIcon,
-} from "~/components";
-import { Icon, Divider, H2 } from "@blueprintjs/core";
-import h from "./main.module.sass";
-import { SETTINGS, macrostratApiURL } from "~/settings";
-import "@macrostrat/style-system";
-import { Overlay2 } from "@blueprintjs/core";
-import { LithologyList } from "@macrostrat/data-components";
-import { ClientOnly } from "vike-react/ClientOnly";
+  CheckinFooter,
+  PersonByline,
+  Rating,
+  ReservedImage,
+} from "~/components/checkin-feed/checkin-card-parts";
 import { ContentPage } from "~/layouts";
 import "@macrostrat/data-components/dist/data-components.css";
+import {
+  hasObservationContent,
+  ObservationCard,
+  ObservationDetails,
+} from "./observation";
+import styles from "./main.module.sass";
 
-function Map(props) {
-  return h(
-    ClientOnly,
-    {
-      load: () => import("./map.client").then((d) => d.MapContainer),
-      fallback: h("div.loading", "Loading map..."),
-    },
-    (component) => h(component, props)
-  );
-}
+const h = hyper.styled(styles);
 
+export { ObservationDetails };
+
+/**
+ * A checkin's page, under the site header ("Rockd › Checkin"): its title,
+ * then the checkin as the cards show it (who and when, rating, description,
+ * photo, place and counts) beside a map of where it is, its observations as
+ * cards, and its comments.
+ */
 export function Checkins({ checkin, comments }) {
   if (checkin === undefined) {
-    return h("div", [
-      h(ContentPage, [
-        h("h2", "Checkin not found"),
-        h(Divider),
-        h("p", "This checkin does not exist or has been deleted."),
-      ]),
-      h(Footer),
+    return h(ContentPage, { title: "Checkin" }, [
+      h("p", "This checkin does not exist or has been deleted."),
     ]);
   }
-  const center = {
-    lat: checkin.lat,
-    lng: checkin.lng,
-  };
 
-  let profile_pic = h(
-    "div.profile-header",
-    h(BlankImage, {
-      src: getProfilePicUrl(checkin.person_id),
-      className: "profile-picture",
-    })
-  );
+  const { title, description } = splitNotes(checkin.notes);
+  const observations = checkin.observations.filter(hasObservationContent);
 
-  // format rating
-  let ratingArr = [];
-  for (var i = 0; i < checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, { className: "star", icon: "star", style: { color: "white" } })
-    );
-  }
-  for (var i = 0; i < 5 - checkin.rating; i++) {
-    ratingArr.push(
-      h(Icon, {
-        className: "star",
-        icon: "star-empty",
-        style: { color: "white" },
+  return h(ContentPage, { title: "Checkin" }, [
+    h("div.checkin-page", [
+      // A long title is cut short, with a "…" that shows it all
+      h("h1.checkin-title", h(TruncatedText, { text: title })),
+      // The two cards share rows, so the map matches the photo's size and place
+      h("div.checkin-overview", [
+        h(CheckinSummary, { checkin, description }),
+        h(Card, { className: "checkin-location" }, [
+          h("div.location-header", [
+            h(Icon, { icon: "map-marker", size: 14 }),
+            h("span", "Location"),
+          ]),
+          h(
+            "div.location-media",
+            h(LocationMap, {
+              position: { lng: checkin.lng, lat: checkin.lat },
+            })
+          ),
+        ]),
+      ]),
+      h.if(observations.length > 0)("section.checkin-section", [
+        h("h2.section-title", `Observations (${observations.length})`),
+        h(
+          "div.observation-grid",
+          observations.map((observation) =>
+            h(ObservationCard, {
+              key: observation.obs_id,
+              observation,
+              personId: checkin.person_id,
+            })
+          )
+        ),
+      ]),
+      h.if(comments?.length > 0)("section.checkin-section", [
+        h("h2.section-title", `Comments (${comments?.length})`),
+        h(Card, { className: "comments-card" }, h(Comments, { comments })),
+      ]),
+    ]),
+  ]);
+}
+
+/** The checkin as its card shows it — byline and rating, then its
+ * description and photo (opening the photo page), then its place and counts —
+ * with the title lifted out to the page's heading. */
+function CheckinSummary({ checkin, description }) {
+  let photo = null;
+  if (checkin.photo != null) {
+    photo = h(
+      "a.summary-photo-link",
+      { href: `/photo/${checkin.photo}` },
+      h(ReservedImage, {
+        className: "checkin-photo",
+        src: getImageUrl(checkin.person_id, checkin.photo),
+        alt: checkin.notes ?? "Checkin photo",
       })
     );
   }
 
-  // get observations
-  let observations = [];
+  // Each piece in its own row of the overview's shared rows
+  return h(Card, { className: "checkin-summary" }, [
+    h(
+      "div.summary-header",
+      h(
+        PersonByline,
+        {
+          personId: checkin.person_id,
+          name: `${checkin.first_name} ${checkin.last_name}`,
+          date: checkin.created,
+        },
+        h(Rating, { value: checkin.rating })
+      )
+    ),
+    h.if(description != null)("p.checkin-description", description),
+    h.if(photo != null)("div.summary-media", photo),
+    h("div.summary-footer", h(CheckinFooter, { data: checkin })),
+  ]);
+}
 
-  // add checkin photo and notes
-  const imageSrc = getImageUrl(checkin.person_id, checkin.photo);
-  const headerBody = h("h4.observation-header", checkin.notes);
+/** Where the checkin is: the map pages' map, loaded in the browser only (a
+ * placeholder holds its place until then, and on the server) */
+function LocationMap(props: { position: { lng: number; lat: number } }) {
+  const Map = useBrowserComponent(loadLocationMap);
+  if (Map == null) return h("div.location-map-placeholder");
+  return h(Map, { ...props, className: "checkin-map" });
+}
 
-  observations.push(
-    h.if(checkin.photo || checkin.notes)("div", { className: "observation" }, [
-      h.if(checkin.photo)(
-        "a",
-        { href: "/photo/" + checkin.photo },
-        h(BlankImage, {
-          className: "observation-image",
-          src: imageSrc,
-          alt: "presentation",
-        })
-      ),
-      h("div.observation-body", headerBody),
-    ])
+const loadLocationMap = () =>
+  import("~/components/map-sidebar/location-map").then(
+    (module) => module.LocationMap
   );
 
-  // add observations
-  checkin.observations.forEach((observation) => {
-    // if photo exists
-    const imageSrc = getImageUrl(checkin.person_id, observation.photo);
+/** A component loaded once the page is in the browser; null until then.
+ * (vike-react's `ClientOnly` relies on its JSX children being stripped from
+ * the server build, which hyperscript children aren't.) */
+function useBrowserComponent<P>(
+  load: () => Promise<ComponentType<P>>
+): ComponentType<P> | null {
+  const [component, setComponent] = useState<ComponentType<P> | null>(null);
 
-    observations.push(
-      h.if(
-        observation.photo ||
-          observation.lat ||
-          observation.lng ||
-          !objectNull(observation.fossils) ||
-          !objectNull(observation.minerals) ||
-          !objectNull(observation.rocks)
-      )("div.observation", [
-        h.if(observation.photo)(
-          "a",
-          { href: "/photo/" + observation.photo },
-          h(BlankImage, { className: "observation-image", src: imageSrc })
-        ),
-        h(ObservationFooter, { observation }),
-      ])
-    );
-  });
+  useEffect(() => {
+    let cancelled = false;
+    load().then((loaded) => {
+      if (!cancelled) setComponent(() => loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [load]);
 
-  let LngLatProps = {
-    position: {
-      lat: checkin.lat,
-      lng: checkin.lng,
-    },
-    precision: 3,
-    zoom: 10,
-  };
-
-  return h("div.container", [
-    h("div.content-area", [
-      h("div", { className: "main" }, [
-        h("div", { className: "checkin-head" }, [
-          h("div.title-area", [
-            h(RockdSiteIcon, { className: "site-icon" }),
-            h("h1", checkin.notes),
-          ]),
-        ]),
-        h(Overlay, {
-          checkin,
-          center,
-          LngLatProps,
-          ratingArr,
-          profile_pic,
-        }),
-        h("div", { className: "observations" }, observations),
-      ]),
-      h.if(comments?.length > 0)("div.comments-container", [
-        h("h2", "Comments"),
-        h(Divider),
-        h(Comments, { comments }),
-      ]),
-      h(Footer),
-    ]),
-  ]);
+  return component;
 }
 
-function Overlay({ checkin, center, LngLatProps, ratingArr, profile_pic }) {
-  const [overlayOpen, setOverlayOpen] = useState(false);
-  const map = h(Map, { center, setOverlayOpen });
-
-  return h("div.overlay", [
-    h.if(!overlayOpen)("div.checkin-header-content", [
-      h("div", [
-        h(
-          "div.stop-header",
-          {
-            onClick: () => {
-              setOverlayOpen(true);
-            },
-          },
-          [
-            profile_pic,
-            h("div.stop-main-info", [
-              h(
-                "h3",
-                { className: "name" },
-                checkin.first_name + " " + checkin.last_name
-              ),
-              h("h4", { className: "edited" }, checkin.created),
-              h("p.location", "Near " + checkin.near),
-              LngLatCoords(LngLatProps),
-              h("h3", { className: "rating" }, ratingArr),
-            ]),
-          ]
-        ),
-      ]),
-      h(
-        "div.location-img-container",
-        h(BlankImage, {
-          className: "location-img",
-          src:
-            "https://api.mapbox.com/styles/v1/jczaplewski/cje04mr9l3mo82spihpralr4i/static/geojson(%7B%22type%22%3A%22Point%22%2C%22coordinates%22%3A%5B" +
-            checkin.lng +
-            "%2C" +
-            checkin.lat +
-            "%5D%7D)/" +
-            checkin.lng +
-            "," +
-            checkin.lat +
-            ",5,0/800x400?access_token=" +
-            SETTINGS.mapboxAccessToken,
-        })
-      ),
-    ]),
-    h(
-      Overlay2,
-      {
-        isOpen: overlayOpen,
-        onClose: () => setOverlayOpen(false),
-        className: "map",
-        usePortal: true,
-        canEscapeKeyClose: true,
-        canOutsideClickClose: true,
-        hasBackdrop: false,
-      },
-      map
-    ),
-  ]);
-}
-
-export function ObservationFooter({ observation }) {
-  const LngLatProps = {
-    position: {
-      lat: observation.lat,
-      lng: observation.lng,
-    },
-    precision: 3,
-    zoom: 10,
-  };
-
-  const rocks = observation.rocks;
-
-  // get liths
-  let liths = [];
-  for (var j = 0; j < rocks?.liths?.length; j++) {
-    liths.push(
-      h("p", { className: "observation-detail liths" }, rocks.liths[j].name)
-    );
-  }
-
-  function rgbaStringToHex(rgba: string): string {
-    // Split the input string by commas and trim whitespace
-    const values = rgba.split(",").map((value) => value.trim());
-
-    // Extract r, g, b values and ignore alpha
-    const r = parseInt(values[0], 10);
-    const g = parseInt(values[1], 10);
-    const b = parseInt(values[2], 10);
-
-    // Convert r, g, b to two-digit hex values
-    const red = r.toString(16).padStart(2, "0");
-    const green = g.toString(16).padStart(2, "0");
-    const blue = b.toString(16).padStart(2, "0");
-
-    // Return the HEX string without alpha
-    return `#${red}${green}${blue}`;
-  }
-
-  let lithologies = [];
-  rocks.liths?.forEach((lith) => {
-    if (!lith.color.includes("#")) {
-      lithologies.push({
-        ...lith,
-        color: rgbaStringToHex(lith.color),
-      });
-    } else {
-      lithologies.push(lith);
-    }
-  });
-
-  if (rocks.interval?.name) {
-    lithologies.push({
-      name: rocks.interval.name,
-      int_id: rocks.interval.int_id,
-      color: rocks.interval.color.includes("#")
-        ? rocks.interval.color
-        : `rgba(${rocks.interval.color})`,
-    });
-  }
-
-  if (rocks.strat_name?.strat_name_long) {
-    lithologies.push({
-      name: rocks.strat_name?.strat_name_long,
-      strat_name_id: rocks.strat_name?.strat_name_id,
-    });
-  }
-
-  if (rocks.map_unit?.unit_name) {
-    lithologies.push({
-      name: rocks.map_unit?.unit_name,
-      unit_id: rocks.map_unit?.unit_id,
-    });
-  }
-
-  if (observation.orientation.feature?.name) {
-    lithologies.push({
-      name: observation.orientation.feature?.name,
-      // Add an arbitrary ID to allow rendering
-      int_id: -1,
-    });
-  }
-
-  const show =
-    lithologies.length > 0 ||
-    (rocks?.notes?.length > 0 &&
-      observation.lat &&
-      rocks.strat_name?.strat_name_long);
-
-  const handleClick = (e, data) => {
-    if (data.int_id) {
-      window.open(macrostratApiURL + `/lex/intervals/${data.int_id}`, "_blank");
-    }
-    if (data.strat_name_id) {
-      window.open(
-        macrostratApiURL + `/lex/strat-names/${data.strat_name_id}`,
-        "_blank"
-      );
-    }
-    if (data.lith_id) {
-      window.open(
-        macrostratApiURL + `/lex/lithology/${data.lith_id}`,
-        "_blank"
-      );
-    }
-  };
-
-  console.log("Rocks data:", lithologies);
-
-  // observation body
-  return h.if(show)("div", { className: "observation-body" }, [
-    observation.lat && rocks.strat_name?.strat_name_long
-      ? h("h4", { className: "observation-header" }, [
-          rocks.strat_name?.strat_name_long,
-          observation.lat ? LngLatCoords(LngLatProps) : null,
-        ])
-      : null,
-    h("div", { className: "observation-details" }, [
-      h(LithologyList, { lithologies, onClickItem: handleClick }),
-      h("p", { className: "notes" }, rocks.notes),
-    ]),
-  ]);
-}
-
-function objectNull(obj) {
-  return Object.keys(obj).length === 0 && obj.constructor === Object;
+/** A checkin's notes as a title (the first line) and a description (the
+ * rest), since the one field carries both */
+function splitNotes(notes: string | null): {
+  title: string;
+  description: string | null;
+} {
+  const [first, ...rest] = (notes ?? "").trim().split(/\n+/);
+  let title = first?.trim();
+  if (!title) title = "Untitled checkin";
+  let description: string | null = rest.join("\n").trim();
+  if (description === "") description = null;
+  return { title, description };
 }

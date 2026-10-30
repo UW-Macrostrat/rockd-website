@@ -13,7 +13,6 @@ import {
 import hyper from "@macrostrat/hyper";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import { Footer, RockdSiteIcon } from "~/components";
 import { atomWithSearchParam, locationAtom } from "~/_utils/url-atoms";
 import {
   safeExternalURL,
@@ -253,19 +252,15 @@ export function OrganizationDirectory() {
   }
 
   return h("div.organizations-page", [
-    h("header.organizations-header", [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("div.header-title", [
-        h("h1", "Organizations"),
-        h("p", "Discover groups sharing geological checkins in Rockd."),
-      ]),
-      h(
-        AnchorButton,
-        { href: "/organizations/new", intent: "primary", icon: "add" },
-        "New organization"
-      ),
-    ]),
     h("main.organizations-main", [
+      h("h1.directory-title", "Organizations"),
+      h("div.directory-intro-row", [
+        h(
+          "p.directory-intro",
+          "Discover groups sharing geological checkins in Rockd."
+        ),
+        h(NewOrganizationButton),
+      ]),
       notice,
       h(
         "section.directory-controls",
@@ -318,6 +313,15 @@ export function OrganizationDirectory() {
       h("p.result-count", { "aria-live": "polite" }, resultCount),
       body,
     ]),
-    h(Footer),
   ]);
+}
+
+/** The directory's call to action, beside its introduction (under the site
+ * header's account button). */
+export function NewOrganizationButton() {
+  return h(
+    AnchorButton,
+    { href: "/orgs/new", intent: "primary", icon: "add" },
+    "New organization"
+  );
 }

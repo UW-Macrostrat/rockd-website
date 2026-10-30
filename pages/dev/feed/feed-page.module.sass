@@ -10,23 +10,13 @@
   --feed-card-width: 21em
   --feed-header-width: 68em
 
-.feed-header
-  display: flex
-  flex-direction: row
-  align-items: center
-  gap: 0.75em
-  padding: 0.75em 1em
-  width: 100%
-  max-width: var(--feed-header-width)
-  margin: 0 auto
-
-  .site-icon img
-    height: 2em
-    display: block
-
-  .page-title
-    margin: 0
-    font-size: 1.4em
+// The site's content-page header, spaced as a content page spaces it (the
+// layout is fullscreen, so the list can scroll on its own)
+.feed-page header.feed-header
+  margin-top: 2em
+  flex-shrink: 0
+  @media only screen and (max-width: 900px)
+    --page-header-padding-x: 1em
 
 .feed-content
   display: flex
@@ -37,44 +27,48 @@
 
   // The tab strip is centered at the header width; the body spans the page so
   // the panel's scrollbar sits at the viewport edge.
-  > *:not(.feed-body)
+  > *:not(.feed-body, .feed-aside-row)
     width: 100%
     max-width: var(--feed-header-width)
     margin: 0 auto
     padding: 0 1em
 
-// Optional aside (the nearby map) beside the feed. A page-level column rather
-// than the panel's sidebar, so it renders even when the feed can't.
 .feed-body
   display: flex
   flex-direction: row
   flex: 1 1 auto
   min-height: 0
-  gap: 1em
   padding: 0 1em
 
-.feed-aside
-  flex: 0 0 320px
-  min-width: 0
-  overflow-y: auto
-  padding-bottom: 1em
-
-  @media only screen and (max-width: 800px)
-    display: none
-
-.feed-tabs
-  align-self: center
-
-.data-panel-container
-  position: relative
-  display: flex
-  flex-direction: column
+// The feed takes the page's width, not its content's full width
+.feed-body > *
   flex: 1 1 auto
-  min-height: 0
-  width: 100%
+  min-width: 0
 
+// The optional aside (the nearby map) above the feed. A page-level row rather
+// than the panel's sidebar, so it renders even when the feed can't. Its
+// spacing copies the list's below it — the page padding, the panel's own
+// padding, and the room its scrollbar takes (none, with overlay scrollbars) —
+// so the aside lines up with the cards' row.
+.feed-aside-row
+  flex-shrink: 0
+  padding: 0 calc(1em + var(--data-panel-content-padding, 12px))
+  overflow: hidden
+  scrollbar-gutter: stable
+
+.feed-aside
+  max-width: var(--feed-content-width)
+  margin: 0 auto
+
+// Without a feed (a prompt in its place), the tabs' own row, right-aligned
+.feed-tabs-row
+  display: flex
+  justify-content: flex-end
+
+// The list's width: capped at the content width, and at what the panel has
+// (less, on a narrow screen)
 .feed-panel
-  --data-panel-content-width: var(--feed-content-width) !important
+  --data-panel-content-width: min(var(--feed-content-width), 100%) !important
   --data-panel-item-gap: 12px
 
 
@@ -85,14 +79,6 @@
   gap: 1.5em
   width: 100%
   padding: 1em 0 2em
-
-.load-progress
-  display: flex
-  flex-direction: column
-  align-items: center
-  justify-content: center
-  gap: 0.75em
-  min-height: 80px
 
 .page-footer
   width: 100%

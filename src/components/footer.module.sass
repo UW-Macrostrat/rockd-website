@@ -1,0 +1,133 @@
+// Adapted from the Macrostrat web footer, so the two sites share one pattern
+.footer
+  border-top: 1px solid var(--pz-panel-rule-color)
+  padding: 4em var(--pz-content-padding, 2em) 2em
+  margin-top: 2em
+  line-height: 2em
+  color: var(--pz-secondary-color)
+  container-type: inline-size
+  --filter: grayscale(100%)
+
+  h4
+    color: var(--pz-secondary-color)
+    font-weight: 200
+    font-size: 1rem
+    margin: 0
+
+  a:hover
+    text-decoration: none
+    color: var(--pz-text-color)
+
+  // The link lists wrap rather than squeeze as the footer narrows, and the
+  // logo shrinks with it
+  .footer-inner
+    max-width: var(--pz-content-width)
+    margin: 0 auto
+    display: flex
+    flex-direction: row
+    flex-wrap: wrap
+    align-items: baseline
+    gap: 1.5rem 1rem
+    justify-content: space-between
+    &>*
+      flex: 1 1 8rem
+
+  .nav-link-list
+    margin: 0.2em 0 1em
+    :global(.bp6-button.bp6-minimal)
+      font-family: var(--pz-body-font)
+      // A `<button>` (the theme toggle) doesn't inherit line height as the
+      // link `<a>`s do, which left its row shorter than the rest
+      line-height: inherit
+      --button-color: var(--pz-secondary-color)
+      color: var(--button-color)
+      :global(.bp6-icon):not([class*="bp6-intent-"])
+        color: var(--button-color)
+
+      &:hover
+        --button-color: var(--pz-text-color)
+
+.homepage-link
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 0.5em
+  flex: 0
+  h3
+    margin: 0
+    color: var(--pz-secondary-color)
+
+  &:hover
+    h3
+      color: var(--pz-text-color)
+    .footer-logo
+      filter: unset
+      opacity: 1
+
+  .footer-logo
+    --logo-size: clamp(48px, 12cqi, 100px)
+    width: var(--logo-size)
+    aspect-ratio: 1/1
+    // The icon file has a transparent border (25px of its 256px at the top);
+    // pull it up so the artwork sits right under the name, as Macrostrat's does
+    margin-top: calc(var(--logo-size) * -25 / 256)
+    filter: var(--filter)
+    opacity: 0.5
+
+.nav-link-list
+  padding-left: 0
+  list-style: none
+
+// Columns are left-aligned, the heading inset by the link buttons' own
+// padding so it lines up with the icons beneath it
+.link-list-container
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  justify-content: space-between
+  flex-grow: 1
+
+  .link-list-title
+    padding-left: 8px
+
+.footer-credits
+  max-width: var(--pz-content-width)
+  margin: 1em auto 0
+  text-align: center
+  font-size: var(--pz-font-size-sm, 0.875rem)
+  line-height: 1.5em
+  color: var(--pz-text-subtle-color)
+
+  a
+    color: inherit
+    text-decoration: underline
+
+// Narrow footers: the name and logo (name still above) span a row of their own
+// and the lists sit two to a row beneath, set smaller and closer
+@container (max-width: 48rem)
+  .footer .footer-inner
+    display: grid
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+    align-items: start
+    gap: 1rem
+    font-size: var(--pz-font-size-sm, 0.875rem)
+    line-height: 1.5em
+
+  .homepage-link
+    grid-column: 1 / -1
+
+    .footer-logo
+      --logo-size: 40px
+
+  .footer .nav-link-list
+    margin: 0.2em 0 0.5em
+
+    :global(.bp6-button)
+      min-height: 24px
+      padding-top: 2px
+      padding-bottom: 2px
+      font-size: inherit
+
+@container (max-width: 18rem)
+  .footer .footer-inner
+    grid-template-columns: minmax(0, 1fr)

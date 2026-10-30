@@ -2,10 +2,10 @@ import { useState, createElement } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ReactECharts from "echarts-for-react";
-import { Footer } from "~/components";
 import styles from "./main.module.sass";
 import { useData } from "vike-react/useData";
-import { Switch } from "@blueprintjs/core";
+import { useAtomValue } from "jotai";
+import { showBarAtom } from "./chart-type";
 
 function h(type: any, propsOrChildren?: any, ...children: any[]) {
   /**
@@ -58,7 +58,8 @@ export function Page() {
   const [checkinBound, setCheckin] = useState([lower, upper]);
   const [signupBound, setSignup] = useState([lower, upper]);
   const [activeBound, setActive] = useState([lower, upper]);
-  const [showBar, setShowBar] = useState(false);
+  // Toggled by the switch in the site header
+  const showBar = useAtomValue(showBarAtom);
 
   // Fetch the data injected by from the api/v2/metrics/ api
   const { data } = useData();
@@ -251,14 +252,7 @@ export function Page() {
   }
 
   return h("div", { className: styles.container }, [
-    h(Switch, {
-      className: styles.switch,
-      checked: showBar,
-      label: "Show bar charts",
-      onChange: () => setShowBar(!showBar),
-    }),
     h("div", { className: styles.metrics }, [
-      h("div", null, [h("h1", "Metrics")]),
       h("div", { className: styles.summary }, [
         h("div", null, [
           h("h2", "Total Users"),
@@ -354,7 +348,6 @@ export function Page() {
         ]),
       ]),
     ]),
-    h(Footer),
   ]);
 }
 

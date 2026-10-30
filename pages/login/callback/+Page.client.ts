@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 import { Callout, Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { saveRockdAuth } from "../rockd-auth";
+import { saveRockdAuth } from "~/components/auth";
 
 /**
  * Lands here after the Rockd API completes an OAuth flow and redirects with
@@ -53,7 +53,7 @@ export function Page() {
       person: { person_id: claims.person_id },
     } as any);
 
-    window.location.replace("/my_checkins");
+    window.location.replace("/my-checkins");
   }, []);
 
   if (error != null) {

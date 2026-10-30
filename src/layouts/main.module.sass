@@ -1,4 +1,3 @@
-
 .fit-viewport
   position: fixed
   width: 100vw
@@ -7,21 +6,37 @@
   left: 0
 
 .content-page
-  margin: 2em auto 3em
-  max-width: 78em
-  padding: 0 4em
-  @media only screen and (max-width: 900px)
-    padding: 0 1em
+  padding: 2em 0 0
+  display: flex
+  flex-direction: column
+  min-height: 100vh
 
+  // Spans the page; its content takes the column's gutter on a narrow screen.
+  // The extra class outranks the site header's own zero gutter.
+  header.content-page-header
+    padding-top: 0
+    @media only screen and (max-width: 900px)
+      --page-header-padding-x: 1em
 
   .centered
-    min-height: 100vh
     margin: auto
     text-align: center
 
+.content-page-inner
+  width: 100%
+  max-width: var(--pz-content-width)
+  box-sizing: border-box
+  display: flex
+  flex-direction: column
+  position: relative
+  margin: 0 auto
+  flex-grow: 1
+  @media only screen and (max-width: 900px)
+    padding: 0 1em
 
-.fullscreen-page
-  padding: 1em 4em 3em
+  .main
+    flex-grow: 1
+    margin-bottom: 2em
 
 .page-transition
   position: fixed

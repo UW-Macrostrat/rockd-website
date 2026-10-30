@@ -315,7 +315,7 @@ export function OrganizationForm({
       h("div.form-actions", [
         h(
           AnchorButton,
-          { href: "/organizations", disabled: submitting },
+          { href: "/orgs", disabled: submitting },
           "Cancel"
         ),
         h(

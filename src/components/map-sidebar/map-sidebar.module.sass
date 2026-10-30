@@ -1,0 +1,67 @@
+// map-interface sizes its sidebar from these variables (its own classes are
+// scoped to the package, so they're the supported way in)
+.map-sidebar-layout
+  --map-context-stack-width: max(30vw, 420px)
+  --map-context-stack-max-width: none
+
+.map-sidebar-header
+  .sidebar-title
+    display: flex
+    align-items: center
+    gap: 0.5em
+    min-width: 0
+
+  .site-icon
+    display: flex
+    flex-shrink: 0
+
+    img
+      width: 36px
+      height: 36px
+
+  .page-title
+    margin: 0
+    font-size: var(--pz-font-size-xl, 1.25rem)
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+  .tools
+    display: flex
+    align-items: center
+    gap: 0.25em
+
+// The body fills the sidebar's width and scrolls within the height the map
+// leaves it. Qualified to outrank map-interface's `.panel-card`, which hides
+// overflow.
+.map-sidebar-layout .map-sidebar-panel
+  flex: 1
+  min-width: 0
+  overflow-y: auto
+  max-height: 100%
+  // A list that scrolls itself (`MapCheckinFeed`) fills this height instead
+  display: flex
+  flex-direction: column
+
+// A small map of one place (`LocationMap`). The map fills it absolutely, so
+// the container sets the height.
+.location-map
+  position: relative
+  min-height: 240px
+  border-radius: 4px
+  overflow: hidden
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
+
+  .location-map-view
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+
+// Checkins picked on the map, spaced as the feed's cards are
+.selected-checkins
+  display: flex
+  flex-direction: column
+  gap: 12px
+  padding: 0 8px 8px

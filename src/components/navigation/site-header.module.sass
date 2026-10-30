@@ -1,0 +1,26 @@
+// Content pages centre the header on the column (`width: "constrained"`), so
+// it adds no gutter of its own. Element-qualified so it outranks the
+// library's own default on the same element.
+header.site-page-header
+  --page-header-padding-x: 0px
+  // Macrostrat's trail proportions: a smaller mark beside larger crumbs
+  --page-header-logo-size: 1.5rem
+  // Macrostrat's crumb size; Rockd's own `--pz-font-size-lg` resolves larger
+  --page-header-crumb-font-size: 1.05rem
+  --page-header-title-font: var(--header-font-family)
+  --page-header-title-spacing: var(--pz-space-4)
+  // Rockd's own page background, so the sticky bar matches the page
+  --page-header-background: var(--background)
+
+.site-logo
+  display: flex
+  width: 100%
+  height: 100%
+
+  img
+    width: 100%
+    height: 100%
+    // The icon file has a transparent border (about 210px of artwork on its
+    // 256px canvas); enlarge it so the artwork fills the logo box, as
+    // Macrostrat's mark does
+    scale: calc(256 / 210)

@@ -21,44 +21,24 @@
  */
 import {
   AnchorButton,
-  Button,
   ButtonGroup,
   NonIdealState,
   Spinner,
 } from "@blueprintjs/core";
-import {
-  createMasonryScrollBody,
-  DataPanel,
-  DataPanelToolbarStyle,
-  LoadProgressIndicator,
-  SelectionInteractionStyle,
-  useLoadControls,
-} from "@macrostrat/data-sheet";
-import "@macrostrat/data-sheet/dist/data-sheet.css";
-import hyper from "@macrostrat/hyper";
+import { createMasonryScrollBody } from "@macrostrat/data-sheet";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { Footer, RockdSiteIcon } from "~/components";
+import type { ReactNode } from "react";
+import { Footer } from "~/components";
+import { ContentPageHeader } from "~/layouts";
 import {
-  initialViewStateFromURL,
-  ViewStateURLSync,
-} from "~/_utils/data-view-url-state";
+  CheckinFeedPanel,
+  FeedLoadProgress,
+  type FeedType,
+} from "~/components/checkin-feed";
 import { locationAtom } from "~/_utils/url-atoms";
-import { getStoredRockdAuth } from "../../login/rockd-auth";
+import { useStoredRockdAuth } from "~/components/auth";
 import { type Center, NearbyMap } from "./nearby-map";
-import { createCheckinProvider, type FeedType } from "./checkin-provider";
-import { CheckinCard } from "./checkin-card";
-import { columnSpec, tableFilters, urlBindings } from "./view-config";
-import { omniFilterAction } from "./semantic/omni-filter";
 import h from "./feed-page.module.sass";
-
-/** Rows per window. Each costs `PAGE_SIZE / 5` requests, since the API pages by
- * fives — so this trades requests for scrolling feel. */
-const PAGE_SIZE = 20;
-/** Windows auto-loaded before the footer's "Load more" takes over. Deliberately
- * small: scrolling forever is how you lose your place, and narrowing the search
- * is the better way to reach something deep. The checkpoint is the point. */
-const AUTO_LOAD_PAGES = 3;
 
 /**
  * Checkin cards are variable-height — a photo, a long note, or neither — so the
@@ -127,7 +107,7 @@ function NearbyFeed() {
   const [center, setCenter] = useAtom(centerAtom);
   return h(Feed, {
     feedType: "nearby",
-    // A page-level column, NOT the panel's `sidebar` slot: the map has to render
+    // A page-level row, NOT the panel's `sidebar` slot: the map has to render
     // whether or not the feed can load, and until a center is picked there is no
     // feed to put a sidebar on. (That was the bug — the map lived inside the
     // panel, and the panel was replaced by the "pick a center" prompt, so a
@@ -171,25 +151,14 @@ function MineFeed() {
   });
 }
 
-/** The Rockd JWT + person the login flow leaves in `localStorage`. Read in an
- * effect because it isn't available during a server render. */
+/** The Rockd JWT + person the login flow leaves in `localStorage`. */
 function useStoredAuth() {
-  const [auth, setAuth] = useState<{
-    checked: boolean;
-    personId: number | null;
-    token: string | null;
-  }>({ checked: false, personId: null, token: null });
-
-  useEffect(() => {
-    const stored = getStoredRockdAuth();
-    setAuth({
-      checked: true,
-      personId: stored?.person?.person_id ?? null,
-      token: stored?.token ?? stored?.person?.token ?? null,
-    });
-  }, []);
-
-  return auth;
+  const { checked, auth } = useStoredRockdAuth();
+  return {
+    checked,
+    personId: auth?.person?.person_id ?? null,
+    token: auth?.token ?? auth?.person?.token ?? null,
+  };
 }
 
 // ---- The shell ----
@@ -199,8 +168,8 @@ interface FeedProps {
   center?: Center | null;
   personId?: number | null;
   token?: string | null;
-  /** A page-level column beside the feed (the nearby map). Rendered whether or
-   * not the feed itself can load. */
+  /** A page-level row above the feed (the nearby map), as wide as the cards.
+   * Rendered whether or not the feed itself can load. */
   aside?: ReactNode;
   /** Rendered instead of the list, when the feed can't be fetched yet. */
   placeholder?: ReactNode;
@@ -214,73 +183,34 @@ function Feed({
   aside = null,
   placeholder = null,
 }: FeedProps) {
-  const provider = useMemo(
-    () => createCheckinProvider({ feedType, center, personId, token }),
-    [feedType, center?.lng, center?.lat, personId, token]
-  );
+  const tabs = h(FeedTabs, { feedType });
 
-  // The panel resets on a view-state change or a `refreshToken` change, not on
-  // a provider swap — so the provider's own inputs have to be announced here.
-  const refreshToken = `${feedType}:${center?.lng ?? ""},${center?.lat ?? ""}:${
-    personId ?? ""
-  }`;
-
-  // A linked view (`?q=…&sort=…`) is applied when the store is created, so the
-  // first request is the right one rather than an unfiltered one immediately
-  // superseded. `ViewStateURLSync` keeps the two in step from there.
-  const { initialFilters, initialSorts } = initialViewStateFromURL(urlBindings);
-
+  // The tabs sit at the right end of the feed's search row; with no feed yet
+  // (a prompt instead), they keep a row of their own, right-aligned the same
   let body = placeholder;
+  let tabsRow = h("div.feed-tabs-row", tabs);
   if (body == null) {
-    body = h(
-      "div.data-panel-container",
-      h(DataPanel, {
-        provider,
-        refreshToken,
-        itemComponent: CheckinCard,
-        // Cards are small and of uneven height; several fit a row once the page
-        // is wide.
-        scrollBody: CardMasonry,
-        // The entire filter surface: search, facets and the applied tags in one
-        // control. Passed as an action so it sits left of Sort; `filters: []`
-        // keeps the built-in Filter menu out of the way.
-        actions: [omniFilterAction],
-        // A checkin card is a link to its own page, nothing more — the cards
-        // renderer enables selection by default, which added a selectable
-        // affordance with no action behind it.
-        enableSelection: SelectionInteractionStyle.NEVER,
-        columnSpec,
-        filters: tableFilters,
-        initialFilters,
-        initialSorts,
-        pageSize: PAGE_SIZE,
-        autoLoadPages: AUTO_LOAD_PAGES,
-        className: "feed-panel",
-        // The counter is folded into the inline footer.
-        statusBar: false,
-        toolbarStyle: DataPanelToolbarStyle.FLOATING,
-        contentFooter: h(FeedFooter),
-        // Typing shouldn't fire a request per keystroke; the input stays
-        // instant, only the fetch waits for the view to settle.
-        filterDebounce: 300,
-        itemLabel: "checkin",
-        name: "Checkins",
-        children: h(ViewStateURLSync, { bindings: urlBindings }),
-      })
-    );
+    tabsRow = null;
+    body = h(CheckinFeedPanel, {
+      feed: { feedType, center, personId, token },
+      // Cards are small and of uneven height; several fit a row once the page
+      // is wide.
+      scrollBody: CardMasonry,
+      contentFooter: h(FeedFooter),
+      // The feed is the page, so a search is a link
+      syncURL: true,
+      className: "feed-panel",
+      toolbarEnd: tabs,
+    });
   }
 
   return h("div.feed-page", [
-    h("header.feed-header", [
-      h(RockdSiteIcon, { className: "site-icon" }),
-      h("h1.page-title", "Checkins"),
-    ]),
+    h(ContentPageHeader, { className: "feed-header" }),
     h("div.feed-content", [
-      h(FeedTabs, { feedType }),
-      h("div.feed-body", [
-        h.if(aside != null)("aside.feed-aside", aside),
-        body,
-      ]),
+      // Above the search, as wide as the cards' row
+      h.if(aside != null)("div.feed-aside-row", h("aside.feed-aside", aside)),
+      tabsRow,
+      h("div.feed-body", body),
     ]),
   ]);
 }
@@ -299,15 +229,23 @@ function FeedTabs({ feedType }: { feedType: FeedType }) {
   }
   const query = carried.toString();
 
+  // The site's outlined grey buttons (the map Settings, the trip header's
+  // actions), small to match Sort beside them; the current feed is shaded
   return h(
     ButtonGroup,
-    { className: "feed-tabs" },
+    { className: "feed-tabs", outlined: true },
     FEEDS.map(({ type, label, href }) => {
       let target = href;
       if (query !== "") target = `${href}?${query}`;
       return h(
         AnchorButton,
-        { key: type, href: target, active: type === feedType },
+        {
+          key: type,
+          href: target,
+          active: type === feedType,
+          outlined: true,
+          small: true,
+        },
         label
       );
     })
@@ -322,19 +260,8 @@ function FeedTabs({ feedType }: { feedType: FeedType }) {
  * set low, the auto-load checkpoint is reached early enough that the footer is
  * actually reachable rather than theoretical. */
 function FeedFooter() {
-  const controls = useLoadControls();
-
-  let more = null;
-  if (controls.paused) {
-    more = h(
-      Button,
-      { minimal: true, intent: "primary", onClick: controls.loadMore },
-      "Load more"
-    );
-  }
-
   return h("div.feed-footer", [
-    h("div.load-progress", [h(LoadProgressIndicator), more]),
+    h(FeedLoadProgress),
     h(Footer, { className: "page-footer" }),
   ]);
 }

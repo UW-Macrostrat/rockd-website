@@ -7,15 +7,9 @@
  * added on the Rockd side, this is where it surfaces.
  */
 import { Button, Callout } from "@blueprintjs/core";
-import { MapMarker, MapView } from "@macrostrat/map-interface";
-import { MapboxMapProvider } from "@macrostrat/mapbox-react";
-import "@macrostrat/map-interface/dist/map-interface.css";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { useDarkMode } from "@macrostrat/ui-components";
-import type { MapPosition } from "@macrostrat/mapbox-utils";
 import hyper from "@macrostrat/hyper";
 import { useCallback, useState } from "react";
-import { mapboxAccessToken } from "~/settings";
+import { LocationMap } from "~/components/map-sidebar/location-map";
 import styles from "./nearby-map.module.sass";
 
 const h = hyper.styled(styles);
@@ -37,22 +31,15 @@ export interface NearbyMapProps {
 const ALTITUDE = 1_200_000;
 
 export function NearbyMap({ center, setCenter }: NearbyMapProps) {
-  const { isEnabled: inDarkMode } = useDarkMode();
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
 
   const locate = useLocate({ setCenter, setLocating, setLocateError });
-
-  let style = "mapbox://styles/mapbox/light-v11";
-  if (inDarkMode) style = "mapbox://styles/mapbox/dark-v11";
-
-  const mapPosition: MapPosition = {
-    camera: {
-      lng: center?.lng ?? -98,
-      lat: center?.lat ?? 39,
-      altitude: ALTITUDE,
-    },
-  };
+  // `setCenter` writes the URL; the map's click handler needs a stable one
+  const pick = useCallback(
+    (position: Center) => setCenter({ lng: position.lng, lat: position.lat }),
+    [setCenter]
+  );
 
   let error = null;
   if (locateError != null) {
@@ -60,31 +47,16 @@ export function NearbyMap({ center, setCenter }: NearbyMapProps) {
   }
 
   return h("div.nearby-map", [
-    // `MapView` reads map state through `@macrostrat/mapbox-react`'s scoped
-    // store, so it needs a provider. Elsewhere in this app that comes free from
-    // `MapAreaContainer`; a bare helper map has to supply it, or the store's
-    // isolation throws ("Missing Provider from createIsolation").
+    // The site's small location map (as on the checkin page): a click picks
+    // the center, and the pin marks it
     h(
       "div.map-holder",
-      h(
-        MapboxMapProvider,
-        h(
-          MapView,
-          {
-            style,
-            mapboxToken: mapboxAccessToken,
-            mapPosition,
-            standalone: true,
-            className: "helper-map",
-          },
-          h(MapMarker, {
-            position: center,
-            setPosition: (pos: { lng: number; lat: number }) => {
-              setCenter({ lng: pos.lng, lat: pos.lat });
-            },
-          })
-        )
-      )
+      h(LocationMap, {
+        position: center,
+        altitude: ALTITUDE,
+        onPick: pick,
+        className: "helper-map",
+      })
     ),
     h("div.map-controls", [
       h(CenterLabel, { center }),

@@ -1,0 +1,101 @@
+/**
+ * The checkin list for a map page's sidebar: the shared `CheckinFeedPanel` in
+ * one column, with cards that show their checkin on the map. Needs the map
+ * context `MapAreaContainer` provides.
+ */
+import { Spinner } from "@blueprintjs/core";
+import { createMasonryScrollBody } from "@macrostrat/data-sheet";
+import { useMap, useMapInitialized } from "@macrostrat/mapbox-react";
+import type { LngLatBounds } from "mapbox-gl";
+import { useEffect, useState } from "react";
+import { CheckinFeedPanel, type CheckinFeedPanelProps } from "./feed-panel";
+import {
+  API_PAGE_SIZE,
+  type CheckinBounds,
+  type FeedContext,
+} from "./checkin-provider";
+import { MapCheckinCard } from "./map-checkin-card";
+import h from "./feed-panel.module.sass";
+
+// A masonry still, for its measured, append-only layout: a card's photo
+// reserves its box before it loads, so paging never moves what's on screen
+const SingleColumn = createMasonryScrollBody({ columns: 1 });
+
+export interface MapCheckinFeedProps {
+  feed: FeedContext;
+  /** Lists only the checkins in the map's visible area, following the map as
+   * it moves */
+  followMap?: boolean;
+  /** A page's own card (see `createMapCheckinCard`); the map card by default */
+  itemComponent?: CheckinFeedPanelProps["itemComponent"];
+}
+
+export function MapCheckinFeed({
+  feed,
+  followMap = false,
+  itemComponent = MapCheckinCard,
+}: MapCheckinFeedProps) {
+  const bounds = useMapBounds(followMap);
+
+  // Until the map has a view there's no region to list, and the unbounded
+  // feed would only be replaced a moment later
+  if (followMap && bounds == null) {
+    return h(Spinner, { className: "feed-spinner" });
+  }
+
+  let context = feed;
+  if (followMap) {
+    context = { ...feed, bounds };
+  }
+
+  return h(CheckinFeedPanel, {
+    feed: context,
+    itemComponent,
+    scrollBody: SingleColumn,
+    // One API page per window: the list reloads whenever the map moves, so
+    // each reload is a single request, and more pages come only as the
+    // sidebar is scrolled toward its end
+    pageSize: API_PAGE_SIZE,
+    className: "map-feed",
+  });
+}
+
+/** The map's visible area, updated when a move ends (not on every frame of
+ * one, which would restart the list mid-pan). */
+function useMapBounds(enabled: boolean): CheckinBounds | null {
+  // `useMap` reads the map at render time without subscribing to it, so
+  // initialization is what re-renders once the map exists
+  const initialized = useMapInitialized();
+  const map = useMap();
+  const [bounds, setBounds] = useState<CheckinBounds | null>(null);
+
+  useEffect(() => {
+    if (!enabled || map == null) return;
+
+    const update = () => setBounds(toCheckinBounds(map.getBounds()));
+    // "idle" follows any load (the first, or a style change's), where "load"
+    // fires only once, possibly before this list mounts
+    if (map.loaded()) {
+      update();
+    } else {
+      map.once("idle", update);
+    }
+    map.on("moveend", update);
+    return () => {
+      map.off("moveend", update);
+      map.off("idle", update);
+    };
+  }, [map, initialized, enabled]);
+
+  return bounds;
+}
+
+function toCheckinBounds(bounds: LngLatBounds | null): CheckinBounds | null {
+  if (bounds == null) return null;
+  return {
+    minLat: bounds.getSouth(),
+    maxLat: bounds.getNorth(),
+    minLng: bounds.getWest(),
+    maxLng: bounds.getEast(),
+  };
+}

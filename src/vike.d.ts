@@ -16,7 +16,7 @@ import type {
 } from "vike/types";
 
 export type PageProps = Record<string, unknown>;
-export type PageStyle = "content" | "fullscreen";
+export type PageStyle = "home" | "content" | "fullscreen";
 
 export type DocumentProps = {
   title?: string;
@@ -31,6 +31,10 @@ declare global {
     interface Config {
       description?: string;
       scripts?: string[];
+      /** Layout from `pageLayouts` in `~/layouts`. */
+      pageStyle?: PageStyle;
+      /** Header controls a page (or subtree) hands to `SitePageHeader`. */
+      headerActions?: React.ComponentType | null;
     }
     interface PageContext {
       pageProps?: PageProps;

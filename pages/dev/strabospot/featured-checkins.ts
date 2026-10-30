@@ -4,23 +4,27 @@ import {
   Dialog,
   DialogBody,
   DialogFooter,
-  Spinner,
 } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
-import h from "../../explore/main.module.sass";
-import { PageCarousel, fetchRockdData } from "~/components";
-import { createCheckins } from "~/components/checkin.client";
-import { useAsyncMemo } from "@macrostrat/ui-components";
-import { useMapRef } from "@macrostrat/mapbox-react";
+import h from "@macrostrat/hyper";
+import { createContext, useContext, useState } from "react";
+import {
+  type Checkin,
+  createMapCheckinCard,
+  MapCheckinCardBody,
+  MapCheckinFeed,
+} from "~/components/checkin-feed";
 import {
   sendCheckinsToStrabospotDataset,
   getStrabospotDatasetId,
 } from "./strabospot-integration";
-import { getStoredRockdToken } from "../../login/rockd-auth";
-const selectionCardStyle = {
-  position: "relative" as const,
-  marginBottom: "1rem",
-  borderRadius: "10px",
+import { getStoredRockdToken } from "~/components/auth";
+
+// The list fills the sidebar, with the selection controls under it
+const listLayoutStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  flex: "1 1 auto",
+  minHeight: 0,
 };
 
 const selectedOverlayStyle = {
@@ -57,8 +61,7 @@ const sentBadgeCheckStyle = {
 };
 
 const selectionFooterStyle = {
-  position: "sticky" as const,
-  bottom: 0,
+  flex: "0 0 auto",
   background: "var(--panel-background-color, white)",
   paddingTop: "0.75rem",
   paddingBottom: "0.5rem",
@@ -143,70 +146,58 @@ const successDialogFooterStyle = {
   borderTop: "1px solid rgba(255,255,255,0.06)",
 };
 
-export function FeatureDetails({
-  setInspectPosition,
-  isStrabospotSynced,
-  personId,
-}) {
-  const [page, setPage] = useState(1);
+/** What each card needs to know about the selection, from the list around it */
+interface StrabospotSelection {
+  isSynced: boolean;
+  selectionMode: boolean;
+  selected: Map<number, Checkin>;
+  sentIds: Set<number>;
+  toggle(checkin: Checkin): void;
+}
+
+const SelectionContext = createContext<StrabospotSelection | null>(null);
+
+function useSelection(): StrabospotSelection {
+  const selection = useContext(SelectionContext);
+  if (selection == null) throw new Error("Missing StraboSpot selection");
+  return selection;
+}
+
+/** A checkin counts as sent once the Rockd DB has its `spot_id`, or once it
+ * was sent during this session (so the badge appears without a refetch). */
+function isSent(checkin: Checkin, sentIds: Set<number>): boolean {
+  return checkin.spot_id != null || sentIds.has(checkin.checkin_id);
+}
+
+/**
+ * The StraboSpot page's list: the signed-in user's checkins in the shared
+ * sidebar feed (search, infinite scroll), with a selection mode for sending
+ * them to StraboSpot once the account is linked.
+ */
+export function FeatureDetails({ isStrabospotSynced, personId }) {
   const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  //Tracks checkin IDs that were sent to StraboSpot in this session so the
-  // badge appears immediately without waiting for the next API refetch.
+  const [selected, setSelected] = useState<Map<number, Checkin>>(new Map());
   const [localSentIds, setLocalSentIds] = useState<Set<number>>(new Set());
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
-  const mapRef = useMapRef();
   const [lastSentCount, setLastSentCount] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [result, nextData] = useRockdCheckins(page, personId);
   const [lastImageFailedIds, setLastImageFailedIds] = useState<number[]>([]);
   const [lastFailedCheckins, setLastFailedCheckins] = useState<
     Array<{ checkinId: number; message: string }>
   >([]);
 
-  const safeResult = result ?? [];
-
-  const sorted = [...safeResult].sort((a, b) => {
-    if (a.photo === null && b.photo !== null) return 1;
-    if (a.photo !== null && b.photo === null) return -1;
-    return 0;
-  });
-
-  // A checkin is considered sent if the DB already has a spot_id for it
-  //checkin.spot_id != null or if we sent it during this session.
-  const selectableCheckins = sorted.filter((checkin) => {
-    const checkinId = Number(checkin.checkin_id ?? checkin.id);
-    return checkin.spot_id == null && !localSentIds.has(checkinId);
-  });
-
   if (personId == null) {
     return null;
   }
 
-  if (result == null) {
-    return h(Spinner, { className: "loading-spinner" });
-  }
-
-  if (result.length === 0) {
-    return h("div.checkin-container", [
-      h("p", `No checkins found for person_id=${personId}`),
-    ]);
-  }
-
-  const pages = PageCarousel({
-    page,
-    setPage,
-    nextData,
-  });
-
-  function toggleSelected(checkinId: number) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(checkinId)) {
-        next.delete(checkinId);
+  function toggle(checkin: Checkin) {
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (next.has(checkin.checkin_id)) {
+        next.delete(checkin.checkin_id);
       } else {
-        next.add(checkinId);
+        next.set(checkin.checkin_id, checkin);
       }
       return next;
     });
@@ -219,7 +210,7 @@ export function FeatureDetails({
 
   function cancelSelectionMode() {
     setSelectionMode(false);
-    setSelectedIds(new Set());
+    setSelected(new Map());
     setSendError(null);
   }
 
@@ -230,8 +221,8 @@ export function FeatureDetails({
     setLastImageFailedIds([]);
     setLastFailedCheckins([]);
     try {
-      const selectedCheckins = selectableCheckins.filter((checkin) =>
-        selectedIds.has(Number(checkin.checkin_id ?? checkin.id))
+      const selectedCheckins = [...selected.values()].filter(
+        (checkin) => !isSent(checkin, localSentIds)
       );
 
       const rockdToken = getStoredRockdToken();
@@ -265,7 +256,7 @@ export function FeatureDetails({
         return next;
       });
 
-      setSelectedIds(new Set());
+      setSelected(new Map());
       setSelectionMode(false);
       setShowSuccessDialog(true);
     } catch (err: any) {
@@ -275,256 +266,283 @@ export function FeatureDetails({
     }
   }
 
-  const checkinCards = sorted.map((checkin) => {
-    const tile = createCheckins([checkin], mapRef, setInspectPosition);
-    const checkinId = Number(checkin.checkin_id ?? checkin.id);
-    const alreadySent =
-      isStrabospotSynced &&
-      (checkin.spot_id != null || localSentIds.has(checkinId));
-    const selected = selectedIds.has(checkinId);
-    const selectable = selectionMode && !alreadySent;
+  const selection: StrabospotSelection = {
+    isSynced: isStrabospotSynced,
+    selectionMode,
+    selected,
+    sentIds: localSentIds,
+    toggle,
+  };
 
-    return h(
+  return h(
+    SelectionContext.Provider,
+    { value: selection },
+    h("div", { style: listLayoutStyle }, [
+      // The signed-in user's checkins only; see `CheckinFeedPanel`'s mine feed
+      h(MapCheckinFeed, {
+        feed: {
+          feedType: "mine",
+          personId,
+          token: getStoredRockdToken(),
+        },
+        itemComponent: StrabospotCheckinCard,
+      }),
+      h.if(isStrabospotSynced)(SelectionFooter, {
+        selectionMode,
+        selectedCount: selected.size,
+        isSending,
+        sendError,
+        onStart: startSelectionMode,
+        onSend: handleBulkSend,
+        onCancel: cancelSelectionMode,
+      }),
+      h(SendResultsDialog, {
+        isOpen: showSuccessDialog,
+        onClose: () => setShowSuccessDialog(false),
+        sentCount: lastSentCount,
+        imageFailedIds: lastImageFailedIds,
+        failedCheckins: lastFailedCheckins,
+      }),
+    ])
+  );
+}
+
+/** A checkin in the list. Outside selection mode a click shows it on the map;
+ * in it, a click selects an unsent checkin. */
+function StrabospotCheckinContent({ data }: { data: Checkin }) {
+  const selection = useSelection();
+  const sent = isSent(data, selection.sentIds);
+  const selectable = selection.selectionMode && !sent;
+  const isSelected = selectable && selection.selected.has(data.checkin_id);
+
+  let onActivate: (() => void) | undefined = undefined;
+  if (selectable) {
+    onActivate = () => selection.toggle(data);
+  }
+
+  return h(MapCheckinCardBody, { data, onActivate }, [
+    h.if(selection.isSynced && sent)(
       "div",
+      { style: sentBadgeStyle, title: "Sent to StraboSpot" },
+      h("span", { style: sentBadgeCheckStyle }, "✓")
+    ),
+    h.if(isSelected)("div", { style: selectedOverlayStyle }),
+  ]);
+}
+
+const StrabospotCheckinCard = createMapCheckinCard(StrabospotCheckinContent);
+
+function SelectionFooter({
+  selectionMode,
+  selectedCount,
+  isSending,
+  sendError,
+  onStart,
+  onSend,
+  onCancel,
+}) {
+  return h("div", { style: selectionFooterStyle }, [
+    h.if(!selectionMode)(
+      Button,
       {
-        key: checkin.checkin_id ?? checkin.id,
-        style: selectionCardStyle,
-        onClick: selectable ? () => toggleSelected(checkinId) : undefined,
+        fill: true,
+        onClick: onStart,
       },
-      [
-        tile,
-        h.if(alreadySent)(
-          "div",
-          {
-            style: sentBadgeStyle,
-            title: "Sent to StraboSpot",
+      "Select checkins"
+    ),
+
+    h.if(selectionMode)([
+      h(
+        "div",
+        {
+          style: { marginBottom: "0.5rem", fontSize: "12px", opacity: 0.75 },
+        },
+        `${selectedCount} selected`
+      ),
+      h(
+        "div",
+        {
+          style: {
+            display: "flex",
+            gap: "0.5rem",
+            alignItems: "center",
           },
-          h("span", { style: sentBadgeCheckStyle }, "✓")
-        ),
-        h.if(selectable && selected)("div", { style: selectedOverlayStyle }),
-      ]
-    );
-  });
+        },
+        [
+          h(
+            Button,
+            {
+              intent: "primary",
+              disabled: selectedCount === 0 || isSending,
+              loading: isSending,
+              onClick: onSend,
+            },
+            "Send to Strabospot"
+          ),
+          h(
+            Button,
+            {
+              minimal: true,
+              disabled: isSending,
+              onClick: onCancel,
+            },
+            "Cancel"
+          ),
+        ]
+      ),
+    ]),
+
+    h.if(sendError != null)(
+      "div",
+      { style: { marginTop: "0.5rem" } },
+      h(
+        Callout,
+        { intent: "danger", title: "Send failed" },
+        h(
+          "pre",
+          { style: { whiteSpace: "pre-wrap", margin: 0, overflowX: "auto" } },
+          sendError
+        )
+      )
+    ),
+  ]);
+}
+
+function SendResultsDialog({
+  isOpen,
+  onClose,
+  sentCount,
+  imageFailedIds,
+  failedCheckins,
+}) {
   const datasetId = getStrabospotDatasetId();
 
-  return h("div.checkin-container", [
-    checkinCards,
-    pages,
-
-    h.if(isStrabospotSynced)("div", { style: selectionFooterStyle }, [
-      h.if(!selectionMode)(
-        Button,
-        {
-          fill: true,
-          onClick: startSelectionMode,
-        },
-        "Select checkins"
-      ),
-
-      h.if(selectionMode)([
+  return h(
+    Dialog,
+    {
+      isOpen,
+      onClose,
+      title: h("div", { style: successDialogHeaderStyle }, [
+        h("span", { style: successDialogIconStyle }, "✓"),
+        h("span", "Checkins sent to StraboSpot"),
+      ]),
+      canOutsideClickClose: true,
+      style: successDialogStyle,
+    },
+    [
+      h(DialogBody, { style: successDialogBodyStyle }, [
         h(
-          "div",
-          {
-            style: { marginBottom: "0.5rem", fontSize: "12px", opacity: 0.75 },
-          },
-          `${selectedIds.size} selected`
+          "p",
+          { style: successDialogTitleStyle },
+          `${sentCount ?? 0} checkin${sentCount === 1 ? "" : "s"} successfully sent`
         ),
         h(
+          "p",
+          { style: successDialogTextStyle },
+          failedCheckins.length > 0 || imageFailedIds.length > 0
+            ? "Some selected checkins were synced to StraboSpot. Review the details below for any issues."
+            : "Your selected checkins were synced to StraboSpot and should now be available in your field data."
+        ),
+        h.if(imageFailedIds.length > 0)(
           "div",
           {
             style: {
-              display: "flex",
-              gap: "0.5rem",
-              alignItems: "center",
+              marginTop: "14px",
+              padding: "12px 14px",
+              borderRadius: "10px",
+              background: "rgba(245, 158, 11, 0.12)",
+              border: "1px solid rgba(245, 158, 11, 0.35)",
+              color: "rgba(255, 236, 204, 0.95)",
+              fontSize: "14px",
+              lineHeight: 1.5,
             },
           },
           [
             h(
-              Button,
-              {
-                intent: "primary",
-                disabled: selectedIds.size === 0 || isSending,
-                loading: isSending,
-                onClick: handleBulkSend,
-              },
-              "Send to Strabospot"
+              "div",
+              { style: { fontWeight: 700, marginBottom: "6px" } },
+              "Some photos could not be uploaded"
             ),
             h(
-              Button,
-              {
-                minimal: true,
-                disabled: isSending,
-                onClick: cancelSelectionMode,
-              },
-              "Cancel"
+              "div",
+              `Spot sync succeeded, but image upload failed for checkin${
+                imageFailedIds.length === 1 ? "" : "s"
+              }: ${imageFailedIds.join(", ")}`
             ),
           ]
         ),
-      ]),
-
-      h.if(sendError != null)(
-        "div",
-        { style: { marginTop: "0.5rem" } },
-        h(
-          Callout,
-          { intent: "danger", title: "Send failed" },
-          h(
-            "pre",
-            { style: { whiteSpace: "pre-wrap", margin: 0, overflowX: "auto" } },
-            sendError
-          )
-        )
-      ),
-      h(
-        Dialog,
-        {
-          isOpen: showSuccessDialog,
-          onClose: () => setShowSuccessDialog(false),
-          title: h("div", { style: successDialogHeaderStyle }, [
-            h("span", { style: successDialogIconStyle }, "✓"),
-            h("span", "Checkins sent to StraboSpot"),
-          ]),
-          canOutsideClickClose: true,
-          style: successDialogStyle,
-        },
-        [
-          h(DialogBody, { style: successDialogBodyStyle }, [
+        h.if(failedCheckins.length > 0)(
+          "div",
+          {
+            style: {
+              marginTop: "14px",
+              padding: "12px 14px",
+              borderRadius: "10px",
+              background: "rgba(239, 68, 68, 0.12)",
+              border: "1px solid rgba(239, 68, 68, 0.35)",
+              color: "rgba(255, 221, 221, 0.96)",
+              fontSize: "14px",
+              lineHeight: 1.5,
+            },
+          },
+          [
             h(
-              "p",
-              { style: successDialogTitleStyle },
-              `${lastSentCount ?? 0} checkin${
-                lastSentCount === 1 ? "" : "s"
-              } successfully sent`
-            ),
-            h(
-              "p",
-              { style: successDialogTextStyle },
-              lastFailedCheckins.length > 0 || lastImageFailedIds.length > 0
-                ? "Some selected checkins were synced to StraboSpot. Review the details below for any issues."
-                : "Your selected checkins were synced to StraboSpot and should now be available in your field data."
-            ),
-            h.if(lastImageFailedIds.length > 0)(
               "div",
-              {
-                style: {
-                  marginTop: "14px",
-                  padding: "12px 14px",
-                  borderRadius: "10px",
-                  background: "rgba(245, 158, 11, 0.12)",
-                  border: "1px solid rgba(245, 158, 11, 0.35)",
-                  color: "rgba(255, 236, 204, 0.95)",
-                  fontSize: "14px",
-                  lineHeight: 1.5,
-                },
-              },
-              [
-                h(
-                  "div",
-                  { style: { fontWeight: 700, marginBottom: "6px" } },
-                  "Some photos could not be uploaded"
-                ),
-                h(
-                  "div",
-                  `Spot sync succeeded, but image upload failed for checkin${
-                    lastImageFailedIds.length === 1 ? "" : "s"
-                  }: ${lastImageFailedIds.join(", ")}`
-                ),
-              ]
+              { style: { fontWeight: 700, marginBottom: "6px" } },
+              "Some checkins failed to sync"
             ),
-            h.if(lastFailedCheckins.length > 0)(
-              "div",
-              {
-                style: {
-                  marginTop: "14px",
-                  padding: "12px 14px",
-                  borderRadius: "10px",
-                  background: "rgba(239, 68, 68, 0.12)",
-                  border: "1px solid rgba(239, 68, 68, 0.35)",
-                  color: "rgba(255, 221, 221, 0.96)",
-                  fontSize: "14px",
-                  lineHeight: 1.5,
-                },
-              },
-              [
-                h(
-                  "div",
-                  { style: { fontWeight: 700, marginBottom: "6px" } },
-                  "Some checkins failed to sync"
-                ),
-                ...lastFailedCheckins.map((item) =>
-                  h(
-                    "div",
-                    { style: { marginTop: "6px" } },
-                    `Checkin ${item.checkinId}: ${item.message}`
-                  )
-                ),
-              ]
-            ),
-            h("div", { style: successDialogLinkCardStyle }, [
+            ...failedCheckins.map((item) =>
               h(
                 "div",
-                {
-                  style: {
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color: "rgba(243,246,251,0.65)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
-                  },
-                },
-                "Next step"
-              ),
-              h(
-                "a",
-                {
-                  href:
-                    datasetId != null
-                      ? `https://strabospot.org/StraboFieldDatasetDetail/?dataset_id=${datasetId}`
-                      : "https://strabospot.org/fieldland/",
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  style: successDialogLinkStyle,
-                },
-                ["Open My Field Data", h("span", "↗")]
-              ),
-            ]),
-          ]),
-          h(DialogFooter, {
-            style: successDialogFooterStyle,
-            actions: [
-              h(
-                Button,
-                {
-                  intent: "success",
-                  large: true,
-                  onClick: () => setShowSuccessDialog(false),
-                },
-                "Done"
-              ),
-            ],
-          }),
-        ]
-      ),
-    ]),
-  ]);
-}
-
-function useRockdCheckins(page: number, personId: number) {
-  const result = useAsyncMemo(async () => {
-    return await fetchRockdCheckins(page, personId);
-  }, [page, personId]);
-
-  const next = useAsyncMemo(async () => {
-    return await fetchRockdCheckins(page + 1, personId);
-  }, [page, personId]);
-
-  return [result, next];
-}
-
-async function fetchRockdCheckins(page: number, personId: number) {
-  const res = await fetchRockdData(
-    `/protected/checkins?person_id=${personId}&page=${page}`
+                { style: { marginTop: "6px" } },
+                `Checkin ${item.checkinId}: ${item.message}`
+              )
+            ),
+          ]
+        ),
+        h("div", { style: successDialogLinkCardStyle }, [
+          h(
+            "div",
+            {
+              style: {
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "rgba(243,246,251,0.65)",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              },
+            },
+            "Next step"
+          ),
+          h(
+            "a",
+            {
+              href:
+                datasetId != null
+                  ? `https://strabospot.org/StraboFieldDatasetDetail/?dataset_id=${datasetId}`
+                  : "https://strabospot.org/fieldland/",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              style: successDialogLinkStyle,
+            },
+            ["Open My Field Data", h("span", "↗")]
+          ),
+        ]),
+      ]),
+      h(DialogFooter, {
+        style: successDialogFooterStyle,
+        actions: [
+          h(
+            Button,
+            {
+              intent: "success",
+              large: true,
+              onClick: onClose,
+            },
+            "Done"
+          ),
+        ],
+      }),
+    ]
   );
-  const json = await res.json();
-  return json?.success?.data ?? [];
 }

@@ -1,218 +1,109 @@
-.location-img
-  position: absolute
-  z-index: 1
-  width: 60%
-  height: 25vh
-  object-fit: cover
+// A checkin photo, in the content layout (`ContentPage`). The details card
+// reuses the checkin cards' pieces and the checkin page's observation details.
 
-.profile-picture
-  height: 100px
-  width: 100px
-  display: grid
-  margin: auto
-  margin-left: 50px
-  border-radius: 50%
+.photo-page
+  display: flex
+  flex-direction: column
+  gap: 1em
+  padding-bottom: 2em
 
-.stop-main-info
-  text-align: left
-  display: grid
-  margin: auto
-  margin-left: 0
+// Back to the checkin
+.checkin-link
+  align-self: flex-start
 
-.star
-  height: 15px
-  filter: var(--anti-img-color)
-
-.marker
-  height: 15px
-
-.checkin-head
-  padding: 30px 0
-  width: 100%
-
-.loading
-  height: 75vh
-  padding-top: 20vh
-  text-align: center
-  background-color: var(--panel-background-color)
-  color: var(--panel-text)
-  font-style: italic
+// The checkin's title over the photo, as the checkin page heads it (a long
+// one cut short, with a "…" that shows it all)
+.photo-title
+  margin: 0
   color: var(--text-emphasized-color)
 
-
-.observation-item
-  width: 40%
-  margin: calc(20px + 7vh) 30% 0 30%
-  position: relative
-
-  .observation-image
-    width: 100%
-
-  .observation-body
-    background-color: var(--secondary-color)
-
-  .notes
-    text-align: center
-    padding-bottom: 10px
-
-.overlay
-  background-color: var(--panel-background-color)
-  height: 100vh
-  width: 100%
-  top: 0
-  left: 0
-  overflow: auto
-
-
-  .overlay-body
-    margin: 0 30%
-    width: 40%
-    border-radius: 2%
-    box-shadow: 0 0 0 1px var(--card-shadow-color)
-    margin: 5vh 30%
-
-    img
-      width: 100%
-      border-radius: 2% 2% 0 0
-
-.observation-body-container
-  padding: 3px
-  color: var(--text)
-  background-color: var(--panel-background)
-  text-align: center
-  width: 100%
-  min-height: 50px
+// The photo, as large as fits the page and the screen, centered on the page
+// itself (no frame around it)
+.photo-frame
   display: flex
   align-items: center
   justify-content: center
 
-  .observation-body
-    position: relative
-    min-hegiht: 50px
-    width: 100%
+.photo-image
+  display: block
+  max-width: 100%
+  max-height: 70vh
+  object-fit: contain
+  border-radius: 4px
 
-
-.photo-banner
-  position: absolute
-  top: 0
-  left: 0
-  z-index: 100
-  width: 100%
-  height: 7vh
+.photo-missing
   display: flex
-  gap: 10px
-  padding-left: 20px
-  background-color: var(--accent-secondary-color)
-  justify-content: space-between
+  flex-direction: column
+  align-items: center
+  gap: 0.5em
+  padding: 3em 1em
+  color: var(--text-subtle-color)
 
-  .right-side
-    display: flex
-    align-items: center
-    gap: 10px
-    height:100%
-    padding-right: 30px
+// Previous at the left, the dots in the middle, next at the right
+.photo-nav
+  display: grid
+  grid-template-columns: auto 1fr auto
+  align-items: center
+  gap: 1em
 
-  .back-checkin
-    display: flex
-    align-items: center
-    gap: 10px
-
-    h3
-      color: var(--text-emphasized-color)
-
-    &:hover
-      text-decoration: none
-
-.hide
-  display: none
-
-.left-arrow, .right-arrow, .back-checkin-arrow
-  filter: var(--anti-img-color)
-  cursor: pointer
-
-.overlay
-  .banner
-    position: sticky
-
-.observation-details
-  text-align: left
-  padding: 5px
-
-  .observation-detail
-    padding: 4px
-    border: 1px solid var(--panel-text)
-    margin: 4px
-    border-radius: 4px
-    display: inline-block
-
-  .interval
-    background-color: var(--interval-background)
-
-  .liths
-    background-color: var(--liths-background)
-
-  .notes
-    padding: 10px 25px
-
-.observation-header
-  padding: 10px
-  text-align: center
-
-
-.overlay-header
-  position: absolute
-  height: 10vh
-  margin-left: 20%
-
-.dark-mode-button
-  height: 5vh
-
-.error
-  height: 100vh
-  width: 100%
-  text-align: center
-  font-size: 2em
-  font-weight: 200
-  background-color: var(--panel-background-color)
-  color: var(--panel-text)
-  padding-top: 5vh
-
-.error-img
-  width: 50%
-  text-align: center
-
-.left-arrow
-  position: absolute
-  top: 30%
-  left: 100px
-
-  svg
-    height: 50px
-    width: 50px
-
-.right-arrow
-  position: absolute
-  top: 30%
-  right: 100px
-
-  svg
-    height: 50px
-    width: 50px
-
-.circles
+.photo-dots-group
   display: flex
+  flex-direction: column
+  align-items: center
+  gap: 0.35em
+
+.photo-dots
+  display: flex
+  flex-wrap: wrap
   justify-content: center
-  padding: 30px 0
+  gap: 8px
 
-.hide
-  display: none
+// A dot per photo: a link, but a quiet circle until hovered; the current one
+// filled
+.photo-dot
+  display: block
+  width: 10px
+  height: 10px
+  border-radius: 50%
+  background-color: var(--text-subtle-color)
+  opacity: 0.4
+  transition: opacity 120ms ease, transform 120ms ease
 
-.page-container
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
+  &:hover
+    opacity: 0.8
+    transform: scale(1.2)
 
-.close-body, .info-btn
-  padding: 5px 0 0 5px
-  cursor: pointer
+  &:focus-visible
+    outline: 2px solid var(--bp-intent-primary-rest)
+    outline-offset: 2px
+
+  &.current
+    background-color: var(--bp-intent-primary-rest)
+    opacity: 1
+    transform: none
+
+.photo-counter
+  font-size: 0.8em
+  color: var(--text-subtle-color)
+
+// What the photo shows. Qualified to outrank Blueprint's own `.bp6-card`
+// padding.
+.photo-page .photo-details
+  display: flex
+  flex-direction: column
+  gap: 0.6em
+  padding: 0.75em 1em
+
+.details-title
+  margin: 0
+  text-align: center
+  color: var(--text-emphasized-color)
+
+.details-empty
+  margin: 0
+  text-align: center
+  color: var(--text-subtle-color)
+
+.checkin-notes
+  margin: 0
+  white-space: pre-line

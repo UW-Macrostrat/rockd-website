@@ -1,37 +1,23 @@
-.organizations-page
-  min-height: 100vh
-  display: flex
-  flex-direction: column
+.directory-intro, .create-intro
+  margin: 0 0 1.5em
+  color: var(--text-subtle-color)
 
-.organizations-header
-  width: min(72em, 100%)
-  margin: 0 auto
-  padding: 1.25em 1.5em
+// The directory's heading, on its own line over the introduction
+.directory-title
+  margin: 0 0 0.35em
+  color: var(--text-emphasized-color)
+
+// The introduction, with "New organization" at the row's right end
+.directory-intro-row
   display: flex
+  flex-wrap: wrap
   align-items: center
-  gap: 1em
+  justify-content: space-between
+  gap: 0.75em 1em
+  margin: 0 0 1.5em
 
-  .site-icon img
-    display: block
-    height: 2.5em
-
-  .header-title
-    flex: 1
-    min-width: 0
-
-    h1
-      margin: 0
-      font-size: 1.7em
-
-    p
-      margin: 0.2em 0 0
-      color: var(--text-subtle-color)
-
-.organizations-main
-  width: min(72em, 100%)
-  margin: 0 auto
-  padding: 0 1.5em 2em
-  flex: 1
+  .directory-intro
+    margin: 0
 
 .directory-controls
   display: grid
@@ -141,31 +127,9 @@
   gap: 1em
   padding: 4em 1em
 
-.create-page
-  min-height: 100vh
-  display: flex
-  flex-direction: column
-
 .create-main
   width: min(44em, 100%)
-  margin: 0 auto
-  padding: 1em 1.5em 3em
-  flex: 1
-
-.breadcrumb
-  display: inline-flex
-  align-items: center
-  gap: 0.35em
-  margin-bottom: 1.5em
-
-.create-heading
-  margin-bottom: 1.5em
-
-  h1
-    margin-bottom: 0.35em
-
-  p
-    color: var(--text-subtle-color)
+  padding-bottom: 1em
 
 .organization-form
   display: flex
@@ -223,13 +187,6 @@
   margin-top: 1em
 
 @media only screen and (max-width: 700px)
-  .organizations-header
-    align-items: flex-start
-    flex-wrap: wrap
-
-    .header-title
-      flex-basis: calc(100% - 4em)
-
   .directory-controls
     grid-template-columns: 1fr
 

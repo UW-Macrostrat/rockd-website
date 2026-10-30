@@ -1,260 +1,197 @@
-import { LngLatCoords } from "@macrostrat/data-components";
-import { useState, useEffect } from "react";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { BlankImage, getImageUrl, TestImage, Footer } from "~/components";
-import { AnchorButton, Icon } from "@blueprintjs/core";
-import h from "./main.module.sass";
-import "@macrostrat/style-system";
-import { useDarkMode } from "@macrostrat/ui-components";
-import { usePageContext } from "vike-react/usePageContext";
+import { AnchorButton, Card, Icon, NonIdealState } from "@blueprintjs/core";
+import hyper from "@macrostrat/hyper";
+import { type ReactNode, useEffect, useState } from "react";
+import { navigate } from "vike/client/router";
 import { useData } from "vike-react/useData";
-import { macrostratApiURL } from "~/settings";
-import { ObservationFooter } from "#/checkin";
+import { usePageContext } from "vike-react/usePageContext";
+import { getImageUrl, TruncatedText } from "~/components";
+import {
+  CheckinFooter,
+  PersonByline,
+  Rating,
+} from "~/components/checkin-feed/checkin-card-parts";
+import { ContentPage } from "~/layouts";
+import "@macrostrat/data-components/dist/data-components.css";
+import { ObservationDetails } from "#/checkin";
+import styles from "./main.module.sass";
 
+const h = hyper.styled(styles);
+
+/**
+ * One of a checkin's photos, large: a link back to its checkin and the
+ * checkin's title above it; previous and
+ * next, and a dot for each photo, below it (the arrow keys step through them
+ * too); then what the photo shows — the observation's details, or, for the
+ * checkin's own photo, the checkin as its card shows it.
+ */
 export function Page() {
-  const { checkin } = useData();
-  const isDarkMode = useDarkMode()?.isEnabled;
-  const pageContext = usePageContext();
-  const photoID = parseInt(
-    pageContext.urlPathname
-      .split("/")[2]
-      .replace(/%40/g, "@")
-      .replace(/%2B/g, "+")
-  );
+  const { checkin } = useData<{ checkin: any }>();
+  const photoID = Number(usePageContext().routeParams.id);
 
-  const TestObject = PhotoIDCollector({ checkin });
-  const photoIDArr = TestObject.props.photoIDArr.sort((a, b) => a - b);
+  let photos: number[] = [];
+  if (checkin != null) photos = checkinPhotos(checkin);
+  const index = Math.max(0, photos.indexOf(photoID));
+  const prevHref = photoHref(photos[index - 1]);
+  const nextHref = photoHref(photos[index + 1]);
+  useArrowKeys(prevHref, nextHref);
 
-  const photoIndex = photoIDArr.indexOf(photoID);
+  if (checkin == null) {
+    return h(ContentPage, { title: "Photo" }, [
+      h(NonIdealState, {
+        icon: "media",
+        title: "Photo not found",
+        description: "This photo doesn't exist or has been deleted.",
+      }),
+    ]);
+  }
 
-  return h("div.page-container", [
-    h(
-      "div.photo-banner",
+  const observation = checkin.observations.find((o) => o.photo === photoID);
+
+  let details: ReactNode = h(CheckinDetails, { checkin });
+  if (observation != null) details = h(ObservationCard, { observation });
+
+  return h(ContentPage, { title: "Photo" }, [
+    h("div.photo-page", [
       h(
         AnchorButton,
         {
-          href: "/checkin/" + checkin.checkin_id,
-          className: "back-checkin",
-          minimal: true,
+          href: `/checkin/${checkin.checkin_id}`,
           icon: "arrow-left",
+          minimal: true,
+          className: "checkin-link",
         },
-        h(Identifier, { identifier: checkin.checkin_id })
-      )
-    ),
-    h("div", { className: "photos" }, [
-      h.if(photoIndex !== 0)(AnchorButton, {
-        href: "/photo/" + photoIDArr[photoIndex - 1],
-        icon: "arrow-left",
-        minimal: true,
+        "Checkin"
+      ),
+      // The checkin's title over its photo, as its page heads it
+      h("h1.photo-title", h(TruncatedText, { text: checkinTitle(checkin) })),
+      h(PhotoFrame, {
+        key: photoID,
+        src: getImageUrl(checkin.person_id, photoID),
       }),
-      h(Item, {
-        checkin,
-        photoID,
-      }),
-      h.if(photoIndex !== photoIDArr.length - 1)(AnchorButton, {
-        href: "/photo/" + photoIDArr[photoIndex + 1],
-        icon: "arrow-right",
-        minimal: true,
-      }),
+      h("div.photo-nav", [
+        h(StepButton, { href: prevHref, icon: "arrow-left", label: "Previous" }),
+        h(PhotoDots, { photos, index }),
+        h(StepButton, { href: nextHref, icon: "arrow-right", label: "Next" }),
+      ]),
+      details,
     ]),
-    h(
-      "div.circles",
-      photoIDArr.map((photo) => {
-        if (photo == photoID) {
-          return h(
-            "div",
-            h(Icon, { icon: "symbol-circle", style: { color: "grey" } })
-          );
-        } else {
-          return h("a", { href: "/photo/" + photo }, [
-            h(Icon, { icon: "symbol-circle", style: { color: "white" } }),
-          ]);
-        }
-      })
-    ),
-    h("div.hide", TestObject),
-    h(Footer),
   ]);
 }
 
-function ObservationContent({ observation, setBody }) {
-  const rocks = observation.rocks;
+/** The photo, as large as fits; an empty frame if it won't load */
+function PhotoFrame({ src }: { src: string }) {
+  const [failed, setFailed] = useState(false);
 
-  function rgbaStringToHex(rgba) {
-    const values = rgba.split(",").map((v) => v.trim());
-    const [r, g, b] = values.map((v) => parseInt(v, 10));
-    return `#${r.toString(16).padStart(2, "0")}${g
-      .toString(16)
-      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-  }
-
-  let lithologies = [];
-  rocks.liths?.forEach((lith) => {
-    if (!lith.color.includes("#")) {
-      lithologies.push({
-        ...lith,
-        color: rgbaStringToHex(lith.color),
-      });
-    } else {
-      lithologies.push(lith);
-    }
+  let content: ReactNode = h("img.photo-image", {
+    src,
+    alt: "Checkin photo",
+    onError: () => setFailed(true),
   });
-
-  if (rocks.interval?.name) {
-    lithologies.push({
-      name: rocks.interval.name,
-      int_id: rocks.interval.int_id,
-      color: `rgba(${rocks.interval.color})`,
-    });
+  if (failed) {
+    content = h("div.photo-missing", [
+      h(Icon, { icon: "media", size: 32 }),
+      h("span", "This photo couldn't be loaded"),
+    ]);
   }
 
-  if (rocks.strat_name?.strat_name_long) {
-    lithologies.push({
-      name: rocks.strat_name?.strat_name_long,
-      strat_id: rocks.strat_name?.strat_name_id,
-    });
-  }
-
-  if (rocks.map_unit?.unit_name) {
-    lithologies.push({
-      name: rocks.map_unit?.unit_name,
-    });
-  }
-
-  if (observation.orientation.feature?.name) {
-    lithologies.push({
-      name: observation.orientation.feature?.name,
-    });
-  }
-
-  const LngLatProps = {
-    position: {
-      lat: observation.lat,
-      lng: observation.lng,
-    },
-    precision: 3,
-    zoom: 10,
-  };
-
-  const show =
-    lithologies.length > 0 ||
-    (rocks?.notes?.length > 0 &&
-      observation.lat &&
-      rocks.strat_name?.strat_name_long);
-
-  const handleClick = (e, data) => {
-    if (data.int_id) {
-      window.open(macrostratApiURL + `/lex/intervals/${data.int_id}`, "_blank");
-    }
-    if (data.strat_id) {
-      window.open(
-        macrostratApiURL + `/lex/strat-names/${data.strat_id}`,
-        "_blank"
-      );
-    }
-    if (data.lith_id) {
-      window.open(
-        macrostratApiURL + `/lex/lithology/${data.lith_id}`,
-        "_blank"
-      );
-    }
-  };
-
-  return h.if(show)("div", { className: "observation-body" }, [
-    h(Icon, {
-      className: "close-body",
-      icon: "ban-circle",
-      onClick: () => setBody(false),
-    }),
-    h(ObservationFooter, { observation }),
-  ]);
+  return h("div.photo-frame", content);
 }
 
-function Item({ checkin, photoID }) {
-  const [showBody, setBody] = useState(true);
-
-  const observation = checkin.observations.find((obs) => obs.photo === photoID);
-  const isObservation = observation !== undefined;
-  const imageSrc = getImageUrl(
-    checkin.person_id,
-    isObservation ? observation.photo : checkin.photo
-  );
-  const bodyContent = isObservation
-    ? h(ObservationContent, { observation, setBody, showBody })
-    : h("div", { className: "observation-body" }, [
-        h(Icon, {
-          className: "close-body",
-          icon: "ban-circle",
-          onClick: () => setBody(false),
-        }),
-        h("div.notes", checkin.notes ?? "No notes available"),
-      ]);
-
-  return h("div", { className: "observation-item" }, [
-    h(BlankImage, { className: "observation-image", src: imageSrc }),
-    showBody ? bodyContent : null,
-    h.if(!showBody)(Icon, {
-      className: "info-btn",
-      icon: "info-sign",
-      onClick: () => setBody(true),
-    }),
-  ]);
-}
-
-function PhotoIDCollector({ checkin }) {
-  const [photoIDArr, setPhotoIDArr] = useState(() =>
-    checkin.photo ? [checkin.photo] : []
-  );
-  const [testedPhotos, setTestedPhotos] = useState(() => {
-    return checkin.observations
-      ? checkin.observations.map((obs) => obs.photo).filter(Boolean)
-      : [];
+/** Previous or next; held in place (disabled) at either end */
+function StepButton({ href, icon, label }) {
+  return h(AnchorButton, {
+    href: href ?? undefined,
+    disabled: href == null,
+    icon,
+    minimal: true,
+    large: true,
+    title: label,
+    "aria-label": label,
   });
+}
 
-  useEffect(() => {
-    // Only update if checkin changes
-    if (checkin.photo && !photoIDArr.includes(checkin.photo)) {
-      setPhotoIDArr((prev) => [...prev, checkin.photo]);
-    }
-
-    const newPhotos = (checkin.observations || [])
-      .map((obs) => obs.photo)
-      .filter((photo) => photo && !testedPhotos.includes(photo));
-
-    if (newPhotos.length > 0) {
-      setTestedPhotos((prev) => [...prev, ...newPhotos]);
-    }
-  }, [checkin]);
-
-  return h("div", { photoIDArr }, [
-    ...testedPhotos.map((photo) => {
-      return h(HideImage, {
+/** A dot for each of the checkin's photos, each a link to it, the current one
+ * filled; and where this one falls ("3 of 11") */
+function PhotoDots({ photos, index }: { photos: number[]; index: number }) {
+  const dots = photos.map((photo, i) => {
+    const label = `Photo ${i + 1} of ${photos.length}`;
+    if (i === index) {
+      return h("span.photo-dot.current", {
         key: photo,
-        checkin,
-        photo,
-        setPhotoIDArr,
+        "aria-current": "true",
+        "aria-label": label,
       });
-    }),
+    }
+    return h("a.photo-dot", {
+      key: photo,
+      href: photoHref(photo),
+      title: label,
+      "aria-label": label,
+    });
+  });
+
+  return h("div.photo-dots-group", [
+    h("nav.photo-dots", { "aria-label": "Photos" }, dots),
+    h("span.photo-counter", `${index + 1} of ${photos.length}`),
   ]);
 }
 
-function HideImage({ checkin, photo, setPhotoIDArr }) {
-  return h(TestImage, {
-    key: photo,
-    src: getImageUrl(checkin.person_id, photo),
-    onLoad: () => {
-      setPhotoIDArr((prev) => (prev.includes(photo) ? prev : [...prev, photo]));
-    },
-    onError: () => console.warn("Image failed to load:", photo),
-  });
+/** What an observation's photo shows, as the checkin page's observation cards
+ * show it */
+function ObservationCard({ observation }) {
+  const details = h(ObservationDetails, { observation });
+  return h(Card, { className: "photo-details" }, [
+    h("h3.details-title", "Observation"),
+    details ?? h("p.details-empty", "No details were recorded."),
+  ]);
 }
 
-export function Identifier({
-  identifier,
-  className,
-}: {
-  identifier: number;
-  className?: string;
-}) {
-  return h("code.identifier", { className }, ["#", identifier]);
+/** The checkin's own photo: the checkin as its card shows it */
+function CheckinDetails({ checkin }) {
+  const notes = checkin.notes?.trim();
+  return h(Card, { className: "photo-details checkin-details" }, [
+    h(
+      PersonByline,
+      {
+        personId: checkin.person_id,
+        name: `${checkin.first_name} ${checkin.last_name}`,
+        date: checkin.created,
+      },
+      h(Rating, { value: checkin.rating })
+    ),
+    h.if(Boolean(notes))("p.checkin-notes", notes),
+    h(CheckinFooter, { data: checkin }),
+  ]);
+}
+
+/** The checkin's photos in order: its own, then each observation's */
+function checkinPhotos(checkin): number[] {
+  const photos = [checkin.photo, ...checkin.observations.map((o) => o.photo)];
+  return photos.filter((photo) => photo != null);
+}
+
+function photoHref(photo: number | undefined): string | null {
+  if (photo == null) return null;
+  return `/photo/${photo}`;
+}
+
+/** The checkin's title, as its page heads it (its notes' first line) */
+function checkinTitle(checkin): string {
+  const first = (checkin.notes ?? "").trim().split(/\n+/)[0]?.trim();
+  if (first) return first;
+  return "Checkin";
+}
+
+/** The left and right arrow keys step to the previous and next photo */
+function useArrowKeys(prevHref: string | null, nextHref: string | null) {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (target?.closest("input, textarea, select, [contenteditable]")) return;
+      if (event.key === "ArrowLeft" && prevHref != null) navigate(prevHref);
+      if (event.key === "ArrowRight" && nextHref != null) navigate(nextHref);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [prevHref, nextHref]);
 }
