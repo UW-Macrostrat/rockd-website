@@ -1,6 +1,5 @@
 import { Button, type IconName } from "@blueprintjs/core";
 import { DarkModeButton, useDarkMode } from "@macrostrat/ui-components";
-import classNames from "classnames";
 import h from "./settings-panel.module.sass";
 
 export interface MapSettingsPanelProps {
@@ -8,21 +7,18 @@ export interface MapSettingsPanelProps {
   onToggleSatellite: () => void;
   showOverlay: boolean;
   onToggleOverlay: () => void;
-  /** Shows a Logout button, for pages behind a sign-in */
-  onLogout?: () => void;
 }
 
 /**
- * The map pages' Settings view: theme, base map and overlay toggles, and
- * Logout where the page has a signed-in user — one centered column of the
- * same outlined button.
+ * The map pages' Settings view: theme, base map and overlay toggles, as one
+ * centered column of the same outlined button. (The account, and Log out, are
+ * in the sidebar header's account button.)
  */
 export function MapSettingsPanel({
   showSatellite,
   onToggleSatellite,
   showOverlay,
   onToggleOverlay,
-  onLogout,
 }: MapSettingsPanelProps) {
   // `DarkModeButton` stays active whenever a theme was picked by hand, Light
   // included; like the other toggles, it's active only while dark mode is on
@@ -48,12 +44,6 @@ export function MapSettingsPanel({
       active: showOverlay,
       onClick: onToggleOverlay,
     }),
-    h.if(onLogout != null)(SettingsButton, {
-      icon: "log-out",
-      text: "Logout",
-      onClick: onLogout,
-      className: "logout-button",
-    }),
   ]);
 }
 
@@ -62,23 +52,15 @@ function SettingsButton({
   text,
   active = false,
   onClick,
-  className,
 }: {
   icon: IconName;
   text: string;
   active?: boolean;
   onClick: () => void;
-  className?: string;
 }) {
   return h(
     Button,
-    {
-      className: classNames("settings-button", className),
-      outlined: true,
-      icon,
-      active,
-      onClick,
-    },
+    { className: "settings-button", outlined: true, icon, active, onClick },
     text
   );
 }

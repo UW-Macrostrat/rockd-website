@@ -51,6 +51,24 @@ export function getStoredRockdToken(): string | null {
   return auth?.token ?? auth?.person?.token ?? null;
 }
 
+/** The stored login, read after mount (`localStorage` isn't there during a
+ * server render): `checked` turns true once it's been read. */
+export function useStoredRockdAuth(): {
+  checked: boolean;
+  auth: RockdLoginPayload | null;
+} {
+  const [state, setState] = useState<{
+    checked: boolean;
+    auth: RockdLoginPayload | null;
+  }>({ checked: false, auth: null });
+
+  useEffect(() => {
+    setState({ checked: true, auth: getStoredRockdAuth() });
+  }, []);
+
+  return state;
+}
+
 /** The signed-in user's person id, for a page behind a sign-in: null until
  * it's read, and a signed-out visitor is sent to /login. */
 export function useRequiredRockdPersonId(): number | null {

@@ -6,13 +6,13 @@
   page) are built from one set of components in `~/components/map-sidebar`:
   - `MapSidebarLayout`, built on `@macrostrat/map-interface`'s
     `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages
-    are: a floating panel with the Rockd icon, the view's title, Settings and
-    close buttons and the page's own controls (StraboSpot's link button), over
-    a scrolling body.
+    are: a floating panel with the Rockd icon, the view's title, the page's own
+    controls (StraboSpot's link button), Settings, the account button (icon
+    only) and a close button, over a scrolling body.
   - `RockdMapPage`: that layout around the map, with the standard Settings
-    view (`MapSettingsPanel`: Dark/Light, Satellite, Overlay and, on signed-in
-    pages, Logout, as a centered column of the same outlined grey button;
-    Logout is red; a toggle is shaded only while it's on) and the map style
+    view (`MapSettingsPanel`: Dark/Light, Satellite and Overlay, as a centered
+    column of the same outlined grey button; a toggle is shaded only while
+    it's on) and the map style
     (`useRockdMapStyle`: the Mapbox base map, the Macrostrat overlay and the
     page's own layers). Settings are shared across the map pages.
   - Point layers: the Rockd API's clustered checkin tiles, or points clustered
@@ -22,6 +22,14 @@
   - `CheckinMapPage`: Explore, My checkins and StraboSpot, each just its title,
     list and filter. A checkin picked on the map shows as the map pages'
     checkin card under "Selected checkins".
+- A sign-in indicator, `UserPersona` (`~/components/auth`), as Macrostrat's:
+  signed in, a button with the user's name, opening a panel with their name
+  and email, "My checkins" and Log out; signed out, "Sign in", opening a
+  panel that links to `/login`. Either way the panel links to Explore and
+  Trips (with the footer's icons), the checkin feed and Organizations. It's at the top right of the `/dev/feed` and
+  `/orgs` pages, and, icon only (`compact`), in every map page's
+  sidebar header right of Settings, where its Log out is the page's own. The
+  stored login's helpers (`rockd-auth`) moved there from `pages/login`.
 - Trips (`~/components/trips`):
   - A trip's page has a "Trips" sidebar with a header card (the trip's name,
     edited date and stop count, description, KMZ download and a Comments view)
@@ -72,12 +80,14 @@
   80%-opacity fill that turns solid on hover),
   so they read as clickable; `/login`'s Login button is the same green.
 
-- Added development-only organization directory and creation pages, with a typed
+- Added development-only organization directory and creation pages (`/orgs`
+  and `/orgs/new`), with a typed
   Rockd organization API client, URL-backed directory search and filters,
   accessible organization cards, and validated organization setup fields. The
   brand-color field includes a synchronized picker, and external organization
   URLs are protocol-checked again when rendered with safer link and image
-  privacy attributes.
+  privacy attributes. The directory has an "Organizations" heading, with
+  "New organization" beside its introduction.
 
 - Added a "Continue with Apple" option to `/login`, alongside Google and
   Facebook. Requires the matching API support in UW-Macrostrat/rockd; the
@@ -122,7 +132,11 @@
 - `/dev/feed/mine` shows a non-ideal state with a login link when signed out.
 - The feed pages use the site header (`Rockd › Development › Checkin feed`) over
   their own scrolling list; the site footer is part of the feed's end-of-scroll
-  region, below the load progress and "Load more" checkpoint.
+  region, below the load progress and "Load more" checkpoint. The All /
+  Nearby / Mine tabs (the site's small outlined buttons, the current feed
+  shaded) stand on their own at the right end of the search row
+  (the search box still wraps just the search and Sort), in line with the
+  cards' right edge (`CheckinFeedPanel`'s `toolbarEnd`).
 - Fixed server-rendered pages that import `@macrostrat/data-components`
   (`/checkin/@id`) failing with "Cannot require() ES Module ... in a cycle":
   `ssr.noExternal` now covers transitive `@macrostrat/*` packages, not only

@@ -12,6 +12,51 @@
 .feed-data-panel
   --data-panel-item-gap: 12px
 
+// A page's controls at the toolbar's right end (`toolbarEnd`), standing on
+// their own (outside the search's box), in line with the cards' right edge
+.toolbar-end
+  order: 1
+  margin-left: auto
+  display: flex
+  align-items: center
+  flex-shrink: 0
+  pointer-events: all
+
+// The floating toolbar is one box hugging its contents. With end controls it
+// spans the list's width instead, unboxed, and the box (data-sheet's floating
+// style, redrawn) wraps only its search and Sort. data-sheet's class names are
+// hashed, hence the attribute match.
+.checkin-feed-panel [class*="actions-toolbar"]:has(> .toolbar-end)
+  flex: 1 1 auto
+  max-width: none
+  margin-left: 0
+  margin-right: 0
+  padding-left: 0
+  padding-right: 0
+  background-color: transparent
+  box-shadow: none
+  pointer-events: none
+
+  > :global(.contextual)
+    align-self: stretch
+    padding: 0.2em 6px
+    margin-left: var(--data-panel-toolbar-offset, -6px)
+    background-color: var(--panel-secondary-background-color)
+    box-shadow: 0 0 0 1px var(--panel-rule-color)
+    border-radius: 4px
+    pointer-events: all
+
+// The cards center beside the list's scrollbar; the toolbar row reserves the
+// same gutter, so the two share edges whatever the scrollbar's width (none,
+// with overlay scrollbars). The list keeps its gutter too, even when short.
+.checkin-feed-panel:has(.toolbar-end)
+  [class*="data-panel-top-area"]
+    overflow: hidden
+    scrollbar-gutter: stable
+
+  [class*="data-panel-body"]
+    scrollbar-gutter: stable
+
 // In a map page's sidebar: the column is narrow, so no content cap
 .map-feed
   --data-panel-content-width: 100%

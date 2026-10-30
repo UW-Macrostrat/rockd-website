@@ -7,7 +7,7 @@ import {
   OrganizationAPIError,
   type CreateOrganizationInput,
 } from "~/organizations";
-import { getStoredRockdToken } from "../../login/rockd-auth";
+import { getStoredRockdToken } from "~/components/auth";
 import styles from "~/components/organizations/organizations.module.sass";
 
 const h = hyper.styled(styles);
@@ -33,7 +33,7 @@ export function Page() {
     try {
       const organization = await createOrganization(input, auth.token);
       const created = encodeURIComponent(organization.name);
-      window.location.assign(`/organizations?created=${created}`);
+      window.location.assign(`/orgs?created=${created}`);
     } catch (error) {
       let message = "Something went wrong while creating the organization.";
       if (error instanceof OrganizationAPIError) message = error.message;

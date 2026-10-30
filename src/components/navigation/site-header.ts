@@ -14,7 +14,7 @@ export type SitePageHeaderProps = Omit<PageHeaderProps, "logo" | "breadcrumbs">;
  * trail. A page's own title comes from its `title` config. Add an entry when a
  * section gains child pages. */
 export const siteSections: Record<string, string> = {
-  "/organizations": "Organizations",
+  "/orgs": "Organizations",
   "/dev": "Development",
 };
 

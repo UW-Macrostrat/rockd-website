@@ -253,10 +253,14 @@ export function OrganizationDirectory() {
 
   return h("div.organizations-page", [
     h("main.organizations-main", [
-      h(
-        "p.directory-intro",
-        "Discover groups sharing geological checkins in Rockd."
-      ),
+      h("h1.directory-title", "Organizations"),
+      h("div.directory-intro-row", [
+        h(
+          "p.directory-intro",
+          "Discover groups sharing geological checkins in Rockd."
+        ),
+        h(NewOrganizationButton),
+      ]),
       notice,
       h(
         "section.directory-controls",
@@ -312,12 +316,12 @@ export function OrganizationDirectory() {
   ]);
 }
 
-/** The directory's call to action, carried in the site header (see
- * `pages/organizations/+headerActions.ts`). */
+/** The directory's call to action, beside its introduction (under the site
+ * header's account button). */
 export function NewOrganizationButton() {
   return h(
     AnchorButton,
-    { href: "/organizations/new", intent: "primary", icon: "add" },
+    { href: "/orgs/new", intent: "primary", icon: "add" },
     "New organization"
   );
 }

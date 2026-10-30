@@ -14,7 +14,7 @@ export interface CheckinMapPageProps {
   personId?: number;
   /** Page-specific controls in the sidebar header */
   tools?: ReactNode;
-  /** Adds Logout to Settings */
+  /** The page's own logout, for the account button's Log out */
   onLogout?: () => void;
 }
 

@@ -6,6 +6,7 @@ import {
 } from "@macrostrat/map-interface";
 import "@macrostrat/map-interface/dist/map-interface.css";
 import { ReactNode } from "react";
+import { UserPersona } from "../auth";
 import { RockdSiteIcon } from "../site-icon";
 import h from "./map-sidebar.module.sass";
 
@@ -20,6 +21,8 @@ export interface MapSidebarLayoutProps {
   onToggleSettings?: () => void;
   /** Shows a close button */
   onClose?: () => void;
+  /** The page's own logout, for the account button's Log out */
+  onLogout?: () => void;
   /** The map, and anything that works with it */
   children: ReactNode;
 }
@@ -28,7 +31,8 @@ export interface MapSidebarLayoutProps {
  * The standard layout for Rockd's map pages: `MapAreaContainer` from
  * `@macrostrat/map-interface` with a sidebar in its `navbar` and
  * `contextPanel` slots, as Macrostrat's map pages have — a header with the
- * Rockd icon, the title and the page's controls, over a scrolling body.
+ * Rockd icon, the title, the page's controls and the account button, over a
+ * scrolling body.
  */
 export function MapSidebarLayout({
   title,
@@ -36,13 +40,20 @@ export function MapSidebarLayout({
   tools,
   onToggleSettings,
   onClose,
+  onLogout,
   children,
 }: MapSidebarLayoutProps) {
   return h(
     MapAreaContainer,
     {
       className: "map-sidebar-layout",
-      navbar: h(MapSidebarHeader, { title, tools, onToggleSettings, onClose }),
+      navbar: h(MapSidebarHeader, {
+        title,
+        tools,
+        onToggleSettings,
+        onClose,
+        onLogout,
+      }),
       contextPanel: h(PanelCard, { className: "map-sidebar-panel" }, sidebar),
     },
     children
@@ -54,6 +65,7 @@ function MapSidebarHeader({
   tools,
   onToggleSettings,
   onClose,
+  onLogout,
 }: Omit<MapSidebarLayoutProps, "sidebar" | "children">) {
   return h(FloatingNavbar, {
     className: "map-sidebar-header",
@@ -67,6 +79,9 @@ function MapSidebarHeader({
         icon: "cog",
         onClick: onToggleSettings,
       }),
+      // As at the content pages' header's end, icon-only to fit; close stays
+      // outermost
+      h(UserPersona, { compact: true, onLogout }),
       h.if(onClose != null)(ToolButton, { icon: "cross", onClick: onClose }),
     ]),
   });

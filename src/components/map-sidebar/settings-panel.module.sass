@@ -9,19 +9,3 @@
 // Qualified to outrank Blueprint's own `.bp6-button` sizing
 .map-settings .settings-button
   min-width: 160px
-
-$logout-red: color-mix(in oklch, var(--bp-intent-danger-hover) 60%, transparent)
-
-// Logout's outline, text and icon in Blueprint's danger red, with its red
-// hover; qualified to outrank `.bp6-button.bp6-outlined:hover` and the button
-// icon's muted color
-.map-settings .settings-button.logout-button
-  border-color: $logout-red
-  color: $logout-red
-
-  :global(.bp6-icon)
-    color: $logout-red
-
-  &:hover
-    color: $logout-red
-    background-color: color-mix(in oklch, var(--bp-intent-danger-rest) 15%, transparent)

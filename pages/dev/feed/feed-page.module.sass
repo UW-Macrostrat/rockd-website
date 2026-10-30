@@ -52,8 +52,10 @@
   @media only screen and (max-width: 800px)
     display: none
 
-.feed-tabs
-  align-self: center
+// Without a feed (a prompt in its place), the tabs' own row, right-aligned
+.feed-tabs-row
+  display: flex
+  justify-content: flex-end
 
 .feed-panel
   --data-panel-content-width: var(--feed-content-width) !important

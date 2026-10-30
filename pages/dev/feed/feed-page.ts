@@ -27,7 +27,7 @@ import {
 } from "@blueprintjs/core";
 import { createMasonryScrollBody } from "@macrostrat/data-sheet";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { Footer } from "~/components";
 import { ContentPageHeader } from "~/layouts";
 import {
@@ -36,7 +36,7 @@ import {
   type FeedType,
 } from "~/components/checkin-feed";
 import { locationAtom } from "~/_utils/url-atoms";
-import { getStoredRockdAuth } from "../../login/rockd-auth";
+import { useStoredRockdAuth } from "~/components/auth";
 import { type Center, NearbyMap } from "./nearby-map";
 import h from "./feed-page.module.sass";
 
@@ -151,25 +151,14 @@ function MineFeed() {
   });
 }
 
-/** The Rockd JWT + person the login flow leaves in `localStorage`. Read in an
- * effect because it isn't available during a server render. */
+/** The Rockd JWT + person the login flow leaves in `localStorage`. */
 function useStoredAuth() {
-  const [auth, setAuth] = useState<{
-    checked: boolean;
-    personId: number | null;
-    token: string | null;
-  }>({ checked: false, personId: null, token: null });
-
-  useEffect(() => {
-    const stored = getStoredRockdAuth();
-    setAuth({
-      checked: true,
-      personId: stored?.person?.person_id ?? null,
-      token: stored?.token ?? stored?.person?.token ?? null,
-    });
-  }, []);
-
-  return auth;
+  const { checked, auth } = useStoredRockdAuth();
+  return {
+    checked,
+    personId: auth?.person?.person_id ?? null,
+    token: auth?.token ?? auth?.person?.token ?? null,
+  };
 }
 
 // ---- The shell ----
@@ -194,8 +183,14 @@ function Feed({
   aside = null,
   placeholder = null,
 }: FeedProps) {
+  const tabs = h(FeedTabs, { feedType });
+
+  // The tabs sit at the right end of the feed's search row; with no feed yet
+  // (a prompt instead), they keep a row of their own, right-aligned the same
   let body = placeholder;
+  let tabsRow = h("div.feed-tabs-row", tabs);
   if (body == null) {
+    tabsRow = null;
     body = h(CheckinFeedPanel, {
       feed: { feedType, center, personId, token },
       // Cards are small and of uneven height; several fit a row once the page
@@ -205,13 +200,14 @@ function Feed({
       // The feed is the page, so a search is a link
       syncURL: true,
       className: "feed-panel",
+      toolbarEnd: tabs,
     });
   }
 
   return h("div.feed-page", [
     h(ContentPageHeader, { className: "feed-header" }),
     h("div.feed-content", [
-      h(FeedTabs, { feedType }),
+      tabsRow,
       h("div.feed-body", [
         h.if(aside != null)("aside.feed-aside", aside),
         body,
@@ -234,15 +230,23 @@ function FeedTabs({ feedType }: { feedType: FeedType }) {
   }
   const query = carried.toString();
 
+  // The site's outlined grey buttons (the map Settings, the trip header's
+  // actions), small to match Sort beside them; the current feed is shaded
   return h(
     ButtonGroup,
-    { className: "feed-tabs" },
+    { className: "feed-tabs", outlined: true },
     FEEDS.map(({ type, label, href }) => {
       let target = href;
       if (query !== "") target = `${href}?${query}`;
       return h(
         AnchorButton,
-        { key: type, href: target, active: type === feedType },
+        {
+          key: type,
+          href: target,
+          active: type === feedType,
+          outlined: true,
+          small: true,
+        },
         label
       );
     })

@@ -69,6 +69,9 @@ export interface CheckinFeedPanelProps {
   pageSize?: number;
   /** For the `DataPanel`, e.g. to set its `--data-panel-content-width` */
   className?: string;
+  /** A page's own controls at the toolbar's right end, past the search and
+   * Sort (the `/dev/feed` tabs) */
+  toolbarEnd?: ReactNode;
 }
 
 export function CheckinFeedPanel({
@@ -79,6 +82,7 @@ export function CheckinFeedPanel({
   syncURL = false,
   pageSize = PAGE_SIZE,
   className,
+  toolbarEnd,
 }: CheckinFeedPanelProps) {
   const { feedType, center, personId, token, bounds } = feed;
   const provider = useMemo(
@@ -135,6 +139,9 @@ export function CheckinFeedPanel({
       filterDebounce: 300,
       itemLabel: "checkin",
       name: "Checkins",
+      // The toolbar puts its `toolbar` content ahead of a flexible spacer; the
+      // wrapper's `order` moves it past the spacer, to the row's right end
+      toolbar: h.if(toolbarEnd != null)("div.toolbar-end", toolbarEnd),
       children: h.if(syncURL)(ViewStateURLSync, { bindings: urlBindings }),
     })
   );

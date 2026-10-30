@@ -5,7 +5,7 @@ import {
   clearRockdAuth,
   getStoredRockdToken,
   useRequiredRockdPersonId,
-} from "../login/rockd-auth";
+} from "~/components/auth";
 
 /** The signed-in user's checkins, on the map and listed beside it */
 export function Page() {

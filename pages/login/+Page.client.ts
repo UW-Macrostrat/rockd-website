@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 import { Button, Callout } from "@blueprintjs/core";
 import { useState } from "react";
-import { saveRockdAuth } from "./rockd-auth";
+import { saveRockdAuth } from "~/components/auth";
 import s from "../index/main.module.sass";
 import ob from "./oauth-buttons.module.sass";
 import { Image } from "~/components";

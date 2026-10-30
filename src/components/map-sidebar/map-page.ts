@@ -30,8 +30,6 @@ export interface RockdMapPageProps
    * Memoize them: a new object rebuilds the style. Null holds the map back. */
   layers: mapboxgl.Style | null;
   mapPosition?: MapPosition;
-  /** Adds Logout to Settings */
-  onLogout?: () => void;
   /** Controls the Settings view, for a page that closes it itself (when a
    * map click shows something in the sidebar) */
   showSettings?: boolean;
@@ -41,10 +39,11 @@ export interface RockdMapPageProps
 }
 
 /**
- * A Rockd map page: `MapSidebarLayout` around the map, with the standard
- * Settings view (theme, satellite, overlay and Logout) in place of the page's
- * own sidebar while it's open, and the base map and Macrostrat overlay under
- * the page's `layers`.
+ * A Rockd map page: `MapSidebarLayout` around the map (with the account
+ * button in its header; `onLogout` is the page's own logout), the standard
+ * Settings view (theme, satellite and overlay) in place of the page's own
+ * sidebar while it's open, and the base map and Macrostrat overlay under the
+ * page's `layers`.
  */
 export function RockdMapPage({
   title,
@@ -68,7 +67,7 @@ export function RockdMapPage({
   if (settingsShown) {
     header = {
       title: "Settings",
-      sidebar: h(MapSettings, { onLogout }),
+      sidebar: h(MapSettings),
       onClose: () => setSettingsShown(false),
     };
   }
@@ -80,6 +79,7 @@ export function RockdMapPage({
     {
       ...header,
       tools,
+      onLogout,
       onToggleSettings: () => setSettingsShown(!settingsShown),
     },
     h(
@@ -95,7 +95,7 @@ export function RockdMapPage({
   );
 }
 
-function MapSettings({ onLogout }: { onLogout?: () => void }) {
+function MapSettings() {
   const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
   const [showOverlay, setShowOverlay] = useAtom(showOverlayAtom);
 
@@ -104,6 +104,5 @@ function MapSettings({ onLogout }: { onLogout?: () => void }) {
     onToggleSatellite: () => setShowSatellite(!showSatellite),
     showOverlay,
     onToggleOverlay: () => setShowOverlay(!showOverlay),
-    onLogout,
   });
 }

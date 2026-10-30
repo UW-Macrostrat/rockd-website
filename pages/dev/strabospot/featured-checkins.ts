@@ -17,7 +17,7 @@ import {
   sendCheckinsToStrabospotDataset,
   getStrabospotDatasetId,
 } from "./strabospot-integration";
-import { getStoredRockdToken } from "../../login/rockd-auth";
+import { getStoredRockdToken } from "~/components/auth";
 
 // The list fills the sidebar, with the selection controls under it
 const listLayoutStyle = {

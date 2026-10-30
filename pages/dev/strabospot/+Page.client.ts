@@ -11,7 +11,7 @@ import {
 import {
   clearRockdAuth,
   useRequiredRockdPersonId,
-} from "../../login/rockd-auth";
+} from "~/components/auth";
 
 const strabospotSyncButtonBaseStyle = {
   borderRadius: "8px",

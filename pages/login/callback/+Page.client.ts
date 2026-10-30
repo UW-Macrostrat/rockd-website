@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 import { Callout, Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { saveRockdAuth } from "../rockd-auth";
+import { saveRockdAuth } from "~/components/auth";
 
 /**
  * Lands here after the Rockd API completes an OAuth flow and redirects with
