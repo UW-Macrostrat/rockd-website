@@ -1,40 +1,39 @@
-import { Image } from "~/components";
+import { Image, RockdSiteIcon } from "~/components";
 import h from "./main.module.sass";
-import { AnchorButton, Button } from "@blueprintjs/core";
+import { AnchorButton } from "@blueprintjs/core";
 
-function FullHeightContainer({
-  children,
-  className,
-  showNextIndicator = true,
-}) {
-  return h("div.full-height-container", { className }, [
-    children,
-    h.if(showNextIndicator)("div.down-indicator-container", [
-      h(
-        Button,
-        {
-          className: "down-indicator",
-          icon: "chevron-down",
-          minimal: true,
-          onClick: () => {
-            const viewportHeight = window.innerHeight;
-            const scrollHeight = window.scrollY;
+/** One of the homepage's sections: as tall as its content, in the page's
+ * centered column */
+function FullHeightContainer({ children, className }) {
+  return h("div.full-height-container", { className }, children);
+}
 
-            window.scrollTo({
-              top: scrollHeight + viewportHeight,
-              behavior: "smooth",
-            });
-          },
-        },
-        "Next page"
-      ),
+/** The homepage's header: the Rockd icon, and the ways into the site as
+ * links */
+function HomeNav() {
+  return h("header.home-nav", [
+    h(RockdSiteIcon, { className: "home-nav-icon" }),
+    h("nav.home-nav-links", [
+      h(NavLink, { href: "/explore", icon: "geosearch" }, "Explore the data"),
+      h(NavLink, { href: "/trips", icon: "route" }, "Trips"),
+      h(NavLink, { href: "/login", icon: "log-in" }, "Login"),
     ]),
   ]);
 }
 
+function NavLink({ href, icon, children }) {
+  return h(
+    AnchorButton,
+    { href, icon, minimal: true, className: "home-nav-link" },
+    children
+  );
+}
+
 export function Page() {
   return h("div.main-page", [
-    h(FullHeightContainer, [
+    h(HomeNav),
+    // The banner: the field photo behind the app and its screens
+    h(FullHeightContainer, { className: "hero-banner" }, [
       h("div.mask", [
         h(Image, {
           src: "main-page/field.jpg",
@@ -77,30 +76,6 @@ export function Page() {
                   alt: "Google Play",
                 }),
               ]
-            ),
-          ]),
-          h("div.hero-links", [
-            h(
-              AnchorButton,
-              {
-                href: "/explore",
-                className: "explore-link",
-                large: true,
-                minimal: true,
-                icon: "geosearch",
-              },
-              "Explore the data"
-            ),
-            h(
-              AnchorButton,
-              {
-                href: "/login",
-                className: "login-link",
-                large: true,
-                minimal: true,
-                icon: "log-in",
-              },
-              "Login"
             ),
           ]),
         ]),
@@ -187,7 +162,7 @@ export function Page() {
         ]),
       ]),
     ]),
-    h(FullHeightContainer, { showNextIndicator: false }, [
+    h(FullHeightContainer, { className: "record-container" }, [
       h("div.contents", [
         h("h1", "Record your observations"),
         h(

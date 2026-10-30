@@ -99,10 +99,14 @@
   Metrics "Show bar charts" switch sits in its header. Upgraded
   `@macrostrat/ui-components` to 5.5.0 and imported its stylesheet.
 
-- The homepage's "Explore the data" and "Login" buttons are minimal buttons in
-  the Rockd wordmark's blue and green (a solid border and an
-  80%-opacity fill that turns solid on hover),
-  so they read as clickable; `/login`'s Login button is the same green.
+- The homepage is compressed into a centered column (960px): a header with the
+  Rockd icon and "Explore the data", "Trips" and "Login" as links; the field
+  photo as a banner behind the wordmark, tagline and app badges beside the
+  app's screens; then each section as tall as its content, its text and
+  pictures side by side (the Dashboard and progress sections as rounded
+  boxes). The full-screen sections and their "Next page" buttons are gone.
+- `/login`'s Login button is a minimal button in the Rockd wordmark's green (a
+  solid border and an 80%-opacity fill that turns solid on hover).
 
 - Added development-only organization directory and creation pages (`/orgs`
   and `/orgs/new`), with a typed
