@@ -1,6 +1,14 @@
 import h from "./main.module.sass";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
-import type mapboxgl from "mapbox-gl";
+import {
+  type ReactNode,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Comments } from "~/components";
 import { MapSettingsPanel, MapSidebarLayout } from "~/components/map-sidebar";
@@ -37,7 +45,17 @@ export function Trips({ data, commentsData }) {
   const [showOverlay, setShowOverlay] = useAtom(showOverlayAtom);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [view, setView] = useState<SidebarView>("trip");
+  const [selectedStopId, setSelectedStopId] = useState<number | null>(null);
   const style = useMapStyle(data.stops, showSatellite, showOverlay);
+
+  // A stop picked on the map shows in the trip's own view
+  const selectStop = useCallback((checkinId: number | null) => {
+    setSelectedStopId(checkinId);
+    if (checkinId != null) setView("trip");
+  }, []);
+  const selectedStop = data.stops.find(
+    (stop) => stop.checkin.checkin_id === selectedStopId
+  );
 
   // The sidebar shows one view at a time: settings, the trip's comments, or
   // (by default) the trip and its stops
@@ -62,6 +80,7 @@ export function Trips({ data, commentsData }) {
     sidebar = h(TripDetails, {
       data,
       commentsData,
+      selectedStopId,
       onShowComments: () => setView("comments"),
     });
   }
@@ -94,25 +113,59 @@ export function Trips({ data, commentsData }) {
         standalone: false,
         onMapLoaded: () => setMapLoaded(true),
       },
-      h(TripStopsInteraction, { stops: data.stops, mapLoaded })
+      [
+        h(TripStopsInteraction, {
+          stops: data.stops,
+          mapLoaded,
+          onSelectStop: selectStop,
+        }),
+        h(SelectedStopPin, { checkin: selectedStop?.checkin }),
+      ]
     )
   );
 }
 
 /** The trip's header, then its stops as the map pages' checkin cards, each
- * under its stop's name. */
-function TripDetails({ data, commentsData, onShowComments }) {
-  const stops = data.stops.map((stop, index) =>
-    h("div.stop", { key: stop.checkin.checkin_id ?? index }, [
-      h("h4.stop-name", stop.name),
-      h(MapCheckinCard, { data: stop.checkin }),
-    ])
-  );
+ * under its stop's name. The stop picked on the map is scrolled to and
+ * highlighted. */
+function TripDetails({ data, commentsData, selectedStopId, onShowComments }) {
+  const listRef = useRef<HTMLDivElement>(null);
+  useScrollToStop(listRef, selectedStopId);
+
+  const stops = data.stops.map((stop, index) => {
+    const checkinId = stop.checkin.checkin_id;
+    let className: string | undefined;
+    if (checkinId === selectedStopId) className = "selected";
+
+    return h(
+      "div.stop",
+      { key: checkinId ?? index, className, "data-checkin-id": checkinId },
+      [
+        h("h4.stop-name", stop.name),
+        h(MapCheckinCard, { data: stop.checkin }),
+      ]
+    );
+  });
 
   return h("div.trip-details", [
     h(TripHeader, { data, commentsData, onShowComments }),
-    h("div.stop-list", stops),
+    h("div.stop-list", { ref: listRef }, stops),
   ]);
+}
+
+/** Scrolls the sidebar to a stop's card whenever it's picked on the map (or
+ * the trip's view returns with one picked). */
+function useScrollToStop(
+  listRef: RefObject<HTMLDivElement | null>,
+  checkinId: number | null
+) {
+  useEffect(() => {
+    if (checkinId == null) return;
+    const stop = listRef.current?.querySelector(
+      `[data-checkin-id="${checkinId}"]`
+    );
+    stop?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [checkinId]);
 }
 
 /** The trip's name, edited date and stop count, description, and its KMZ
@@ -151,9 +204,10 @@ function TripHeader({ data, commentsData, onShowComments }) {
   ]);
 }
 
-/** Frames the map around the trip's stops, and makes them clickable: a
- * cluster zooms in to split, and a stop flies the map to it. */
-function TripStopsInteraction({ stops, mapLoaded }) {
+/** Frames the map around the trip's stops, and handles map clicks as /explore
+ * does: a cluster zooms in to split, a stop is picked (its card scrolled to in
+ * the sidebar), and a click anywhere else clears the pick. */
+function TripStopsInteraction({ stops, mapLoaded, onSelectStop }) {
   const mapRef = useMapRef();
 
   useEffect(() => {
@@ -170,42 +224,70 @@ function TripStopsInteraction({ stops, mapLoaded }) {
       { padding: 40, maxZoom: 12, animate: false }
     );
 
-    const zoomIntoCluster = (e) => {
-      const feature = e.features?.[0];
-      if (feature == null) return;
-      const source = map.getSource(STOPS_SOURCE) as mapboxgl.GeoJSONSource;
-      source.getClusterExpansionZoom(
-        feature.properties.cluster_id,
-        (error, zoom) => {
-          if (error != null) return;
-          map.easeTo({ center: feature.geometry.coordinates, zoom });
-        }
-      );
-    };
-    const flyToStop = (e) => {
-      const feature = e.features?.[0];
-      if (feature == null) return;
-      map.flyTo({ center: feature.geometry.coordinates, zoom: 12 });
+    const handleClick = (e) => {
+      const [cluster] = map.queryRenderedFeatures(e.point, {
+        layers: ["clusters"],
+      });
+      if (cluster != null) zoomIntoCluster(map, cluster);
+
+      const [stop] = map.queryRenderedFeatures(e.point, {
+        layers: ["unclustered-point"],
+      });
+      onSelectStop(stop?.properties.checkin_id ?? null);
     };
     const showPointer = () => (map.getCanvas().style.cursor = "pointer");
     const hidePointer = () => (map.getCanvas().style.cursor = "");
 
-    map.on("click", "clusters", zoomIntoCluster);
-    map.on("click", "unclustered-point", flyToStop);
+    map.on("click", handleClick);
     for (const layer of ["clusters", "unclustered-point"]) {
       map.on("mouseenter", layer, showPointer);
       map.on("mouseleave", layer, hidePointer);
     }
 
     return () => {
-      map.off("click", "clusters", zoomIntoCluster);
-      map.off("click", "unclustered-point", flyToStop);
+      map.off("click", handleClick);
       for (const layer of ["clusters", "unclustered-point"]) {
         map.off("mouseenter", layer, showPointer);
         map.off("mouseleave", layer, hidePointer);
       }
     };
-  }, [mapLoaded, stops]);
+  }, [mapLoaded, stops, onSelectStop]);
+
+  return null;
+}
+
+function zoomIntoCluster(map: mapboxgl.Map, cluster) {
+  const source = map.getSource(STOPS_SOURCE) as mapboxgl.GeoJSONSource;
+  source.getClusterExpansionZoom(cluster.properties.cluster_id, (error, zoom) => {
+    if (error != null) return;
+    map.easeTo({ center: cluster.geometry.coordinates, zoom });
+  });
+}
+
+/** The blue pin /explore puts on a picked checkin, on the picked stop. */
+function SelectedStopPin({ checkin }) {
+  const mapRef = useMapRef();
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map == null || checkin == null) return;
+
+    const el = document.createElement("div");
+    Object.assign(el.style, {
+      backgroundColor: "blue",
+      borderRadius: "50%",
+      border: "2px solid white",
+      width: "15px",
+      height: "15px",
+    });
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat([checkin.lng, checkin.lat])
+      .addTo(map);
+
+    return () => {
+      marker.remove();
+    };
+  }, [checkin]);
 
   return null;
 }

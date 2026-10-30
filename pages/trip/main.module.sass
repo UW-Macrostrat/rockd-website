@@ -43,6 +43,14 @@
   display: flex
   flex-direction: column
   gap: 0.25rem
+  // Room above a stop scrolled to the top of the sidebar
+  scroll-margin-top: 8px
+
+// The stop picked on the map: its card (data-sheet's, whose class is hashed)
+// outlined in the pin's blue
+.stop.selected > div
+  outline: 2px solid var(--bp-intent-primary-rest)
+  outline-offset: 1px
 
 .stop-name
   margin: 0

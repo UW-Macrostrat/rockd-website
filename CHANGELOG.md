@@ -17,7 +17,9 @@
   a Comments view) over its stops (the
   map pages' checkin cards, each under its stop's name). Its map has the
   standard Settings and Macrostrat overlay, with the stops clustered and drawn
-  as My checkins draws its checkins.
+  as My checkins draws its checkins. Map clicks work as on Explore: a cluster
+  zooms in, a stop gets Explore's blue pin and the sidebar scrolls to its
+  card (outlined), and a click elsewhere clears it.
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
