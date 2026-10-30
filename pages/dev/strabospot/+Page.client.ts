@@ -1,32 +1,17 @@
-import { useMapRef } from "@macrostrat/mapbox-react";
+import h from "@macrostrat/hyper";
 import { Button } from "@blueprintjs/core";
-import { mapboxAccessToken, SETTINGS } from "~/settings";
-import {
-  buildInspectorStyle,
-  MapMarker,
-  MapView,
-} from "@macrostrat/map-interface";
-import { MapSettingsPanel, MapSidebarLayout } from "~/components/map-sidebar";
-import { buildMacrostratStyle } from "@macrostrat/map-styles";
-import { MapPosition, mergeStyles } from "@macrostrat/mapbox-utils";
-import { useDarkMode } from "@macrostrat/ui-components";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import h from "../../explore/main.module.sass";
-import { useRockdAPI } from "~/components";
-import { deletePins } from "../../explore/utils";
-import { createCheckins } from "~/components/checkin.client";
-import { mapStyle } from "../../explore/map-style";
-import { atom, useAtom } from "jotai";
+import { CheckinMapPage } from "~/components/map-sidebar";
+import { useEffect, useState } from "react";
 import { FeatureDetails } from "./featured-checkins";
 import {
   refreshStoredStrabospotAuth,
   clearStoredStrabospotAuth,
   loginAndRefreshStrabospotFromUUID,
 } from "./strabospot-integration";
-import { getStoredRockdPersonId, clearRockdAuth } from "../../login/rockd-auth";
+import {
+  clearRockdAuth,
+  useRequiredRockdPersonId,
+} from "../../login/rockd-auth";
 
 const strabospotSyncButtonBaseStyle = {
   borderRadius: "8px",
@@ -125,43 +110,13 @@ function StrabospotLinkControl({
   ]);
 }
 
-mapboxgl.accessToken = mapboxAccessToken;
-
-const _macrostratStyle = buildMacrostratStyle({
-  tileserverDomain: SETTINGS.burwellTileDomain,
-  fillOpacity: 0.3,
-  strokeOpacity: 0.1,
-}) as mapboxgl.Style;
-
-const type = {
-  id: "Sample",
-  name: "Sample",
-  color: "purple",
-};
-
-const showSatelliteAtom = atom(false);
-const showOverlayAtom = atom(true);
-const showSettingsAtom = atom(false);
-
+/** The signed-in user's checkins, on the map and listed beside it, for sending
+ * to StraboSpot */
 export function Page() {
-  const [showSatellite, setShowSatellite] = useAtom(showSatelliteAtom);
-  const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
-  const [showSettings, setSettings] = useAtom(showSettingsAtom);
   const [isStrabospotSynced, setIsStrabospotSynced] = useState(false);
   const [isCheckingStrabospotSync, setIsCheckingStrabospotSync] =
     useState(true);
-  const [rockdPersonId, setRockdPersonId] = useState<number | null>(null);
-  const [rockdChecked, setRockdChecked] = useState(false);
-
-  useEffect(() => {
-    const personId = getStoredRockdPersonId();
-    if (personId == null) {
-      window.location.href = "/login";
-      return;
-    }
-    setRockdPersonId(personId);
-    setRockdChecked(true);
-  }, []);
+  const rockdPersonId = useRequiredRockdPersonId();
 
   useEffect(() => {
     let cancelled = false;
@@ -217,226 +172,26 @@ export function Page() {
     window.location.href = strabospotLoginURL.toString();
   }
 
-  const style = useMapStyle(
-    type,
-    mapboxAccessToken,
-    showSatellite,
-    showOverlay,
-    rockdPersonId
-  );
+  if (rockdPersonId == null) return null;
 
-  const [selectedCheckin, setSelectedCheckin] = useState<number | null>(null);
-  const [inspectPosition, setInspectPosition] =
-    useState<mapboxgl.LngLat | null>(null);
-
-  const onSelectPosition = useCallback((position: mapboxgl.LngLat) => {
-    setInspectPosition(position);
-    deletePins(".selected_pin");
-  }, []);
-
-  const checkinData = useRockdAPI(
-    selectedCheckin != null
-      ? `/protected/checkins?checkin_id=${selectedCheckin}`
-      : `/protected/checkins?checkin_id=0`
-  );
-
-  // The sidebar shows one view at a time: settings, the selected checkins, or
-  // (by default) the user's checkins
-  let title: string;
-  let sidebar: ReactNode;
-  let onClose: (() => void) | undefined;
-
-  if (showSettings) {
-    title = "Settings";
-    onClose = () => setSettings(false);
-    sidebar = h(ContextPanel);
-  } else if (selectedCheckin != null && checkinData?.success?.data) {
-    const clickedCheckins = h(createSelectedCheckins, {
-      data: checkinData.success.data,
-      setInspectPosition,
-    });
-    title = "Selected checkins";
-    onClose = () => {
-      setSelectedCheckin(null);
-      deletePins(".selected_pin");
-    };
-    sidebar = h("div.checkin-container", clickedCheckins);
-  } else {
-    title = "My checkins";
-    sidebar = h(FeatureDetails, {
+  return h(CheckinMapPage, {
+    title: "My checkins",
+    personId: rockdPersonId,
+    onLogout: logOut,
+    tools: h(StrabospotLinkControl, {
+      isSynced: isStrabospotSynced,
+      isChecking: isCheckingStrabospotSync,
+      onToggle: handleToggleStrabospotSync,
+    }),
+    list: h(FeatureDetails, {
       isStrabospotSynced,
       personId: rockdPersonId,
-    });
-  }
-
-  if (!rockdChecked || rockdPersonId == null || style == null) return null;
-
-  const mapPosition: MapPosition = {
-    camera: {
-      lat: 39,
-      lng: -98,
-      altitude: 6000000,
-    },
-  };
-
-  return h(
-    MapSidebarLayout,
-    {
-      title,
-      sidebar,
-      onClose,
-      onToggleSettings: () => setSettings(!showSettings),
-      tools: h(StrabospotLinkControl, {
-        isSynced: isStrabospotSynced,
-        isChecking: isCheckingStrabospotSync,
-        onToggle: handleToggleStrabospotSync,
-      }),
-    },
-    h(
-      MapView,
-      {
-        style,
-        mapboxToken: mapboxAccessToken,
-        mapPosition,
-        standalone: false,
-      },
-      [
-        h(MapMarker, {
-          setPosition: onSelectPosition,
-        }),
-        h(ClickedCheckins, { setSelectedCheckin }),
-      ]
-    )
-  );
-}
-
-function useMapStyle(type, mapboxToken, showSatellite, showOverlay, personId) {
-  const dark = useDarkMode();
-  const isEnabled = dark?.isEnabled;
-
-  const baseStyle = isEnabled
-    ? "mapbox://styles/mapbox/dark-v10"
-    : "mapbox://styles/mapbox/light-v10";
-  const satelliteStyle = "mapbox://styles/mapbox/satellite-v9";
-  const finalStyle = showSatellite ? satelliteStyle : baseStyle;
-
-  const [actualStyle, setActualStyle] = useState(null);
-
-  const baseOverlayStyle = mapStyle(type);
-
-  const strabospotOverlayStyle = {
-    ...baseOverlayStyle,
-    sources: {
-      ...baseOverlayStyle.sources,
-      weaver: {
-        ...baseOverlayStyle.sources.weaver,
-        tiles: [
-          `${SETTINGS.rockdApiURL}/checkin-tile/{z}/{x}/{y}?cluster=true&person_id=${personId}`,
-        ],
-      },
-    },
-  };
-
-  const overlayStyle = showOverlay
-    ? mergeStyles(_macrostratStyle, strabospotOverlayStyle)
-    : strabospotOverlayStyle;
-
-  useEffect(() => {
-    if (personId == null) {
-      setActualStyle(null);
-      return;
-    }
-
-    buildInspectorStyle(finalStyle, overlayStyle, {
-      mapboxToken,
-      inDarkMode: isEnabled,
-    }).then((s) => {
-      setActualStyle(s);
-    });
-  }, [isEnabled, showSatellite, showOverlay, personId, mapboxToken]);
-
-  return actualStyle;
-}
-
-function ContextPanel() {
-  const [showOverlay, setOverlay] = useAtom(showOverlayAtom);
-  const [showSatellite, setSatellite] = useAtom(showSatelliteAtom);
-
-  function handleLogout() {
-    clearRockdAuth();
-    clearStoredStrabospotAuth();
-    window.location.href = "/login";
-  }
-
-  return h(MapSettingsPanel, {
-    showSatellite,
-    onToggleSatellite: () => setSatellite(!showSatellite),
-    showOverlay,
-    onToggleOverlay: () => setOverlay(!showOverlay),
-    onLogout: handleLogout,
+    }),
   });
 }
 
-function createSelectedCheckins(result, setInspectPosition) {
-  const mapRef = useMapRef();
-  return createCheckins(result.data, mapRef, setInspectPosition);
-}
-
-function ClickedCheckins({ setSelectedCheckin }) {
-  const mapRef = useMapRef();
-  const map = mapRef.current;
-
-  useEffect(() => {
-    if (!map) return;
-
-    const handleClick = (e) => {
-      const cluster = map.queryRenderedFeatures(e.point, {
-        layers: ["clusters"],
-      });
-
-      if (cluster.length > 0) {
-        const zoom = cluster[0].properties.expansion_zoom;
-
-        map.flyTo({
-          center: cluster[0].geometry.coordinates,
-          zoom: zoom + 2,
-          speed: 10,
-          curve: 0.5,
-        });
-      }
-
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: ["unclustered-point"],
-      });
-
-      if (features.length > 0) {
-        const checkinId = features[0].properties.id;
-        const coord = features[0].geometry.coordinates.slice();
-
-        deletePins(".selected_pin");
-
-        const el = document.createElement("div");
-        el.className = "selected_pin";
-        el.style.backgroundColor = "blue";
-        el.style.borderRadius = "50%";
-        el.style.border = "2px solid white";
-        el.style.width = "15px";
-        el.style.height = "15px";
-
-        new mapboxgl.Marker(el).setLngLat(coord).addTo(map);
-        setSelectedCheckin(Number(checkinId));
-      } else {
-        setSelectedCheckin(null);
-        deletePins(".selected_pin");
-      }
-    };
-
-    map.on("click", handleClick);
-
-    return () => {
-      map.off("click", handleClick);
-    };
-  }, [map]);
-
-  return null;
+function logOut() {
+  clearRockdAuth();
+  clearStoredStrabospotAuth();
+  window.location.href = "/login";
 }

@@ -1,0 +1,119 @@
+// A trip in a map page's sidebar (`MapSidebarLayout`)
+
+.trip-details
+  display: flex
+  flex-direction: column
+  gap: 0.75rem
+  padding: 0 8px 8px
+  // Past the sidebar's own top padding, so a newly shown trip scrolls the
+  // sidebar fully back to its top
+  scroll-margin-top: 2rem
+
+// The trip's header card over its stops. Qualified to outrank Blueprint's own
+// `.bp6-card` padding.
+.trip-details .trip-header
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+  padding: 0.75rem 1rem
+
+  .trip-name
+    margin: 0
+    color: var(--text-emphasized-color)
+
+  .trip-meta
+    margin: 0
+    font-size: 0.85em
+    color: var(--bp-typography-color-muted)
+
+  .description
+    margin: 0
+
+  .trip-actions
+    display: flex
+    flex-wrap: wrap
+    gap: 0.5rem
+    margin-top: 0.25rem
+
+// The stops: the map pages' checkin cards, spaced as in their feed
+.stop-list
+  display: flex
+  flex-direction: column
+  gap: 12px
+
+.stop
+  display: flex
+  flex-direction: column
+  gap: 0.25rem
+  // Room above a stop scrolled to the top of the sidebar
+  scroll-margin-top: 8px
+
+// The stop picked on the map: its card (data-sheet's, whose class is hashed)
+// outlined in the pin's blue
+.stop.selected > div
+  outline: 2px solid var(--bp-intent-primary-rest)
+  outline-offset: 1px
+
+.stop-name
+  margin: 0
+  padding: 0 4px
+  color: var(--text-emphasized-color)
+
+.trip-comments
+  padding: 0 12px 12px
+
+// A list of trips as cards (`TripList`), as /trips shows its most recent
+.trip-list
+  display: flex
+  flex-direction: column
+  gap: 0.75rem
+  padding: 0.25rem 8px 8px
+
+  .trip-list-description
+    margin: 0
+    padding: 0 4px
+    color: var(--bp-typography-color-muted)
+
+  .trip-list-title
+    margin: 0
+    padding: 0 4px
+    color: var(--text-emphasized-color)
+
+.trip-cards
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+
+.trip-list-spinner
+  margin: 1rem 0
+
+// The whole card is the link to its trip
+.trip-card-link, .trip-card-link:hover
+  text-decoration: none
+
+// Qualified to outrank Blueprint's own `.bp6-card` padding. Its body text is
+// set here, as the link's color would make it link blue. The byline is the
+// checkin cards' (`PersonByline`).
+.trip-card-link .trip-card
+  color: var(--text-color)
+  display: flex
+  flex-direction: column
+  gap: 0.4rem
+  padding: 0.75em 1em 0.6em
+
+  .trip-card-name
+    margin: 0.15rem 0 0
+    color: var(--text-emphasized-color)
+
+  .trip-card-description
+    margin: 0
+    display: -webkit-box
+    -webkit-line-clamp: 2
+    -webkit-box-orient: vertical
+    overflow: hidden
+
+  .trip-card-counts
+    display: flex
+    gap: 0.75em
+    font-size: 0.85em
+    color: var(--text-subtle-color)

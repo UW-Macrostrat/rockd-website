@@ -15,6 +15,7 @@ export interface NavLinkItem {
 export const exploreNavItems: NavLinkItem[] = [
   { href: "/", text: "Home", icon: "home" },
   { href: "/explore", text: "Explore", icon: "geosearch" },
+  { href: "/trips", text: "Trips", icon: "route" },
   { href: "/heatmap", text: "Heatmap", icon: "map" },
 ];
 

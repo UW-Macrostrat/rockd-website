@@ -9,7 +9,7 @@
  * it's the candidate to promote back into the library (converging with that
  * component and `CheckinListing`, which already carries a TODO to dedupe).
  */
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Icon } from "@blueprintjs/core";
 import { LngLatCoords } from "@macrostrat/data-components";
 import { createDataCard, type ItemComponentProps } from "@macrostrat/data-sheet";
@@ -64,10 +64,39 @@ function ReservedImage(props: {
   });
 }
 
-function Stat({ icon, value }: { icon: any; value: number | string }) {
+/** A count with its icon, as a card's footer shows likes and comments */
+export function Stat({ icon, value }: { icon: any; value: number | string }) {
   return h("div.stat", [
     h(Icon, { icon, size: 12 }),
     h("span.stat-value", String(value ?? 0)),
+  ]);
+}
+
+/** Who posted something and when: their gravatar, name and date, with
+ * anything else for the row (a checkin's rating) at its end. Heads the
+ * checkin cards and trip cards. */
+export function PersonByline({
+  personId,
+  name,
+  date,
+  children,
+}: {
+  personId: number;
+  name: string;
+  date: string;
+  children?: ReactNode;
+}) {
+  return h("div.checkin-header", [
+    h(ReservedImage, {
+      className: "profile-pic",
+      src: getProfilePicUrl(personId),
+      alt: "",
+    }),
+    h("div.checkin-byline", [
+      h("span.person-name", name),
+      h("span.checkin-date", date),
+    ]),
+    children,
   ]);
 }
 
@@ -117,18 +146,15 @@ export function checkinSummary(data: Checkin) {
   }
 
   return [
-    h("div.checkin-header", [
-      h(ReservedImage, {
-        className: "profile-pic",
-        src: getProfilePicUrl(person_id),
-        alt: "",
-      }),
-      h("div.checkin-byline", [
-        h("span.person-name", `${first_name} ${last_name}`),
-        h("span.checkin-date", created),
-      ]),
-      h(Rating, { value: rating }),
-    ]),
+    h(
+      PersonByline,
+      {
+        personId: person_id,
+        name: `${first_name} ${last_name}`,
+        date: created,
+      },
+      h(Rating, { value: rating })
+    ),
     h.if(notes != null && notes !== "")("p.checkin-notes", notes),
     image,
     h("div.checkin-footer", [

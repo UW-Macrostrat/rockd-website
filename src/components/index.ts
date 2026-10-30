@@ -53,8 +53,11 @@ export async function fetchRockdData(url: string) {
   return await fetch(apiURL + url);
 }
 
-export function useRockdAPI(src) {
-  return useAPIResult(apiURL + src);
+/** A Rockd API route's response; a null route makes no request. */
+export function useRockdAPI(src: string | null) {
+  let route: string | null = null;
+  if (src != null) route = apiURL + src;
+  return useAPIResult(route);
 }
 
 function imageExists(src: string): Promise<boolean> {

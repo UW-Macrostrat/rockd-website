@@ -5,7 +5,7 @@
  */
 import { Spinner } from "@blueprintjs/core";
 import { createMasonryScrollBody } from "@macrostrat/data-sheet";
-import { useMap } from "@macrostrat/mapbox-react";
+import { useMap, useMapInitialized } from "@macrostrat/mapbox-react";
 import type { LngLatBounds } from "mapbox-gl";
 import { useEffect, useState } from "react";
 import { CheckinFeedPanel, type CheckinFeedPanelProps } from "./feed-panel";
@@ -63,6 +63,9 @@ export function MapCheckinFeed({
 /** The map's visible area, updated when a move ends (not on every frame of
  * one, which would restart the list mid-pan). */
 function useMapBounds(enabled: boolean): CheckinBounds | null {
+  // `useMap` reads the map at render time without subscribing to it, so
+  // initialization is what re-renders once the map exists
+  const initialized = useMapInitialized();
   const map = useMap();
   const [bounds, setBounds] = useState<CheckinBounds | null>(null);
 
@@ -70,17 +73,19 @@ function useMapBounds(enabled: boolean): CheckinBounds | null {
     if (!enabled || map == null) return;
 
     const update = () => setBounds(toCheckinBounds(map.getBounds()));
+    // "idle" follows any load (the first, or a style change's), where "load"
+    // fires only once, possibly before this list mounts
     if (map.loaded()) {
       update();
     } else {
-      map.once("load", update);
+      map.once("idle", update);
     }
     map.on("moveend", update);
     return () => {
       map.off("moveend", update);
-      map.off("load", update);
+      map.off("idle", update);
     };
-  }, [map, enabled]);
+  }, [map, initialized, enabled]);
 
   return bounds;
 }

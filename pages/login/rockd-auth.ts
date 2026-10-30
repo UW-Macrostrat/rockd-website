@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 const ROCKD_AUTH_STORAGE_KEY = "rockd-auth";
 
 export interface RockdLoginPayload {
@@ -47,4 +49,21 @@ export function getStoredRockdPersonId(): number | null {
 export function getStoredRockdToken(): string | null {
   const auth = getStoredRockdAuth();
   return auth?.token ?? auth?.person?.token ?? null;
+}
+
+/** The signed-in user's person id, for a page behind a sign-in: null until
+ * it's read, and a signed-out visitor is sent to /login. */
+export function useRequiredRockdPersonId(): number | null {
+  const [personId, setPersonId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const storedId = getStoredRockdPersonId();
+    if (storedId == null) {
+      window.location.href = "/login";
+      return;
+    }
+    setPersonId(storedId);
+  }, []);
+
+  return personId;
 }

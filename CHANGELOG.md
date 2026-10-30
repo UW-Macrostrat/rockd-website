@@ -2,24 +2,39 @@
 
 ## Unreleased
 
-- Explore, My checkins and StraboSpot share one map sidebar, `MapSidebarLayout`
-  (`~/components/map-sidebar`), built on `@macrostrat/map-interface`'s
-  `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages are: a
-  floating panel with the Rockd icon, the view's title, Settings and close
-  buttons and each page's own controls (StraboSpot's link button), over a
-  scrolling body. It replaces three copies of the sidebar. Settings (a gear in
-  the header) is one shared `MapSettingsPanel`: Dark/Light, Satellite, Overlay
-  and, on the signed-in pages, Logout, as a centered column of the same
-  outlined grey button (Logout is red: outline, text, icon and hover). A
-  toggle is shaded only while it's on: Dark only in dark mode.
-  The trip page uses the same layout: a "Trips" sidebar with a header card
-  (the trip's name, edited date and stop count, description, KMZ download and
-  a Comments view) over its stops (the
-  map pages' checkin cards, each under its stop's name). Its map has the
-  standard Settings and Macrostrat overlay, with the stops clustered and drawn
-  as My checkins draws its checkins. Map clicks work as on Explore: a cluster
-  zooms in, a stop gets Explore's blue pin and the sidebar scrolls to its
-  card (outlined), and a click elsewhere clears it.
+- The map pages (Explore, My checkins, StraboSpot, a trip and the new Trips
+  page) are built from one set of components in `~/components/map-sidebar`:
+  - `MapSidebarLayout`, built on `@macrostrat/map-interface`'s
+    `MapAreaContainer` slots and `FloatingNavbar` as Macrostrat's map pages
+    are: a floating panel with the Rockd icon, the view's title, Settings and
+    close buttons and the page's own controls (StraboSpot's link button), over
+    a scrolling body.
+  - `RockdMapPage`: that layout around the map, with the standard Settings
+    view (`MapSettingsPanel`: Dark/Light, Satellite, Overlay and, on signed-in
+    pages, Logout, as a centered column of the same outlined grey button;
+    Logout is red; a toggle is shaded only while it's on) and the map style
+    (`useRockdMapStyle`: the Mapbox base map, the Macrostrat overlay and the
+    page's own layers). Settings are shared across the map pages.
+  - Point layers: the Rockd API's clustered checkin tiles, or points clustered
+    in the browser (`clusteredPointsStyle`). `MapPointClicks` handles clicks as
+    Explore always has: a cluster zooms in, a point gets a blue pin
+    (`SelectedPin`) and shows in the sidebar, and a click elsewhere clears it.
+  - `CheckinMapPage`: Explore, My checkins and StraboSpot, each just its title,
+    list and filter. A checkin picked on the map shows as the map pages'
+    checkin card under "Selected checkins".
+- Trips (`~/components/trips`):
+  - A trip's page has a "Trips" sidebar with a header card (the trip's name,
+    edited date and stop count, description, KMZ download and a Comments view)
+    over its stops in trip order, each the map pages' checkin card under its
+    stop's name. On the map, each stop is its own blue point, joined in order
+    by a dotted line; picking one scrolls the sidebar to its card (outlined).
+    Closing the trip returns to `/trips`, at the view it was left in.
+  - `/trips` puts every public trip on the map as one clustered point (its
+    first stop), from the Rockd API's `/trips?points=true`, and lists the 10
+    most recent as cards: the author's gravatar, name and the trip's date (the
+    checkin cards' byline), then its name, description, and stop, like and
+    comment counts. Picking a trip in either opens its page. The footer links
+    to it under Explore.
 
 - Explore's, My checkins' and StraboSpot's sidebar lists are the `/dev/feed`
   checkin list (StraboSpot's keeps its selection mode, "Send to Strabospot",
