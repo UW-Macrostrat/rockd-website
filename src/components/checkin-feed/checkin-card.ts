@@ -10,8 +10,13 @@
  * it's the candidate to promote back into the library (converging with that
  * component and `CheckinListing`, which already carries a TODO to dedupe).
  */
-import { createDataCard, type ItemComponentProps } from "@macrostrat/data-sheet";
+import { AnchorButton } from "@blueprintjs/core";
+import {
+  createDataCard,
+  type ItemComponentProps,
+} from "@macrostrat/data-sheet";
 import { getImageUrl } from "~/components";
+import { useRockdAuth } from "~/components/auth";
 import hyper from "@macrostrat/hyper";
 import styles from "./checkin-card.module.sass";
 import type { Checkin } from "./checkin-provider";
@@ -26,13 +31,31 @@ export * from "./checkin-card-parts";
 
 const h = hyper.styled(styles);
 
-/** The card as a link to the checkin's own page (the `/dev/feed` lists). */
+/** The card as a link to the checkin's own page (the `/dev/feed` lists),
+ * with Edit beneath it when the checkin is the signed-in user's own. */
 function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
-  return h(
-    "a.checkin-card-content",
-    { href: `/checkin/${data.checkin_id}` },
-    checkinSummary(data)
-  );
+  const { personId } = useRockdAuth();
+  const own = personId != null && data.person_id === personId;
+  return h("div.checkin-card-content", [
+    h(
+      "a.checkin-card-link",
+      { href: `/checkin/${data.checkin_id}` },
+      checkinSummary(data)
+    ),
+    h.if(own)(
+      "div.card-actions",
+      h(
+        AnchorButton,
+        {
+          href: `/dev/checkin/${data.checkin_id}`,
+          icon: "edit",
+          minimal: true,
+          small: true,
+        },
+        "Edit"
+      )
+    ),
+  ]);
 }
 
 export const CheckinCard = createDataCard<Checkin>(CheckinCardContent, {

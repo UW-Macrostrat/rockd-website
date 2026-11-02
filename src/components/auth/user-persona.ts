@@ -115,9 +115,7 @@ function SignedOutPanel() {
   return h("div.user-panel", [
     h("div.user-panel-header", [
       h(Icon, { icon: "blocked-person", size: 20 }),
-      h("div.user-panel-identity", [
-        h("div.user-panel-name", "Not signed in"),
-      ]),
+      h("div.user-panel-identity", [h("div.user-panel-name", "Not signed in")]),
     ]),
     h(
       AnchorButton,
@@ -164,6 +162,16 @@ function SignedInPanel({
         AnchorButton,
         { minimal: true, icon: "map-marker", href: "/my-checkins" },
         "My checkins"
+      ),
+      h(
+        AnchorButton,
+        { minimal: true, icon: "add", href: "/dev/checkin/new" },
+        "New checkin"
+      ),
+      h(
+        AnchorButton,
+        { minimal: true, icon: "cloud-upload", href: "/dev/checkin" },
+        "Unsaved edits"
       ),
       h(
         Button,
