@@ -21,7 +21,8 @@
     (`MacrostratDataProvider`), with minerals and structures loaded from
     Macrostrat's `/defs` routes, stratigraphic names searched on Macrostrat,
     taxa on the Paleobiology Database, and map units from Macrostrat's nearby
-    geology at the checkin's location.
+    geology at the checkin's location. The age picker lists the ages of the
+    map units there first, marked "Nearby", as the app's picker does.
   - A chosen photo's EXIF is read in the browser (`~/checkin-editor/exif`): its
     position and date are offered for the checkin, as the app's EXIF prompt
     does. JPEGs upload as-is; other formats are re-encoded through a canvas.

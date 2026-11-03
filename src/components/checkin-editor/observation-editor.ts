@@ -187,6 +187,7 @@ export function ObservationEditor({
           h(IntervalPicker, {
             value: rocks.interval,
             onChange: (interval) => setRocks({ interval }),
+            nearby: nearby.data?.intervals ?? [],
           })
         ),
         h(

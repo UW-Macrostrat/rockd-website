@@ -46,14 +46,24 @@ const POPOVER = { minimal: true, matchTargetWidth: true };
 
 // ---- Interval ----
 
+/** The whole timescale, youngest first — with the intervals Macrostrat
+ * reports at the checkin's location listed ahead of the rest, as the app's
+ * picker leads with its "nearby" ages. */
 export function IntervalPicker({
   value,
   onChange,
+  nearby = [],
 }: {
   value: IntervalRef | null;
   onChange: (value: IntervalRef | null) => void;
+  /** Ages of the map units at the checkin's location */
+  nearby?: IntervalRef[];
 }) {
   const intervals = useIntervals();
+  const nearbyIds = useMemo(
+    () => new Set(nearby.map((d: any) => Number(d.int_id ?? d.id))),
+    [nearby]
+  );
   const items = useMemo<RefItem<IntervalRef>[]>(() => {
     if (intervals == null) return [];
     return Array.from(intervals.values())
@@ -63,7 +73,7 @@ export function IntervalPicker({
         id: d.int_id,
         name: d.name,
         color: d.color,
-        description: `${d.int_type ?? ""} ${fmtAges(d.t_age, d.b_age)}`.trim(),
+        description: intervalDescription(d, nearbyIds.has(d.int_id)),
         ref: {
           int_id: d.int_id,
           name: d.name,
@@ -72,7 +82,13 @@ export function IntervalPicker({
           t_age: d.t_age,
         },
       }));
-  }, [intervals]);
+  }, [intervals, nearbyIds]);
+
+  // Nearby ages first; within each group, the age order above
+  const rank = (d: RefItem<IntervalRef>) =>
+    nearbyIds.has(Number(d.id)) ? 0 : 1;
+  const compareItems = (a: RefItem<IntervalRef>, b: RefItem<IntervalRef>) =>
+    rank(a) - rank(b) || items.indexOf(a) - items.indexOf(b);
 
   const picked = useMemo<RefItem<IntervalRef>[]>(() => {
     if (value == null) return [];
@@ -98,8 +114,15 @@ export function IntervalPicker({
     searchPlaceholder: "Search geologic ages…",
     size: TagSize.Normal,
     className: "picker",
+    compareItems,
     onChange: (next) => onChange(next[0]?.ref ?? null),
   });
+}
+
+function intervalDescription(d: any, isNearby: boolean): string {
+  const parts = [d.int_type, fmtAges(d.t_age, d.b_age)];
+  if (isNearby) parts.unshift("Nearby ·");
+  return parts.filter(Boolean).join(" ");
 }
 
 function fmtAges(t: number, b: number): string {
