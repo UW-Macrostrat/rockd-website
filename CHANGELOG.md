@@ -8,6 +8,9 @@
   A second section lists the other pages whose `+guard.ts` is the production
   guard (403 outside development), found the same way: `/heatmap`, `/login`
   and its sub-pages, `/my-checkins` and `/orgs`.
+- Removed `/login/strabojwt`, the original StraboSpot account-linking page
+  (StraboSpot redirected there with `?j=<jwt>`). StraboSpot no longer uses it;
+  linking happens on `/dev/strabospot` through `strabospot.org/rockd_login`.
 - **Checkin editing on the web** (`/dev/checkin`, signed-in users): the app's
   create/edit flow as pages, so new features can be prototyped here before the
   mobile app.
@@ -164,8 +167,7 @@
   hover the same in either theme. The email and password fields take the
   theme's colors, and keep them when the browser autofills them. The green
   hero-button styles, no longer used
-  anywhere, are gone. `/login/callback` and `/login/strabojwt` keep their
-  full-window layout.
+  anywhere, are gone. `/login/callback` keeps its full-window layout.
 
 - Added development-only organization directory and creation pages (`/orgs`
   and `/orgs/new`), with a typed
