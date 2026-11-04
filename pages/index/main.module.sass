@@ -41,31 +41,6 @@
     align-items: center
     gap: 0.5rem
 
-  // Minimal buttons in a band of the Rockd wordmark (Explore its blue, Login
-  // its green) so they read as clickable: a solid border of the color around an
-  // 80%-opacity fill that turns solid on hover, keeping Blueprint's text and
-  // icon colors. Dark mode keeps the hue as a fainter tint. Shared with
-  // /login's Login button. Qualified to outrank
-  // `.bp6-dark .bp6-button.bp6-minimal:hover`.
-  .explore-link:global(.bp6-button), .login-link:global(.bp6-button)
-    border: 1px solid var(--hero-link-color)
-    background-color: color-mix(in srgb, var(--hero-link-color) 80%, transparent)
-
-    &:hover
-      background-color: var(--hero-link-color)
-
-    :global(.bp6-dark) &, :global([data-bp-color-scheme=dark]) &
-      background-color: color-mix(in srgb, var(--hero-link-color) 15%, transparent)
-
-      &:hover
-        background-color: color-mix(in srgb, var(--hero-link-color) 30%, transparent)
-
-  .explore-link
-    --hero-link-color: #c1d2d6
-
-  .login-link
-    --hero-link-color: #91b197
-
 
 .dashboard-img-container
   margin: 2em 0
@@ -388,3 +363,21 @@ img
 
     .image-container img
       max-height: 300px
+
+// /login's banner has no photo behind it, so it takes the theme's panel colors,
+// and the app's screens beside the form are larger than the homepage's
+.main-page .login-banner
+  background-color: var(--panel-secondary-background-color, rgba(128, 128, 128, 0.08))
+  color: var(--text-color)
+
+  .main-img
+    max-height: 480px
+
+  // Its Login button's hover: one transparent gray in either theme, stronger
+  // than Blueprint's faint light-mode default
+  .login-button:global(.bp6-button)
+    &:hover
+      background-color: rgba(143, 153, 168, 0.25)
+
+    &:active
+      background-color: rgba(143, 153, 168, 0.35)

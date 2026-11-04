@@ -37,16 +37,13 @@ const selectedOverlayStyle = {
 };
 
 const sentBadgeStyle = {
-  position: "absolute" as const,
-  top: "14px",
-  right: "14px",
+  flex: "0 0 auto",
   width: "18px",
   height: "18px",
   borderRadius: "999px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  zIndex: 3,
   background: "linear-gradient(180deg, #7ee08f 0%, #43b864 100%)",
   border: "1px solid #379654",
   boxShadow:
@@ -320,14 +317,18 @@ function StrabospotCheckinContent({ data }: { data: Checkin }) {
     onActivate = () => selection.toggle(data);
   }
 
-  return h(MapCheckinCardBody, { data, onActivate }, [
-    h.if(selection.isSynced && sent)(
-      "div",
-      { style: sentBadgeStyle, title: "Sent to StraboSpot" },
-      h("span", { style: sentBadgeCheckStyle }, "✓")
-    ),
-    h.if(isSelected)("div", { style: selectedOverlayStyle }),
-  ]);
+  // Sits after the star rating in the card's header row
+  const badge = h.if(selection.isSynced && sent)(
+    "div",
+    { style: sentBadgeStyle, title: "Sent to StraboSpot" },
+    h("span", { style: sentBadgeCheckStyle }, "✓")
+  );
+
+  return h(
+    MapCheckinCardBody,
+    { data, onActivate, badge },
+    h.if(isSelected)("div", { style: selectedOverlayStyle })
+  );
 }
 
 const StrabospotCheckinCard = createMapCheckinCard(StrabospotCheckinContent);

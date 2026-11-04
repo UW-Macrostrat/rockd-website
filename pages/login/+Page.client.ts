@@ -6,6 +6,7 @@ import s from "../index/main.module.sass";
 import ob from "./oauth-buttons.module.sass";
 import { Image } from "~/components";
 import { SETTINGS } from "~/settings";
+import { HomeNav } from "../index/home-nav";
 
 const ROCKD_LOGIN_ENDPOINT = `${SETTINGS.rockdApiURL}/login`;
 
@@ -121,158 +122,161 @@ export function Page() {
     }
   }
 
-  return s("div.full-height-container", [
-    s("div.mask", [
-      s(Image, {
-        src: "main-page/field.jpg",
-        className: "start-img back-img",
-        alt: "Field",
-      }),
-    ]),
+  // The homepage's header and banner, without its photo, and with the form in
+  // place of the app badges
+  return s("div.main-page", [
+    h(HomeNav),
+    s("div.full-height-container.hero-banner.login-banner", [
+      s("div.main-content.side-by-side", [
+        s("div.content-panel.app-info", [
+          s(Image, {
+            src: "main-page/rockd_transparent.png",
+            className: "not-huge",
+            alt: "Rockd logo",
+          }),
 
-    s("div.main-content.side-by-side", [
-      s("div.content-panel.app-info", [
-        s(Image, {
-          src: "main-page/rockd_transparent.png",
-          className: "not-huge",
-          alt: "Rockd logo",
-        }),
+          s(
+            "p.tagline",
+            "Learn about, explore, and document the geologic world"
+          ),
 
-        s("p.tagline", "Learn about, explore, and document the geologic world"),
-
-        h(
-          "div",
-          {
-            style: {
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "1.5rem",
-            },
-          },
-          [
-            h(
-              "form",
-              {
-                onSubmit: handleSubmit,
-                style: {
-                  width: "100%",
-                  maxWidth: "302px",
-                  // One font, size and weight for every field and button
-                  fontFamily: "var(--pz-body-font)",
-                  fontSize: "0.9rem",
-                  fontWeight: 400,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                },
+          h(
+            "div",
+            {
+              style: {
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "1.5rem",
               },
-              [
-                h("input", {
-                  type: "email",
-                  value: email,
-                  onChange: (e) => setEmail(e.target.value),
-                  placeholder: "Email",
+            },
+            [
+              h(
+                "form",
+                {
+                  onSubmit: handleSubmit,
                   style: {
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "8px",
-                    border: "1px solid #ccc",
-                    font: "inherit",
+                    width: "100%",
+                    maxWidth: "302px",
+                    // One font, size and weight for every field and button
+                    fontFamily: "var(--pz-body-font)",
+                    fontSize: "0.9rem",
+                    fontWeight: 400,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.75rem",
                   },
-                }),
-
-                h("input", {
-                  type: "password",
-                  value: password,
-                  onChange: (e) => setPassword(e.target.value),
-                  placeholder: "Password",
-                  style: {
-                    padding: "0.7rem 0.9rem",
-                    borderRadius: "8px",
-                    border: "1px solid #ccc",
-                    font: "inherit",
-                  },
-                }),
-
-                // Styled as the homepage's Login link
-                s(
-                  Button,
-                  {
-                    type: "submit",
-                    className: "login-link",
-                    icon: "log-in",
-                    large: true,
-                    minimal: true,
+                },
+                [
+                  h("input", {
+                    type: "email",
+                    value: email,
+                    onChange: (e) => setEmail(e.target.value),
+                    placeholder: "Email",
                     style: {
-                      width: "fit-content",
-                      alignSelf: "center",
-                      // 10% under Blueprint's large button
-                      minHeight: "36px",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
                       font: "inherit",
                     },
-                  },
-                  "Login"
-                ),
+                  }),
 
-                h(
-                  "div",
-                  {
+                  h("input", {
+                    type: "password",
+                    value: password,
+                    onChange: (e) => setPassword(e.target.value),
+                    placeholder: "Password",
                     style: {
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
+                      padding: "0.7rem 0.9rem",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                      font: "inherit",
                     },
-                  },
-                  [
-                    h("hr", {
-                      style: {
-                        flex: 1,
-                        border: 0,
-                        borderTop: "1px solid #ccc",
-                      },
-                    }),
-                    h(
-                      "span",
-                      { style: { fontSize: "0.85rem", opacity: 0.7 } },
-                      "or"
-                    ),
-                    h("hr", {
-                      style: {
-                        flex: 1,
-                        border: 0,
-                        borderTop: "1px solid #ccc",
-                      },
-                    }),
-                  ]
-                ),
+                  }),
 
-                ob(
-                  "div.oauth-buttons",
-                  OAUTH_PROVIDERS.map(({ id, label, mark }) =>
-                    ob(
-                      `a.oauth-button.${id}`,
-                      { key: id, href: `${ROCKD_AUTH_BASE}/${id}` },
-                      [mark, h("span", label)]
+                  // The header's Login link with a thin border fitted around
+                  // its icon and label, centered under the fields
+                  s(
+                    Button,
+                    {
+                      type: "submit",
+                      className: "login-button",
+                      icon: "log-in",
+                      minimal: true,
+                      style: {
+                        alignSelf: "center",
+                        minHeight: "38px",
+                        padding: "0.4rem 1rem",
+                        border: "1px solid var(--text-subtle-color, #ccc)",
+                        color: "var(--text-subtle-color, #5f6b7c)",
+                        borderRadius: "8px",
+                        font: "inherit",
+                        fontWeight: 600,
+                      },
+                    },
+                    "Login"
+                  ),
+
+                  h(
+                    "div",
+                    {
+                      style: {
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                      },
+                    },
+                    [
+                      h("hr", {
+                        style: {
+                          flex: 1,
+                          border: 0,
+                          borderTop: "1px solid #ccc",
+                        },
+                      }),
+                      h(
+                        "span",
+                        { style: { fontSize: "0.85rem", opacity: 0.7 } },
+                        "or"
+                      ),
+                      h("hr", {
+                        style: {
+                          flex: 1,
+                          border: 0,
+                          borderTop: "1px solid #ccc",
+                        },
+                      }),
+                    ]
+                  ),
+
+                  ob(
+                    "div.oauth-buttons",
+                    OAUTH_PROVIDERS.map(({ id, label, mark }) =>
+                      ob(
+                        `a.oauth-button.${id}`,
+                        { key: id, href: `${ROCKD_AUTH_BASE}/${id}` },
+                        [mark, h("span", label)]
+                      )
                     )
-                  )
-                ),
+                  ),
 
-                h.if(error != null)(
-                  Callout,
-                  { intent: "danger", title: "Login failed" },
-                  error
-                ),
-              ]
-            ),
-          ]
-        ),
+                  h.if(error != null)(
+                    Callout,
+                    { intent: "danger", title: "Login failed" },
+                    error
+                  ),
+                ]
+              ),
+            ]
+          ),
+        ]),
+
+        s(Image, {
+          src: "main-page/main.png",
+          className: "main-img",
+          alt: "Rockd app preview",
+        }),
       ]),
-
-      s(Image, {
-        src: "main-page/main.png",
-        className: "main-img",
-        alt: "Rockd app preview",
-      }),
     ]),
   ]);
 }

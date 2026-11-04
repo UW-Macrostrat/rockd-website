@@ -13,6 +13,7 @@
 import { createDataCard, type ItemComponentProps } from "@macrostrat/data-sheet";
 import { getImageUrl } from "~/components";
 import hyper from "@macrostrat/hyper";
+import type { ReactNode } from "react";
 import styles from "./checkin-card.module.sass";
 import type { Checkin } from "./checkin-provider";
 import {
@@ -41,8 +42,9 @@ export const CheckinCard = createDataCard<Checkin>(CheckinCardContent, {
 
 /** A checkin's summary — byline, notes, photo, place and stats — for a card
  * to wrap. Shared by the link card here and the map pages' card
- * (`./map-checkin-card`), which differ only in what a click does. */
-export function checkinSummary(data: Checkin) {
+ * (`./map-checkin-card`), which differ only in what a click does. A `badge`
+ * sits after the rating. */
+export function checkinSummary(data: Checkin, badge?: ReactNode) {
   const { person_id, first_name, last_name, photo, notes, created, rating } =
     data;
 
@@ -63,7 +65,7 @@ export function checkinSummary(data: Checkin) {
         name: `${first_name} ${last_name}`,
         date: created,
       },
-      h(Rating, { value: rating })
+      [h(Rating, { value: rating }), badge]
     ),
     h.if(notes != null && notes !== "")("p.checkin-notes", notes),
     image,

@@ -20,7 +20,9 @@ export interface MapCheckinCardBodyProps {
   /** What a click does; flies the map to the checkin by default */
   onActivate?: () => void;
   className?: string;
-  /** Laid over the card, e.g. a status badge */
+  /** Shown after the rating, e.g. a status badge */
+  badge?: ReactNode;
+  /** Laid over the card, e.g. a selection outline */
   children?: ReactNode;
 }
 
@@ -30,6 +32,7 @@ export function MapCheckinCardBody({
   data,
   onActivate,
   className,
+  badge,
   children,
 }: MapCheckinCardBodyProps) {
   const mapRef = useMapRef();
@@ -51,7 +54,7 @@ export function MapCheckinCardBody({
       },
     },
     [
-      checkinSummary(data),
+      checkinSummary(data, badge),
       // A new tab, so the map keeps its place
       h(
         "a.checkin-details",

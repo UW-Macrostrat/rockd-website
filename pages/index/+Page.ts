@@ -1,32 +1,11 @@
-import { Image, RockdSiteIcon } from "~/components";
+import { Image } from "~/components";
 import h from "./main.module.sass";
-import { AnchorButton } from "@blueprintjs/core";
+import { HomeNav } from "./home-nav";
 
 /** One of the homepage's sections: as tall as its content, in the page's
  * centered column */
 function FullHeightContainer({ children, className }) {
   return h("div.full-height-container", { className }, children);
-}
-
-/** The homepage's header: the Rockd icon, and the ways into the site as
- * links */
-function HomeNav() {
-  return h("header.home-nav", [
-    h(RockdSiteIcon, { className: "home-nav-icon" }),
-    h("nav.home-nav-links", [
-      h(NavLink, { href: "/explore", icon: "geosearch" }, "Explore the data"),
-      h(NavLink, { href: "/trips", icon: "route" }, "Trips"),
-      h(NavLink, { href: "/login", icon: "log-in" }, "Login"),
-    ]),
-  ]);
-}
-
-function NavLink({ href, icon, children }) {
-  return h(
-    AnchorButton,
-    { href, icon, minimal: true, className: "home-nav-link" },
-    children
-  );
 }
 
 export function Page() {

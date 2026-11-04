@@ -1,4 +1,4 @@
 export default {
-  title: "Checkin feed",
+  title: "Feed",
   pageStyle: "fullscreen",
 };

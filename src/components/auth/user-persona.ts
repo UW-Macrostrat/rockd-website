@@ -98,7 +98,7 @@ const siteLinks: NavLinkItem[] = [
   ...exploreNavItems.filter(
     (item) => item.href === "/explore" || item.href === "/trips"
   ),
-  { href: "/dev/feed", text: "Checkin feed", icon: "feed" },
+  { href: "/dev/feed", text: "Feed", icon: "feed" },
   { href: "/orgs", text: "Organizations", icon: "people" },
 ];
 
@@ -164,6 +164,11 @@ function SignedInPanel({
         AnchorButton,
         { minimal: true, icon: "map-marker", href: "/my-checkins" },
         "My checkins"
+      ),
+      h(
+        AnchorButton,
+        { minimal: true, icon: "link", href: "/dev/strabospot" },
+        "Integrations"
       ),
       h(
         Button,

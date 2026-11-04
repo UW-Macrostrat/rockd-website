@@ -24,9 +24,9 @@
     checkin card under "Selected checkins".
 - A sign-in indicator, `UserPersona` (`~/components/auth`), as Macrostrat's:
   signed in, a button with the user's name, opening a panel with their name
-  and email, "My checkins" and Log out; signed out, "Sign in", opening a
+  and email, "My checkins", "Integrations" (`/dev/strabospot`) and Log out; signed out, "Sign in", opening a
   panel that links to `/login`. Either way the panel links to Explore and
-  Trips (with the footer's icons), the checkin feed and Organizations. It's at the top right of the `/dev/feed` and
+  Trips (with the footer's icons), the Feed and Organizations. It's at the top right of the `/dev/feed` and
   `/orgs` pages, and, icon only (`compact`), in every map page's
   sidebar header right of Settings, where its Log out is the page's own. The
   stored login's helpers (`rockd-auth`) moved there from `pages/login`.
@@ -61,6 +61,8 @@
   checkins: its `person_id` outranks any filter, and its search has no Person
   facet. The search's age and lithology chips are styled on every page that
   shows the list; they had relied on the checkin page's stylesheet.
+  StraboSpot's sent badge sits after a card's star rating rather than over it
+  (`MapCheckinCardBody`'s `badge`).
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
   under the header "Rockd › Checkin": the checkin's title (its notes' first
@@ -105,8 +107,16 @@
   app's screens; then each section as tall as its content, its text and
   pictures side by side (the Dashboard and progress sections as rounded
   boxes). The full-screen sections and their "Next page" buttons are gone.
-- `/login`'s Login button is a minimal button in the Rockd wordmark's green (a
-  solid border and an 80%-opacity fill that turns solid on hover).
+- `/login` takes the homepage's layout: the same column, header (`HomeNav`,
+  now in `pages/index/home-nav.ts`) and footer, with the login form in the
+  banner in place of the app badges. The banner has no photo behind it and
+  takes the theme's panel colors, and the app's screens beside the form are
+  larger (up to 480px). Its Login button matches the header's
+  Login link (icon and bold label), in gray with a thin gray border and roomy
+  padding around them, centered under the fields, and a transparent gray
+  hover the same in either theme. The green hero-button styles, no longer used
+  anywhere, are gone. `/login/callback` and `/login/strabojwt` keep their
+  full-window layout.
 
 - Added development-only organization directory and creation pages (`/orgs`
   and `/orgs/new`), with a typed
@@ -162,7 +172,7 @@
   chosen. The feed takes the page's width rather than its content's, so it
   no longer runs off a narrow page.
 - `/dev/feed/mine` shows a non-ideal state with a login link when signed out.
-- The feed pages use the site header (`Rockd › Development › Checkin feed`) over
+- The feed pages use the site header (`Rockd › Development › Feed`) over
   their own scrolling list; the site footer is part of the feed's end-of-scroll
   region, below the load progress and "Load more" checkpoint. The All /
   Nearby / Mine tabs (the site's small outlined buttons, the current feed
