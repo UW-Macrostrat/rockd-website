@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- `/dev` lists every page in the development section (behind its dev guard),
+  each by title with its URL, found from the `+Page` files under `pages/dev`
+  so new pages appear on their own. The Development breadcrumb now leads there.
+  A second section lists the other pages whose `+guard.ts` is the production
+  guard (403 outside development), found the same way: `/heatmap`, `/login`
+  and its sub-pages, `/my-checkins` and `/orgs`.
 - **Checkin editing on the web** (`/dev/checkin`, signed-in users): the app's
   create/edit flow as pages, so new features can be prototyped here before the
   mobile app.
@@ -155,7 +161,9 @@
   larger (up to 480px). Its Login button matches the header's
   Login link (icon and bold label), in gray with a thin gray border and roomy
   padding around them, centered under the fields, and a transparent gray
-  hover the same in either theme. The green hero-button styles, no longer used
+  hover the same in either theme. The email and password fields take the
+  theme's colors, and keep them when the browser autofills them. The green
+  hero-button styles, no longer used
   anywhere, are gone. `/login/callback` and `/login/strabojwt` keep their
   full-window layout.
 

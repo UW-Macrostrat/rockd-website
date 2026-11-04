@@ -168,7 +168,7 @@ export function Page() {
                   },
                 },
                 [
-                  h("input", {
+                  s("input.login-input", {
                     type: "email",
                     value: email,
                     onChange: (e) => setEmail(e.target.value),
@@ -181,7 +181,7 @@ export function Page() {
                     },
                   }),
 
-                  h("input", {
+                  s("input.login-input", {
                     type: "password",
                     value: password,
                     onChange: (e) => setPassword(e.target.value),
