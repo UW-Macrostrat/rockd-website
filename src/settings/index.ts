@@ -54,6 +54,12 @@ export function getEnvironment(): Environment {
   return Environment.production;
 }
 
+/** Whether this is the development deployment (`MACROSTRAT_ENV`), where
+ * the `/dev` pages are served. Links into them are hidden elsewhere. */
+export function isDevelopmentEnvironment(): boolean {
+  return getEnvironment() === Environment.development;
+}
+
 /** Legacy settings object */
 export const SETTINGS = {
   rockdApiURL,

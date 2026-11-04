@@ -1,2 +1,2 @@
-// The sign-in indicator, in the feeds' site header.
-export { UserPersona as default } from "~/components/auth";
+// New checkin (signed in) and the sign-in indicator, in the feeds' site header.
+export { AccountActions as default } from "~/components/auth";

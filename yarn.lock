@@ -1140,6 +1140,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@macrostrat/api-types@npm:1.4.0, @macrostrat/api-types@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@macrostrat/api-types@npm:1.4.0"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.16"
+  checksum: 10c0/8023ac66e6f46f5b6308c3d8eed06c12d20e814a9b0ba2f96dbddc661c3dce7b8fa70a8d0de5ed667f7e379c02931076d5fb1119481d99fc1c5b37b420380f12
+  languageName: node
+  linkType: hard
+
 "@macrostrat/color-utils@npm:1.2.2, @macrostrat/color-utils@npm:^1.2.2":
   version: 1.2.2
   resolution: "@macrostrat/color-utils@npm:1.2.2"
@@ -1147,6 +1156,38 @@ __metadata:
     "@types/chroma-js": "npm:^3.1.1"
     chroma-js: "npm:^3.2.0"
   checksum: 10c0/07ec3296c6dbf16a535996c9cd0c16eee1eb4b1e78e595ae08a9eb5fe90576d12997e6895f2a059370929a659ca597a1134545a8f978965c654e3da5936bb2d1
+  languageName: node
+  linkType: hard
+
+"@macrostrat/data-components@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "@macrostrat/data-components@npm:1.10.0"
+  dependencies:
+    "@blueprintjs/core": "npm:^6.14.0"
+    "@dnd-kit/core": "npm:^6.3.1"
+    "@dnd-kit/sortable": "npm:^10.0.0"
+    "@macrostrat/color-utils": "npm:^1.2.2"
+    "@macrostrat/data-provider": "npm:^1.4.1"
+    "@macrostrat/hyper": "npm:^3.1.1"
+    "@macrostrat/mapbox-utils": "npm:^1.9.0"
+    "@macrostrat/scoped-store": "npm:^1.1.0"
+    "@macrostrat/stratigraphy-utils": "npm:^1.4.2"
+    "@macrostrat/ui-components": "npm:^5.5.0"
+    "@types/d3-array": "npm:^3.2.1"
+    "@visx/axis": "npm:^3.12.0"
+    "@visx/gradient": "npm:^3.12.0"
+    "@visx/scale": "npm:^3.12.0"
+    "@visx/shape": "npm:^3.12.0"
+    axios: "npm:^1.13.2"
+    classnames: "npm:^2.5.1"
+    cross-fetch: "npm:^4.1.0"
+    d3-array: "npm:^3.2.4"
+    jotai: "npm:^2.20.0"
+    jotai-scope: "npm:^0.11.0"
+    mapbox-gl: "npm:^3.0.0"
+  peerDependencies:
+    react: ^18.0.0||^19.0.0
+  checksum: 10c0/bd9b7bcefa4acc5485fc60890e63498bebfa98c67f8e34cc3e4571b8c20314c85bbf2038614e894733f711a8169438d3c74bb0abe1ea136b781f93072f548ecf
   languageName: node
   linkType: hard
 
@@ -1178,6 +1219,24 @@ __metadata:
   peerDependencies:
     react: ^18.0.0||^19.0.0
   checksum: 10c0/ef0119c94687e6e6cfef8e9a23a6516bcef6774750ecd724c9c7a05b47a551ff52fefa45c2491c0f7d1fba8c35f4fbf49f40916d4512a461dbb605379313f04e
+  languageName: node
+  linkType: hard
+
+"@macrostrat/data-provider@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "@macrostrat/data-provider@npm:1.4.1"
+  dependencies:
+    "@macrostrat/api-types": "npm:^1.4.0"
+    "@macrostrat/hyper": "npm:^3.1.1"
+    "@macrostrat/ui-components": "npm:^5.2.0"
+    "@types/topojson-client": "npm:^3.1.5"
+    cross-fetch: "npm:^4.1.0"
+    d3-geo: "npm:^3.1.1"
+    topojson-client: "npm:^3.1.0"
+    zustand: "npm:^5.0.3"
+  peerDependencies:
+    react: ^18.0.0||^19.0.0
+  checksum: 10c0/99ed47e33891569b7e38714915c9e39a444ca96d0a767b3d085b790dc9a615add8a9888464831a276ad39e91e7b58ec236291d0298d28fb9a359dd71a0a3d31f
   languageName: node
   linkType: hard
 
@@ -1324,6 +1383,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@macrostrat/mapbox-utils@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "@macrostrat/mapbox-utils@npm:1.9.0"
+  dependencies:
+    "@turf/bbox": "npm:^7.3.2"
+    axios: "npm:^1.13.2"
+    mapbox-gl: "npm:^3.0.0"
+  checksum: 10c0/4f7d7daba5d91153cbfb6e6933164e30fa08239bfc09e699140808cebefc7bd6b27bfcecc5947e4fd8b89d622d1e2bd796c442d9f137cc64c44a88acc77b6ef9
+  languageName: node
+  linkType: hard
+
 "@macrostrat/revision-info-webpack@npm:^1.0.0":
   version: 1.0.0
   resolution: "@macrostrat/revision-info-webpack@npm:1.0.0"
@@ -1342,7 +1412,8 @@ __metadata:
     "@blueprintjs/table": "npm:^6.0.19"
     "@loadable/component": "npm:^5.14.1"
     "@macrostrat/color-utils": "npm:^1.2.2"
-    "@macrostrat/data-components": "npm:^1.5.1"
+    "@macrostrat/data-components": "npm:^1.10.0"
+    "@macrostrat/data-provider": "npm:^1.4.1"
     "@macrostrat/data-sheet": "npm:^4.6.0"
     "@macrostrat/form-components": "npm:^1.0.10"
     "@macrostrat/hyper": "npm:^3.1.1"
@@ -1408,6 +1479,16 @@ __metadata:
     "@macrostrat/api-types": "npm:1.3.0"
     chroma-js: "npm:^3.2.0"
   checksum: 10c0/295cdcfabe0e572f169c92d88d30bdf7e93305c8c1601621cd3684e8f4eb65198d6ac523ef4200b10a3ec43cb2ef159d4ece7b71505ff0819f7341c7d1786868
+  languageName: node
+  linkType: hard
+
+"@macrostrat/stratigraphy-utils@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "@macrostrat/stratigraphy-utils@npm:1.4.2"
+  dependencies:
+    "@macrostrat/api-types": "npm:1.4.0"
+    chroma-js: "npm:^3.2.0"
+  checksum: 10c0/2a23df36f317c6ec3623bdb343fd7e8424933c2b78e7418252194803a96adf05080a12e8c8fc21ecb99669429e02d6eecab2b78352eae4671158b80a1ec19d4f
   languageName: node
   linkType: hard
 
@@ -3044,6 +3125,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/topojson-client@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "@types/topojson-client@npm:3.1.5"
+  dependencies:
+    "@types/geojson": "npm:*"
+    "@types/topojson-specification": "npm:*"
+  checksum: 10c0/f60c71a79ec2d6387a9437a2d3d61d1a39928211c8b26e6a4572e4e65ff6d9ad283caa2207c447fe67cb20259c72f53ce21e222cd5c7af6f31b18cce0ab79b5d
+  languageName: node
+  linkType: hard
+
+"@types/topojson-specification@npm:*":
+  version: 1.0.5
+  resolution: "@types/topojson-specification@npm:1.0.5"
+  dependencies:
+    "@types/geojson": "npm:*"
+  checksum: 10c0/015f5470b210cb2a4b9cc3fb5b411b2f774189663bdf70855a7ab8e56d55f2b23124d1f8bf345356407691f4a70a85e87d05512b0ffc90d4f5ee81ab96af180b
+  languageName: node
+  linkType: hard
+
 "@types/underscore@npm:^1":
   version: 1.11.15
   resolution: "@types/underscore@npm:1.11.15"
@@ -4303,6 +4403,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:2":
+  version: 2.20.3
+  resolution: "commander@npm:2.20.3"
+  checksum: 10c0/74c781a5248c2402a0a3e966a0a2bba3c054aad144f5c023364be83265e796b20565aa9feff624132ff629aa64e16999fa40a743c10c12f7c61e96a794b99288
+  languageName: node
+  linkType: hard
+
 "compressible@npm:~2.0.16":
   version: 2.0.18
   resolution: "compressible@npm:2.0.18"
@@ -4464,6 +4571,15 @@ __metadata:
   dependencies:
     d3-array: "npm:2.5.0 - 3"
   checksum: 10c0/5b0a26d232787ca9e824a660827c28626a51004328dde7c76a1bd300d3cad8c7eeb55fea64c8cd6495d5a34fea434fb1418d59926a6cb24e6fb6e2b6f62c6bd9
+  languageName: node
+  linkType: hard
+
+"d3-geo@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "d3-geo@npm:3.1.1"
+  dependencies:
+    d3-array: "npm:2.5.0 - 3"
+  checksum: 10c0/d32270dd2dc8ac3ea63e8805d63239c4c8ec6c0d339d73b5e5a30a87f8f54db22a78fb434369799465eae169503b25f9a107c642c8a16c32a3285bc0e6d8e8c1
   languageName: node
   linkType: hard
 
@@ -8388,6 +8504,19 @@ __metadata:
   dependencies:
     is-number: "npm:^7.0.0"
   checksum: 10c0/487988b0a19c654ff3e1961b87f471702e708fa8a8dd02a298ef16da7206692e8552a0250e8b3e8759270f62e9d8314616f6da274734d3b558b1fc7b7724e892
+  languageName: node
+  linkType: hard
+
+"topojson-client@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "topojson-client@npm:3.1.0"
+  dependencies:
+    commander: "npm:2"
+  bin:
+    topo2geo: bin/topo2geo
+    topomerge: bin/topomerge
+    topoquantize: bin/topoquantize
+  checksum: 10c0/da2acba268cbf4d002483d5d81452e0d797b2fff6041fafb1d420e58973fa780a6f42041ce4c2677376ab977e5e1732b89c42a2db3c334a34f6c47f4d94b3eaa
   languageName: node
   linkType: hard
 

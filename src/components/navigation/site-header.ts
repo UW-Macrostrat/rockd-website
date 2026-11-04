@@ -16,6 +16,7 @@ export type SitePageHeaderProps = Omit<PageHeaderProps, "logo" | "breadcrumbs">;
 export const siteSections: Record<string, string> = {
   "/orgs": "Organizations",
   "/dev": "Development",
+  "/dev/checkin": "Checkins",
 };
 
 /**

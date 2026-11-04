@@ -1,0 +1,364 @@
+// The checkin editor, in the content layout: the fields and observations in
+// the main column, the save panel beside them (stacked on a narrow screen).
+
+.editor-spinner
+  margin: 4em auto
+
+.checkin-editor
+  display: flex
+  flex-direction: column
+  gap: 1em
+  padding-bottom: 2em
+
+.editor-columns
+  display: grid
+  grid-template-columns: minmax(0, 1fr) 16em
+  gap: 1.5em
+  align-items: start
+
+  @media only screen and (max-width: 800px)
+    display: flex
+    flex-direction: column-reverse
+
+.editor-main
+  display: flex
+  flex-direction: column
+  gap: 1.5em
+  min-width: 0
+
+.editor-side
+  position: sticky
+  top: 1em
+
+// ---- Fields ----
+
+.checkin-fields
+  display: flex
+  flex-direction: column
+  gap: 0.25em
+
+.field
+  margin-bottom: 0.75em
+
+.field-row
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  gap: 0 1.5em
+  align-items: flex-start
+
+.field-label
+  font-weight: 600
+  margin-bottom: 0.3em
+
+.field-note
+  font-size: 0.85em
+  color: var(--text-subtle-color)
+
+.field-error
+  font-size: 0.85em
+  color: var(--bp-intent-danger-text-color, #cd4246)
+
+.private-switch
+  margin-top: 0.4em
+
+// The rating's stars: one tight row, coloured like the cards' stars
+.rating-input
+  display: flex
+  flex-direction: row
+
+  .star-button
+    min-width: 0
+    padding: 0 2px
+    color: var(--text-subtle-color)
+
+// ---- Location ----
+
+.location-field
+  display: grid
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr)
+  gap: 1em
+
+  @media only screen and (max-width: 640px)
+    display: flex
+    flex-direction: column
+
+.location-map-holder
+  position: relative
+  // The map fills its holder absolutely and contributes no height of its own
+  height: 260px
+  border-radius: 4px
+  overflow: hidden
+
+  &.small
+    height: 180px
+    margin-top: 0.5em
+
+  .location-map
+    position: absolute
+    inset: 0
+    width: 100%
+    height: 100%
+    min-height: 0
+
+.location-controls
+  display: flex
+  flex-direction: column
+  gap: 0.5em
+  align-items: flex-start
+
+.coordinate-inputs
+  display: flex
+  flex-direction: row
+  gap: 0.5em
+  width: 100%
+
+  > *
+    flex: 1 1 0
+    min-width: 0
+
+// ---- Photos ----
+
+.photo-field
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+  margin-bottom: 0.75em
+
+.photo-preview
+  display: block
+  width: 100%
+  max-width: 20em
+  aspect-ratio: 1 / 1
+  object-fit: cover
+  border-radius: 4px
+  background-color: var(--card-shadow-color, rgba(128, 128, 128, 0.15))
+
+  &.empty
+    display: flex
+    align-items: center
+    justify-content: center
+    max-width: 10em
+    font-size: 0.85em
+    color: var(--text-subtle-color)
+
+.photo-actions
+  display: flex
+  flex-direction: row
+  align-items: center
+  gap: 0.5em
+  flex-wrap: wrap
+
+.exif-callout, .restore-callout
+  margin-bottom: 0.75em
+
+.exif-actions
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  gap: 0.4em
+  margin-top: 0.5em
+
+// ---- Observations ----
+
+.observations
+  display: flex
+  flex-direction: column
+  gap: 0.75em
+
+.observations-header
+  display: flex
+  flex-direction: row
+  align-items: center
+  justify-content: space-between
+  gap: 1em
+
+.section-title
+  margin: 0
+  color: var(--text-emphasized-color)
+
+.observation-card
+  display: flex
+  flex-direction: column
+  gap: 0.5em
+  padding: 0.75em 1em
+  border-radius: 6px
+  border: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+  background-color: var(--panel-secondary-background-color, rgba(128, 128, 128, 0.05))
+
+.obs-header
+  display: flex
+  flex-direction: row
+  align-items: center
+  justify-content: space-between
+  gap: 1em
+
+.obs-title
+  margin: 0
+  font-size: 1.05em
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.module-section
+  // Blueprint's Section brings its own card shadow; the observation's card
+  // is enough chrome
+  box-shadow: none
+  border: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.2))
+
+.module-body
+  display: flex
+  flex-direction: column
+  gap: 0
+
+.module-badge
+  font-size: 0.75em
+  color: var(--text-subtle-color)
+  margin-right: 0.5em
+
+.obs-extras
+  display: grid
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+  gap: 1em
+  margin-top: 0.25em
+
+  @media only screen and (max-width: 640px)
+    display: flex
+    flex-direction: column
+
+.obs-location
+  display: flex
+  flex-direction: column
+
+// Pickers in a row with a clear button
+.suggest-row
+  display: flex
+  flex-direction: row
+  align-items: center
+  gap: 0.25em
+
+  > :first-child
+    flex: 1 1 auto
+    min-width: 0
+
+.picker
+  min-height: 2em
+
+.picker-with-status
+  display: flex
+  flex-direction: row
+  align-items: center
+  gap: 0.5em
+  flex-wrap: wrap
+
+.vocab-spinner
+  flex: 0 0 auto
+
+.taxon-option
+  display: inline-flex
+  align-items: center
+  gap: 0.5em
+
+.taxon-thumb
+  width: 1.5em
+  height: 1.5em
+  object-fit: contain
+
+// Strike/dip and trend/plunge: compact numeric fields in rows
+.orientation-fields
+  display: flex
+  flex-direction: column
+
+.degrees-row
+  display: flex
+  flex-direction: row
+  gap: 0.75em
+  flex-wrap: wrap
+
+  &.uncertainty
+    font-size: 0.9em
+
+.degrees-field
+  flex: 1 1 6em
+  max-width: 10em
+  margin-bottom: 0.5em
+
+// ---- Save panel ----
+
+.save-panel
+  display: flex
+  flex-direction: column
+  gap: 0.75em
+  padding: 1em
+  border-radius: 6px
+  border: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+  background-color: var(--panel-background-color, transparent)
+
+.save-status
+  font-size: 0.85em
+  color: var(--text-subtle-color)
+
+.save-actions
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+  align-items: stretch
+
+.error-list
+  margin: 0.25em 0 0
+  padding-left: 1.2em
+
+.save-progress
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+  font-size: 0.9em
+
+.delete-section
+  display: flex
+  flex-direction: column
+  gap: 0.3em
+  margin-top: 0.5em
+  padding-top: 0.75em
+  border-top: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+
+// ---- Drafts ----
+
+.drafts-list
+  display: flex
+  flex-direction: column
+  gap: 0.6em
+
+.draft-row
+  display: flex
+  flex-direction: row
+  align-items: center
+  justify-content: space-between
+  gap: 1em
+  flex-wrap: wrap
+
+.draft-info
+  display: flex
+  flex-direction: column
+  gap: 0.15em
+  min-width: 0
+
+.draft-title
+  font-weight: 600
+
+.draft-actions
+  display: flex
+  flex-direction: row
+  gap: 0.25em
+
+.checkins-index
+  display: flex
+  flex-direction: column
+  gap: 1em
+  padding-bottom: 2em
+
+.index-actions
+  display: flex
+  flex-direction: row
+  gap: 0.5em
+  flex-wrap: wrap

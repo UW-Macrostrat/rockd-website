@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+- **Checkin editing on the web** (`/dev/checkin`, signed-in users): the app's
+  create/edit flow as pages, so new features can be prototyped here before the
+  mobile app.
+  - `/dev/checkin/new` creates a checkin; `/dev/checkin/:id` edits one of your
+    own; `/dev/checkin` lists edits kept in this browser (the app's "Unsynced"
+    feed), with New checkin. Breadcrumbs: Rockd › Development › Checkins.
+  - The editor (`~/components/checkin-editor`): description, star rating, date
+    observed, private, organization (from your memberships), location (the
+    site's location map, typed coordinates or the browser's position, with the
+    server's place name) and photo. Observations are cards with the app's four
+    modules — rocks (stratigraphic name, map unit, age, lithologies with
+    attributes), fossils (PBDB taxa), minerals, structure (strike/dip,
+    trend/plunge with uncertainties, feature) — each collapsible, plus a photo
+    and an optional location of its own.
+  - Vocabularies come from `@macrostrat/data-components` pickers
+    (`LithologyPicker`, `TagPicker`) over `@macrostrat/data-provider`
+    (`MacrostratDataProvider`), with minerals and structures loaded from
+    Macrostrat's `/defs` routes, stratigraphic names searched on Macrostrat,
+    taxa on the Paleobiology Database, and map units from Macrostrat's nearby
+    geology at the checkin's location. The age picker lists the ages of the
+    map units there first, marked "Nearby", as the app's picker does.
+  - A chosen photo's EXIF is read in the browser (`~/checkin-editor/exif`): its
+    position and date are offered for the checkin, as the app's EXIF prompt
+    does. JPEGs upload as-is; other formats are re-encoded through a canvas.
+  - Saving follows the app's two-phase sync (`~/checkin-editor/sync`): one
+    `POST /protected/checkin` for the checkin and its observations, then one
+    `POST /protected/photos` per new photo with retries; failed photos can be
+    retried without re-saving. The draft reloads from the server after a save,
+    so ids are the server's. Delete, with confirmation, as in the app.
+  - Unsaved edits are kept in `localStorage` per checkin and offered back on
+    return. The draft model and its operations are pure functions
+    (`~/checkin-editor`), and `syncCheckins` runs over a list, for bulk editing
+    to build on.
+- Signed in, the `/dev/feed` pages and the checkin pages show New checkin in
+  the header, your own cards carry Edit, and a checkin page you own has Edit in
+  its header. The account panel links to New checkin and Unsaved edits. A
+  shared `useRockdAuth` hook (`~/components/auth`) reads the stored login once
+  for every component.
+- `@macrostrat/data-components` 1.10 (the pickers) and
+  `@macrostrat/data-provider` 1.4 added.
+
 - The map pages (Explore, My checkins, StraboSpot, a trip and the new Trips
   page) are built from one set of components in `~/components/map-sidebar`:
   - `MapSidebarLayout`, built on `@macrostrat/map-interface`'s

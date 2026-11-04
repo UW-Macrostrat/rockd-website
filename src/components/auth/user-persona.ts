@@ -7,6 +7,7 @@ import {
 } from "@blueprintjs/core";
 import hyper from "@macrostrat/hyper";
 import classNames from "classnames";
+import { isDevelopmentEnvironment } from "~/settings";
 import { exploreNavItems, type NavLinkItem } from "../footer";
 import {
   clearRockdAuth,
@@ -115,9 +116,7 @@ function SignedOutPanel() {
   return h("div.user-panel", [
     h("div.user-panel-header", [
       h(Icon, { icon: "blocked-person", size: 20 }),
-      h("div.user-panel-identity", [
-        h("div.user-panel-name", "Not signed in"),
-      ]),
+      h("div.user-panel-identity", [h("div.user-panel-name", "Not signed in")]),
     ]),
     h(
       AnchorButton,
@@ -165,6 +164,24 @@ function SignedInPanel({
         { minimal: true, icon: "map-marker", href: "/my-checkins" },
         "My checkins"
       ),
+      // The editor is served on the development deployment only
+      h.if(isDevelopmentEnvironment())([
+        h(
+          AnchorButton,
+          { key: "new", minimal: true, icon: "add", href: "/dev/checkin/new" },
+          "New checkin"
+        ),
+        h(
+          AnchorButton,
+          {
+            key: "drafts",
+            minimal: true,
+            icon: "cloud-upload",
+            href: "/dev/checkin",
+          },
+          "Unsaved edits"
+        ),
+      ]),
       h(
         AnchorButton,
         { minimal: true, icon: "link", href: "/dev/strabospot" },
