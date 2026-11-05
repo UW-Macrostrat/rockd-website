@@ -16,7 +16,9 @@
   mobile app.
   - `/dev/checkin/new` creates a checkin; `/dev/checkin/:id` edits one of your
     own; `/dev/checkin` lists edits kept in this browser (the app's "Unsynced"
-    feed), with New checkin. Breadcrumbs: Rockd › Development › Checkins.
+    feed). Laid out as `/orgs` is: a "Checkins" title, then an introduction
+    with Your checkins and New checkin at the row's right end, then the
+    Unsaved edits section. Breadcrumbs: Rockd › Development › Checkins.
   - The editor (`~/components/checkin-editor`): description, star rating, date
     observed, private, organization (from your memberships), location (the
     site's location map, typed coordinates or the browser's position, with the
@@ -44,11 +46,12 @@
     return. The draft model and its operations are pure functions
     (`~/checkin-editor`), and `syncCheckins` runs over a list, for bulk editing
     to build on.
-- Signed in, the `/dev/feed` pages and the checkin pages show New checkin in
-  the header, your own cards carry Edit, and a checkin page you own has Edit in
-  its header. The account panel links to New checkin and Unsaved edits. A
-  shared `useRockdAuth` hook (`~/components/auth`) reads the stored login once
-  for every component.
+- Signed in, the `/dev/feed` pages show New checkin in the header (the
+  `/dev/checkin` pages' header has only the sign-in indicator, as `/orgs`
+  does), your own cards carry Edit, and a checkin page you own has Edit in its
+  header. New checkin and Unsaved edits are reached from `/dev`, not the
+  account panel. A shared `useRockdAuth` hook (`~/components/auth`) reads the
+  stored login once for every component.
 - `@macrostrat/data-components` 1.10 (the pickers) and
   `@macrostrat/data-provider` 1.4 added.
 
