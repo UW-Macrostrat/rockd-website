@@ -11,18 +11,34 @@
 - Removed `/login/strabojwt`, the original StraboSpot account-linking page
   (StraboSpot redirected there with `?j=<jwt>`). StraboSpot no longer uses it;
   linking happens on `/dev/strabospot` through `strabospot.org/rockd_login`.
-- **Checkin editing on the web** (`/dev/checkin`, signed-in users): the app's
+- **Checkin editing on the web** (`/dev/create-edit-checkin`, signed-in users): the app's
   create/edit flow as pages, so new features can be prototyped here before the
   mobile app.
-  - `/dev/checkin/new` creates a checkin; `/dev/checkin/:id` edits one of your
-    own; `/dev/checkin` lists edits kept in this browser (the app's "Unsynced"
+  - `/dev/create-edit-checkin/new` creates a checkin; `/dev/create-edit-checkin/:id` edits one of your
+    own; `/dev/create-edit-checkin` lists edits kept in this browser (the app's "Unsynced"
     feed). Laid out as `/orgs` is: a "Checkins" title, then an introduction
     with Your checkins and New checkin at the row's right end, then the
-    Unsaved edits section. Breadcrumbs: Rockd › Development › Checkins.
-  - The editor (`~/components/checkin-editor`): description, star rating, date
-    observed, private, organization (from your memberships), location (the
-    site's location map, typed coordinates or the browser's position, with the
-    server's place name) and photo. Observations are cards with the app's four
+    Unsaved edits section. Breadcrumbs: Rockd › Development › Edit checkins.
+    Both editor pages are the one `CheckinEditor`, with Back at the top left
+    (the page before, or `/dev/create-edit-checkin` when opened directly); an existing
+    checkin opens prefilled, titled by its id (Rockd › Development › Edit
+    checkins › 43766, and in the browser tab). A page's `title` may be a
+    function of the page context (`+title.ts`), which the site header calls.
+  - The editor (`~/components/checkin-editor`): description, star rating (five
+    spaced stars), date observed, private, organization (from your
+    memberships), location (the `/checkin/:id` page's map — square, at its
+    regional view — typed coordinates or the browser's position, with the
+    server's place name) and photo. The checkin's fields are in three titled
+    groups — Outcrop (the description, with an example placeholder and a note
+    that its first line is the title), Details (rating, observed, visibility
+    and organization on a two-column grid) and Location (the map beside
+    labelled latitude and longitude, Use my location and the place) — each
+    control labelled above it, in the page's font, with aligned figures in the
+    date and coordinates. The save column is one box: the status after a
+    coloured dot (green saved, amber unsaved changes, grey not yet saved), then
+    every action stacked as full-width buttons of one size — Save and, once
+    saved, View checkin (in a new tab) and Delete checkin under it. Unsaved
+    edits stay as a draft rather than being discarded. Observations are cards with the app's four
     modules — rocks (stratigraphic name, map unit, age, lithologies with
     attributes), fossils (PBDB taxa), minerals, structure (strike/dip,
     trend/plunge with uncertainties, feature) — each collapsible, plus a photo
@@ -46,9 +62,11 @@
     return. The draft model and its operations are pure functions
     (`~/checkin-editor`), and `syncCheckins` runs over a list, for bulk editing
     to build on.
-- Signed in, the `/dev/feed` pages show New checkin in the header (the
-  `/dev/checkin` pages' header has only the sign-in indicator, as `/orgs`
-  does), your own cards carry Edit, and a checkin page you own has Edit in its
+- Signed in, the `/dev/feed` pages show New checkin in the header, as the
+  same blue button `/dev/create-edit-checkin` has (the `/dev/create-edit-checkin` pages' header has
+  only the sign-in indicator, as `/orgs` does), every card ends in a Details
+  link to its page with Edit to its right on your own, and a checkin page you
+  own has Edit in its
   header. New checkin and Unsaved edits are reached from `/dev`, not the
   account panel. A shared `useRockdAuth` hook (`~/components/auth`) reads the
   stored login once for every component.
@@ -116,9 +134,22 @@
   shows the list; they had relied on the checkin page's stylesheet.
   StraboSpot's sent badge sits after a card's star rating rather than over it
   (`MapCheckinCardBody`'s `badge`).
+- `/dev/strabospot` resyncs. Sending a checkin again (same checkin_id and
+  spot_id) updates its spot and photos in StraboSpot, so already-sent
+  checkins can be selected too, to carry an edit ("N selected (M already
+  sent, to update)"). Photos that didn't reach StraboSpot are remembered by
+  id per checkin in `localStorage` (`strabospot-photo-failures`, across
+  reloads): their card shows an amber ! instead of ✓ and an "N photos didn't
+  sync — Resync" row, and the footer offers "Resync them" for all of them.
+  Resync uploads only those photos (api-v3 `POST
+  /dev/convert/resync-strabo-photos`), not the spot or the photos already
+  there; a photo that fails again stays recorded for the next try. Needs
+  api-v3's per-photo `imageFailures` in the sync response.
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
-  under the header "Rockd › Checkin": the checkin's title (its notes' first
+  under the header "Rockd › Checkin": Back at the top left (the page before,
+  or home when opened directly — the editor's button, now the shared
+  `BackButton` in `~/components`), then the checkin's title (its notes' first
   line) as the page heading, a long one cut short at a sentence or word with
   a clickable "…" that shows it all (`TruncatedText`); the checkin as its
   card shows it (byline and
@@ -203,6 +234,9 @@
   URL-linkable search and sort state.
 - `/dev/feed/nearby` carries a helper map that sets the region's center point
   (`?lat=&lng=`); the API's 100 km radius around it is fixed server-side.
+  With a center picked, the map sits at the top of the list's scroll, under
+  the pinned search bar, and scrolls away with the cards; before one is
+  picked it keeps its own row above the prompt.
 - `/dev/feed/mine` reads the Rockd login stored by `/login`.
 - Added `~/_utils/url-atoms` and `~/_utils/data-view-url-state` (ported from the
   `web` repo) for query-string-backed view state.

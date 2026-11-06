@@ -25,9 +25,12 @@ import {
   NonIdealState,
   Spinner,
 } from "@blueprintjs/core";
-import { createMasonryScrollBody } from "@macrostrat/data-sheet";
+import {
+  createMasonryScrollBody,
+  type ScrollBodyProps,
+} from "@macrostrat/data-sheet";
 import { atom, useAtom, useAtomValue } from "jotai";
-import type { ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import { Footer } from "~/components";
 import { ContentPageHeader } from "~/layouts";
 import {
@@ -55,6 +58,22 @@ const CardMasonry = createMasonryScrollBody({
   columns: 3,
   minColumnWidth: 320,
 });
+
+// A page's aside (the nearby map), for the scroll body to draw above the
+// cards. A context rather than a prop, since the panel renders the scroll body
+// itself; React context, since the panel keeps its own jotai store.
+const FeedAsideContext = createContext<ReactNode>(null);
+
+/** The masonry with the page's aside at its top, inside the list's scroll
+ * container, so the aside scrolls away with the cards rather than staying
+ * pinned above them. */
+function MasonryWithAside(props: ScrollBodyProps) {
+  const aside = useContext(FeedAsideContext);
+  return h([
+    h("aside.feed-aside.in-scroll", { key: "aside" }, aside),
+    h(CardMasonry, { key: "cards", ...props }),
+  ]);
+}
 
 const FEEDS: { type: FeedType; label: string; href: string }[] = [
   { type: "all", label: "All", href: "/dev/feed" },
@@ -189,26 +208,41 @@ function Feed({
   // (a prompt instead), they keep a row of their own, right-aligned the same
   let body = placeholder;
   let tabsRow = h("div.feed-tabs-row", tabs);
+  // With no feed yet, the aside keeps a row of its own above the prompt (the
+  // map is how a center gets picked); with one, it moves into the list
+  let asideRow = null;
+  if (aside != null) {
+    asideRow = h("div.feed-aside-row", h("aside.feed-aside", aside));
+  }
   if (body == null) {
     tabsRow = null;
-    body = h(CheckinFeedPanel, {
-      feed: { feedType, center, personId, token },
-      // Cards are small and of uneven height; several fit a row once the page
-      // is wide.
-      scrollBody: CardMasonry,
-      contentFooter: h(FeedFooter),
-      // The feed is the page, so a search is a link
-      syncURL: true,
-      className: "feed-panel",
-      toolbarEnd: tabs,
-    });
+    // Cards are small and of uneven height; several fit a row once the page
+    // is wide. An aside scrolls with them, above the first row.
+    let scrollBody: any = CardMasonry;
+    if (aside != null) {
+      scrollBody = MasonryWithAside;
+      asideRow = null;
+    }
+    body = h(
+      FeedAsideContext.Provider,
+      { value: aside },
+      h(CheckinFeedPanel, {
+        feed: { feedType, center, personId, token },
+        scrollBody,
+        contentFooter: h(FeedFooter),
+        // The feed is the page, so a search is a link
+        syncURL: true,
+        className: "feed-panel",
+        toolbarEnd: tabs,
+      })
+    );
   }
 
   return h("div.feed-page", [
     h(ContentPageHeader, { className: "feed-header" }),
     h("div.feed-content", [
       // Above the search, as wide as the cards' row
-      h.if(aside != null)("div.feed-aside-row", h("aside.feed-aside", aside)),
+      asideRow,
       tabsRow,
       h("div.feed-body", body),
     ]),

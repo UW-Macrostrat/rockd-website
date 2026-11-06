@@ -52,10 +52,12 @@ function DraftRow({
   let title = draft.notes.trim().split(/\n+/)[0];
   if (!title) title = "Untitled checkin";
 
-  let href = `/dev/checkin/new?draft=${encodeURIComponent(draftKey)}`;
+  let href = `/dev/create-edit-checkin/new?draft=${encodeURIComponent(
+    draftKey
+  )}`;
   let kind = "New checkin";
   if (draft.checkin_id != null) {
-    href = `/dev/checkin/${draft.checkin_id}`;
+    href = `/dev/create-edit-checkin/${draft.checkin_id}`;
     kind = `Edits to checkin ${draft.checkin_id}`;
   }
 

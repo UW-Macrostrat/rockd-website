@@ -1,4 +1,4 @@
 export default {
-  title: "Checkins",
+  title: "Edit checkins",
   pageStyle: "content",
 };

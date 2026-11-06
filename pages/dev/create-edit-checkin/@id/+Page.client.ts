@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { usePageContext } from "vike-react/usePageContext";
 import { CheckinEditor } from "~/components/checkin-editor";
 
-/** `/dev/checkin/:id` — edit one of your checkins */
+/** `/dev/create-edit-checkin/:id` — edit one of your checkins */
 export function Page() {
   const { routeParams } = usePageContext();
   const checkinId = parseInt(routeParams.id, 10);

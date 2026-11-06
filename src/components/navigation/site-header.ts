@@ -16,7 +16,7 @@ export type SitePageHeaderProps = Omit<PageHeaderProps, "logo" | "breadcrumbs">;
 export const siteSections: Record<string, string> = {
   "/orgs": "Organizations",
   "/dev": "Development",
-  "/dev/checkin": "Checkins",
+  "/dev/create-edit-checkin": "Edit checkins",
 };
 
 /**
@@ -40,9 +40,14 @@ export function SitePageHeader(props: SitePageHeaderProps) {
     headerActions = h([h(PageActions, { key: "page" }), actions]);
   }
 
+  // A page's `title` may be a function of the page context (e.g. a route
+  // parameter), as vike-react allows for the document title
+  let pageTitle: any = ctx.config.title;
+  if (typeof pageTitle === "function") pageTitle = pageTitle(ctx);
+
   return h(PageHeader, {
     breadcrumbs: usePageBreadcrumbs(),
-    title: title ?? ctx.config.title,
+    title: title ?? pageTitle,
     logo: h(SiteLogo),
     titleAlignment: "left",
     actions: headerActions,

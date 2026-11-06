@@ -53,7 +53,7 @@ function sitePages(include: (dir: string) => boolean): SitePage[] {
       // `index` folders take their parent's URL
       const route = segments.filter((s) => s !== "index").map(routeSegment);
       let title = configTitle(configs[`/pages/${dir}/+config.ts`]);
-      if (title == null) title = humanize(segments[segments.length - 1]);
+      if (title == null) title = fallbackTitle(segments);
       return {
         path: "/" + route.join("/"),
         title,
@@ -71,6 +71,20 @@ function configTitle(source: string | undefined) {
 function routeSegment(segment: string) {
   if (segment.startsWith("@")) return ":" + segment.slice(1);
   return segment;
+}
+
+/** A page's title when its folder's config sets none: the folder's name, or
+ * for a parameter route (`@id`, whose title may come from the route itself)
+ * its parent's title, by that parameter */
+function fallbackTitle(segments: string[]) {
+  const last = segments[segments.length - 1];
+  if (!last.startsWith("@")) return humanize(last);
+  const parent = segments.slice(0, -1);
+  let parentTitle = configTitle(
+    configs[`/pages/${parent.join("/")}/+config.ts`]
+  );
+  if (parentTitle == null) parentTitle = humanize(parent[parent.length - 1]);
+  return `${parentTitle} (by ${last.slice(1)})`;
 }
 
 function humanize(segment: string) {

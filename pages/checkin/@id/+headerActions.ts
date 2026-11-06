@@ -17,7 +17,7 @@ export default function CheckinPageActions() {
   return h(
     AnchorButton,
     {
-      href: `/dev/checkin/${checkin.checkin_id}`,
+      href: `/dev/create-edit-checkin/${checkin.checkin_id}`,
       icon: "edit",
       minimal: true,
       small: true,

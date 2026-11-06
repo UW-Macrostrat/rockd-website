@@ -20,8 +20,6 @@ import {
   isDirtyAtom,
   isSavingAtom,
   isValid,
-  originalAtom,
-  resetDraftAtom,
   saveStateAtom,
   showErrorsAtom,
   type SyncProgress,
@@ -44,13 +42,11 @@ export function SavePanel({
   onDeleted,
 }: SavePanelProps) {
   const draft = useAtomValue(draftAtom);
-  const original = useAtomValue(originalAtom);
   const dirty = useAtomValue(isDirtyAtom);
   const saving = useAtomValue(isSavingAtom);
   const errors = useAtomValue(errorsAtom);
   const showErrors = useAtomValue(showErrorsAtom);
   const save = useAtomValue(saveStateAtom);
-  const reset = useSetAtom(resetDraftAtom);
   const setShowErrors = useSetAtom(showErrorsAtom);
   if (draft == null) return null;
 
@@ -58,9 +54,17 @@ export function SavePanel({
   const valid = isValid(errors);
   const errorList = Object.values(errors);
 
+  // The status line's text, and its dot: green when the server has it all,
+  // amber with edits pending, grey before the first save
   let status: string = "No unsaved changes";
-  if (isNew) status = "Not yet saved to Rockd";
-  else if (dirty) status = "Unsaved changes";
+  let tone = "saved";
+  if (isNew) {
+    status = "Not yet saved to Rockd";
+    tone = "new";
+  } else if (dirty) {
+    status = "Unsaved changes";
+    tone = "dirty";
+  }
 
   let canSave = dirty || isNew;
   if (saving) canSave = false;
@@ -71,40 +75,51 @@ export function SavePanel({
     onSave();
   }
 
+  // In a new tab, so the editor (and any unsaved edits) stays open
   let viewLink = null;
   if (!isNew) {
     viewLink = h(
       AnchorButton,
       {
-        minimal: true,
-        small: true,
+        key: "view",
+        outlined: true,
+        fill: true,
         icon: "eye-open",
+        rightIcon: "share",
         href: `/checkin/${draft.checkin_id}`,
+        target: "_blank",
+        rel: "noopener",
       },
       "View checkin"
     );
   }
 
+  // Where the checkin stands, then every action in one stack: Save, View
+  // checkin and Delete checkin, one under the other
   return h("div.save-panel", [
-    h("div.save-status", status),
+    h(`div.save-status.${tone}`, status),
     h("div.save-actions", [
       h(
         Button,
         {
+          key: "save",
           intent: "primary",
           icon: "cloud-upload",
+          fill: true,
           loading: saving,
           disabled: !canSave,
           onClick: handleSave,
         },
         "Save to Rockd"
       ),
-      h.if(dirty && original != null && !saving)(
-        Button,
-        { minimal: true, icon: "undo", onClick: () => reset(original!) },
-        "Discard changes"
-      ),
       viewLink,
+      h.if(!isNew)(DeleteCheckin, {
+        key: "delete",
+        checkinId: draft.checkin_id!,
+        token,
+        onDeleted,
+        disabled: saving,
+      }),
     ]),
     h.if(showErrors && errorList.length > 0)(
       Callout,
@@ -121,12 +136,6 @@ export function SavePanel({
     ),
     h(SaveProgress, { progress: save.progress }),
     h(SaveOutcome, { onRetryPhotos }),
-    h.if(!isNew)(DeleteCheckin, {
-      checkinId: draft.checkin_id!,
-      token,
-      onDeleted,
-      disabled: saving,
-    }),
   ]);
 }
 
@@ -231,7 +240,8 @@ function DeleteCheckin({
     h(
       Button,
       {
-        minimal: true,
+        outlined: true,
+        fill: true,
         intent: "danger",
         icon: "trash",
         disabled,

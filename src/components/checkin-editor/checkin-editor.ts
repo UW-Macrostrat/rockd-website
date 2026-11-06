@@ -26,6 +26,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigate } from "vike/client/router";
 import { useRockdAuth } from "~/components/auth";
+import { BackButton } from "~/components/back-button";
 import {
   clearDraft,
   draftAtom,
@@ -62,7 +63,24 @@ export interface CheckinEditorProps {
   draftKey?: string | null;
 }
 
-export function CheckinEditor({
+/** One page for creating and editing: a new checkin starts blank (or from a
+ * stored draft), an existing one is loaded and prefilled. Both save through
+ * the same `POST /protected/checkin`, which edits when the draft carries a
+ * `checkin_id`. */
+export function CheckinEditor(props: CheckinEditorProps) {
+  return h("div.checkin-editor-page", [
+    // To the checkins index when the editor was opened directly. Unsaved
+    // edits are kept as a draft either way.
+    h(BackButton, {
+      key: "back",
+      fallback: "/dev/create-edit-checkin",
+      className: "back",
+    }),
+    h(EditorContent, { key: "editor", ...props }),
+  ]);
+}
+
+function EditorContent({
   checkinId,
   draftKey: storedKey = null,
 }: CheckinEditorProps) {
@@ -376,7 +394,11 @@ function useSaveCheckin({
     // than re-creates. A new checkin's URL becomes its edit page in place,
     // keeping this component (and the files a photo retry needs) mounted.
     if (wasNew && typeof window !== "undefined") {
-      window.history.replaceState(null, "", `/dev/checkin/${result.checkinId}`);
+      window.history.replaceState(
+        null,
+        "",
+        `/dev/create-edit-checkin/${result.checkinId}`
+      );
     }
     await reloadFromServer(result.checkinId);
     if (result.status === "success") {
