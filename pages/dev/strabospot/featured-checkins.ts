@@ -14,8 +14,12 @@ import {
   MapCheckinFeed,
 } from "~/components/checkin-feed";
 import {
-  sendCheckinsToStrabospotDataset,
+  getStoredPhotoFailures,
   getStrabospotDatasetId,
+  type PhotoFailures,
+  resyncStrabospotPhotos,
+  saveStoredPhotoFailures,
+  sendCheckinsToStrabospotDataset,
 } from "./strabospot-integration";
 import { getStoredRockdToken } from "~/components/auth";
 
@@ -143,13 +147,44 @@ const successDialogFooterStyle = {
   borderTop: "1px solid rgba(255,255,255,0.06)",
 };
 
+const photoFailedBadgeStyle = {
+  ...sentBadgeStyle,
+  background: "linear-gradient(180deg, #fbbf4d 0%, #e08a12 100%)",
+  border: "1px solid #b86e0b",
+};
+
+const photoFailedBadgeMarkStyle = {
+  ...sentBadgeCheckStyle,
+  color: "#5c3605",
+};
+
+// A card's "photos didn't sync" row, under its Details link
+const photoFailedRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "0.5em",
+  marginTop: "0.4em",
+  padding: "0.35em 0.6em",
+  borderRadius: "6px",
+  background: "rgba(245, 158, 11, 0.12)",
+  border: "1px solid rgba(245, 158, 11, 0.35)",
+  fontSize: "12px",
+};
+
 /** What each card needs to know about the selection, from the list around it */
 interface StrabospotSelection {
   isSynced: boolean;
   selectionMode: boolean;
   selected: Map<number, Checkin>;
   sentIds: Set<number>;
+  /** Sent checkins some of whose photos didn't reach StraboSpot */
+  photoFailures: PhotoFailures;
+  /** Checkins whose failed photos are being resynced */
+  resyncingIds: Set<number>;
   toggle(checkin: Checkin): void;
+  /** Uploads only the photos of these checkins that didn't make it */
+  resyncPhotos(checkinIds: number[]): void;
 }
 
 const SelectionContext = createContext<StrabospotSelection | null>(null);
@@ -169,7 +204,10 @@ function isSent(checkin: Checkin, sentIds: Set<number>): boolean {
 /**
  * The StraboSpot page's list: the signed-in user's checkins in the shared
  * sidebar feed (search, infinite scroll), with a selection mode for sending
- * them to StraboSpot once the account is linked.
+ * them to StraboSpot once the account is linked. A sent checkin can be
+ * selected and sent again to carry an edit: StraboSpot updates the spot (same
+ * checkin_id and spot_id) and its photos in place. Photos that failed are
+ * remembered by id and resynced on their own, without resending the rest.
  */
 export function FeatureDetails({ isStrabospotSynced, personId }) {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -183,9 +221,129 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
   const [lastFailedCheckins, setLastFailedCheckins] = useState<
     Array<{ checkinId: number; message: string }>
   >([]);
+  // The photos that didn't make it, by checkin; kept across reloads, so the
+  // page can still offer to resync them
+  const [photoFailures, setPhotoFailures] = useState<PhotoFailures>(() =>
+    getStoredPhotoFailures()
+  );
+  const [resyncingIds, setResyncingIds] = useState<Set<number>>(new Set());
+
+  function updatePhotoFailures(change: (next: PhotoFailures) => void) {
+    setPhotoFailures((prev) => {
+      const next = new Map(prev);
+      change(next);
+      saveStoredPhotoFailures(next);
+      return next;
+    });
+  }
 
   if (personId == null) {
     return null;
+  }
+
+  /** Sends checkins to StraboSpot (new or again), then records which went
+   * through, which lost photos on the way, and which didn't go at all. */
+  async function send(checkins: Checkin[]) {
+    const rockdToken = getStoredRockdToken();
+    if (!rockdToken) {
+      throw new Error("Not logged in to Rockd. Please log in and try again.");
+    }
+
+    // Sends to StraboSpot and persists spot_id to the Rockd DB in one step.
+    const response = await sendCheckinsToStrabospotDataset(
+      checkins,
+      rockdToken
+    );
+
+    const sentIds: number[] = (response?.sentCheckinIds ?? []).map(Number);
+    const imageFailedIds: number[] = (
+      response?.imageFailedCheckinIds ?? []
+    ).map(Number);
+    const failedCheckins = response?.failedCheckins ?? [];
+    if (sentIds.length === 0 && failedCheckins.length > 0) {
+      throw new Error(
+        failedCheckins
+          .map((f) => `Checkin ${f.checkinId}: ${f.message}`)
+          .join("\n")
+      );
+    }
+    setLastSentCount(sentIds.length);
+    setLastImageFailedIds(imageFailedIds);
+    setLastFailedCheckins(failedCheckins);
+
+    setLocalSentIds((prev) => {
+      const next = new Set(prev);
+      for (const id of sentIds) next.add(id);
+      return next;
+    });
+
+    // A checkin sent cleanly clears its old photo failure; one whose photos
+    // failed (again) records exactly which (null: all of them)
+    // An api-v3 without per-photo results names only the checkins; record
+    // those as "all photos still to go"
+    let imageFailures = response?.imageFailures;
+    if (!Array.isArray(imageFailures)) {
+      imageFailures = imageFailedIds.map((checkinId) => ({
+        checkinId,
+        photoIds: null,
+      }));
+    }
+    updatePhotoFailures((next) => {
+      for (const id of sentIds) next.delete(id);
+      for (const failure of imageFailures) {
+        let photoIds: number[] | null = null;
+        if (Array.isArray(failure.photoIds)) {
+          photoIds = failure.photoIds.map(Number);
+        }
+        next.set(Number(failure.checkinId), photoIds);
+      }
+    });
+
+    setShowSuccessDialog(true);
+  }
+
+  /** Uploads only the photos of these checkins that didn't reach StraboSpot,
+   * leaving their spots and the photos already there alone. A photo that
+   * fails again stays recorded for the next try. */
+  async function resyncPhotos(checkinIds: number[]) {
+    setSendError(null);
+    setResyncingIds((prev) => new Set([...prev, ...checkinIds]));
+    const errors: string[] = [];
+    try {
+      const rockdToken = getStoredRockdToken();
+      if (!rockdToken) {
+        throw new Error("Not logged in to Rockd. Please log in and try again.");
+      }
+      // One checkin at a time, as the sync itself goes
+      for (const id of checkinIds) {
+        try {
+          const result = await resyncStrabospotPhotos(
+            id,
+            photoFailures.get(id) ?? null,
+            rockdToken
+          );
+          const stillFailed = result.failed_photos.map((f) => f.photo_id);
+          updatePhotoFailures((next) => {
+            if (stillFailed.length === 0) next.delete(id);
+            else next.set(id, stillFailed);
+          });
+          for (const f of result.failed_photos) {
+            errors.push(`Checkin ${id}, photo ${f.photo_id}: ${f.message}`);
+          }
+        } catch (err: any) {
+          errors.push(`Checkin ${id}: ${err?.message ?? "resync failed"}`);
+        }
+      }
+    } catch (err: any) {
+      errors.push(err?.message ?? "Failed to resync photos.");
+    } finally {
+      setResyncingIds((prev) => {
+        const next = new Set(prev);
+        for (const id of checkinIds) next.delete(id);
+        return next;
+      });
+    }
+    if (errors.length > 0) setSendError(errors.join("\n"));
   }
 
   function toggle(checkin: Checkin) {
@@ -211,6 +369,8 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     setSendError(null);
   }
 
+  // The selection: new checkins are sent, already-sent ones resynced (a
+  // resync carries their edits and any photos that didn't make it)
   async function handleBulkSend() {
     setIsSending(true);
     setSendError(null);
@@ -218,44 +378,9 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     setLastImageFailedIds([]);
     setLastFailedCheckins([]);
     try {
-      const selectedCheckins = [...selected.values()].filter(
-        (checkin) => !isSent(checkin, localSentIds)
-      );
-
-      const rockdToken = getStoredRockdToken();
-      if (!rockdToken) {
-        throw new Error("Not logged in to Rockd. Please log in and try again.");
-      }
-
-      // Sends to StraboSpot and persists spot_id to the Rockd DB in one step.
-      const response = await sendCheckinsToStrabospotDataset(
-        selectedCheckins,
-        rockdToken
-      );
-
-      const sentIds = response?.sentCheckinIds ?? [];
-      const imageFailedIds = response?.imageFailedCheckinIds ?? [];
-      const failedCheckins = response?.failedCheckins ?? [];
-      if (sentIds.length === 0 && failedCheckins.length > 0) {
-        throw new Error(
-          failedCheckins
-            .map((f) => `Checkin ${f.checkinId}: ${f.message}`)
-            .join("\n")
-        );
-      }
-      setLastSentCount(sentIds.length);
-      setLastImageFailedIds(imageFailedIds);
-      setLastFailedCheckins(failedCheckins);
-
-      setLocalSentIds((prev) => {
-        const next = new Set(prev);
-        for (const id of sentIds) next.add(Number(id));
-        return next;
-      });
-
+      await send([...selected.values()]);
       setSelected(new Map());
       setSelectionMode(false);
-      setShowSuccessDialog(true);
     } catch (err: any) {
       setSendError(err?.message ?? "Failed to send selected checkins.");
     } finally {
@@ -263,12 +388,22 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     }
   }
 
+  let resyncCount = 0;
+  for (const checkin of selected.values()) {
+    if (isSent(checkin, localSentIds)) resyncCount += 1;
+  }
+
+  const photoFailedIds = [...photoFailures.keys()];
+
   const selection: StrabospotSelection = {
     isSynced: isStrabospotSynced,
     selectionMode,
     selected,
     sentIds: localSentIds,
+    photoFailures,
+    resyncingIds,
     toggle,
+    resyncPhotos,
   };
 
   return h(
@@ -287,8 +422,12 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
       h.if(isStrabospotSynced)(SelectionFooter, {
         selectionMode,
         selectedCount: selected.size,
+        resyncCount,
         isSending,
         sendError,
+        photoFailedIds,
+        isResyncingFailures: resyncingIds.size > 0,
+        onResyncFailures: () => resyncPhotos(photoFailedIds),
         onStart: startSelectionMode,
         onSend: handleBulkSend,
         onCancel: cancelSelectionMode,
@@ -305,11 +444,13 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
 }
 
 /** A checkin in the list. Outside selection mode a click shows it on the map;
- * in it, a click selects an unsent checkin. */
+ * in it, a click selects the checkin — to send it, or to send an edited one
+ * again. */
 function StrabospotCheckinContent({ data }: { data: Checkin }) {
   const selection = useSelection();
   const sent = isSent(data, selection.sentIds);
-  const selectable = selection.selectionMode && !sent;
+  const photosFailed = sent && selection.photoFailures.has(data.checkin_id);
+  const selectable = selection.selectionMode;
   const isSelected = selectable && selection.selected.has(data.checkin_id);
 
   let onActivate: (() => void) | undefined = undefined;
@@ -317,17 +458,69 @@ function StrabospotCheckinContent({ data }: { data: Checkin }) {
     onActivate = () => selection.toggle(data);
   }
 
-  // Sits after the star rating in the card's header row
-  const badge = h.if(selection.isSynced && sent)(
-    "div",
-    { style: sentBadgeStyle, title: "Sent to StraboSpot" },
-    h("span", { style: sentBadgeCheckStyle }, "✓")
-  );
+  // Sits after the star rating in the card's header row: ✓ once sent, or an
+  // amber ! when some of its photos didn't reach StraboSpot
+  let badge = null;
+  if (selection.isSynced && photosFailed) {
+    badge = h(
+      "div",
+      {
+        style: photoFailedBadgeStyle,
+        title: "Sent to StraboSpot, but some photos didn't sync",
+      },
+      h("span", { style: photoFailedBadgeMarkStyle }, "!")
+    );
+  } else if (selection.isSynced && sent) {
+    badge = h(
+      "div",
+      { style: sentBadgeStyle, title: "Sent to StraboSpot" },
+      h("span", { style: sentBadgeCheckStyle }, "✓")
+    );
+  }
 
+  return h(MapCheckinCardBody, { data, onActivate, badge }, [
+    h.if(selection.isSynced && photosFailed && !selection.selectionMode)(
+      PhotoResyncRow,
+      {
+        key: "resync",
+        photoIds: selection.photoFailures.get(data.checkin_id) ?? null,
+        resyncing: selection.resyncingIds.has(data.checkin_id),
+        onResync: () => selection.resyncPhotos([data.checkin_id]),
+      }
+    ),
+    h.if(isSelected)("div", { key: "selected", style: selectedOverlayStyle }),
+  ]);
+}
+
+/** A sent checkin's prompt when some of its photos didn't make it; Resync
+ * uploads just those */
+function PhotoResyncRow({ photoIds, resyncing, onResync }) {
+  let label = "Its photos didn't sync";
+  if (photoIds != null && photoIds.length === 1) {
+    label = "1 photo didn't sync";
+  } else if (photoIds != null) {
+    label = `${photoIds.length} photos didn't sync`;
+  }
   return h(
-    MapCheckinCardBody,
-    { data, onActivate, badge },
-    h.if(isSelected)("div", { style: selectedOverlayStyle })
+    "div",
+    {
+      style: photoFailedRowStyle,
+      // A click here resyncs; it shouldn't also fly the map to the checkin
+      onClick: (e) => e.stopPropagation(),
+    },
+    [
+      h("span", label),
+      h(
+        Button,
+        {
+          small: true,
+          icon: "refresh",
+          loading: resyncing,
+          onClick: onResync,
+        },
+        "Resync"
+      ),
+    ]
   );
 }
 
@@ -336,13 +529,52 @@ const StrabospotCheckinCard = createMapCheckinCard(StrabospotCheckinContent);
 function SelectionFooter({
   selectionMode,
   selectedCount,
+  resyncCount,
   isSending,
   sendError,
+  photoFailedIds,
+  isResyncingFailures,
+  onResyncFailures,
   onStart,
   onSend,
   onCancel,
 }) {
+  let selectedLabel = `${selectedCount} selected`;
+  if (resyncCount > 0) {
+    selectedLabel += ` (${resyncCount} already sent, to update)`;
+  }
+
+  let failuresLabel = `${photoFailedIds.length} checkins have photos that didn't sync to StraboSpot.`;
+  if (photoFailedIds.length === 1) {
+    failuresLabel = "1 checkin has photos that didn't sync to StraboSpot.";
+  }
+
   return h("div", { style: selectionFooterStyle }, [
+    // Photos that didn't make it, remembered across reloads, with one button
+    // to send those checkins again
+    h.if(!selectionMode && photoFailedIds.length > 0)(
+      Callout,
+      {
+        intent: "warning",
+        icon: "warning-sign",
+        compact: true,
+        style: { marginBottom: "0.5rem" },
+      },
+      [
+        h("div", { style: { marginBottom: "0.4rem" } }, failuresLabel),
+        h(
+          Button,
+          {
+            small: true,
+            icon: "refresh",
+            loading: isResyncingFailures,
+            onClick: onResyncFailures,
+          },
+          "Resync them"
+        ),
+      ]
+    ),
+
     h.if(!selectionMode)(
       Button,
       {
@@ -358,7 +590,7 @@ function SelectionFooter({
         {
           style: { marginBottom: "0.5rem", fontSize: "12px", opacity: 0.75 },
         },
-        `${selectedCount} selected`
+        selectedLabel
       ),
       h(
         "div",
@@ -435,7 +667,9 @@ function SendResultsDialog({
         h(
           "p",
           { style: successDialogTitleStyle },
-          `${sentCount ?? 0} checkin${sentCount === 1 ? "" : "s"} successfully sent`
+          `${sentCount ?? 0} checkin${
+            sentCount === 1 ? "" : "s"
+          } successfully sent`
         ),
         h(
           "p",
@@ -469,6 +703,11 @@ function SendResultsDialog({
               `Spot sync succeeded, but image upload failed for checkin${
                 imageFailedIds.length === 1 ? "" : "s"
               }: ${imageFailedIds.join(", ")}`
+            ),
+            h(
+              "div",
+              { style: { marginTop: "6px" } },
+              "They're marked with an amber ! in the list; Resync sends just the photos that failed."
             ),
           ]
         ),

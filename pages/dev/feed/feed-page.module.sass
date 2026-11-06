@@ -60,6 +60,13 @@
   max-width: var(--feed-content-width)
   margin: 0 auto
 
+  // Inside the list, at the top of its scroll, as wide as the cards' row and
+  // one card gap above it
+  &.in-scroll
+    width: 100%
+    max-width: var(--data-panel-content-width, var(--feed-content-width))
+    margin: 0 auto var(--data-panel-item-gap, 12px)
+
 // Without a feed (a prompt in its place), the tabs' own row, right-aligned
 .feed-tabs-row
   display: flex

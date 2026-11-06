@@ -12,6 +12,7 @@ import { Image, type ImageProps } from "./image";
 
 export { Image };
 export type { ImageProps };
+export * from "./back-button";
 export * from "./footer";
 export * from "./theme-button";
 export * from "./navigation";

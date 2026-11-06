@@ -4,6 +4,15 @@
 .editor-spinner
   margin: 4em auto
 
+// Back at the top left, over the editor, for a new checkin and an existing one
+.checkin-editor-page
+  display: flex
+  flex-direction: column
+
+  > .back
+    align-self: flex-start
+    margin-bottom: 0.5em
+
 .checkin-editor
   display: flex
   flex-direction: column
@@ -35,17 +44,59 @@
 .checkin-fields
   display: flex
   flex-direction: column
-  gap: 0.25em
 
-.field
-  margin-bottom: 0.75em
+  // Every control in the page's own font (the browser's default for a textarea
+  // or date field is monospace), with figures that line up
+  input, textarea, select
+    font-family: inherit
 
-.field-row
+  // The site's dark theme (`body.bp6-dark .bp6-input::placeholder`) draws a
+  // box around placeholder text; not here
+  :global(.bp6-dark) & :global(.bp6-input)::placeholder
+    box-shadow: none
+
+// A titled group of fields, set off from the next by a rule
+.field-section
   display: flex
-  flex-direction: row
-  flex-wrap: wrap
-  gap: 0 1.5em
-  align-items: flex-start
+  flex-direction: column
+  gap: 1em
+  padding-bottom: 1.5em
+  margin-bottom: 1.5em
+  border-bottom: 1px solid var(--panel-border-color, rgba(128, 128, 128, 0.25))
+
+.field-section-title
+  margin: 0
+  font-size: 0.8em
+  font-weight: 700
+  letter-spacing: 0.06em
+  text-transform: uppercase
+  color: var(--text-subtle-color)
+
+.field-section-required
+  font-weight: 400
+  letter-spacing: 0
+  text-transform: none
+
+// Labelled controls on one grid: two equal columns, one on a narrow screen
+.field-grid
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 1em 1.5em
+  align-items: start
+
+  @media only screen and (max-width: 640px)
+    grid-template-columns: minmax(0, 1fr)
+
+// Spacing comes from the section and grid gaps, not from each field
+.field
+  margin: 0
+
+.description-input
+  min-height: 5.5em
+  line-height: 1.5
+
+.datetime-input input, .coordinate-input input
+  font-variant-numeric: tabular-nums
 
 .field-label
   font-weight: 600
@@ -59,17 +110,24 @@
   font-size: 0.85em
   color: var(--bp-intent-danger-text-color, #cd4246)
 
+// Centred in the 30px height of the controls beside it
 .private-switch
-  margin-top: 0.4em
+  margin: 5px 0 0
 
-// The rating's stars: one tight row, coloured like the cards' stars
+// The rating's stars: one row with space between them, coloured like the
+// cards' stars
 .rating-input
   display: flex
   flex-direction: row
+  gap: 0.5em
 
+  // Each star its own 24px square, so the row's gap shows between them
   .star-button
-    min-width: 0
-    padding: 0 2px
+    flex: 0 0 auto
+    min-width: 24px
+    min-height: 24px
+    padding: 0
+    justify-content: center
     color: var(--text-subtle-color)
 
 // ---- Location ----
@@ -94,6 +152,11 @@
     height: 180px
     margin-top: 0.5em
 
+  // The checkin's own map, square as on its `/checkin/:id` page
+  &.square
+    height: auto
+    aspect-ratio: 1 / 1
+
   .location-map
     position: absolute
     inset: 0
@@ -101,21 +164,12 @@
     height: 100%
     min-height: 0
 
+// Beside the map: the coordinates, the browser's position and the place,
+// stacked at one width
 .location-controls
   display: flex
   flex-direction: column
-  gap: 0.5em
-  align-items: flex-start
-
-.coordinate-inputs
-  display: flex
-  flex-direction: row
-  gap: 0.5em
-  width: 100%
-
-  > *
-    flex: 1 1 0
-    min-width: 0
+  gap: 0.75em
 
 // ---- Photos ----
 
@@ -285,24 +339,47 @@
 
 // ---- Save panel ----
 
+// The save column: the status, then every action in one stack (Save, View
+// checkin, Delete checkin), each the column's full width and one height.
 .save-panel
   display: flex
   flex-direction: column
-  gap: 0.75em
+  gap: 1em
   padding: 1em
   border-radius: 6px
   border: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
   background-color: var(--panel-background-color, transparent)
 
+  :global(.bp6-button)
+    min-height: 34px
+
+// The status, after a dot in its colour
 .save-status
-  font-size: 0.85em
-  color: var(--text-subtle-color)
+  display: flex
+  align-items: center
+  gap: 0.5em
+  font-size: 0.9em
+  font-weight: 600
+  color: var(--text-color)
+
+  &::before
+    content: ""
+    flex: 0 0 auto
+    width: 8px
+    height: 8px
+    border-radius: 50%
+    background-color: var(--text-subtle-color)
+
+  &.saved::before
+    background-color: #238551
+
+  &.dirty::before
+    background-color: #c87619
 
 .save-actions
   display: flex
   flex-direction: column
-  gap: 0.4em
-  align-items: stretch
+  gap: 0.5em
 
 .error-list
   margin: 0.25em 0 0
@@ -314,13 +391,11 @@
   gap: 0.4em
   font-size: 0.9em
 
+// Delete, in the actions' stack under View checkin, with its error under it
 .delete-section
   display: flex
   flex-direction: column
-  gap: 0.3em
-  margin-top: 0.5em
-  padding-top: 0.75em
-  border-top: 1px solid var(--panel-rule-color, rgba(128, 128, 128, 0.3))
+  gap: 0.5em
 
 // ---- Drafts ----
 
@@ -356,6 +431,24 @@
   flex-direction: column
   gap: 1em
   padding-bottom: 2em
+
+// The index's heading and introduction, as the organizations directory has
+// them, with its actions at the row's right end
+.index-title
+  margin: 0
+  color: var(--text-emphasized-color)
+
+.index-intro-row
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  justify-content: space-between
+  gap: 0.75em 1em
+  margin-bottom: 0.5em
+
+.index-intro
+  margin: 0
+  color: var(--text-subtle-color)
 
 .index-actions
   display: flex

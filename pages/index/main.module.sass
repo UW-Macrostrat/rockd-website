@@ -373,6 +373,20 @@ img
   .main-img
     max-height: 480px
 
+  // Its email and password fields take the theme's colors, and keep them when
+  // the browser autofills them (Chrome paints its own yellow otherwise; a
+  // background can't override it, so an inset shadow covers it)
+  .login-input
+    background-color: var(--panel-background-color, #fff)
+    color: var(--text-color)
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus
+      -webkit-box-shadow: 0 0 0 100px var(--panel-background-color, #fff) inset
+      -webkit-text-fill-color: var(--text-color)
+      caret-color: var(--text-color)
+
   // Its Login button's hover: one transparent gray in either theme, stronger
   // than Blueprint's faint light-mode default
   .login-button:global(.bp6-button)

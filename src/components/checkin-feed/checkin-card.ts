@@ -10,7 +10,7 @@
  * it's the candidate to promote back into the library (converging with that
  * component and `CheckinListing`, which already carries a TODO to dedupe).
  */
-import { AnchorButton } from "@blueprintjs/core";
+import { AnchorButton, Icon } from "@blueprintjs/core";
 import {
   createDataCard,
   type ItemComponentProps,
@@ -32,8 +32,9 @@ export * from "./checkin-card-parts";
 
 const h = hyper.styled(styles);
 
-/** The card as a link to the checkin's own page (the `/dev/feed` lists),
- * with Edit beneath it when the checkin is the signed-in user's own. */
+/** The card as a link to the checkin's own page (the `/dev/feed` lists), with
+ * a row beneath it: the map cards' Details link to its page, then Edit when
+ * the checkin is the signed-in user's own. */
 function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
   const { personId } = useRockdAuth();
   const own = personId != null && data.person_id === personId;
@@ -43,19 +44,24 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
       { href: `/checkin/${data.checkin_id}` },
       checkinSummary(data)
     ),
-    h.if(own)(
-      "div.card-actions",
+    h("div.card-actions", [
       h(
+        "a.checkin-details",
+        { key: "details", href: `/checkin/${data.checkin_id}` },
+        ["Details", h(Icon, { icon: "arrow-right", size: 12 })]
+      ),
+      h.if(own)(
         AnchorButton,
         {
-          href: `/dev/checkin/${data.checkin_id}`,
+          key: "edit",
+          href: `/dev/create-edit-checkin/${data.checkin_id}`,
           icon: "edit",
           minimal: true,
           small: true,
         },
         "Edit"
-      )
-    ),
+      ),
+    ]),
   ]);
 }
 

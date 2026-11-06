@@ -2,6 +2,7 @@ import { macrostratApiURL } from "~/settings";
 
 const STRABOSPOT_SETUP_ENDPOINT = `${macrostratApiURL}/api/v3/dev/convert/strabospot-setup`;
 const SYNC_CHECKINS_ENDPOINT = `${macrostratApiURL}/api/v3/dev/convert/sync-checkins-to-strabo`;
+const RESYNC_PHOTOS_ENDPOINT = `${macrostratApiURL}/api/v3/dev/convert/resync-strabo-photos`;
 
 const STRABOSPOT_REFRESH_ENDPOINT = "https://strabospot.org/jwtauth/refresh";
 const STORAGE_KEY = "strabospot-auth";
@@ -131,6 +132,86 @@ export function getStrabospotDatasetId(): number | null {
 
 export function clearStoredStrabospotAuth() {
   localStorage.removeItem(STORAGE_KEY);
+}
+
+/** Photos of sent checkins that didn't reach StraboSpot, by checkin id. A
+ * null list means the photo step failed before any photo was tried, so all of
+ * that checkin's photos are still to go. */
+export type PhotoFailures = Map<number, number[] | null>;
+
+// Kept so the page can offer to resync them after a reload
+const PHOTO_FAILURES_KEY = "strabospot-photo-failures";
+
+export function getStoredPhotoFailures(): PhotoFailures {
+  const failures: PhotoFailures = new Map();
+  try {
+    const raw = localStorage.getItem(PHOTO_FAILURES_KEY);
+    if (raw == null) return failures;
+    const stored = JSON.parse(raw);
+    if (stored == null || typeof stored !== "object" || Array.isArray(stored)) {
+      return failures;
+    }
+    for (const [id, photoIds] of Object.entries(stored)) {
+      let photos: number[] | null = null;
+      if (Array.isArray(photoIds)) photos = photoIds.map(Number);
+      failures.set(Number(id), photos);
+    }
+  } catch {
+    // Unreadable: start with none
+  }
+  return failures;
+}
+
+export function saveStoredPhotoFailures(failures: PhotoFailures) {
+  try {
+    if (failures.size === 0) {
+      localStorage.removeItem(PHOTO_FAILURES_KEY);
+      return;
+    }
+    localStorage.setItem(
+      PHOTO_FAILURES_KEY,
+      JSON.stringify(Object.fromEntries(failures))
+    );
+  } catch {
+    // Storage unavailable (private mode): the failures last for this visit
+  }
+}
+
+export interface PhotoResyncResult {
+  checkin_id: number;
+  uploaded_photo_ids: number[];
+  failed_photos: { photo_id: number; message: string }[];
+}
+
+/**
+ * Uploads only a sent checkin's photos that failed before (all of them, with
+ * `photoIds` null), leaving its spot and the photos already there alone.
+ */
+export async function resyncStrabospotPhotos(
+  checkinId: number,
+  photoIds: number[] | null,
+  rockdToken: string
+): Promise<PhotoResyncResult> {
+  const auth = getStoredStrabospotAuth();
+  if (auth == null || auth.accessToken == null) {
+    throw new Error("StraboSpot is not linked. Missing access token.");
+  }
+  const res = await fetch(RESYNC_PHOTOS_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      checkin_id: checkinId,
+      photo_ids: photoIds,
+      strabo_token: auth.accessToken,
+      rockd_token: rockdToken,
+    }),
+  });
+  const body = await parseJsonResponse(res);
+  if (!res.ok)
+    throw new Error(
+      typeof body === "string" ? body : JSON.stringify(body, null, 2)
+    );
+  return body as PhotoResyncResult;
 }
 
 export async function refreshStoredStrabospotAuth(): Promise<boolean> {

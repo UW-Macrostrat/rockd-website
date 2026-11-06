@@ -51,55 +51,76 @@ export function CheckinFields({ token }: { token: string }) {
     return errors[field];
   };
 
+  // Three groups, each answering one question in the order a geologist
+  // records it: what's here, when and who it's shared with, and where. Every
+  // control has its label above it, on one grid, so the eye runs down a
+  // single left edge.
   return h("div.checkin-fields", [
-    h(
-      Field,
-      { label: "Outcrop description", error: shown("notes"), required: true },
-      h(TextArea, {
-        value: draft.notes,
-        onChange: (e) => update({ notes: e.currentTarget.value }),
-        placeholder: "What's here? The first line is the checkin's title.",
-        fill: true,
-        autoResize: true,
-        intent: intentFor(shown("notes")),
-      })
-    ),
-    h("div.field-row", [
+    h(FieldSection, { title: "Outcrop" }, [
       h(
         Field,
-        { label: "Rating", error: shown("rating"), required: true },
-        h(RatingInput, {
-          value: draft.rating,
-          onChange: (rating) => update({ rating }),
-        })
-      ),
-      h(
-        Field,
-        { label: "Observed", error: shown("created") },
-        h(InputGroup, {
-          type: "datetime-local",
-          value: toLocalInput(draft.created),
-          onChange: (e) =>
-            update({ created: fromLocalInput(e.currentTarget.value) }),
-          intent: intentFor(shown("created")),
+        {
+          label: "Description",
+          error: shown("notes"),
+          required: true,
+          helper: "The first line becomes the checkin's title.",
+        },
+        h(TextArea, {
+          value: draft.notes,
+          onChange: (e) => update({ notes: e.currentTarget.value }),
+          placeholder:
+            "e.g. Cross-bedded sandstone along the creek, with ripple marks near the base",
+          fill: true,
+          autoResize: true,
+          className: "description-input",
+          intent: intentFor(shown("notes")),
         })
       ),
     ]),
-    h("div.field-row", [
-      h(Switch, {
-        checked: draft.private,
-        onChange: (e) => update({ private: e.currentTarget.checked }),
-        label: "Private — only you can see it",
-        className: "private-switch",
+    h(FieldSection, { title: "Details" }, [
+      h("div.field-grid", [
+        h(
+          Field,
+          { label: "Rating", error: shown("rating"), required: true },
+          h(RatingInput, {
+            value: draft.rating,
+            onChange: (rating) => update({ rating }),
+          })
+        ),
+        h(
+          Field,
+          { label: "Observed", error: shown("created") },
+          h(InputGroup, {
+            type: "datetime-local",
+            value: toLocalInput(draft.created),
+            onChange: (e) =>
+              update({ created: fromLocalInput(e.currentTarget.value) }),
+            fill: true,
+            className: "datetime-input",
+            intent: intentFor(shown("created")),
+          })
+        ),
+        h(
+          Field,
+          { label: "Visibility" },
+          h(Switch, {
+            checked: draft.private,
+            onChange: (e) => update({ private: e.currentTarget.checked }),
+            label: "Private — only you can see it",
+            className: "private-switch",
+          })
+        ),
+        h(OrganizationField, { draft, token, update }),
+      ]),
+    ]),
+    h(FieldSection, { title: "Location", required: true }, [
+      h(LocationField, {
+        position: draft.position,
+        near: draft.near ?? null,
+        error: shown("position"),
+        onChange: (position, near) => update({ position, near }),
       }),
-      h(OrganizationField, { draft, token, update }),
     ]),
-    h(LocationField, {
-      position: draft.position,
-      near: draft.near ?? null,
-      error: shown("position"),
-      onChange: (position, near) => update({ position, near }),
-    }),
     h(PhotoField, {
       photo: draft.photo,
       // Discarding a chosen file goes back to the stored photo, if any
@@ -122,19 +143,42 @@ export function CheckinFields({ token }: { token: string }) {
 
 // ---- Pieces ----
 
+/** A titled group of fields, set off from the next by a rule */
+function FieldSection({
+  title,
+  required = false,
+  children,
+}: {
+  title: string;
+  required?: boolean;
+  children: any;
+}) {
+  return h("section.field-section", [
+    h("h3.field-section-title", [
+      title,
+      h.if(required)("span.field-section-required", " (required)"),
+    ]),
+    children,
+  ]);
+}
+
+/** A labelled control. An error replaces the helper text under it. */
 function Field({
   label,
   error,
+  helper,
   required = false,
   children,
 }: {
   label: string;
   error?: string;
+  helper?: string;
   required?: boolean;
   children: any;
 }) {
-  let helper = null;
-  if (error != null) helper = h("span.field-error", error);
+  let helperText = null;
+  if (helper != null) helperText = h("span.field-note", helper);
+  if (error != null) helperText = h("span.field-error", error);
   let labelInfo = null;
   if (required) labelInfo = "(required)";
   return h(
@@ -142,7 +186,7 @@ function Field({
     {
       label,
       labelInfo,
-      helperText: helper,
+      helperText,
       intent: intentFor(error),
       className: "field",
     },
@@ -213,6 +257,7 @@ function OrganizationField({
     { label: "Organization" },
     h(HTMLSelect, {
       options,
+      fill: true,
       value: current,
       onChange: (e) => {
         const raw = e.currentTarget.value;
@@ -296,50 +341,66 @@ function LocationField({
   let placeLine = "Click the map, enter coordinates, or use your location.";
   if (place != null) placeLine = `Near ${place}`;
 
-  return h(Field, { label: "Location", error, required: true }, [
-    h("div.location-field", [
+  let lat = "";
+  let lng = "";
+  if (position != null) {
+    lat = String(position.lat);
+    lng = String(position.lng);
+  }
+
+  // The map, and beside it the same place as numbers: labelled coordinates,
+  // the browser's position, and where the pin is
+  return h("div.location-field", [
+    // The `/checkin/:id` page's map: square, at its default regional view
+    h(
+      "div.location-map-holder.square",
+      h(LocationMap, {
+        position,
+        onPick: pick,
+        className: "location-map",
+      })
+    ),
+    h("div.location-controls", [
       h(
-        "div.location-map-holder",
-        h(LocationMap, {
-          position,
-          altitude: 150_000,
-          onPick: pick,
-          className: "location-map",
+        Field,
+        { label: "Latitude" },
+        h(InputGroup, {
+          type: "number",
+          step: "any",
+          placeholder: "e.g. 43.0731",
+          value: lat,
+          fill: true,
+          className: "coordinate-input",
+          onChange: (e) => setCoordinate("lat", e.currentTarget.value),
         })
       ),
-      h("div.location-controls", [
-        h("div.coordinate-inputs", [
-          h(InputGroup, {
-            type: "number",
-            step: "any",
-            placeholder: "Latitude",
-            value: position == null ? "" : String(position.lat),
-            onChange: (e) => setCoordinate("lat", e.currentTarget.value),
-            "aria-label": "Latitude",
-          }),
-          h(InputGroup, {
-            type: "number",
-            step: "any",
-            placeholder: "Longitude",
-            value: position == null ? "" : String(position.lng),
-            onChange: (e) => setCoordinate("lng", e.currentTarget.value),
-            "aria-label": "Longitude",
-          }),
-        ]),
-        h(
-          Button,
-          {
-            icon: "locate",
-            minimal: true,
-            small: true,
-            loading: locating,
-            onClick: locate,
-          },
-          "Use my location"
-        ),
-        h("span.field-note", placeLine),
-        h.if(locateError != null)("span.field-error", locateError),
-      ]),
+      h(
+        Field,
+        { label: "Longitude" },
+        h(InputGroup, {
+          type: "number",
+          step: "any",
+          placeholder: "e.g. -89.4012",
+          value: lng,
+          fill: true,
+          className: "coordinate-input",
+          onChange: (e) => setCoordinate("lng", e.currentTarget.value),
+        })
+      ),
+      h(
+        Button,
+        {
+          icon: "locate",
+          outlined: true,
+          fill: true,
+          loading: locating,
+          onClick: locate,
+        },
+        "Use my location"
+      ),
+      h("span.field-note", placeLine),
+      h.if(locateError != null)("span.field-error", locateError),
+      h.if(error != null)("span.field-error", error),
     ]),
   ]);
 }

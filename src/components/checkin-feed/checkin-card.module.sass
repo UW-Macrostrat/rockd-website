@@ -18,10 +18,16 @@
     color: var(--text-color)
     text-decoration: none
 
+// Details then Edit (your own checkin's), at the card's bottom right
 .card-actions
   display: flex
   justify-content: flex-end
+  align-items: center
+  gap: 0.75em
   margin-top: 0.4em
+
+  .checkin-details
+    align-self: center
 
 // The map pages' card: a click shows the checkin on the map. Positioned, so a
 // page can lay a badge or outline over it.

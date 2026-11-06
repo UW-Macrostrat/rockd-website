@@ -1,7 +1,7 @@
 import { Card, Icon } from "@blueprintjs/core";
 import hyper from "@macrostrat/hyper";
 import { type ComponentType, useEffect, useState } from "react";
-import { Comments, getImageUrl, TruncatedText } from "~/components";
+import { BackButton, Comments, getImageUrl, TruncatedText } from "~/components";
 import {
   CheckinFooter,
   PersonByline,
@@ -39,8 +39,13 @@ export function Checkins({ checkin, comments }) {
 
   return h(ContentPage, { title: "Checkin" }, [
     h("div.checkin-page", [
-      // A long title is cut short, with a "…" that shows it all
-      h("h1.checkin-title", h(TruncatedText, { text: title })),
+      h("div.checkin-heading", [
+        // Back to the page before (a feed, a map, the editor), or home when
+        // the checkin was opened directly
+        h(BackButton, { fallback: "/" }),
+        // A long title is cut short, with a "…" that shows it all
+        h("h1.checkin-title", h(TruncatedText, { text: title })),
+      ]),
       // The two cards share rows, so the map matches the photo's size and place
       h("div.checkin-overview", [
         h(CheckinSummary, { checkin, description }),
