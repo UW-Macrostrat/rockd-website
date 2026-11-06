@@ -7,6 +7,7 @@ import {
 } from "@blueprintjs/core";
 import hyper from "@macrostrat/hyper";
 import classNames from "classnames";
+import { isDevelopmentEnvironment } from "~/settings";
 import { exploreNavItems, type NavLinkItem } from "../footer";
 import {
   clearRockdAuth,
@@ -162,6 +163,12 @@ function SignedInPanel({
         AnchorButton,
         { minimal: true, icon: "map-marker", href: "/my-checkins" },
         "My checkins"
+      ),
+      // The checkin editor is served on the development deployment only
+      h.if(isDevelopmentEnvironment())(
+        AnchorButton,
+        { minimal: true, icon: "edit", href: "/dev/create-edit-checkin" },
+        "Create/edit checkins"
       ),
       h(
         AnchorButton,

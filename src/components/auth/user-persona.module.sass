@@ -36,3 +36,13 @@
 
   :global(.bp6-button)
     justify-content: flex-start
+
+  // One light gray hover for every option, Log out included, in either theme
+  // (Blueprint's own is fainter, and red on Log out). Qualified to outrank
+  // Blueprint's `.bp6-button.bp6-minimal:hover` and its danger variant.
+  :global(.bp6-button.bp6-minimal)
+    &:hover, &:global(.bp6-intent-danger):hover
+      background-color: rgba(143, 153, 168, 0.18)
+
+    &:active, &:global(.bp6-intent-danger):active
+      background-color: rgba(143, 153, 168, 0.28)

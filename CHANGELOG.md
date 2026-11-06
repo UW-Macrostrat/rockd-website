@@ -95,7 +95,9 @@
     checkin card under "Selected checkins".
 - A sign-in indicator, `UserPersona` (`~/components/auth`), as Macrostrat's:
   signed in, a button with the user's name, opening a panel with their name
-  and email, "My checkins", "Integrations" (`/dev/strabospot`) and Log out; signed out, "Sign in", opening a
+  and email, "My checkins", "Create/edit checkins" (`/dev/create-edit-checkin`,
+  on the development deployment only), "Integrations" (`/dev/strabospot`) and
+  Log out, every option with one light gray hover; signed out, "Sign in", opening a
   panel that links to `/login`. Either way the panel links to Explore and
   Trips (with the footer's icons), the Feed and Organizations. It's at the top right of the `/dev/feed` and
   `/orgs` pages, and, icon only (`compact`), in every map page's
@@ -160,7 +162,8 @@
 - On `/dev/strabospot`, the Linked button, the cards' ✓ and a selected
   card's outline use the Rockd icon's green (`ROCKD_GREEN`: its sage
   `#93b398`, with the icon's darker outline green `#759a7b` as the border and
-  a deep green for the text and tick) instead of a bright green.
+  a deep green for the text and tick) instead of a bright green. The Linked /
+  Link to StraboSpot button has 4px corners, like the logo beside it.
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
   under the header "Rockd › Checkin": Back at the top left (the page before,

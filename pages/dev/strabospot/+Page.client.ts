@@ -13,7 +13,8 @@ import {
 import { clearRockdAuth, useRequiredRockdPersonId } from "~/components/auth";
 
 const strabospotSyncButtonBaseStyle = {
-  borderRadius: "8px",
+  // Squarer than a pill, still softly rounded
+  borderRadius: "4px",
   fontWeight: 600,
   fontSize: "12px",
   letterSpacing: "0.01em",
