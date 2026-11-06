@@ -145,6 +145,12 @@
   /dev/convert/resync-strabo-photos`), not the spot or the photos already
   there; a photo that fails again stays recorded for the next try. Needs
   api-v3's per-photo `imageFailures` in the sync response.
+  A checkin edited since it was synced is flagged the same way, with an
+  "Edited since last sync — Resync" row that sends the whole checkin again.
+  After each sync the page records the checkin's `updated` as Rockd then
+  reports it (`localStorage` `strabospot-synced-at`); a later `updated` means
+  an edit. Both are the server's times, so the browser's clock doesn't
+  matter. Needs the Rockd API's checkins GET to return `updated`.
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
   under the header "Rockd › Checkin": Back at the top left (the page before,

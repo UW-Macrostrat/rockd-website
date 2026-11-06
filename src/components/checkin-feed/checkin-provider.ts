@@ -77,6 +77,8 @@ export interface Checkin {
   observations?: unknown[];
   /** Set once the checkin has been sent to StraboSpot */
   spot_id?: number | null;
+  /** When it was last edited (or its spot_id saved), as the API reports it */
+  updated?: string | null;
 }
 
 /** Column key → the route's `orderBy` value. `likes` is deliberately absent:

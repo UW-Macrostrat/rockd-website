@@ -14,14 +14,19 @@ import {
   MapCheckinFeed,
 } from "~/components/checkin-feed";
 import {
+  editedSinceSync,
   getStoredPhotoFailures,
+  getStoredSyncedAt,
   getStrabospotDatasetId,
   type PhotoFailures,
   resyncStrabospotPhotos,
   saveStoredPhotoFailures,
+  saveStoredSyncedAt,
   sendCheckinsToStrabospotDataset,
 } from "./strabospot-integration";
 import { getStoredRockdToken } from "~/components/auth";
+// The API module alone, not the editor's whole barrel (EXIF, drafts, sync)
+import { fetchCheckin } from "~/checkin-editor/api";
 
 // The list fills the sidebar, with the selection controls under it
 const listLayoutStyle = {
@@ -185,6 +190,10 @@ interface StrabospotSelection {
   toggle(checkin: Checkin): void;
   /** Uploads only the photos of these checkins that didn't make it */
   resyncPhotos(checkinIds: number[]): void;
+  /** Each synced checkin's `updated` just after its sync, by id */
+  syncedAt: Record<string, string>;
+  /** Sends edited checkins again */
+  resyncEdited(checkinIds: number[]): void;
 }
 
 const SelectionContext = createContext<StrabospotSelection | null>(null);
@@ -227,6 +236,10 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     getStoredPhotoFailures()
   );
   const [resyncingIds, setResyncingIds] = useState<Set<number>>(new Set());
+  // Each synced checkin's `updated` just after its sync, to spot later edits
+  const [syncedAt, setSyncedAt] = useState<Record<string, string>>(() =>
+    getStoredSyncedAt()
+  );
 
   function updatePhotoFailures(change: (next: PhotoFailures) => void) {
     setPhotoFailures((prev) => {
@@ -300,6 +313,46 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     });
 
     setShowSuccessDialog(true);
+    await recordSyncTimes(sentIds, rockdToken);
+  }
+
+  /** Records each sent checkin's `updated` as Rockd now reports it (the sync
+   * just set it), so a later edit shows as needing a resync */
+  async function recordSyncTimes(checkinIds: number[], rockdToken: string) {
+    const fresh = await Promise.all(
+      checkinIds.map((id) => fetchCheckin(id, rockdToken).catch(() => null))
+    );
+    setSyncedAt((prev) => {
+      const next = { ...prev };
+      for (const checkin of fresh) {
+        if (checkin?.updated != null) {
+          next[String(checkin.checkin_id)] = checkin.updated;
+        }
+      }
+      saveStoredSyncedAt(next);
+      return next;
+    });
+  }
+
+  /** Sends edited checkins again, read fresh from Rockd so the edit goes */
+  async function resyncEdited(checkinIds: number[]) {
+    setSendError(null);
+    setResyncingIds((prev) => new Set([...prev, ...checkinIds]));
+    try {
+      const token = getStoredRockdToken();
+      const fresh = await Promise.all(
+        checkinIds.map((id) => fetchCheckin(id, token))
+      );
+      await send(fresh.filter((c): c is Checkin => c != null));
+    } catch (err: any) {
+      setSendError(err?.message ?? "Failed to resync the checkin.");
+    } finally {
+      setResyncingIds((prev) => {
+        const next = new Set(prev);
+        for (const id of checkinIds) next.delete(id);
+        return next;
+      });
+    }
   }
 
   /** Uploads only the photos of these checkins that didn't reach StraboSpot,
@@ -404,6 +457,8 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
     resyncingIds,
     toggle,
     resyncPhotos,
+    syncedAt,
+    resyncEdited,
   };
 
   return h(
@@ -448,26 +503,45 @@ export function FeatureDetails({ isStrabospotSynced, personId }) {
  * again. */
 function StrabospotCheckinContent({ data }: { data: Checkin }) {
   const selection = useSelection();
+  const id = data.checkin_id;
   const sent = isSent(data, selection.sentIds);
-  const photosFailed = sent && selection.photoFailures.has(data.checkin_id);
+  // Edited in Rockd after its last sync from this browser
+  const edited =
+    sent && editedSinceSync(data.updated, selection.syncedAt[String(id)]);
+  const photosFailed = sent && selection.photoFailures.has(id);
   const selectable = selection.selectionMode;
-  const isSelected = selectable && selection.selected.has(data.checkin_id);
+  const isSelected = selectable && selection.selected.has(id);
 
   let onActivate: (() => void) | undefined = undefined;
   if (selectable) {
     onActivate = () => selection.toggle(data);
   }
 
+  // What still needs sending, if anything: an edit (the whole checkin goes
+  // again, photos included), or just the photos that failed
+  let resyncRow = null;
+  let flagTitle: string | null = null;
+  if (edited) {
+    flagTitle = "Edited since it was sent to StraboSpot";
+    resyncRow = {
+      label: "Edited since last sync",
+      onResync: () => selection.resyncEdited([id]),
+    };
+  } else if (photosFailed) {
+    flagTitle = "Sent to StraboSpot, but some photos didn't sync";
+    resyncRow = {
+      label: photoFailureLabel(selection.photoFailures.get(id) ?? null),
+      onResync: () => selection.resyncPhotos([id]),
+    };
+  }
+
   // Sits after the star rating in the card's header row: ✓ once sent, or an
-  // amber ! when some of its photos didn't reach StraboSpot
+  // amber ! when it needs resyncing
   let badge = null;
-  if (selection.isSynced && photosFailed) {
+  if (selection.isSynced && flagTitle != null) {
     badge = h(
       "div",
-      {
-        style: photoFailedBadgeStyle,
-        title: "Sent to StraboSpot, but some photos didn't sync",
-      },
+      { style: photoFailedBadgeStyle, title: flagTitle },
       h("span", { style: photoFailedBadgeMarkStyle }, "!")
     );
   } else if (selection.isSynced && sent) {
@@ -479,28 +553,27 @@ function StrabospotCheckinContent({ data }: { data: Checkin }) {
   }
 
   return h(MapCheckinCardBody, { data, onActivate, badge }, [
-    h.if(selection.isSynced && photosFailed && !selection.selectionMode)(
-      PhotoResyncRow,
+    h.if(selection.isSynced && resyncRow != null && !selection.selectionMode)(
+      ResyncRow,
       {
         key: "resync",
-        photoIds: selection.photoFailures.get(data.checkin_id) ?? null,
-        resyncing: selection.resyncingIds.has(data.checkin_id),
-        onResync: () => selection.resyncPhotos([data.checkin_id]),
+        ...resyncRow,
+        resyncing: selection.resyncingIds.has(id),
       }
     ),
     h.if(isSelected)("div", { key: "selected", style: selectedOverlayStyle }),
   ]);
 }
 
-/** A sent checkin's prompt when some of its photos didn't make it; Resync
- * uploads just those */
-function PhotoResyncRow({ photoIds, resyncing, onResync }) {
-  let label = "Its photos didn't sync";
-  if (photoIds != null && photoIds.length === 1) {
-    label = "1 photo didn't sync";
-  } else if (photoIds != null) {
-    label = `${photoIds.length} photos didn't sync`;
-  }
+function photoFailureLabel(photoIds: number[] | null) {
+  if (photoIds == null) return "Its photos didn't sync";
+  if (photoIds.length === 1) return "1 photo didn't sync";
+  return `${photoIds.length} photos didn't sync`;
+}
+
+/** A sent checkin's prompt when it needs resyncing: what's out of date, and
+ * Resync */
+function ResyncRow({ label, resyncing, onResync }) {
   return h(
     "div",
     {

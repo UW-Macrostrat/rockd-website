@@ -177,6 +177,41 @@ export function saveStoredPhotoFailures(failures: PhotoFailures) {
   }
 }
 
+// Each synced checkin's `updated` time as Rockd reported it just after the
+// sync (whose spot_id save sets it), by checkin id. A later `updated` means
+// the checkin was edited since, and needs resyncing. Both times are the
+// server's, so the browser's clock and time zone don't enter into it.
+const SYNCED_AT_KEY = "strabospot-synced-at";
+
+export function getStoredSyncedAt(): Record<string, string> {
+  try {
+    const stored = JSON.parse(localStorage.getItem(SYNCED_AT_KEY) ?? "{}");
+    if (stored == null || typeof stored !== "object") return {};
+    return stored;
+  } catch {
+    return {};
+  }
+}
+
+export function saveStoredSyncedAt(syncedAt: Record<string, string>) {
+  try {
+    localStorage.setItem(SYNCED_AT_KEY, JSON.stringify(syncedAt));
+  } catch {
+    // Storage unavailable (private mode): edits won't be flagged after a reload
+  }
+}
+
+/** True when the checkin's `updated` is after its recorded sync time. A
+ * checkin with no recorded sync (sent before this was tracked, or from
+ * another browser) is never flagged. */
+export function editedSinceSync(
+  updated: string | null | undefined,
+  syncedAt: string | undefined
+): boolean {
+  if (updated == null || syncedAt == null) return false;
+  return new Date(updated).getTime() > new Date(syncedAt).getTime();
+}
+
 export interface PhotoResyncResult {
   checkin_id: number;
   uploaded_photo_ids: number[];
