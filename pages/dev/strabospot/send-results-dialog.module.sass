@@ -1,0 +1,64 @@
+// The "sent to StraboSpot" dialog: Blueprint's own dialog, so it follows the
+// theme like the site's other dialogs, with a few spacing rules of its own
+
+// The Rockd icon in the header, where Blueprint puts a dialog's icon. The
+// icon file has an empty margin around the logo (the logo fills x 23–234,
+// y 25–236 of 256), so this 18px window shows the logo alone: it centres on
+// the title by the logo itself, and the 8px gap (the one Blueprint gives its
+// own icons) runs from the logo's edge.
+.dialog-logo
+  flex: 0 0 auto
+  width: 18px
+  height: 18px
+  margin-right: 8px
+  overflow: hidden
+  border-radius: 4px
+
+  img
+    display: block
+    // 256 / 211: the whole file, scaled so its logo fills the window
+    width: 121.33%
+    max-width: none
+    // Shifted past the empty margin: 23 / 211 left, 25 / 211 top (a
+    // percentage margin is of the window's width, which is its height too)
+    margin: -11.85% 0 0 -10.9%
+
+.results-body
+  display: flex
+  flex-direction: column
+  gap: 0.75em
+
+.results-summary
+  margin: 0
+  font-size: 1.15em
+  font-weight: 600
+  color: var(--text-emphasized-color)
+
+.results-text
+  margin: 0
+  color: var(--text-subtle-color)
+
+.results-list
+  margin: 0.25em 0 0
+  padding-left: 1.2em
+
+// Next step: StraboSpot's logo beside the link to the field data
+.next-step
+  display: flex
+  align-items: center
+  gap: 0.75em
+  margin-top: 0.25em
+
+.next-step-label
+  font-size: 0.75em
+  font-weight: 700
+  letter-spacing: 0.06em
+  text-transform: uppercase
+  color: var(--text-subtle-color)
+
+.strabospot-logo
+  width: 28px
+  height: 28px
+  border-radius: 4px
+  object-fit: cover
+  flex: 0 0 auto

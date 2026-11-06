@@ -7,11 +7,10 @@ import {
   refreshStoredStrabospotAuth,
   clearStoredStrabospotAuth,
   loginAndRefreshStrabospotFromUUID,
+  ROCKD_GREEN,
+  STRABOSPOT_LOGO_URL,
 } from "./strabospot-integration";
-import {
-  clearRockdAuth,
-  useRequiredRockdPersonId,
-} from "~/components/auth";
+import { clearRockdAuth, useRequiredRockdPersonId } from "~/components/auth";
 
 const strabospotSyncButtonBaseStyle = {
   borderRadius: "8px",
@@ -38,11 +37,12 @@ const strabospotSyncButtonStyles = {
     boxShadow: "none",
     cursor: "default",
   },
+  // Linked: the Rockd icon's green
   synced: {
     ...strabospotSyncButtonBaseStyle,
-    background: "linear-gradient(180deg, #7ee08f 0%, #43b864 100%)",
-    color: "#2f6a41",
-    border: "1px solid #379654",
+    background: `linear-gradient(180deg, ${ROCKD_GREEN.light} 0%, ${ROCKD_GREEN.base} 100%)`,
+    color: ROCKD_GREEN.ink,
+    border: `1px solid ${ROCKD_GREEN.dark}`,
     boxShadow:
       "inset 0 2px 4px rgba(16,53,29,0.2), inset 0 -1px 0 rgba(255,255,255,0.35), 0 1px 0 rgba(255,255,255,0.2)",
     transform: "translateY(1px)",
@@ -92,7 +92,7 @@ function StrabospotLinkControl({
 
   return h("div", { style: strabospotSyncControlStyle }, [
     h("img", {
-      src: "https://strabospot.org/includes/mimages/pic01.jpg",
+      src: STRABOSPOT_LOGO_URL,
       alt: "StraboSpot",
       style: strabospotBadgeImageStyle,
     }),

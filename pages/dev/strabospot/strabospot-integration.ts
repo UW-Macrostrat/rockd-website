@@ -8,6 +8,21 @@ const STRABOSPOT_REFRESH_ENDPOINT = "https://strabospot.org/jwtauth/refresh";
 const STORAGE_KEY = "strabospot-auth";
 const STRABOSPOT_ROCKD_LOGIN_ENDPOINT = "https://strabospot.org/rockd_login";
 
+/** The Rockd icon's greens, for the page's "linked" and "sent" marks: its
+ * sage stripe (`base`, the icon's most common green), the darker green of
+ * its outline (`dark`), a lighter tint of the sage for a gradient's top, and
+ * a deep green for text and ticks on it (readable on the sage) */
+export const ROCKD_GREEN = {
+  light: "#a9c6ae",
+  base: "#93b398",
+  dark: "#759a7b",
+  ink: "#23402a",
+};
+
+/** StraboSpot's logo, beside its link button and its links in the page */
+export const STRABOSPOT_LOGO_URL =
+  "https://strabospot.org/includes/mimages/pic01.jpg";
+
 export interface StrabospotLoginResponse {
   access_token: string;
   refresh_token: string;

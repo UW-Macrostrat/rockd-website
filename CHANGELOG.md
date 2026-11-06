@@ -151,6 +151,16 @@
   reports it (`localStorage` `strabospot-synced-at`); a later `updated` means
   an edit. Both are the server's times, so the browser's clock doesn't
   matter. Needs the Rockd API's checkins GET to return `updated`.
+- The "Checkins sent to StraboSpot" dialog is Blueprint's own dialog, so it
+  follows the light and dark theme like the site's other dialogs: the Rockd
+  icon in its header, the count and a summary, photo failures and failed
+  checkins as warning and danger callouts, and a "Next step" card with
+  StraboSpot's logo beside "Open my field data". The logo's URL is shared
+  (`STRABOSPOT_LOGO_URL`) with the page's Link to StraboSpot control.
+- On `/dev/strabospot`, the Linked button, the cards' ✓ and a selected
+  card's outline use the Rockd icon's green (`ROCKD_GREEN`: its sage
+  `#93b398`, with the icon's darker outline green `#759a7b` as the border and
+  a deep green for the text and tick) instead of a bright green.
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
   under the header "Rockd › Checkin": Back at the top left (the page before,
