@@ -56,6 +56,15 @@ async function parseJsonResponse(res: Response) {
   }
 }
 
+/** A failed response's message, readable: the API's `detail` or `message`
+ * when it gives one, otherwise the body as it came */
+function errorMessage(body: any): string {
+  if (typeof body === "string") return body;
+  if (typeof body?.detail === "string") return body.detail;
+  if (typeof body?.message === "string") return body.message;
+  return JSON.stringify(body, null, 2);
+}
+
 function saveStoredStrabospotAuth(auth: StoredStrabospotAuth) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(auth));
 }
@@ -67,10 +76,7 @@ export async function refreshStrabospotToken(refreshToken: string) {
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
   const body = await parseJsonResponse(res);
-  if (!res.ok)
-    throw new Error(
-      typeof body === "string" ? body : JSON.stringify(body, null, 2)
-    );
+  if (!res.ok) throw new Error(errorMessage(body));
   return body as StrabospotRefreshResponse;
 }
 
@@ -89,10 +95,7 @@ export async function ensureRockdIntegrationResources(
     },
   });
   const body = await parseJsonResponse(res);
-  if (!res.ok)
-    throw new Error(
-      typeof body === "string" ? body : JSON.stringify(body, null, 2)
-    );
+  if (!res.ok) throw new Error(errorMessage(body));
 
   const updatedAuth: StoredStrabospotAuth = {
     ...auth,
@@ -111,10 +114,7 @@ export async function loginToStrabospotWithUUID(uuid: string) {
     headers: { Accept: "*/*" },
   });
   const body = await parseJsonResponse(res);
-  if (!res.ok)
-    throw new Error(
-      typeof body === "string" ? body : JSON.stringify(body, null, 2)
-    );
+  if (!res.ok) throw new Error(errorMessage(body));
   return body as StrabospotLoginResponse;
 }
 
@@ -257,13 +257,17 @@ export async function resyncStrabospotPhotos(
     }),
   });
   const body = await parseJsonResponse(res);
-  if (!res.ok)
-    throw new Error(
-      typeof body === "string" ? body : JSON.stringify(body, null, 2)
-    );
+  if (!res.ok) throw new Error(errorMessage(body));
   return body as PhotoResyncResult;
 }
 
+/**
+ * Refreshes the stored StraboSpot login on a page load. The "Rockd
+ * Integration" project and "Rockd Checkins" dataset are set up only when
+ * linking (`loginAndRefreshStrabospotFromUUID`), not here, so a load costs
+ * StraboSpot one request: if they're deleted in StraboSpot, unlink and link
+ * again (or log out and back in) to recreate them.
+ */
 export async function refreshStoredStrabospotAuth(): Promise<boolean> {
   const auth = getStoredStrabospotAuth();
   if (auth == null || auth.refreshToken == null) return false;
@@ -310,9 +314,6 @@ export async function sendCheckinsToStrabospotDataset(
   });
 
   const body = await parseJsonResponse(res);
-  if (!res.ok)
-    throw new Error(
-      typeof body === "string" ? body : JSON.stringify(body, null, 2)
-    );
+  if (!res.ok) throw new Error(errorMessage(body));
   return body;
 }

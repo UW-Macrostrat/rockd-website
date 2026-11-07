@@ -164,6 +164,15 @@
   `#93b398`, with the icon's darker outline green `#759a7b` as the border and
   a deep green for the text and tick) instead of a bright green. The Linked /
   Link to StraboSpot button has 4px corners, like the logo beside it.
+- `/dev/strabospot` sets up its StraboSpot "Rockd Integration" project and
+  "Rockd Checkins" dataset only when linking (a page load just refreshes the
+  login, one request to StraboSpot). If they're deleted in StraboSpot,
+  unlinking and linking again (or logging out of Rockd and back in, then
+  linking) recreates them. A failed link shows why on the page ("Couldn't link
+  to StraboSpot", with the API's message) instead of only in the console. The
+  one-time `?u=` code is removed from the URL whatever happens, so a reload
+  can't retry a spent code, and is sent to StraboSpot once even when React
+  runs the page's effect twice in development.
 
 - The checkin page (`/checkin/{id}`) is rebuilt from the site's components,
   under the header "Rockd › Checkin": Back at the top left (the page before,

@@ -1,5 +1,5 @@
 import h from "@macrostrat/hyper";
-import { Button } from "@blueprintjs/core";
+import { Button, Callout } from "@blueprintjs/core";
 import { CheckinMapPage } from "~/components/map-sidebar";
 import { useEffect, useState } from "react";
 import { FeatureDetails } from "./featured-checkins";
@@ -111,6 +111,22 @@ function StrabospotLinkControl({
   ]);
 }
 
+// One link request per code, shared by every caller: StraboSpot honours a
+// code once, so a second request with it would fail
+const linkRequests = new Map<
+  string,
+  ReturnType<typeof loginAndRefreshStrabospotFromUUID>
+>();
+
+function linkWithCode(code: string) {
+  let request = linkRequests.get(code);
+  if (request == null) {
+    request = loginAndRefreshStrabospotFromUUID(code);
+    linkRequests.set(code, request);
+  }
+  return request;
+}
+
 /** The signed-in user's checkins, on the map and listed beside it, for sending
  * to StraboSpot */
 export function Page() {
@@ -119,13 +135,25 @@ export function Page() {
     useState(true);
   const rockdPersonId = useRequiredRockdPersonId();
 
+  const [linkError, setLinkError] = useState<string | null>(null);
+  // StraboSpot's one-time `?u=` code, read once when the page mounts (the
+  // effect below may run twice in development, and the URL loses it)
+  const [linkCode] = useState(() =>
+    new URLSearchParams(window.location.search).get("u")
+  );
+
   useEffect(() => {
     let cancelled = false;
     async function checkStrabospotSync() {
+      // The code works once: drop it from the URL whatever happens, so a
+      // reload doesn't retry a spent code
+      if (linkCode != null) {
+        const cleanURL = `${window.location.origin}${window.location.pathname}`;
+        window.history.replaceState({}, "", cleanURL);
+      }
       try {
-        const uuid = new URLSearchParams(window.location.search).get("u");
-        if (uuid != null) {
-          const auth = await loginAndRefreshStrabospotFromUUID(uuid);
+        if (linkCode != null) {
+          const auth = await linkWithCode(linkCode);
           if (cancelled) return;
 
           const isFullyLinked =
@@ -135,22 +163,17 @@ export function Page() {
             auth.projectId != null;
 
           setIsStrabospotSynced(isFullyLinked);
-
-          const cleanURL = `${window.location.origin}${window.location.pathname}`;
-          window.history.replaceState({}, "", cleanURL);
-
           return;
         }
+        // A load only refreshes the login; setup runs when linking
         const ok = await refreshStoredStrabospotAuth();
         if (cancelled) return;
         setIsStrabospotSynced(ok);
       } catch (err: any) {
         console.error("Failed to complete StraboSpot login:", err);
-        console.error("Message:", err?.message);
-
         if (cancelled) return;
-
         setIsStrabospotSynced(false);
+        setLinkError(err?.message ?? "Couldn't link to StraboSpot.");
       } finally {
         if (!cancelled) {
           setIsCheckingStrabospotSync(false);
@@ -164,6 +187,7 @@ export function Page() {
   }, []);
 
   function handleToggleStrabospotSync() {
+    setLinkError(null);
     if (isStrabospotSynced) {
       clearStoredStrabospotAuth();
       setIsStrabospotSynced(false);
@@ -184,10 +208,25 @@ export function Page() {
       isChecking: isCheckingStrabospotSync,
       onToggle: handleToggleStrabospotSync,
     }),
-    list: h(FeatureDetails, {
-      isStrabospotSynced,
-      personId: rockdPersonId,
-    }),
+    list: h([
+      // Why linking didn't work, rather than a button that just stays unlinked
+      h.if(linkError != null)(
+        Callout,
+        {
+          key: "link-error",
+          intent: "danger",
+          icon: "error",
+          title: "Couldn't link to StraboSpot",
+          style: { marginBottom: "0.5rem", wordBreak: "break-word" },
+        },
+        linkError
+      ),
+      h(FeatureDetails, {
+        key: "list",
+        isStrabospotSynced,
+        personId: rockdPersonId,
+      }),
+    ]),
   });
 }
 
