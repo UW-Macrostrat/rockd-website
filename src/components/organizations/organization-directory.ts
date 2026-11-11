@@ -132,7 +132,6 @@ function OrganizationCard({
           h("h2.organization-title", organization.name),
           accent,
         ]),
-        h("span.organization-slug", `@${organization.slug}`),
       ]),
     ]),
     description,
