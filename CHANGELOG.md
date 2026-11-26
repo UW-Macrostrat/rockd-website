@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **An organization has a page** (`/orgs/:id`, by id or slug), opened by
+  clicking its card in the directory: its details and summary numbers, its
+  roster, a link to its checkins, and a **Join** button. Joining files a
+  request — an admin approves it; nobody joins by their own action. Admins see
+  pending requests on the roster with Approve and Deny.
+- **`/profile`**: a read-only account summary (name, email, affiliation,
+  ORCID, profile visibility, member since), the organizations you belong to,
+  and every join request waiting on you across the organizations you
+  administer, each with Approve and Deny. Linked from the header dropdown.
+- The invitation role is gone. An organization membership is now `requested`,
+  `member` or `admin`; there is no way to invite someone, only to approve the
+  people who ask. **Needs the `org_role` enum migration.**
+- The Orgs feed takes `?org_id=` to narrow to one organization, which is how
+  an organization's page links to its checkins. Without it the tab still shows
+  every organization at once.
 - Checkin feeds load one request per window, from `/protected/checkins`'s new
   `?limit=`/`?offset=`, replacing the fan-out of parallel `?page=N` requests
   the route's fixed five-row page used to force. A 47-row scroll at the default

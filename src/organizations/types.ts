@@ -1,4 +1,17 @@
-export type OrganizationRole = "requested" | "invited" | "member" | "admin";
+/** There is no invitation flow: someone asks to join ("requested") and an
+ * admin approves them into "member". Ordered as the database enum is, because
+ * the API compares roles with `>= 'member'` to mean "actually in the org". */
+export type OrganizationRole = "requested" | "member" | "admin";
+
+/** Someone on an organization's roster. A "requested" row is only visible to
+ * that organization's admins. */
+export interface OrganizationMember {
+  person_id: number;
+  first_name: string | null;
+  last_name: string | null;
+  role: OrganizationRole;
+  date_added: string;
+}
 
 export interface Organization {
   id: number;
@@ -24,7 +37,9 @@ export interface OrganizationSummary extends Organization {
   last_checkin: string | null;
 }
 
-export interface OrganizationDetail extends Organization {
+/** One organization's page: the directory's summary numbers plus the caller's
+ * own standing in it, which is null when they have no row at all. */
+export interface OrganizationDetail extends OrganizationSummary {
   role: OrganizationRole | null;
 }
 

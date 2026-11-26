@@ -183,11 +183,21 @@ function MineFeed() {
  * the signed-out version of the feed and then have it replaced. */
 function OrgsFeed() {
   const auth = useStoredAuth();
+  const orgId = useAtomValue(orgIdAtom);
 
   if (!auth.checked) return h(Spinner, { className: "feed-spinner" });
 
-  return h(Feed, { feedType: "orgs", token: auth.token });
+  return h(Feed, { feedType: "orgs", token: auth.token, orgId });
 }
+
+/** `?org_id=` narrows the feed to one organization — how an organization's own
+ * page links to its checkins. Absent means every organization at once, which
+ * is what the tab itself shows. */
+const orgIdAtom = atom((get): number | "all" => {
+  const raw = get(locationAtom).searchParams?.get("org_id");
+  if (raw == null || !/^\d+$/.test(raw)) return "all";
+  return parseInt(raw, 10);
+});
 
 /** The Rockd JWT + person the login flow leaves in `localStorage`. */
 function useStoredAuth() {
@@ -206,6 +216,8 @@ interface FeedProps {
   center?: Center | null;
   personId?: number | null;
   token?: string | null;
+  /** `orgs`: one organization, or every one the visitor can see. */
+  orgId?: number | "all";
   /** A page-level row above the feed (the nearby map), as wide as the cards.
    * Rendered whether or not the feed itself can load. */
   aside?: ReactNode;
@@ -218,6 +230,7 @@ function Feed({
   center = null,
   personId = null,
   token = null,
+  orgId = "all",
   aside = null,
   placeholder = null,
 }: FeedProps) {
@@ -246,7 +259,7 @@ function Feed({
       FeedAsideContext.Provider,
       { value: aside },
       h(CheckinFeedPanel, {
-        feed: { feedType, center, personId, token },
+        feed: { feedType, center, personId, token, orgId },
         scrollBody,
         contentFooter: h(FeedFooter),
         // The feed is the page, so a search is a link

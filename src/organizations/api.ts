@@ -4,7 +4,9 @@ import type {
   CreateOrganizationInput,
   Organization,
   OrganizationDetail,
+  OrganizationMember,
   OrganizationMembership,
+  OrganizationRole,
   OrganizationSummary,
   UpdateOrganizationInput,
 } from "./types";
@@ -115,6 +117,73 @@ export function createOrganization(
   return post<Organization, CreateOrganizationInput>(
     "/protected/orgs",
     input,
+    token,
+    options
+  );
+}
+
+/** An organization's roster. Pass a token: an admin's request also returns the
+ * people who have asked to join, and members whose Rockd profile is private. */
+export function listOrganizationMembers(
+  id: number | string,
+  options: RequestOptions = {}
+): Promise<OrganizationMember[]> {
+  return get<OrganizationMember[]>(
+    `/orgs/${encodeURIComponent(id)}/members`,
+    options
+  );
+}
+
+/** Ask to join. The row lands in "requested" and waits for an admin; nobody
+ * joins by their own action. Harmless to call twice. */
+export function requestMembership(
+  id: number | string,
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<{ org_id: number; role: OrganizationRole }> {
+  return post(`/protected/orgs/${encodeURIComponent(id)}/membership`, {}, token, options);
+}
+
+/** Leave, or withdraw a request that hasn't been approved. Refused for an
+ * organization's last admin. */
+export function leaveOrganization(
+  id: number | string,
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<unknown> {
+  return del(
+    `/protected/orgs/${encodeURIComponent(id)}/membership`,
+    token,
+    options
+  );
+}
+
+/** Admins only. Approving a request is `member`; `admin` promotes. */
+export function setMemberRole(
+  id: number | string,
+  personId: number,
+  role: "member" | "admin",
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<OrganizationMember> {
+  return post(
+    `/protected/orgs/${encodeURIComponent(id)}/members`,
+    { person_id: personId, role },
+    token,
+    options
+  );
+}
+
+/** Admins only. Removes the row — which is how a request is denied, and how a
+ * member is taken off the roster. */
+export function removeMember(
+  id: number | string,
+  personId: number,
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<unknown> {
+  return del(
+    `/protected/orgs/${encodeURIComponent(id)}/members/${personId}`,
     token,
     options
   );

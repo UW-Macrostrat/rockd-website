@@ -120,13 +120,9 @@ function OrganizationCard({
     description = h("p.organization-description", organization.description);
   }
 
-  let visibility = h(Tag, { minimal: true }, "Members-only checkins");
+  let visibility = h(Tag, { minimal: true }, "Private");
   if (organization.public) {
-    visibility = h(
-      Tag,
-      { intent: "success", minimal: true },
-      "Public checkins allowed"
-    );
+    visibility = h(Tag, { intent: "success", minimal: true }, "Public");
   }
 
   let website = null;
@@ -176,22 +172,21 @@ function OrganizationCard({
     ]);
   }
 
-  let adminActions = null;
+  // Sits in the card's top-right corner rather than in the flow, so it never
+  // pushes the card's own content around. Icon only: a corner control has no
+  // room for a label, and the confirmation it opens spells out what happens.
+  let deleteButton = null;
   if (isAdmin) {
-    adminActions = h(
-      "div.card-admin-actions",
-      h(
-        Button,
-        {
-          icon: "trash",
-          intent: "danger",
-          minimal: true,
-          small: true,
-          onClick: () => onDelete(organization),
-        },
-        "Delete"
-      )
-    );
+    deleteButton = h(Button, {
+      className: "card-delete",
+      icon: "trash",
+      intent: "danger",
+      minimal: true,
+      small: true,
+      title: `Delete ${organization.name}`,
+      "aria-label": `Delete ${organization.name}`,
+      onClick: () => onDelete(organization),
+    });
   }
 
   let accent = null;
@@ -205,18 +200,29 @@ function OrganizationCard({
     });
   }
 
-  return h(Card, { className: "organization-card" }, [
-    h("div.card-heading", [
-      h(OrganizationLogo, { organization }),
-      h("div.card-title", [
-        h("div.organization-title-row", [
-          h("h2.organization-title", organization.name),
-          accent,
+  // The card opens the organization's page. Only the heading and description
+  // are inside the link: the meta row holds a link of its own (the website),
+  // and the corner's delete control is a button — neither may nest inside an
+  // anchor. `has-corner-action` reserves room beside the title so a long name
+  // wraps before it reaches the button.
+  let className = "organization-card";
+  if (deleteButton != null) className += " has-corner-action";
+
+  return h(Card, { className }, [
+    deleteButton,
+    h("a.organization-card-link", { href: `/orgs/${organization.id}` }, [
+      h("div.card-heading", [
+        h(OrganizationLogo, { organization }),
+        h("div.card-title", [
+          h("div.organization-title-row", [
+            h("h2.organization-title", organization.name),
+            accent,
+          ]),
+          h("span.organization-slug", `@${organization.slug}`),
         ]),
-        h("span.organization-slug", `@${organization.slug}`),
       ]),
+      description,
     ]),
-    description,
     h("div.organization-meta", [
       h("span.member-count", [
         h(Icon, { icon: "person", size: 14, "aria-hidden": true }),
@@ -227,7 +233,6 @@ function OrganizationCard({
       visibility,
       website,
     ]),
-    adminActions,
   ]);
 }
 
@@ -273,10 +278,7 @@ function filterOrganizations(
 /** The directory's delete flow: which organization is awaiting confirmation,
  * whether the request is in flight, and what came back if it failed. Kept out
  * of the component so the page body stays a list of named pieces. */
-function useOrganizationDeletion(
-  token: string | null,
-  onDeleted: () => void
-) {
+function useOrganizationDeletion(token: string | null, onDeleted: () => void) {
   const [target, setTarget] = useState<OrganizationSummary | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -467,8 +469,8 @@ export function OrganizationDirectory() {
               },
               options: [
                 { value: "all", label: "All organizations" },
-                { value: "public", label: "Public checkins allowed" },
-                { value: "members", label: "Members-only checkins" },
+                { value: "public", label: "Public" },
+                { value: "members", label: "Private" },
               ],
             }),
           ]),

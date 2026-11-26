@@ -144,17 +144,30 @@ function SignedInPanel({
     window.location.reload();
   }
 
+  // The name and email are the way to your profile — clicking the person at
+  // the top of the panel opens /profile, which is also where join requests
+  // waiting on you show up.
   return h("div.user-panel", [
-    h("div.user-panel-header", [
-      h(Icon, { icon: "user", size: 20 }),
-      h("div.user-panel-identity", [
-        h("div.user-panel-name", displayName(auth)),
-        h.if(auth.person?.email != null)(
-          "div.user-panel-detail",
-          auth.person?.email
-        ),
-      ]),
-    ]),
+    h(
+      "a.user-panel-header.user-panel-profile",
+      { href: "/profile", title: "Your profile" },
+      [
+        h(Icon, { icon: "user", size: 20 }),
+        h("div.user-panel-identity", [
+          h("div.user-panel-name", displayName(auth)),
+          h.if(auth.person?.email != null)(
+            "div.user-panel-detail",
+            auth.person?.email
+          ),
+        ]),
+        h(Icon, {
+          className: "user-panel-chevron",
+          icon: "chevron-right",
+          size: 14,
+          "aria-hidden": true,
+        }),
+      ]
+    ),
     h(Divider),
     h(SiteLinks),
     h(Divider),

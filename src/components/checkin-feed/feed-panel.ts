@@ -85,17 +85,33 @@ export function CheckinFeedPanel({
   className,
   toolbarEnd,
 }: CheckinFeedPanelProps) {
-  const { feedType, center, personId, token, bounds } = feed;
+  const { feedType, center, personId, token, bounds, orgId } = feed;
   const provider = useMemo(
-    () => createCheckinProvider({ feedType, center, personId, token, bounds }),
-    [feedType, center?.lng, center?.lat, personId, token, boundsKey(bounds)]
+    () =>
+      createCheckinProvider({
+        feedType,
+        center,
+        personId,
+        token,
+        bounds,
+        orgId,
+      }),
+    [
+      feedType,
+      center?.lng,
+      center?.lat,
+      personId,
+      token,
+      boundsKey(bounds),
+      orgId,
+    ]
   );
 
   // The panel resets on a view-state change or a `refreshToken` change, not on
   // a provider swap — so the provider's own inputs have to be announced here.
   const refreshToken = `${feedType}:${center?.lng ?? ""},${center?.lat ?? ""}:${
     personId ?? ""
-  }:${boundsKey(bounds)}`;
+  }:${boundsKey(bounds)}:${orgId ?? ""}`;
 
   // A linked view (`?q=…&sort=…`) is applied when the store is created, so the
   // first request is the right one rather than an unfiltered one immediately

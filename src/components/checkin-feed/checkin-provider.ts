@@ -56,6 +56,9 @@ export interface FeedContext {
   token?: string | null;
   /** Limits any feed to a region — the map's visible area, on a map page. */
   bounds?: CheckinBounds | null;
+  /** `orgs`: one organization, or every one the caller can see (the default).
+   * An organization's own page links here with its id. */
+  orgId?: number | "all" | null;
 }
 
 export interface CheckinBounds {
@@ -116,11 +119,12 @@ function feedParams(feed: FeedContext): Record<string, string> {
     if (feed.token != null) params.token = feed.token;
   }
   if (feed.feedType === "orgs") {
-    // Every organization at once. The route applies the same rule per org:
-    // a member sees everything shared with an org they belong to, and everyone
-    // else — signed out included — sees only that org's public checkins.
-    // Checkins shared with no organization drop out entirely.
-    params.org_id = "all";
+    // One organization, or every one at once. Either way the route applies
+    // the same rule per org: a member sees everything shared with an org they
+    // belong to, and everyone else — signed out included — sees only that
+    // org's public checkins. Checkins shared with no organization drop out
+    // entirely.
+    params.org_id = String(feed.orgId ?? "all");
     if (feed.token != null) params.token = feed.token;
   }
   if (feed.bounds != null) {
