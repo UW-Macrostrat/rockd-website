@@ -38,8 +38,9 @@ import { personFacet, SEMANTIC_FACETS } from "./semantic/facets";
 import { columnSpec, tableFilters, urlBindings } from "./view-config";
 import h from "./feed-panel.module.sass";
 
-/** Rows per window, by default. Each window costs `pageSize / 5` requests,
- * since the API pages by fives — so this trades requests for scrolling feel. */
+/** Rows per window, by default. One request per window whatever this is (the
+ * route takes `?limit=`/`?offset=` directly), so it's purely a question of
+ * scrolling feel. */
 const PAGE_SIZE = 20;
 /** Rows auto-loaded before the footer's "Load more" takes over, whatever the
  * window size. Deliberately few: scrolling forever is how you lose your place,
@@ -65,7 +66,7 @@ export interface CheckinFeedPanelProps {
    * link. For pages whose URL is the list's own. */
   syncURL?: boolean;
   /** Rows per window: the first load, and each one scrolling to the end of the
-   * list asks for. `API_PAGE_SIZE` makes every window a single request. */
+   * list asks for. Each window is one request. */
   pageSize?: number;
   /** For the `DataPanel`, e.g. to set its `--data-panel-content-width` */
   className?: string;

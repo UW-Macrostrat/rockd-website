@@ -79,6 +79,7 @@ const FEEDS: { type: FeedType; label: string; href: string }[] = [
   { type: "all", label: "All", href: "/dev/feed" },
   { type: "nearby", label: "Nearby", href: "/dev/feed/nearby" },
   { type: "mine", label: "Mine", href: "/dev/feed/mine" },
+  { type: "orgs", label: "Orgs", href: "/dev/feed/orgs" },
 ];
 
 /** The nearby feed's center point, held in the URL so the region is linkable.
@@ -117,10 +118,11 @@ export interface FeedPageProps {
 export function FeedPage({ feedType }: FeedPageProps) {
   if (feedType === "nearby") return h(NearbyFeed);
   if (feedType === "mine") return h(MineFeed);
+  if (feedType === "orgs") return h(OrgsFeed);
   return h(Feed, { feedType: "all" });
 }
 
-// ---- The three feeds ----
+// ---- The four feeds ----
 
 function NearbyFeed() {
   const [center, setCenter] = useAtom(centerAtom);
@@ -168,6 +170,23 @@ function MineFeed() {
     token: auth.token,
     placeholder,
   });
+}
+
+/** Checkins shared with an organization, across every organization at once.
+ *
+ * Unlike `mine` this needs no sign-in: a signed-out visitor sees the public
+ * checkins of organizations that allow public checkins, so there is no prompt
+ * — the token just widens what comes back. Signing in adds everything shared
+ * with the organizations you belong to, private checkins included.
+ *
+ * The token is still waited for, so a signed-in visitor doesn't briefly see
+ * the signed-out version of the feed and then have it replaced. */
+function OrgsFeed() {
+  const auth = useStoredAuth();
+
+  if (!auth.checked) return h(Spinner, { className: "feed-spinner" });
+
+  return h(Feed, { feedType: "orgs", token: auth.token });
 }
 
 /** The Rockd JWT + person the login flow leaves in `localStorage`. */

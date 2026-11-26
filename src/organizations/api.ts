@@ -71,6 +71,19 @@ async function post<T, P extends object>(
   return await parseResponse<T>(response);
 }
 
+async function del<T>(
+  path: string,
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<T> {
+  const response = await fetch(apiURL(path, token), {
+    method: "DELETE",
+    signal: options.signal,
+    headers: { Accept: "application/json" },
+  });
+  return await parseResponse<T>(response);
+}
+
 export function listOrganizations(
   options: Pick<RequestOptions, "signal"> = {}
 ): Promise<OrganizationSummary[]> {
@@ -102,6 +115,20 @@ export function createOrganization(
   return post<Organization, CreateOrganizationInput>(
     "/protected/orgs",
     input,
+    token,
+    options
+  );
+}
+
+/** Admins only. The organization's checkins are unassigned and its memberships
+ * dropped; the checkins themselves stay in their authors' accounts. */
+export function deleteOrganization(
+  id: number | string,
+  token: string,
+  options: Pick<RequestOptions, "signal"> = {}
+): Promise<Organization> {
+  return del<Organization>(
+    `/protected/orgs/${encodeURIComponent(id)}`,
     token,
     options
   );

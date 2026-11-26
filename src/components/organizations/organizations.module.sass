@@ -115,10 +115,18 @@
   gap: 0.6em 0.9em
   font-size: 0.9em
 
-.member-count, .organization-website
+.member-count, .checkin-count, .last-checkin, .organization-website
   display: inline-flex
   align-items: center
   gap: 0.35em
+
+.last-checkin
+  color: var(--text-subtle-color)
+
+// Admin-only controls, pushed to the card's bottom-right corner
+.card-admin-actions
+  display: flex
+  justify-content: flex-end
 
 .directory-state
   display: flex

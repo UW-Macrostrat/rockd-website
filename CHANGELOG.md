@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- Checkin feeds load one request per window, from `/protected/checkins`'s new
+  `?limit=`/`?offset=`, replacing the fan-out of parallel `?page=N` requests
+  the route's fixed five-row page used to force. A 47-row scroll at the default
+  window of 20 went from 12 requests to 3. **Needs the matching Rockd API
+  deploy** — against an API without those parameters the feed stops after the
+  first window.
+- **Orgs feed** (`/dev/feed/orgs`): a fourth tab beside All, Nearby and Mine,
+  showing checkins shared with an organization across every organization at
+  once (`?org_id=all`). Works signed out — public organizations' public
+  checkins — and widens to everything shared with your own organizations once
+  signed in. The Person filter is dropped on this feed, since the API refuses
+  `org_id` and `person_id` together.
+- Checkin cards carry the organization a checkin was shared with, as a tag
+  beside the rating, from the `org_name` the feed response now returns.
+- `/orgs` cards show a checkin count and the date of the most recent checkin
+  alongside the member count, and the directory can sort by either. An admin
+  gets a Delete control on their own organizations, behind a confirmation that
+  spells out that the checkins are unassigned rather than deleted.
+- `/orgs/new` has a "Checkin visibility" switch, so an organization can be
+  created public instead of being created private and then edited.
 - `/dev` lists every page in the development section (behind its dev guard),
   each by title with its URL, found from the `+Page` files under `pages/dev`
   so new pages appear on their own. The Development breadcrumb now leads there.

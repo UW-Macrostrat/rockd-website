@@ -5,6 +5,7 @@ import {
   Callout,
   FormGroup,
   InputGroup,
+  Switch,
   TextArea,
 } from "@blueprintjs/core";
 import hyper from "@macrostrat/hyper";
@@ -36,6 +37,7 @@ const initialValues: OrganizationFormValues = {
   url: "",
   logoURL: "",
   color: "",
+  isPublic: false,
 };
 
 interface OrganizationFormProps {
@@ -117,6 +119,10 @@ export function OrganizationForm({
   function setValue(field: keyof OrganizationFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function setPublic(isPublic: boolean) {
+    setValues((current) => ({ ...current, isPublic }));
   }
 
   function updateName(name: string) {
@@ -219,6 +225,22 @@ export function OrganizationForm({
           disabled: submitting,
           onChange: (event) =>
             setValue("description", event.currentTarget.value),
+        }),
+      }),
+      h(FormGroup, {
+        label: "Checkin visibility",
+        helperText:
+          "Off by default: everything shared with the organization stays " +
+          "visible to its members only. Turning it on lets a checkin be " +
+          "public — but only when the checkin and its author's account are " +
+          "public too, so a private checkin is never exposed. Admins can " +
+          "change this later.",
+        children: h(Switch, {
+          checked: values.isPublic,
+          disabled: submitting,
+          label: "Allow public checkins",
+          onChange: (event: ChangeEvent<HTMLInputElement>) =>
+            setPublic(event.currentTarget.checked),
         }),
       }),
       h("div.form-row", [
