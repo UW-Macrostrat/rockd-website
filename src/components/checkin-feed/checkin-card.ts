@@ -10,7 +10,7 @@
  * it's the candidate to promote back into the library (converging with that
  * component and `CheckinListing`, which already carries a TODO to dedupe).
  */
-import { AnchorButton, Icon } from "@blueprintjs/core";
+import { AnchorButton, Icon, Tag } from "@blueprintjs/core";
 import {
   createDataCard,
   type ItemComponentProps,
@@ -42,7 +42,7 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
     h(
       "a.checkin-card-link",
       { href: `/checkin/${data.checkin_id}` },
-      checkinSummary(data)
+      checkinSummary(data, organizationBadge(data))
     ),
     h("div.card-actions", [
       h(
@@ -63,6 +63,15 @@ function CheckinCardContent({ data }: ItemComponentProps<Checkin>) {
       ),
     ]),
   ]);
+}
+
+/** Which organization a checkin was shared with, when it was shared with one.
+ * The feed response carries `org_name` beside `org_id`, so this needs no
+ * lookup of its own. Most checkins belong to no organization and get nothing.
+ */
+function organizationBadge(data: Checkin) {
+  if (data.org_name == null) return null;
+  return h(Tag, { key: "org", minimal: true, icon: "people" }, data.org_name);
 }
 
 export const CheckinCard = createDataCard<Checkin>(CheckinCardContent, {

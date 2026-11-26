@@ -51,10 +51,39 @@
   gap: 1em
 
 .organization-card
+  position: relative
   display: flex
   flex-direction: column
   gap: 1em
   min-height: 13em
+
+// The admin's delete control, in the card's top-right corner. Taken out of
+// the flow so it can't shift the card's content; the title row is padded to
+// match, so a long name wraps instead of running underneath it.
+.card-delete
+  position: absolute
+  top: 0.5em
+  right: 0.5em
+  z-index: 1
+
+.has-corner-action .organization-title-row
+  padding-right: 2em
+
+// The clickable part of a card: heading and description, as a column that
+// fills the card so the meta row stays pinned to the bottom
+.organization-card-link
+  display: flex
+  flex: 1
+  flex-direction: column
+  gap: 1em
+  color: inherit
+  text-decoration: none
+
+  &:hover, &:focus-visible
+    color: inherit
+
+    .organization-title
+      text-decoration: underline
 
 .card-heading
   display: flex
@@ -115,10 +144,13 @@
   gap: 0.6em 0.9em
   font-size: 0.9em
 
-.member-count, .organization-website
+.member-count, .checkin-count, .last-checkin, .organization-website
   display: inline-flex
   align-items: center
   gap: 0.35em
+
+.last-checkin
+  color: var(--text-subtle-color)
 
 .directory-state
   display: flex
@@ -193,3 +225,108 @@
   .form-row
     flex-direction: column
     gap: 0
+
+// ---- One organization's page (/orgs/:id) ----
+
+.organization-main
+  width: min(52em, 100%)
+  padding-bottom: 2em
+
+.organization-back
+  margin-bottom: 0.5em
+
+.organization-header
+  margin-bottom: 1.25em
+
+  .organization-title
+    font-size: 1.8em
+
+.organization-lede
+  margin: 0.75em 0 0
+  color: var(--text-subtle-color)
+  overflow-wrap: anywhere
+
+.membership-panel
+  display: flex
+  flex-direction: column
+  gap: 0.75em
+  margin-bottom: 1.5em
+
+.membership-row
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: 0.75em
+
+.membership-note
+  color: var(--text-subtle-color)
+  font-size: 0.9em
+
+.organization-facts
+  display: flex
+  flex-direction: column
+  gap: 1em
+  align-items: flex-start
+  padding: 1em
+  margin-bottom: 1.5em
+  border: 1px solid var(--card-shadow-color)
+  border-radius: 4px
+  background: var(--panel-background-color)
+
+.fact-row
+  display: flex
+  flex-wrap: wrap
+  gap: 2em
+
+.fact
+  display: flex
+  flex-direction: column
+
+.fact-value
+  font-size: 1.4em
+  font-weight: 600
+
+.fact-label
+  color: var(--text-subtle-color)
+  font-size: 0.85em
+
+.roster-section
+  margin-bottom: 1.5em
+
+.section-title
+  margin: 0 0 0.6em
+  font-size: 1.1em
+
+.member-list
+  display: flex
+  flex-direction: column
+  gap: 0.4em
+  padding: 0
+  margin: 0
+  list-style: none
+
+.member-row
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: 0.6em
+  padding: 0.5em 0.75em
+  border: 1px solid var(--card-shadow-color)
+  border-radius: 4px
+
+.member-name
+  font-weight: 600
+  overflow-wrap: anywhere
+
+.member-asked
+  color: var(--text-subtle-color)
+  font-size: 0.85em
+
+// Pending requests stand out from the settled roster
+.request-row
+  background: var(--panel-background-color)
+
+.request-actions
+  display: flex
+  gap: 0.4em
+  margin-left: auto

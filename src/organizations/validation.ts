@@ -7,6 +7,9 @@ export interface OrganizationFormValues {
   url: string;
   logoURL: string;
   color: string;
+  /** Whether the organization allows public checkins. Off is the safe default
+   * and matches what the API does with no `public` in the body. */
+  isPublic: boolean;
 }
 
 export type OrganizationFormErrors = Partial<
@@ -94,5 +97,6 @@ export function createInputFromValues(
     url: safeExternalURL(values.url),
     logo_url: safeExternalURL(values.logoURL, { httpsOnly: true }),
     color: safeOrganizationColor(values.color),
+    public: values.isPublic,
   };
 }

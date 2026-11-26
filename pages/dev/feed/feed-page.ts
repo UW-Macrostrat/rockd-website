@@ -79,6 +79,7 @@ const FEEDS: { type: FeedType; label: string; href: string }[] = [
   { type: "all", label: "All", href: "/dev/feed" },
   { type: "nearby", label: "Nearby", href: "/dev/feed/nearby" },
   { type: "mine", label: "Mine", href: "/dev/feed/mine" },
+  { type: "orgs", label: "Orgs", href: "/dev/feed/orgs" },
 ];
 
 /** The nearby feed's center point, held in the URL so the region is linkable.
@@ -117,10 +118,11 @@ export interface FeedPageProps {
 export function FeedPage({ feedType }: FeedPageProps) {
   if (feedType === "nearby") return h(NearbyFeed);
   if (feedType === "mine") return h(MineFeed);
+  if (feedType === "orgs") return h(OrgsFeed);
   return h(Feed, { feedType: "all" });
 }
 
-// ---- The three feeds ----
+// ---- The four feeds ----
 
 function NearbyFeed() {
   const [center, setCenter] = useAtom(centerAtom);
@@ -170,6 +172,33 @@ function MineFeed() {
   });
 }
 
+/** Checkins shared with an organization, across every organization at once.
+ *
+ * Unlike `mine` this needs no sign-in: a signed-out visitor sees the public
+ * checkins of organizations that allow public checkins, so there is no prompt
+ * — the token just widens what comes back. Signing in adds everything shared
+ * with the organizations you belong to, private checkins included.
+ *
+ * The token is still waited for, so a signed-in visitor doesn't briefly see
+ * the signed-out version of the feed and then have it replaced. */
+function OrgsFeed() {
+  const auth = useStoredAuth();
+  const orgId = useAtomValue(orgIdAtom);
+
+  if (!auth.checked) return h(Spinner, { className: "feed-spinner" });
+
+  return h(Feed, { feedType: "orgs", token: auth.token, orgId });
+}
+
+/** `?org_id=` narrows the feed to one organization — how an organization's own
+ * page links to its checkins. Absent means every organization at once, which
+ * is what the tab itself shows. */
+const orgIdAtom = atom((get): number | "all" => {
+  const raw = get(locationAtom).searchParams?.get("org_id");
+  if (raw == null || !/^\d+$/.test(raw)) return "all";
+  return parseInt(raw, 10);
+});
+
 /** The Rockd JWT + person the login flow leaves in `localStorage`. */
 function useStoredAuth() {
   const { checked, auth } = useStoredRockdAuth();
@@ -187,6 +216,8 @@ interface FeedProps {
   center?: Center | null;
   personId?: number | null;
   token?: string | null;
+  /** `orgs`: one organization, or every one the visitor can see. */
+  orgId?: number | "all";
   /** A page-level row above the feed (the nearby map), as wide as the cards.
    * Rendered whether or not the feed itself can load. */
   aside?: ReactNode;
@@ -199,6 +230,7 @@ function Feed({
   center = null,
   personId = null,
   token = null,
+  orgId = "all",
   aside = null,
   placeholder = null,
 }: FeedProps) {
@@ -227,7 +259,7 @@ function Feed({
       FeedAsideContext.Provider,
       { value: aside },
       h(CheckinFeedPanel, {
-        feed: { feedType, center, personId, token },
+        feed: { feedType, center, personId, token, orgId },
         scrollBody,
         contentFooter: h(FeedFooter),
         // The feed is the page, so a search is a link
